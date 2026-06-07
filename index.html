@@ -825,6 +825,68 @@
         .wa-float i { font-size: 1.3rem; }
         @keyframes waBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
 
+        /* DASHBOARD & RSVP SECTIONS */
+        .platform-section { padding: 90px 0; background: var(--cream); }
+        .platform-section.dark { background: var(--cream-dark); border-top: 1px solid var(--sand); border-bottom: 1px solid var(--sand); }
+        .platform-header { text-align: center; margin-bottom: 60px; }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .dash-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px 24px;
+            box-shadow: 0 10px 30px rgba(46,46,46,0.06);
+            border: 1px solid var(--sand);
+            text-align: center;
+            transition: var(--transition);
+        }
+        .dash-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(46,46,46,0.1); border-color: var(--rose-light); }
+        .dash-card.highlight { background: var(--rose-pale); border-color: var(--rose-light); }
+        .dash-num { font-family: var(--serif); font-size: 3rem; font-weight: 400; color: var(--charcoal); line-height: 1; margin-bottom: 8px; }
+        .dash-card.highlight .dash-num { color: var(--rose); font-style: italic; }
+        .dash-label { font-size: 0.8rem; font-weight: 600; color: var(--warm-grey); text-transform: uppercase; letter-spacing: 0.1em; }
+        
+        .rsvp-mockup {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(46,46,46,0.08);
+            border: 1px solid var(--sand);
+            position: relative;
+        }
+        .rsvp-mockup::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 6px;
+            background: linear-gradient(90deg, var(--rose-light), var(--rose), var(--rose-deep));
+            border-radius: 24px 24px 0 0;
+        }
+        .rsvp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; border-bottom: 1px solid var(--sand); padding-bottom: 20px; }
+        .rsvp-name { font-family: var(--serif); font-size: 1.8rem; font-weight: 400; color: var(--charcoal); }
+        .rsvp-status { display: inline-flex; align-items: center; gap: 6px; background: #e6f4ea; color: #137333; font-size: 0.75rem; font-weight: 600; padding: 6px 12px; border-radius: 20px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .rsvp-status i { font-size: 0.8rem; }
+        .rsvp-details { list-style: none; }
+        .rsvp-details li { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 0.95rem; }
+        .rsvp-details span:first-child { color: var(--warm-grey); }
+        .rsvp-details span:last-child { color: var(--charcoal); font-weight: 500; }
+        
+        @media (max-width: 920px) {
+            .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .dash-card { padding: 24px; }
+            .dash-num { font-size: 2.5rem; }
+            .rsvp-mockup { padding: 30px 20px; }
+            .rsvp-name { font-size: 1.5rem; }
+        }
+
         /* ANIMATIONS */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(24px); }
@@ -939,17 +1001,17 @@
                         Invitaciones Digitales &middot; México
                     </div>
                     <h1 class="fade-up delay-2">
-                        Haz que tu evento<br>empiece con algo <em>hermoso</em>
+                        Organiza tu evento desde una <em>sola plataforma</em>
                     </h1>
                     <p class="fade-up delay-3">
-                        En Invitta creamos invitaciones digitales personalizadas para bodas, XV años, bautizos, cumpleaños y más. Con música, RSVP automático, pase QR y el elegante efecto de sobre animado.
+                        Invitaciones digitales premium, confirmaciones automáticas, pases QR y gestión inteligente de invitados.
                     </p>
                     <div class="hero-buttons fade-up delay-4">
-                        <a href="#modelos" class="btn-primary">
-                            <i class="fa-solid fa-envelope-open-text"></i> Ver muestras
+                        <a href="administracion/formulario-cliente.html" class="btn-primary">
+                            <i class="fa-solid fa-file-pen"></i> Solicitar propuesta
                         </a>
-                        <a href="plantillas/vip/index.html" target="_blank" class="btn-outline">
-                            <i class="fa-regular fa-eye"></i> Ver demo VIP
+                        <a href="#modelos" class="btn-outline">
+                            <i class="fa-regular fa-eye"></i> Ver ejemplos
                         </a>
                     </div>
                     <div class="hero-trust fade-up delay-5">
@@ -1027,6 +1089,61 @@
         </div>
     </div>
 
+    <!-- DASHBOARD -->
+    <section class="platform-section reveal">
+        <div class="container">
+            <div class="platform-header">
+                <span class="section-label">Control de Invitados</span>
+                <h2 class="section-title">Conoce exactamente quién asistirá</h2>
+                <div class="divider-floral"><span>✦</span></div>
+                <p class="section-lead" style="margin:0 auto;">Organiza tu evento sin perseguir invitados por WhatsApp. Obtén estadísticas y control en tiempo real.</p>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="dash-card highlight">
+                    <div class="dash-num">118</div>
+                    <div class="dash-label">Invitados Totales</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-num">84</div>
+                    <div class="dash-label">Confirmados</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-num">23</div>
+                    <div class="dash-label">Pendientes</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-num">11</div>
+                    <div class="dash-label">No Asistirán</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RSVP EN TIEMPO REAL -->
+    <section class="platform-section dark reveal">
+        <div class="container">
+            <div class="platform-header">
+                <span class="section-label">RSVP en Tiempo Real</span>
+                <h2 class="section-title">Confirmaciones al <em>instante</em></h2>
+                <div class="divider-floral"><span>✦</span></div>
+                <p class="section-lead" style="margin:0 auto;">Cada invitado confirma fácilmente desde su invitación digital y tu panel se actualiza automáticamente.</p>
+            </div>
+            
+            <div class="rsvp-mockup">
+                <div class="rsvp-header">
+                    <div class="rsvp-name">Juan Pérez</div>
+                    <div class="rsvp-status"><i class="fa-solid fa-check"></i> Confirmado</div>
+                </div>
+                <ul class="rsvp-details">
+                    <li><span>Acompañantes:</span> <span>3</span></li>
+                    <li><span>Mesa:</span> <span>12</span></li>
+                    <li><span>Restricciones alimenticias:</span> <span>Ninguna</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
     <!-- BENEFICIOS -->
     <section class="benefits">
         <div class="container">
@@ -1038,34 +1155,34 @@
             </div>
             <div class="benefits-grid">
                 <div class="benefit-card reveal">
-                    <div class="benefit-icon"><i class="fa-solid fa-envelope-open"></i></div>
-                    <h3>Sobre Digital Animado</h3>
-                    <p>Una experiencia única de apertura: el invitado toca el sello, el sobre se abre y la música empieza a sonar al instante.</p>
-                </div>
-                <div class="benefit-card reveal">
                     <div class="benefit-icon"><i class="fa-brands fa-whatsapp"></i></div>
-                    <h3>RSVP Automático</h3>
-                    <p>Las confirmaciones llegan directo a tu WhatsApp con nombre, número de personas y mesa asignada. Sin formularios complicados.</p>
+                    <h3>Confirmación automática</h3>
+                    <p>Las confirmaciones llegan directo a tu panel y WhatsApp con nombre, número de personas y mesa asignada. Sin formularios complicados.</p>
                 </div>
                 <div class="benefit-card reveal">
                     <div class="benefit-icon"><i class="fa-solid fa-qrcode"></i></div>
-                    <h3>Pase con Código QR</h3>
-                    <p>Cada invitado tiene su pase único con nombre, número de pases y mesa. El QR sirve para control de acceso en la puerta.</p>
+                    <h3>Pases QR personalizados</h3>
+                    <p>Cada invitado recibe un pase único. Agiliza la entrada escaneando el código en puerta para un control exacto y seguro.</p>
                 </div>
                 <div class="benefit-card reveal">
-                    <div class="benefit-icon"><i class="fa-solid fa-music"></i></div>
-                    <h3>Música de Fondo</h3>
-                    <p>Agrega la canción especial de tu evento. El reproductor flotante le permite al invitado pausarla cuando lo desee.</p>
+                    <div class="benefit-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+                    <h3>Invitación digital premium</h3>
+                    <p>Diseños elegantes con animaciones, música de fondo y una experiencia de apertura de sobre que impresionará a tus invitados.</p>
                 </div>
                 <div class="benefit-card reveal">
-                    <div class="benefit-icon"><i class="fa-solid fa-bolt"></i></div>
-                    <h3>Entrega en 24 Horas</h3>
-                    <p>Nuestro proceso optimizado nos permite personalizar y entregar tu invitación completa en menos de un día hábil.</p>
+                    <div class="benefit-icon"><i class="fa-regular fa-calendar-check"></i></div>
+                    <h3>Recordatorios automáticos</h3>
+                    <p>Programa envíos de mensajes SMS o WhatsApp para asegurar que nadie olvide confirmar o asistir a tu evento.</p>
                 </div>
                 <div class="benefit-card reveal">
-                    <div class="benefit-icon"><i class="fa-solid fa-paper-plane"></i></div>
-                    <h3>Envíos Ilimitados</h3>
-                    <p>La invitación es un enlace. Compártela por WhatsApp, redes sociales o email cuantas veces necesites, sin costo extra.</p>
+                    <div class="benefit-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                    <h3>Ubicación integrada</h3>
+                    <p>Mapas interactivos de la ceremonia y recepción enlazados a Google Maps o Waze para que todos lleguen sin perderse.</p>
+                </div>
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fa-regular fa-images"></i></div>
+                    <h3>Galería compartida</h3>
+                    <p>Un espacio donde tú y tus invitados pueden subir fotos y videos del evento, creando un álbum colaborativo inolvidable.</p>
                 </div>
             </div>
         </div>
