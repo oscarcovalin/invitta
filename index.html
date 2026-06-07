@@ -850,25 +850,15 @@
             .pricing-intro { grid-template-columns: 1fr; }
             .pricing-intro-right { justify-content: flex-start; margin-top: -20px; }
             .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
-            .benefits-grid { grid-template-columns: 1fr 1fr; }
+            .benefits-grid { grid-template-columns: 1fr; }
             .how-grid { grid-template-columns: 1fr; }
             .how-grid::before { display: none; }
             .catalog-showcase { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
             .test-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
             .footer-inner { flex-direction: column; gap: 24px; }
-
-            /* Tamaños de fuente mejorados en tablet/móvil */
-            .benefit-card h3 { font-size: 1.5rem; }
-            .benefit-card p { font-size: 1rem; line-height: 1.8; }
-            .section-lead { font-size: 1.05rem; }
-            .test-quote { font-size: 1.15rem; }
-            .how-step h3 { font-size: 1.35rem; }
-            .how-step p { font-size: 1rem; }
-            .catalog-card-desc { font-size: 0.95rem; }
-            .price-card-desc { font-size: 0.95rem; }
-            .price-features li { font-size: 0.95rem; }
         }
         @media (max-width: 600px) {
+            html { font-size: 18px; }
             .nav-links { display: none; }
             .nav-hamburger { display: flex; }
             .benefits-grid { grid-template-columns: 1fr; }
@@ -876,22 +866,28 @@
             .wa-float span { display: none; }
             .wa-float { padding: 16px; border-radius: 50%; }
 
-            /* Fuentes más grandes en móvil pequeño */
-            .benefit-card h3 { font-size: 1.6rem; }
-            .benefit-card p { font-size: 1.05rem; }
-            .test-quote { font-size: 1.15rem; }
-            .test-info strong { font-size: 1rem; }
-            .test-info span { font-size: 0.85rem; }
-            .section-lead { font-size: 1.05rem; }
-            .how-step h3 { font-size: 1.4rem; }
-            .how-step p { font-size: 1rem; }
-            .catalog-card-title { font-size: 1.5rem; }
-            .catalog-card-desc { font-size: 0.98rem; }
-            .catalog-card-tag { font-size: 0.78rem; }
-            .price-features li { font-size: 0.98rem; }
-            .price-card-desc { font-size: 0.98rem; }
-            .demo-btn { font-size: 0.95rem; }
-            .footer-links a { font-size: 0.95rem; }
+            /* Tipografía legible en móvil */
+            body { font-size: 1rem; }
+            .section-lead { font-size: 1rem; max-width: 100%; }
+            .benefit-card { padding: 32px 24px; }
+            .benefit-card h3 { font-size: 1.4rem; margin-bottom: 12px; }
+            .benefit-card p { font-size: 0.95rem; line-height: 1.85; }
+            .test-quote { font-size: 1.05rem; line-height: 1.8; }
+            .test-quote::before { font-size: 1.6rem; }
+            .test-info strong { font-size: 0.95rem; }
+            .test-info span { font-size: 0.82rem; }
+            .how-step h3 { font-size: 1.35rem; }
+            .how-step p { font-size: 0.95rem; line-height: 1.85; }
+            .catalog-card-title { font-size: 1.4rem; }
+            .catalog-card-desc { font-size: 0.92rem; line-height: 1.7; }
+            .catalog-card-tag { font-size: 0.75rem; }
+            .catalog-chip { font-size: 0.72rem; }
+            .price-card-desc { font-size: 0.93rem; }
+            .price-features li { font-size: 0.93rem; line-height: 1.6; }
+            .demo-btn { font-size: 0.93rem; padding: 13px; }
+            .footer-links a { font-size: 0.93rem; }
+            .footer-tagline { font-size: 0.88rem; }
+            .section-label { font-size: 0.72rem; }
         }
     </style>
 </head>
