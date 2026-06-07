@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Invittia</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -146,6 +147,35 @@
             .tl-item { flex-direction: column; gap: 12px; }
             .tl-item::before { display: none; }
         }
+        /* DRAWER LATERAL */
+        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 200; backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.3s; }
+        .drawer-overlay.active { display: block; opacity: 1; }
+        .drawer { position: fixed; top: 0; right: 0; width: 400px; height: 100%; background: var(--bg-color); z-index: 201; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -10px 0 30px rgba(0,0,0,0.1); overflow-y: auto; display: flex; flex-direction: column; }
+        .drawer.active { transform: translateX(0); }
+        .drawer-header { padding: 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg-color); z-index: 10; }
+        .drawer-title { font-family: var(--serif); font-size: 1.4rem; color: var(--text-main); }
+        .drawer-close { background: var(--card-bg); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: background 0.2s; color: var(--text-muted); }
+        .drawer-close:hover { background: #f0f0f0; }
+        .drawer-content { padding: 24px; flex: 1; }
+        .drawer-section { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+        .drawer-section h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 16px; font-weight: 600; }
+        .drawer-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
+        .drawer-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .drawer-lbl { color: var(--text-muted); }
+        .drawer-val { font-weight: 500; color: var(--text-main); text-align: right; }
+        .drawer-qr { text-align: center; margin-top: 10px; }
+        .drawer-qr-id { margin-top: 12px; font-family: monospace; font-size: 1.1rem; letter-spacing: 0.1em; background: #f5f5f5; padding: 8px 16px; border-radius: 8px; display: inline-block; color: var(--text-main); }
+
+        /* ANALÍTICA CHART */
+        .chart-wrapper { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .chart-title { position: absolute; top: 24px; left: 24px; font-size: 1.1rem; font-family: var(--serif); color: var(--text-main); font-weight: 600; }
+        
+        /* TABLA HOVER ROW */
+        table tbody tr { cursor: pointer; transition: background 0.2s; }
+        
+        @media (max-width: 480px) {
+            .drawer { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -207,6 +237,11 @@
                 </div>
             </div>
         </section>
+
+        <div class="chart-wrapper">
+            <div class="chart-title">Distribución de Invitados</div>
+            <canvas id="statsChart"></canvas>
+        </div>
 
         <section class="guest-management">
             <div class="controls">
@@ -313,17 +348,49 @@
         </div>
     </div>
 
+        <!-- DRAWER LATERAL -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+    <div class="drawer" id="guestDrawer">
+        <div class="drawer-header">
+            <h2 class="drawer-title" id="dwName">Nombre del Invitado</h2>
+            <button class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="drawer-content">
+            <div class="drawer-section">
+                <h4>Detalles de Asistencia</h4>
+                <div class="drawer-row"><span class="drawer-lbl">Estado</span><span class="drawer-val" id="dwStatus">Confirmado</span></div>
+                <div class="drawer-row"><span class="drawer-lbl">Mesa asignada</span><span class="drawer-val" id="dwTable">12</span></div>
+                <div class="drawer-row"><span class="drawer-lbl">Acompañantes</span><span class="drawer-val" id="dwCompanions">2</span></div>
+                <div class="drawer-row"><span class="drawer-lbl">Fecha conf.</span><span class="drawer-val" id="dwDate">2026-08-10</span></div>
+            </div>
+            
+            <div class="drawer-section">
+                <h4>Datos de Contacto</h4>
+                <div class="drawer-row"><span class="drawer-lbl">Teléfono</span><span class="drawer-val" id="dwPhone">555-0101</span></div>
+                <div class="drawer-row"><span class="drawer-lbl">Email</span><span class="drawer-val" id="dwEmail">juan@example.com</span></div>
+            </div>
+
+            <div class="drawer-section" style="border: none; background: transparent; padding: 0;">
+                <h4 style="text-align:center;">Identificador Único</h4>
+                <div class="drawer-qr">
+                    <div id="dwQrImg" style="width:160px; height:160px; margin:0 auto; background-size:cover; background-position:center; border: 1px solid var(--border-color); border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08);"></div>
+                    <div class="drawer-qr-id" id="dwQrId">INV-00001</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Simulando Base de Datos (con campos adicionales para el CSV)
+        // Simulando Base de Datos
         const guests = [
-            { id: 1, name: "Juan Pérez", family: "Familia Pérez López", status: "Confirmado", companions: 3, table: 12, email: "juan@example.com", phone: "555-0101", date: "2026-08-10" },
-            { id: 2, name: "María Gómez", family: "Familia Gómez", status: "Pendiente", companions: 1, table: "-", email: "maria@example.com", phone: "555-0102", date: "-" },
-            { id: 3, name: "Carlos Slim", family: "Familia Slim", status: "Confirmado", companions: 4, table: 1, email: "carlos@example.com", phone: "555-0103", date: "2026-08-11" },
-            { id: 4, name: "Ana Martínez", family: "Familia Martínez", status: "No asistirá", companions: 0, table: "-", email: "ana@example.com", phone: "555-0104", date: "2026-08-12" },
-            { id: 5, name: "Roberto Torres", family: "Familia Torres", status: "Confirmado", companions: 2, table: 12, email: "roberto@example.com", phone: "555-0105", date: "2026-08-13" },
-            { id: 6, name: "Laura Sánchez", family: "Familia Sánchez", status: "Pendiente", companions: 2, table: "-", email: "laura@example.com", phone: "555-0106", date: "-" },
-            { id: 7, name: "Diego Fernández", family: "Familia Fernández", status: "Confirmado", companions: 1, table: 5, email: "diego@example.com", phone: "555-0107", date: "2026-08-14" },
-            { id: 8, name: "Sofía Ruiz", family: "Familia Ruiz", status: "Confirmado", companions: 0, table: 5, email: "sofia@example.com", phone: "555-0108", date: "2026-08-15" }
+            { id: 1, qr_id: "INV-00001", name: "Juan Pérez", family: "Familia Pérez López", status: "Confirmado", companions: 3, table: 12, email: "juan@example.com", phone: "555-0101", date: "2026-08-10" },
+            { id: 2, qr_id: "INV-00002", name: "María Gómez", family: "Familia Gómez", status: "Pendiente", companions: 1, table: "-", email: "maria@example.com", phone: "555-0102", date: "-" },
+            { id: 3, qr_id: "INV-00003", name: "Carlos Slim", family: "Familia Slim", status: "Confirmado", companions: 4, table: 1, email: "carlos@example.com", phone: "555-0103", date: "2026-08-11" },
+            { id: 4, qr_id: "INV-00004", name: "Ana Martínez", family: "Familia Martínez", status: "No asistirá", companions: 0, table: "-", email: "ana@example.com", phone: "555-0104", date: "2026-08-12" },
+            { id: 5, qr_id: "INV-00005", name: "Roberto Torres", family: "Familia Torres", status: "Confirmado", companions: 2, table: 12, email: "roberto@example.com", phone: "555-0105", date: "2026-08-13" },
+            { id: 6, qr_id: "INV-00006", name: "Laura Sánchez", family: "Familia Sánchez", status: "Pendiente", companions: 2, table: "-", email: "laura@example.com", phone: "555-0106", date: "-" },
+            { id: 7, qr_id: "INV-00007", name: "Diego Fernández", family: "Familia Fernández", status: "Confirmado", companions: 1, table: 5, email: "diego@example.com", phone: "555-0107", date: "2026-08-14" },
+            { id: 8, qr_id: "INV-00008", name: "Sofía Ruiz", family: "Familia Ruiz", status: "Confirmado", companions: 0, table: 5, email: "sofia@example.com", phone: "555-0108", date: "2026-08-15" }
         ];
 
         const tbody = document.getElementById('tableBody');
@@ -357,6 +424,7 @@
                     const statusIcon = g.status === 'Confirmado' ? 'fa-check' : (g.status === 'Pendiente' ? 'fa-clock' : 'fa-xmark');
                     
                     const row = document.createElement('tr');
+                    row.onclick = () => openDrawer(g);
                     row.innerHTML = `
                         <td>
                             <div class="guest-name">${g.name}</div>
@@ -368,7 +436,7 @@
                         <td>${g.companions}</td>
                         <td>${g.table}</td>
                         <td>
-                            ${g.status === 'Confirmado' ? `<button class="qr-btn" onclick="openQrModal('${g.name}', '${g.table}', ${g.companions})"><i class="fa-solid fa-qrcode"></i> Ver QR</button>` : '<span style="color:#A09A94;font-size:0.85rem;">No disp.</span>'}
+                            ${g.status === 'Confirmado' ? `<button class="qr-btn" onclick="event.stopPropagation(); openQrModal('${g.name}', '${g.table}', ${g.companions}, '${g.qr_id}')"><i class="fa-solid fa-qrcode"></i> Ver QR</button>` : '<span style="color:#A09A94;font-size:0.85rem;">No disp.</span>'}
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -439,18 +507,88 @@
 
         // QR Modal Logic
         const qrModal = document.getElementById('qrModal');
-        function openQrModal(name, table, companions) {
+        function openQrModal(name, table, companions, qr_id) {
             document.getElementById('qrName').textContent = name;
             document.getElementById('qrDetails').innerHTML = `Mesa ${table} &middot; ${companions} Acompañante(s)`;
-            document.getElementById('qrImage').style.backgroundImage = `url('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Invittia_${encodeURIComponent(name)}')`;
+            document.getElementById('qrImage').style.backgroundImage = `url('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${qr_id}')`;
             qrModal.classList.add('active');
         }
         function closeQrModal() {
             qrModal.classList.remove('active');
         }
 
+        // Chart Logic
+        let statsChart;
+        function updateChart() {
+            const conf = guests.filter(g => g.status === 'Confirmado').length;
+            const pend = guests.filter(g => g.status === 'Pendiente').length;
+            const no = guests.filter(g => g.status === 'No asistirá').length;
+
+            if(statsChart) {
+                statsChart.data.datasets[0].data = [conf, pend, no];
+                statsChart.update();
+            } else {
+                const ctx = document.getElementById('statsChart').getContext('2d');
+                statsChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Confirmados', 'Pendientes', 'No asistirán'],
+                        datasets: [{
+                            data: [conf, pend, no],
+                            backgroundColor: ['#4CAF50', '#FF9800', '#E53935'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        plugins: {
+                            legend: { position: 'right', labels: { font: { family: "'Inter', sans-serif" } } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Drawer Logic
+        const drawer = document.getElementById('guestDrawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+
+        function openDrawer(g) {
+            document.getElementById('dwName').textContent = g.name;
+            const statusClass = getStatusClass(g.status);
+            const statusIcon = g.status === 'Confirmado' ? 'fa-check' : (g.status === 'Pendiente' ? 'fa-clock' : 'fa-xmark');
+            document.getElementById('dwStatus').innerHTML = `<span class="status-badge ${statusClass}"><i class="fa-solid ${statusIcon}"></i> ${g.status}</span>`;
+            document.getElementById('dwTable').textContent = g.table;
+            document.getElementById('dwCompanions').textContent = g.companions;
+            document.getElementById('dwDate').textContent = g.date;
+            document.getElementById('dwPhone').textContent = g.phone;
+            document.getElementById('dwEmail').textContent = g.email;
+            document.getElementById('dwQrId').textContent = g.qr_id;
+            
+            if(g.status === 'Confirmado') {
+                document.getElementById('dwQrImg').style.backgroundImage = `url('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${g.qr_id}')`;
+                document.getElementById('dwQrImg').style.display = 'block';
+                document.getElementById('dwQrId').style.display = 'inline-block';
+            } else {
+                document.getElementById('dwQrImg').style.display = 'none';
+                document.getElementById('dwQrId').style.display = 'none';
+            }
+
+            drawerOverlay.classList.add('active');
+            drawer.classList.add('active');
+        }
+
+        function closeDrawer() {
+            drawerOverlay.classList.remove('active');
+            drawer.classList.remove('active');
+        }
+
         // Init
         renderTable();
+        updateChart();
     </script>
 </body>
 </html>
