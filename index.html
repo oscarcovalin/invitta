@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitta | Invitaciones Digitales para Bodas, XV Años y más Eventos</title>
+    <meta name="description" content="Invitta: Invitaciones digitales premium para bodas, XV años, bautizos, cumpleaños y más. Diseño personalizado con música, RSVP, pase QR y sobre animado. Entrega en 24 hrs.">
+    <meta property="og:title" content="Invitta — Invitaciones Digitales Premium">
+    <meta property="og:description" content="Diseño personalizado con música, RSVP automático, pase QR y sobre animado. Entrega en 24 hrs.">
+    <meta property="og:image" content="assets/og-preview.jpg">
+    <meta property="og:url" content="https://invitta.mx">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --cream: #FAF7F2;
+            --cream-dark: #F2EDE4;
+            --sand: #E8DDD0;
+            --rose: #C9877D;
+            --rose-light: #E8B4AD;
+            --rose-pale: #F5E6E3;
+            --rose-deep: #A86860;
+            --sage: #8A9E7B;
+            --sage-light: #C4D4BA;
+            --charcoal: #2E2E2E;
+            --warm-grey: #6B6560;
+            --light-grey: #A09A94;
+            --serif: 'Cormorant Garamond', serif;
+            --sans: 'Jost', sans-serif;
+            --transition: all 0.4s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--sans);
+            background-color: var(--cream);
+            color: var(--charcoal);
+            overflow-x: hidden;
+        }
+
+        /* UTILITIES */
+        .container { max-width: 1160px; margin: 0 auto; padding: 0 28px; }
+
+        .section-label {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--rose);
+            margin-bottom: 14px;
+            display: block;
+        }
+        .section-title {
+            font-family: var(--serif);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 400;
+            color: var(--charcoal);
+            line-height: 1.2;
+            margin-bottom: 18px;
+        }
+        .section-title em { font-style: italic; color: var(--rose); }
+        .section-lead {
+            font-size: 1rem;
+            color: var(--warm-grey);
+            font-weight: 300;
+            line-height: 1.8;
+            max-width: 560px;
+        }
+        .divider-floral {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 20px 0 50px;
+        }
+        .divider-floral::before,
+        .divider-floral::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--sand);
+        }
+        .divider-floral span {
+            font-family: var(--serif);
+            font-size: 1.3rem;
+            color: var(--rose-light);
+        }
+
+        /* HEADER */
+        header {
+            background: rgba(250,247,242,0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--sand);
+            padding: 18px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-family: var(--serif);
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            text-decoration: none;
+            letter-spacing: 0.02em;
+        }
+        .logo em { font-style: italic; color: var(--rose); }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 36px;
+            align-items: center;
+        }
+        .nav-links a {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--warm-grey);
+            text-decoration: none;
+            letter-spacing: 0.04em;
+            transition: var(--transition);
+        }
+        .nav-links a:hover { color: var(--rose); }
+        .btn-nav {
+            padding: 10px 22px;
+            background: var(--rose);
+            color: #fff !important;
+            border-radius: 40px;
+            font-size: 0.82rem !important;
+            font-weight: 600 !important;
+            transition: var(--transition) !important;
+        }
+        .btn-nav:hover { background: var(--rose-deep) !important; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,135,125,0.35) !important; }
+
+        /* HAMBURGER */
+        .nav-hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .nav-hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--charcoal);
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--cream);
+            z-index: 200;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+        }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a {
+            font-family: var(--serif);
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--charcoal);
+            text-decoration: none;
+            font-style: italic;
+        }
+        .mobile-menu a:hover { color: var(--rose); }
+        .mobile-close {
+            position: absolute;
+            top: 24px; right: 28px;
+            background: none; border: none;
+            font-size: 1.5rem;
+            color: var(--warm-grey);
+            cursor: pointer;
+        }
+
+        /* HERO */
+        .hero {
+            padding: 80px 0 70px;
+            background: var(--cream);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 580px; height: 580px;
+            background: radial-gradient(circle, rgba(201,135,125,0.09) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: -40px;
+            width: 380px; height: 380px;
+            background: radial-gradient(circle, rgba(138,158,123,0.06) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--rose-pale);
+            color: var(--rose);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 30px;
+            margin-bottom: 28px;
+        }
+        .hero-badge i { animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .hero-copy h1 {
+            font-family: var(--serif);
+            font-size: clamp(2.6rem, 5vw, 4.2rem);
+            font-weight: 400;
+            line-height: 1.12;
+            color: var(--charcoal);
+            margin-bottom: 22px;
+        }
+        .hero-copy h1 em { font-style: italic; color: var(--rose); }
+        .hero-copy p {
+            font-size: 1.05rem;
+            color: var(--warm-grey);
+            font-weight: 300;
+            line-height: 1.8;
+            max-width: 480px;
+            margin-bottom: 36px;
+        }
+        .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 30px;
+            background: var(--rose);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 40px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            transition: var(--transition);
+        }
+        .btn-primary:hover { background: var(--rose-deep); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(201,135,125,0.35); }
+        .btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 30px;
+            background: transparent;
+            color: var(--charcoal);
+            text-decoration: none;
+            border-radius: 40px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            border: 1.5px solid var(--sand);
+            transition: var(--transition);
+        }
+        .btn-outline:hover { border-color: var(--rose-light); color: var(--rose); transform: translateY(-2px); }
+
+        .hero-trust {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 36px;
+            padding-top: 28px;
+            border-top: 1px solid var(--sand);
+        }
+        .trust-item { display: flex; flex-direction: column; }
+        .trust-item strong {
+            font-family: var(--serif);
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--charcoal);
+        }
+        .trust-item span {
+            font-size: 0.72rem;
+            color: var(--light-grey);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .trust-sep { width: 1px; height: 36px; background: var(--sand); }
+
+        /* Hero mockup */
+        .hero-visual { position: relative; display: flex; justify-content: center; align-items: center; }
+        .hero-mockup {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(46,46,46,0.15), 0 0 0 1px rgba(232,221,208,0.8);
+            background: linear-gradient(160deg, #f5ede4 0%, #fdf8f3 40%, #ece5da 100%);
+            aspect-ratio: 9/14;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            animation: floatCard 6s ease-in-out infinite;
+        }
+        @keyframes floatCard { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        .mockup-svg-tl { position: absolute; top: 0; left: 0; width: 120px; opacity: 0.6; }
+        .mockup-svg-br { position: absolute; bottom: 0; right: 0; width: 120px; opacity: 0.6; transform: rotate(180deg); }
+        .mockup-subtitle {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--sage);
+            margin-bottom: 10px;
+        }
+        .mockup-names {
+            font-family: var(--serif);
+            font-size: 2.6rem;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--charcoal);
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+        .mockup-date {
+            font-size: 0.75rem;
+            letter-spacing: 0.14em;
+            color: var(--warm-grey);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .mockup-ornament {
+            width: 60px; height: 1px;
+            background: var(--sand);
+            margin: 14px auto;
+            position: relative;
+        }
+        .mockup-ornament::before, .mockup-ornament::after {
+            content: '◦';
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
+            font-size: 0.6rem;
+            color: var(--rose-light);
+        }
+        .mockup-ornament::before { left: -12px; }
+        .mockup-ornament::after { right: -12px; }
+        .mockup-seal {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1.3rem;
+            box-shadow: 0 6px 20px rgba(201,135,125,0.5);
+            margin-bottom: 14px;
+            animation: floatSeal 3s ease-in-out infinite;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .mockup-seal:hover { transform: scale(1.1); }
+        @keyframes floatSeal { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        .mockup-hint { font-size: 0.65rem; color: var(--light-grey); letter-spacing: 0.08em; }
+
+        .float-badge {
+            position: absolute;
+            background: #fff;
+            border-radius: 14px;
+            padding: 12px 18px;
+            box-shadow: 0 10px 32px rgba(46,46,46,0.12);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: floatBadge 5s ease-in-out infinite;
+        }
+        .float-badge-1 { top: 15%; right: -10%; animation-delay: 0s; }
+        .float-badge-2 { bottom: 20%; left: -12%; animation-delay: 2.5s; }
+        @keyframes floatBadge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        .float-badge i { color: var(--rose); font-size: 1.15rem; }
+        .float-badge-text strong { display: block; font-size: 0.8rem; font-weight: 600; color: var(--charcoal); }
+        .float-badge-text span { font-size: 0.68rem; color: var(--light-grey); }
+
+        /* EVENTOS BAR */
+        .eventos-bar {
+            padding: 26px 0;
+            background: var(--cream-dark);
+            border-top: 1px solid var(--sand);
+            border-bottom: 1px solid var(--sand);
+        }
+        .eventos-bar-inner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .evento-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 18px;
+            background: var(--cream);
+            border: 1px solid var(--sand);
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--warm-grey);
+            transition: var(--transition);
+            cursor: default;
+        }
+        .evento-chip:hover {
+            border-color: var(--rose-light);
+            color: var(--rose);
+            background: var(--rose-pale);
+            transform: translateY(-2px);
+        }
+        .evento-chip i { font-size: 0.85rem; color: var(--rose); }
+
+        /* BENEFICIOS */
+        .benefits { padding: 100px 0; background: var(--cream); }
+        .benefits-header { text-align: center; margin-bottom: 60px; }
+        .benefits-header .section-lead { margin: 0 auto; text-align: center; }
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+        }
+        .benefit-card {
+            background: var(--cream-dark);
+            border: 1px solid var(--sand);
+            border-radius: 20px;
+            padding: 36px 30px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--rose-pale) 0%, transparent 60%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .benefit-card:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(46,46,46,0.09); border-color: var(--rose-light); }
+        .benefit-card:hover::before { opacity: 1; }
+        .benefit-icon {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: var(--rose-pale);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.4rem;
+            color: var(--rose);
+            transition: var(--transition);
+            position: relative; z-index: 1;
+        }
+        .benefit-card:hover .benefit-icon { background: var(--rose); color: #fff; transform: scale(1.1) rotate(-5deg); }
+        .benefit-card h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; color: var(--charcoal); margin-bottom: 10px; position: relative; z-index: 1; }
+        .benefit-card p { font-size: 0.88rem; color: var(--warm-grey); line-height: 1.7; font-weight: 300; position: relative; z-index: 1; }
+
+        /* CATALOGO */
+        .catalog { padding: 100px 0; background: var(--cream-dark); }
+        .catalog-header { text-align: center; margin-bottom: 16px; }
+        .catalog-showcase {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            align-items: start;
+            margin-top: 50px;
+        }
+        .catalog-card {
+            border-radius: 22px;
+            overflow: hidden;
+            background: var(--cream);
+            border: 1.5px solid var(--sand);
+            transition: var(--transition);
+            text-decoration: none;
+            display: block;
+        }
+        .catalog-card:hover { transform: translateY(-12px); box-shadow: 0 30px 70px rgba(46,46,46,0.14); border-color: var(--rose-light); }
+        .catalog-card-img {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 9/16;
+            background: #1a1a1a;
+        }
+        .catalog-card-img img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: top;
+            display: block;
+            transition: transform 0.7s ease;
+        }
+        .catalog-card:hover .catalog-card-img img { transform: scale(1.05); }
+        .catalog-card-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(20,15,10,0.75) 0%, transparent 55%);
+            display: flex; align-items: flex-end;
+            padding: 24px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .catalog-card:hover .catalog-card-overlay { opacity: 1; }
+        .overlay-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 30px;
+            color: #fff;
+            text-align: center;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+        }
+        .catalog-card-body { padding: 24px 26px; }
+        .catalog-card-tag {
+            font-size: 0.68rem; font-weight: 600;
+            letter-spacing: 0.14em; text-transform: uppercase;
+            color: var(--rose); margin-bottom: 6px; display: block;
+        }
+        .catalog-card-title { font-family: var(--serif); font-size: 1.4rem; font-weight: 400; color: var(--charcoal); margin-bottom: 8px; }
+        .catalog-card-desc { font-size: 0.83rem; color: var(--warm-grey); font-weight: 300; line-height: 1.6; margin-bottom: 14px; }
+        .catalog-chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+        .catalog-chip {
+            font-size: 0.68rem; padding: 4px 11px;
+            border-radius: 20px; background: var(--cream-dark);
+            border: 1px solid var(--sand); color: var(--warm-grey); font-weight: 500;
+        }
+        .catalog-chip.chip-rose { background: var(--rose-pale); border-color: var(--rose-light); color: var(--rose); }
+        .catalog-demo-btns { display: flex; gap: 10px; margin-top: 22px; }
+        .demo-btn {
+            flex: 1; padding: 12px;
+            font-size: 0.84rem; font-weight: 600; text-align: center;
+            border-radius: 40px; text-decoration: none;
+            transition: var(--transition);
+        }
+        .demo-btn-rose { background: var(--rose); color: #fff; border: 1px solid var(--rose); }
+        .demo-btn-rose:hover { background: var(--rose-deep); }
+        .demo-btn-outline { background: var(--rose-pale); color: var(--rose); border: 1px solid var(--rose-light); }
+        .demo-btn-outline:hover { background: var(--rose-light); color: #fff; }
+
+        /* TESTIMONIOS */
+        .testimonios { padding: 100px 0; background: var(--cream); }
+        .testimonios-header { text-align: center; margin-bottom: 60px; }
+        .testimonios-header .section-lead { margin: 0 auto; text-align: center; }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .test-card {
+            background: var(--cream-dark);
+            border: 1px solid var(--sand);
+            border-radius: 20px;
+            padding: 32px 28px;
+            transition: var(--transition);
+            position: relative;
+        }
+        .test-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(46,46,46,0.08); border-color: var(--rose-light); }
+        .test-stars {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 18px;
+            color: var(--rose);
+            font-size: 0.85rem;
+        }
+        .test-quote {
+            font-family: var(--serif);
+            font-size: 1.1rem;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--charcoal);
+            line-height: 1.7;
+            margin-bottom: 22px;
+        }
+        .test-quote::before { content: '\201C'; font-size: 2rem; color: var(--rose-light); line-height: 0; vertical-align: -0.5rem; margin-right: 4px; }
+        .test-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-top: 1px solid var(--sand);
+            padding-top: 18px;
+        }
+        .test-avatar {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background: var(--rose-pale);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--serif);
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--rose);
+            flex-shrink: 0;
+            border: 2px solid var(--rose-light);
+        }
+        .test-info strong { display: block; font-size: 0.88rem; font-weight: 600; color: var(--charcoal); }
+        .test-info span { font-size: 0.75rem; color: var(--light-grey); }
+        .test-event-badge {
+            position: absolute;
+            top: 22px; right: 22px;
+            font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: var(--rose-pale);
+            color: var(--rose);
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--rose-light);
+        }
+
+        /* PRECIOS */
+        .pricing { padding: 100px 0; background: var(--cream-dark); }
+        .pricing-intro {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: end;
+            margin-bottom: 60px;
+        }
+        .pricing-intro-right { display: flex; justify-content: flex-end; align-items: flex-end; }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+            align-items: start;
+        }
+        .price-card {
+            background: var(--cream);
+            border: 1.5px solid var(--sand);
+            border-radius: 22px;
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex; flex-direction: column;
+        }
+        .price-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(46,46,46,0.1); border-color: var(--rose-light); }
+        .price-card.featured { border-color: var(--rose); box-shadow: 0 10px 36px rgba(201,135,125,0.22); }
+        .price-card-top { height: 5px; background: var(--sand); }
+        .price-card.featured .price-card-top { background: linear-gradient(90deg, var(--rose-light), var(--rose), var(--rose-deep)); }
+        .price-card-body { padding: 32px 28px; flex: 1; display: flex; flex-direction: column; }
+        .price-tag-label { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--warm-grey); margin-bottom: 12px; }
+        .price-card.featured .price-tag-label { color: var(--rose); }
+        .price-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: var(--rose); color: #fff;
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 20px; margin-bottom: 8px;
+        }
+        .price-card h3 { font-family: var(--serif); font-size: 1.7rem; font-weight: 400; color: var(--charcoal); margin-bottom: 6px; }
+        .price-card-desc { font-size: 0.85rem; color: var(--warm-grey); line-height: 1.6; font-weight: 300; margin-bottom: 24px; }
+        .price-amount { margin-bottom: 24px; }
+        .price-amount .amount { font-family: var(--serif); font-size: 3rem; font-weight: 300; color: var(--charcoal); line-height: 1; }
+        .price-amount .currency { font-size: 1.2rem; font-weight: 400; vertical-align: super; color: var(--warm-grey); }
+        .price-amount .period { font-size: 0.8rem; color: var(--light-grey); letter-spacing: 0.04em; margin-left: 4px; }
+        .price-divider { height: 1px; background: var(--sand); margin: 0 0 22px; }
+        .price-features { list-style: none; margin-bottom: 28px; flex: 1; }
+        .price-features li {
+            display: flex; align-items: flex-start; gap: 10px;
+            font-size: 0.87rem; color: var(--charcoal);
+            margin-bottom: 11px; font-weight: 400; line-height: 1.5;
+        }
+        .price-features li i { color: var(--sage); margin-top: 3px; font-size: 0.75rem; flex-shrink: 0; }
+        .price-features li.highlight i { color: var(--rose); }
+        .price-features li.highlight { font-weight: 500; }
+        .btn-price {
+            display: block; width: 100%; padding: 14px;
+            text-align: center; text-decoration: none;
+            border-radius: 40px; font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 0.04em; transition: var(--transition);
+            border: 1.5px solid var(--sand); color: var(--charcoal); background: transparent;
+        }
+        .btn-price:hover { border-color: var(--rose); color: var(--rose); }
+        .btn-price.btn-price-primary { background: var(--rose); border-color: var(--rose); color: #fff; }
+        .btn-price.btn-price-primary:hover { background: var(--rose-deep); border-color: var(--rose-deep); transform: translateY(-1px); box-shadow: 0 8px 22px rgba(201,135,125,0.4); }
+        .price-demo-link { display: block; text-align: center; margin-top: 12px; font-size: 0.78rem; color: var(--light-grey); text-decoration: none; transition: var(--transition); }
+        .price-demo-link:hover { color: var(--rose); }
+
+        /* PROCESO */
+        .how { padding: 90px 0; background: var(--cream); }
+        .how-header { text-align: center; margin-bottom: 60px; }
+        .how-header .section-lead { margin: 0 auto; text-align: center; }
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            position: relative;
+        }
+        .how-grid::before {
+            content: '';
+            position: absolute;
+            top: 36px;
+            left: calc(33% + 20px);
+            right: calc(33% + 20px);
+            height: 1px;
+            border-top: 1.5px dashed var(--rose-light);
+        }
+        .how-step { text-align: center; padding: 36px 24px; }
+        .how-step-num {
+            width: 54px; height: 54px;
+            border-radius: 50%;
+            background: var(--cream-dark);
+            border: 1.5px solid var(--sand);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-family: var(--serif); font-size: 1.4rem;
+            color: var(--rose); font-style: italic;
+            position: relative; z-index: 1;
+            transition: var(--transition);
+        }
+        .how-step:hover .how-step-num { background: var(--rose); color: #fff; border-color: var(--rose); transform: scale(1.1); }
+        .how-step h3 { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; color: var(--charcoal); margin-bottom: 10px; }
+        .how-step p { font-size: 0.87rem; color: var(--warm-grey); line-height: 1.75; font-weight: 300; }
+
+        /* CTA FINAL */
+        .cta { padding: 100px 0; background: var(--cream-dark); text-align: center; }
+        .cta-box {
+            max-width: 740px; margin: 0 auto;
+            padding: 70px 50px;
+            background: linear-gradient(140deg, #fff 0%, var(--rose-pale) 100%);
+            border: 1px solid var(--rose-light);
+            border-radius: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 260px; height: 260px;
+            background: radial-gradient(circle, rgba(201,135,125,0.12) 0%, transparent 70%);
+        }
+        .cta-box .section-label { text-align: center; }
+        .cta-box .section-title { text-align: center; margin-bottom: 14px; font-size: 2.4rem; }
+        .cta-box p { font-size: 1rem; color: var(--warm-grey); font-weight: 300; line-height: 1.7; margin-bottom: 36px; position: relative; z-index: 1; }
+        .cta-btns { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; position: relative; z-index: 1; }
+
+        /* FOOTER */
+        footer {
+            background: var(--charcoal);
+            color: rgba(255,255,255,0.5);
+            padding: 48px 0 32px;
+        }
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+            margin-bottom: 32px;
+        }
+        .logo-footer {
+            font-family: var(--serif);
+            font-size: 1.8rem; font-weight: 400;
+            color: rgba(255,255,255,0.9);
+            font-style: italic;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .footer-tagline { font-size: 0.82rem; color: rgba(255,255,255,0.4); }
+        .footer-links { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+        .footer-links a { font-size: 0.82rem; color: rgba(255,255,255,0.45); text-decoration: none; transition: var(--transition); }
+        .footer-links a:hover { color: var(--rose-light); }
+        .footer-social { display: flex; gap: 12px; }
+        .footer-social a {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .footer-social a:hover { border-color: var(--rose); color: var(--rose-light); }
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 24px;
+            text-align: center;
+            font-size: 0.75rem;
+            opacity: 0.35;
+        }
+
+        /* WHATSAPP FLOTANTE */
+        .wa-float {
+            position: fixed;
+            bottom: 28px; right: 28px;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #25D366;
+            color: #fff;
+            border-radius: 50px;
+            padding: 14px 20px 14px 16px;
+            box-shadow: 0 8px 30px rgba(37,211,102,0.4);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            animation: waBounce 3s ease-in-out infinite;
+            transition: var(--transition);
+        }
+        .wa-float:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 14px 40px rgba(37,211,102,0.5); }
+        .wa-float i { font-size: 1.3rem; }
+        @keyframes waBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+        /* ANIMATIONS */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .fade-up { opacity: 0; animation: fadeUp 0.8s ease forwards; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.25s; }
+        .delay-3 { animation-delay: 0.4s; }
+        .delay-4 { animation-delay: 0.55s; }
+        .delay-5 { animation-delay: 0.7s; }
+
+        /* Scroll reveal */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        /* RESPONSIVE */
+        @media (max-width: 920px) {
+            .hero-inner { grid-template-columns: 1fr; gap: 50px; }
+            .hero-visual { order: -1; }
+            .hero-mockup { max-width: 280px; margin: 0 auto; animation: none; }
+            .float-badge-1, .float-badge-2 { display: none; }
+            .pricing-intro { grid-template-columns: 1fr; }
+            .pricing-intro-right { justify-content: flex-start; margin-top: -20px; }
+            .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+            .benefits-grid { grid-template-columns: 1fr 1fr; }
+            .how-grid { grid-template-columns: 1fr; }
+            .how-grid::before { display: none; }
+            .catalog-showcase { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+            .test-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+            .footer-inner { flex-direction: column; gap: 24px; }
+        }
+        @media (max-width: 600px) {
+            .nav-links { display: none; }
+            .nav-hamburger { display: flex; }
+            .benefits-grid { grid-template-columns: 1fr; }
+            .cta-box { padding: 40px 24px; }
+            .wa-float span { display: none; }
+            .wa-float { padding: 16px; border-radius: 50%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MENÚ MÓVIL -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-close" id="mobileClose" aria-label="Cerrar menú"><i class="fa-solid fa-xmark"></i></button>
+        <a href="#modelos" onclick="closeMobileMenu()">Muestras</a>
+        <a href="#precios" onclick="closeMobileMenu()">Paquetes</a>
+        <a href="#proceso" onclick="closeMobileMenu()">Cómo funciona</a>
+        <a href="#testimonios" onclick="closeMobileMenu()">Testimonios</a>
+        <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20quiero%20solicitar%20una%20invitaci%C3%B3n" target="_blank" class="btn-primary" style="font-family:var(--sans);">
+            <i class="fa-brands fa-whatsapp"></i> Hablar por WhatsApp
+        </a>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="container nav-wrapper">
+            <a href="#" class="logo">Inv<em>itta</em></a>
+            <ul class="nav-links">
+                <li><a href="#modelos">Muestras</a></li>
+                <li><a href="#precios">Paquetes</a></li>
+                <li><a href="#proceso">Cómo funciona</a></li>
+                <li><a href="#testimonios">Testimonios</a></li>
+                <li>
+                    <a href="administracion/formulario-cliente.html" class="btn-nav">
+                        <i class="fa-solid fa-file-pen"></i> Solicitar Invitación
+                    </a>
+                </li>
+            </ul>
+            <button class="nav-hamburger" id="navHamburger" aria-label="Abrir menú">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-inner">
+                <div class="hero-copy">
+                    <div class="hero-badge fade-up delay-1">
+                        <i class="fa-solid fa-circle-dot"></i>
+                        Invitaciones Digitales &middot; México
+                    </div>
+                    <h1 class="fade-up delay-2">
+                        Haz que tu evento<br>empiece con algo <em>hermoso</em>
+                    </h1>
+                    <p class="fade-up delay-3">
+                        En Invitta creamos invitaciones digitales personalizadas para bodas, XV años, bautizos, cumpleaños y más. Con música, RSVP automático, pase QR y el elegante efecto de sobre animado.
+                    </p>
+                    <div class="hero-buttons fade-up delay-4">
+                        <a href="#modelos" class="btn-primary">
+                            <i class="fa-solid fa-envelope-open-text"></i> Ver muestras
+                        </a>
+                        <a href="plantillas/vip/index.html" target="_blank" class="btn-outline">
+                            <i class="fa-regular fa-eye"></i> Ver demo VIP
+                        </a>
+                    </div>
+                    <div class="hero-trust fade-up delay-5">
+                        <div class="trust-item">
+                            <strong>+100</strong>
+                            <span>Eventos creados</span>
+                        </div>
+                        <div class="trust-sep"></div>
+                        <div class="trust-item">
+                            <strong>24 hrs</strong>
+                            <span>Tiempo de entrega</span>
+                        </div>
+                        <div class="trust-sep"></div>
+                        <div class="trust-item">
+                            <strong>5 ★</strong>
+                            <span>Satisfacción</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-visual fade-up delay-3">
+                    <div class="hero-mockup">
+                        <svg class="mockup-svg-tl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0 Q60 40 40 100 Q70 60 120 80 Q80 120 100 180" stroke="#8A9E7B" stroke-width="1.5" fill="none" opacity="0.5"/>
+                            <circle cx="40" cy="100" r="6" fill="#C9877D" opacity="0.4"/>
+                            <circle cx="120" cy="80" r="4" fill="#C9877D" opacity="0.35"/>
+                            <ellipse cx="30" cy="70" rx="12" ry="6" fill="#C4D4BA" opacity="0.5" transform="rotate(-30 30 70)"/>
+                            <ellipse cx="90" cy="45" rx="10" ry="5" fill="#C4D4BA" opacity="0.45" transform="rotate(20 90 45)"/>
+                        </svg>
+                        <svg class="mockup-svg-br" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0 Q60 40 40 100 Q70 60 120 80 Q80 120 100 180" stroke="#8A9E7B" stroke-width="1.5" fill="none" opacity="0.5"/>
+                            <circle cx="40" cy="100" r="6" fill="#C9877D" opacity="0.4"/>
+                            <ellipse cx="30" cy="70" rx="12" ry="6" fill="#C4D4BA" opacity="0.5" transform="rotate(-30 30 70)"/>
+                        </svg>
+                        <div class="mockup-subtitle">Boda &middot; 2026</div>
+                        <img src="assets/pareja_1.jpg" alt="Foto Novios" style="width:130px;height:130px;border-radius:50%;object-fit:cover;margin:10px 0 20px;border:3px solid #fff;box-shadow:0 10px 25px rgba(0,0,0,0.08);z-index:2;position:relative;">
+                        <div class="mockup-names">Ana &amp; Carlos</div>
+                        <div class="mockup-ornament"></div>
+                        <div class="mockup-date">28 &middot; Septiembre &middot; 2026</div>
+                        <div class="mockup-seal"><i class="fa-solid fa-envelope"></i></div>
+                        <div class="mockup-hint">Toca el sello para abrir ✨</div>
+                    </div>
+
+                    <div class="float-badge float-badge-1">
+                        <i class="fa-solid fa-music"></i>
+                        <div class="float-badge-text">
+                            <strong>Música de fondo</strong>
+                            <span>Reproducción automática</span>
+                        </div>
+                    </div>
+                    <div class="float-badge float-badge-2">
+                        <i class="fa-solid fa-qrcode"></i>
+                        <div class="float-badge-text">
+                            <strong>Pase con QR</strong>
+                            <span>Control de invitados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TIPOS DE EVENTO -->
+    <div class="eventos-bar">
+        <div class="container">
+            <div class="eventos-bar-inner">
+                <span style="font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--light-grey);margin-right:6px;">Para todo tipo de evento:</span>
+                <span class="evento-chip"><i class="fa-solid fa-rings-wedding"></i> Bodas</span>
+                <span class="evento-chip"><i class="fa-solid fa-crown"></i> XV Años</span>
+                <span class="evento-chip"><i class="fa-solid fa-baby"></i> Bautizos</span>
+                <span class="evento-chip"><i class="fa-solid fa-cake-candles"></i> Cumpleaños</span>
+                <span class="evento-chip"><i class="fa-solid fa-graduation-cap"></i> Graduaciones</span>
+                <span class="evento-chip"><i class="fa-solid fa-champagne-glasses"></i> Eventos sociales</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BENEFICIOS -->
+    <section class="benefits">
+        <div class="container">
+            <div class="benefits-header reveal">
+                <span class="section-label">Por qué elegirnos</span>
+                <h2 class="section-title">Todo lo que necesitas,<br>en un solo enlace</h2>
+                <div class="divider-floral"><span>✦</span></div>
+                <p class="section-lead">Olvida el papel. Tus invitados reciben un enlace que se abre como una experiencia real, no una imagen.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fa-solid fa-envelope-open"></i></div>
+                    <h3>Sobre Digital Animado</h3>
+                    <p>Una experiencia única de apertura: el invitado toca el sello, el sobre se abre y la música empieza a sonar al instante.</p>
+                </div>
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fa-brands fa-whatsapp"></i></div>
+                    <h3>RSVP Automático</h3>
+                    <p>Las confirmaciones llegan directo a tu WhatsApp con nombre, número de personas y mesa asignada. Sin formularios complicados.</p>
+                </div>
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fa-solid fa-qrcode"></i></div>
+                    <h3>Pase con Código QR</h3>
+                    <p>Cada invitado tiene su pase único con nombre, número de pases y mesa. El QR sirve para control de acceso en la puerta.</p>
+                </div>
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fa-solid fa-music"></i></div>
+                    <h3>Música de Fondo</h3>
+                    <p>Agrega la canción especial de tu evento. El reproductor flotante le permite al invitado pausarla cuando lo desee.</p>
+                </div>
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <h3>Entrega en 24 Horas</h3>
+                    <p>Nuestro proceso optimizado nos permite personalizar y entregar tu invitación completa en menos de un día hábil.</p>
+                </div>
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fa-solid fa-paper-plane"></i></div>
+                    <h3>Envíos Ilimitados</h3>
+                    <p>La invitación es un enlace. Compártela por WhatsApp, redes sociales o email cuantas veces necesites, sin costo extra.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATÁLOGO -->
+    <section class="catalog" id="modelos">
+        <div class="container">
+            <div class="catalog-header reveal">
+                <span class="section-label">Nuestras Muestras</span>
+                <h2 class="section-title">Así lucen en <em>un celular real</em></h2>
+                <div class="divider-floral"><span>✦</span></div>
+                <p class="section-lead" style="margin:0 auto;text-align:center;">
+                    Cada diseño está pensado para que tus invitados digan "¡Wow!" desde el primer toque. Haz clic para ver el demo en vivo.
+                </p>
+            </div>
+
+            <div class="catalog-showcase">
+                <!-- Esencial -->
+                <div class="catalog-card reveal">
+                    <div class="catalog-card-img">
+                        <img src="assets/mockup_esencial.png" alt="Paquete Esencial - Invitación clásica" loading="lazy">
+                        <div class="catalog-card-overlay">
+                            <div class="overlay-btn"><i class="fa-solid fa-layer-group"></i>&nbsp; Paquete Base</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <span class="catalog-card-tag">PAQUETE ESENCIAL</span>
+                        <h3 class="catalog-card-title">Clásica &amp; Romántica</h3>
+                        <p class="catalog-card-desc">Diseño sobrio con fondo crema y fotos del evento. Elegante y atemporal para cualquier celebración.</p>
+                        <div class="catalog-chip-list">
+                            <span class="catalog-chip">Cuenta regresiva</span>
+                            <span class="catalog-chip">Mapa</span>
+                            <span class="catalog-chip">RSVP WhatsApp</span>
+                        </div>
+                        <div class="catalog-demo-btns">
+                            <a href="demos/boda-esencial/index.html" target="_blank" class="demo-btn demo-btn-rose">Demo Boda</a>
+                            <a href="demos/xv-esencial/index.html" target="_blank" class="demo-btn demo-btn-outline">Demo XV Años</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Premium -->
+                <div class="catalog-card reveal" style="border-color:var(--rose-light);box-shadow:0 8px 32px rgba(201,135,125,0.15);">
+                    <div class="catalog-card-img">
+                        <img src="assets/mockup_premium.png" alt="Paquete Premium - Invitación moderna" loading="lazy">
+                        <div class="catalog-card-overlay">
+                            <div class="overlay-btn"><i class="fa-solid fa-star"></i>&nbsp; Más Popular</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <span class="catalog-card-tag">PAQUETE PREMIUM</span>
+                        <h3 class="catalog-card-title">Moderna &amp; Elegante</h3>
+                        <p class="catalog-card-desc">Fondo oscuro de alto impacto con efectos Glassmorphism, galería de fotos y música de fondo.</p>
+                        <div class="catalog-chip-list">
+                            <span class="catalog-chip chip-rose">Música</span>
+                            <span class="catalog-chip chip-rose">Animación entrada</span>
+                            <span class="catalog-chip">Galería fotos</span>
+                            <span class="catalog-chip">Mesa regalos</span>
+                        </div>
+                        <div class="catalog-demo-btns">
+                            <a href="demos/boda-premium/index.html" target="_blank" class="demo-btn demo-btn-rose">Demo Boda</a>
+                            <a href="demos/xv-premium/index.html" target="_blank" class="demo-btn demo-btn-outline">Demo XV Años</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIP -->
+                <div class="catalog-card reveal">
+                    <div class="catalog-card-img">
+                        <img src="assets/mockup_vip.png" alt="Paquete VIP - Invitación animada" loading="lazy">
+                        <div class="catalog-card-overlay">
+                            <div class="overlay-btn"><i class="fa-solid fa-crown"></i>&nbsp; Experiencia Total</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <span class="catalog-card-tag">PAQUETE VIP EXPERIENCE</span>
+                        <h3 class="catalog-card-title">Sobre Animado VIP</h3>
+                        <p class="catalog-card-desc">La experiencia definitiva: sobre que se abre, música al instante y pase QR personalizado para entrada.</p>
+                        <div class="catalog-chip-list">
+                            <span class="catalog-chip chip-rose">Sobre animado</span>
+                            <span class="catalog-chip chip-rose">Pase QR</span>
+                            <span class="catalog-chip">Álbum interactivo</span>
+                            <span class="catalog-chip">Todo Premium</span>
+                        </div>
+                        <div class="catalog-demo-btns">
+                            <a href="demos/boda-vip/index.html" target="_blank" class="demo-btn demo-btn-rose">Demo Boda</a>
+                            <a href="demos/xv-vip/index.html" target="_blank" class="demo-btn demo-btn-outline">Demo XV Años</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align:center;margin-top:56px;padding-top:40px;border-top:1px solid var(--sand);" class="reveal">
+                <p style="font-size:0.9rem;color:var(--warm-grey);margin-bottom:20px;font-weight:300;">
+                    ¿Tienes dudas sobre cuál elegir? Escríbenos y te asesoramos sin costo.
+                </p>
+                <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20vi%20las%20muestras%20y%20quisiera%20asesor%C3%ADa%20para%20elegir%20mi%20paquete" target="_blank" class="btn-primary">
+                    <i class="fa-brands fa-whatsapp"></i> Pedir asesoría gratis
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIOS -->
+    <section class="testimonios" id="testimonios">
+        <div class="container">
+            <div class="testimonios-header reveal">
+                <span class="section-label">Lo que dicen nuestros clientes</span>
+                <h2 class="section-title">Historias que nos <em>llenan de orgullo</em></h2>
+                <div class="divider-floral"><span>✦</span></div>
+                <p class="section-lead">Más de 100 eventos creados. Esto es lo que dicen quienes ya confiaron en Invitta.</p>
+            </div>
+            <div class="test-grid">
+                <div class="test-card reveal">
+                    <span class="test-event-badge">Boda</span>
+                    <div class="test-stars">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="test-quote">Todos mis invitados me preguntaron dónde hice la invitación. Fue la primera "sorpresa" de mi boda y la gente lo amó. El sobre animado es una maravilla.</p>
+                    <div class="test-author">
+                        <div class="test-avatar">S</div>
+                        <div class="test-info">
+                            <strong>Sofía &amp; Rodrigo</strong>
+                            <span>CDMX &middot; Marzo 2026</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-card reveal">
+                    <span class="test-event-badge">XV Años</span>
+                    <div class="test-stars">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="test-quote">Súper rápidos y muy atentos. En menos de 24 horas teníamos la invitación lista, exactamente como la pedimos. Los pases QR fueron geniales para la entrada.</p>
+                    <div class="test-author">
+                        <div class="test-avatar">V</div>
+                        <div class="test-info">
+                            <strong>Valeria &amp; familia</strong>
+                            <span>Guadalajara &middot; Febrero 2026</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-card reveal">
+                    <span class="test-event-badge">Bautizo</span>
+                    <div class="test-stars">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="test-quote">Lo que más me gustó es que todo llegó al WhatsApp de mis invitados y se veía increíble. Nada de imágenes aburridas. Vale mucho más de lo que cuesta.</p>
+                    <div class="test-author">
+                        <div class="test-avatar">M</div>
+                        <div class="test-info">
+                            <strong>Mariana Torres</strong>
+                            <span>Monterrey &middot; Enero 2026</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRECIOS -->
+    <section class="pricing" id="precios">
+        <div class="container">
+            <div class="pricing-intro reveal">
+                <div>
+                    <span class="section-label">Nuestros Paquetes</span>
+                    <h2 class="section-title">Elige el paquete<br>que merece tu evento</h2>
+                    <p class="section-lead">Tres niveles de personalización con precios claros. Todos incluyen atención personalizada y entrega en 24 horas.</p>
+                </div>
+                <div class="pricing-intro-right">
+                    <a href="administracion/formulario-cliente.html" class="btn-outline" style="white-space:nowrap;">
+                        <i class="fa-solid fa-file-pen"></i> Llenar cuestionario
+                    </a>
+                </div>
+            </div>
+
+            <div class="pricing-grid">
+                <!-- Esencial -->
+                <div class="price-card reveal">
+                    <div class="price-card-top"></div>
+                    <div class="price-card-body">
+                        <span class="price-tag-label">Paquete 01</span>
+                        <h3>Esencial</h3>
+                        <p class="price-card-desc">Diseño clásico y elegante. Todo lo fundamental para cualquier tipo de evento.</p>
+                        <div class="price-amount">
+                            <span class="currency">$</span><span class="amount">399</span><span class="period">MXN</span>
+                        </div>
+                        <div class="price-divider"></div>
+                        <ul class="price-features">
+                            <li><i class="fa-solid fa-check"></i> Diseño clásico personalizado</li>
+                            <li><i class="fa-solid fa-check"></i> Cuenta regresiva en vivo</li>
+                            <li><i class="fa-solid fa-check"></i> Mapa de ceremonia y recepción</li>
+                            <li><i class="fa-solid fa-check"></i> Código de vestimenta</li>
+                            <li><i class="fa-solid fa-check"></i> Mesa de regalos</li>
+                            <li><i class="fa-solid fa-check"></i> RSVP por WhatsApp</li>
+                            <li><i class="fa-solid fa-check"></i> Enlace activo por 2 meses</li>
+                        </ul>
+                        <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20me%20interesa%20el%20paquete%20Esencial%20de%20%24399" target="_blank" class="btn-price">
+                            <i class="fa-brands fa-whatsapp"></i> Solicitar este paquete
+                        </a>
+                        <a href="plantillas/clasica/index.html" target="_blank" class="price-demo-link">Ver demo &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- Premium -->
+                <div class="price-card featured reveal">
+                    <div class="price-card-top"></div>
+                    <div class="price-card-body">
+                        <span class="price-badge"><i class="fa-solid fa-star" style="font-size:0.6rem;"></i> Más elegido</span>
+                        <span class="price-tag-label">Paquete 02</span>
+                        <h3>Premium</h3>
+                        <p class="price-card-desc">Diseño moderno con animaciones y música. La experiencia completa para tu celebración.</p>
+                        <div class="price-amount">
+                            <span class="currency">$</span><span class="amount">699</span><span class="period">MXN</span>
+                        </div>
+                        <div class="price-divider"></div>
+                        <ul class="price-features">
+                            <li><i class="fa-solid fa-check"></i> Todo del paquete Esencial</li>
+                            <li class="highlight"><i class="fa-solid fa-check"></i> Música de fondo personalizada</li>
+                            <li class="highlight"><i class="fa-solid fa-check"></i> Animación de entrada elegante</li>
+                            <li><i class="fa-solid fa-check"></i> Diseño oscuro Glassmorphism</li>
+                            <li><i class="fa-solid fa-check"></i> Galería de fotos interactiva</li>
+                            <li><i class="fa-solid fa-check"></i> Itinerario visual con íconos</li>
+                            <li><i class="fa-solid fa-check"></i> Enlace activo por 4 meses</li>
+                        </ul>
+                        <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20me%20interesa%20el%20paquete%20Premium%20de%20%24699" target="_blank" class="btn-price btn-price-primary">
+                            <i class="fa-brands fa-whatsapp"></i> Solicitar este paquete
+                        </a>
+                        <a href="plantillas/moderna/index.html" target="_blank" class="price-demo-link">Ver demo &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- VIP -->
+                <div class="price-card reveal">
+                    <div class="price-card-top"></div>
+                    <div class="price-card-body">
+                        <span class="price-tag-label">Paquete 03</span>
+                        <h3>VIP Experience</h3>
+                        <p class="price-card-desc">La experiencia definitiva. El Efecto WOW que impresionará a todos tus invitados.</p>
+                        <div class="price-amount">
+                            <span class="currency">$</span><span class="amount">999</span><span class="period">MXN</span>
+                        </div>
+                        <div class="price-divider"></div>
+                        <ul class="price-features">
+                            <li><i class="fa-solid fa-check"></i> Todo del paquete Premium</li>
+                            <li class="highlight"><i class="fa-solid fa-check"></i> Sobre digital animado</li>
+                            <li class="highlight"><i class="fa-solid fa-check"></i> Pase QR único por invitado</li>
+                            <li class="highlight"><i class="fa-solid fa-check"></i> Álbum colaborativo con QR</li>
+                            <li><i class="fa-solid fa-check"></i> Control de asistentes por URL</li>
+                            <li><i class="fa-solid fa-check"></i> Sugerencias de hospedaje</li>
+                            <li><i class="fa-solid fa-check"></i> Enlace activo por 12 meses</li>
+                        </ul>
+                        <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20me%20interesa%20el%20paquete%20VIP%20Experience%20de%20%24999" target="_blank" class="btn-price">
+                            <i class="fa-brands fa-whatsapp"></i> Solicitar este paquete
+                        </a>
+                        <a href="plantillas/vip/index.html" target="_blank" class="price-demo-link">Ver demo &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROCESO -->
+    <section class="how" id="proceso">
+        <div class="container">
+            <div class="how-header reveal">
+                <span class="section-label">El Proceso</span>
+                <h2 class="section-title">Tu invitación lista<br>en <em>3 sencillos pasos</em></h2>
+                <div class="divider-floral"><span>✦</span></div>
+                <p class="section-lead">Sin complicaciones. Nos encargamos de todo para que tú solo te preocupes por disfrutar.</p>
+            </div>
+            <div class="how-grid">
+                <div class="how-step reveal">
+                    <div class="how-step-num">1</div>
+                    <h3>Elige tu paquete</h3>
+                    <p>Selecciona el paquete que mejor se adapte a tu evento. Escríbenos por WhatsApp y te respondemos en minutos.</p>
+                </div>
+                <div class="how-step reveal">
+                    <div class="how-step-num">2</div>
+                    <h3>Comparte tus datos</h3>
+                    <p>Llena el cuestionario con la información de tu evento: fechas, lugares, fotos y la canción que quieres de fondo.</p>
+                </div>
+                <div class="how-step reveal">
+                    <div class="how-step-num">3</div>
+                    <h3>Recibe y comparte</h3>
+                    <p>En 24 horas recibes tu enlace listo para enviar por WhatsApp a todos tus invitados. Así de simple.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-box reveal">
+                <span class="section-label">Listos cuando tú quieras</span>
+                <h2 class="section-title">Haz inolvidable<br>tu <em>evento</em></h2>
+                <p>Escríbenos hoy y recibe tu invitación personalizada en menos de 24 horas. Sin complicaciones, sin sorpresas.</p>
+                <div class="cta-btns">
+                    <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20me%20interesa%20pedir%20informes%20sobre%20las%20invitaciones%20digitales" target="_blank" class="btn-primary">
+                        <i class="fa-brands fa-whatsapp"></i> Hablar por WhatsApp
+                    </a>
+                    <a href="administracion/formulario-cliente.html" class="btn-outline">
+                        <i class="fa-solid fa-file-pen"></i> Llenar cuestionario
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-inner">
+                <div>
+                    <span class="logo-footer">Invitta</span>
+                    <p class="footer-tagline">Invitaciones digitales premium &middot; México</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#modelos">Muestras</a>
+                    <a href="#precios">Paquetes</a>
+                    <a href="#proceso">Cómo funciona</a>
+                    <a href="#testimonios">Testimonios</a>
+                    <a href="https://wa.me/525566790073" target="_blank">WhatsApp</a>
+                </div>
+                <div class="footer-social">
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                    <a href="https://wa.me/525566790073" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">&copy; 2026 Invitta &middot; Todos los derechos reservados</div>
+        </div>
+    </footer>
+
+    <!-- WHATSAPP FLOTANTE -->
+    <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20me%20interesa%20una%20invitaci%C3%B3n%20digital" target="_blank" class="wa-float" aria-label="Contactar por WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+        <span>¿Tienes dudas? Escríbenos</span>
+    </a>
+
+    <script>
+        // Menú móvil
+        const hamburger = document.getElementById('navHamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileClose = document.getElementById('mobileClose');
+
+        hamburger.addEventListener('click', () => mobileMenu.classList.add('open'));
+        mobileClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
+
+        function closeMobileMenu() {
+            mobileMenu.classList.remove('open');
+        }
+
+        // Scroll reveal
+        const revealEls = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => entry.target.classList.add('visible'), i * 80);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        revealEls.forEach(el => observer.observe(el));
+
+        // Header shadow on scroll
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            header.style.boxShadow = window.scrollY > 10
+                ? '0 4px 24px rgba(46,46,46,0.08)'
+                : 'none';
+        });
+    </script>
+</body>
+</html>

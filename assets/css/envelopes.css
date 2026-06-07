@@ -1,0 +1,206 @@
+/* =========================================
+   BASE ENVELOPE STYLES
+   ========================================= */
+.envelope-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-family: 'Playfair Display', serif;
+}
+.envelope-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.envelope-container {
+    position: relative;
+    width: 90vw;
+    max-width: 500px;
+    height: 320px;
+    perspective: 1500px;
+}
+
+/* CARAS DEL SOBRE (Base) */
+.envelope-back {
+    position: absolute;
+    width: 100%; height: 100%;
+    background-color: var(--env-bg, #f5ede4);
+    border-radius: 8px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.envelope-liner {
+    position: absolute;
+    top: 0; left: 2%; right: 2%; height: 95%;
+    background: var(--env-liner, #fff);
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    z-index: 2;
+    transform: translateY(0);
+    transition: transform 0.8s ease;
+}
+
+.envelope-front {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 70%;
+    background-color: var(--env-front, #eae0d5);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    clip-path: polygon(0 0, 50% 30%, 100% 0, 100% 100%, 0 100%);
+    z-index: 4;
+    transition: transform 0.8s ease, opacity 0.8s ease;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+}
+.envelope-front.slide-down {
+    transform: translateY(100px);
+    opacity: 0;
+}
+
+.envelope-flap {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 65%;
+    background-color: var(--env-flap, #f5ede4);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 5;
+    /* Efecto sombra hacia adentro */
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.15));
+}
+.envelope-flap.open {
+    transform: rotateX(180deg);
+    z-index: 1; /* Pasa atrás */
+}
+
+/* SILUETAS ESPECIALES */
+.envelope-overlay.env-arch .envelope-flap {
+    clip-path: path('M0,0 L500,0 C500,0 400,200 250,200 C100,200 0,0 0,0 Z'); /* Curva suave, requiere SVG inline real o un truco. Usaremos border-radius como truco */
+    clip-path: none;
+    border-bottom-left-radius: 50%;
+    border-bottom-right-radius: 50%;
+    height: 55%;
+}
+.envelope-overlay.env-arch .envelope-front {
+    clip-path: none;
+    height: 100%;
+    background: transparent;
+}
+.envelope-overlay.env-arch .envelope-front::before {
+    content:''; position: absolute; bottom: 0; left: 0; width: 100%; height: 75%;
+    background-color: var(--env-front); border-radius: 8px;
+}
+
+.envelope-overlay.env-asym .envelope-flap {
+    clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+}
+
+/* SELLO */
+.envelope-seal {
+    position: absolute;
+    top: 60%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: var(--env-seal, #C9877D);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-family: 'Inter', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; text-align:center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 6;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.5s ease;
+}
+.envelope-seal:hover { transform: translate(-50%, -50%) scale(1.1); }
+.envelope-seal.open { opacity: 0; pointer-events: none; }
+
+
+/* =========================================
+   TENDENCIAS 2026 - MODIFICADORES
+   ========================================= */
+
+/* 1. Boda Esencial: Minimalismo Lo-Fi */
+.env-boda-esencial {
+    --env-bg: #FAF7F2;
+    --env-flap: #F0EAE1;
+    --env-front: #E8E0D5;
+    --env-liner: #fff;
+    --env-seal: #2E2E2E;
+}
+.env-boda-esencial .envelope-back {
+    /* Simular ruido de papel (Lo-Fi) */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+.env-boda-esencial .envelope-seal { border: 2px solid #FAF7F2; font-size: 0.6rem; }
+
+/* 2. Boda Premium: Mocha Mousse & Arc */
+.env-boda-premium {
+    --env-bg: #9c7e75; /* Mocha Mousse */
+    --env-flap: #8a6c63;
+    --env-front: #7a5e55;
+    --env-liner: #d2c0b8;
+    --env-seal: #4a342e;
+}
+.env-boda-premium .envelope-seal { border: 2px solid #d2c0b8; box-shadow: 0 5px 20px rgba(74, 52, 46, 0.5); }
+
+/* 3. Boda VIP: Lujo Textural & Floral Doormat Appeal */
+.env-boda-vip {
+    --env-bg: #FDFDFD;
+    --env-flap: #F4F4F4;
+    --env-front: #EAEAEA;
+    --env-seal: linear-gradient(135deg, #e6c27a 0%, #d4af37 100%); /* Gold */
+}
+.env-boda-vip .envelope-liner {
+    /* Floral Vintage (un patrón en base64 o color temporal elegante) */
+    background: #fcf1e3 url('https://images.unsplash.com/photo-1572624346850-93a8d11c1d0b?auto=format&fit=crop&q=80&w=600') center/cover;
+    opacity: 0.8;
+}
+.env-boda-vip .envelope-seal { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+
+/* 4. XV Años Esencial: Soft Nude */
+.env-xv-esencial {
+    --env-bg: #FFE5E5;
+    --env-flap: #FFD6D6;
+    --env-front: #FFC4C4;
+    --env-liner: #fff;
+    --env-seal: #fff;
+}
+.env-xv-esencial .envelope-seal { color: #FF9999; box-shadow: 0 4px 15px rgba(255, 153, 153, 0.4); }
+
+/* 5. XV Años Premium: Dark Elegance */
+.env-xv-premium {
+    --env-bg: #4a1525; /* Dark Burgundy */
+    --env-flap: #3a101d;
+    --env-front: #2a0b15;
+    --env-liner: #111;
+    --env-seal: #d4af37; /* Gold */
+}
+
+/* 6. XV Años VIP: Velvet Escarchado */
+.env-xv-vip {
+    --env-bg: #1a1a2e; /* Dark Navy Velvet */
+    --env-flap: #16213e;
+    --env-front: #0f3460;
+    --env-seal: #e94560; /* Ruby Red */
+}
+.env-xv-vip .envelope-liner {
+    background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%), url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='1' fill='%23fff' opacity='0.5'/%3E%3Ccircle cx='20' cy='80' r='1.5' fill='%23fff' opacity='0.8'/%3E%3Ccircle cx='80' cy='30' r='0.5' fill='%23fff' opacity='0.3'/%3E%3C/svg%3E");
+    background-size: 100px 100px;
+}
+.env-xv-vip .envelope-container::after {
+    /* Listón de seda simulado */
+    content: ''; position: absolute; top: 0; bottom: 0; left: 20%; width: 30px;
+    background: linear-gradient(to right, rgba(233,69,96,0.8), rgba(233,69,96,1), rgba(233,69,96,0.8));
+    z-index: 3; box-shadow: 2px 0 10px rgba(0,0,0,0.3); pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+.env-xv-vip:has(.envelope-flap.open) .envelope-container::after { opacity: 0; }

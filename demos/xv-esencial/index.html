@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis XV Años - Valentina</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css?v=1780781627972">
+
+    <!-- Open Graph for WhatsApp & Social Media Previews -->
+    <meta property="og:title" content="Mis XV Años - Valentina">
+    <meta property="og:description" content="¡Estás invitado a nuestra boda! Acompáñanos en este día tan especial.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tudominio.com/">
+    <!-- Nota: WhatsApp requiere un enlace absoluto de internet (https://...) para mostrar la imagen -->
+    <meta property="og:image" content="https://tudominio.com/assets/hero_bg.jpg">
+    <link rel="stylesheet" href="../../assets/css/envelopes.css">
+    <style id="dynamic-theme">
+        @import url('https://fonts.googleapis.com/css2?family=Parisienne&family=Outfit:wght@300;400;600&display=swap');
+        :root {
+            --primary-color: #E89A9A !important;
+            --secondary-color: #C27A7A !important;
+            --bg-color: #FDFBFB !important;
+            --text-color: #444444 !important;
+            --font-script: 'Parisienne', cursive !important;
+            --font-primary: 'Outfit', sans-serif !important;
+            --font-secondary: 'Outfit', sans-serif !important;
+        }
+        body { background-color: var(--bg-color); color: var(--text-color); }
+        h1, h2, .script-title { font-family: var(--font-script); }
+    </style>
+</head>
+<body>
+
+    <!-- Envelope Overlay (Sobre Digital) -->
+    <div id="envelope-overlay" class="envelope-overlay env-xv-esencial">
+        <div class="envelope-container">
+            <div class="envelope-flap" id="envelope-flap"></div>
+            <div class="envelope-back"></div>
+            <div class="envelope-liner"></div>
+            <div class="envelope-front"></div>
+            <div class="envelope-seal" id="envelope-seal">
+                <i class="fa-solid fa-envelope-open" style="font-size:1.2rem;"></i>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Background Music -->
+    <audio id="bg-music" loop autoplay>
+        <source src="assets/music.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <!-- Floating Music Button -->
+    <button id="music-btn" class="music-btn">
+        <i class="fa-solid fa-music"></i>
+    </button>    <!-- Hero Section -->
+    <header class="hero" id="home">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h2 class="pre-title fade-in-up">Mis XV Años</h2>
+            <h1 class="title fade-in-up delay-1">Valentina</h1>
+            <p class="date fade-in-up delay-2">11 de Julio, 2026</p>
+            
+            <div class="countdown-wrapper fade-in-up delay-3">
+                <div class="countdown-item">
+                    <span id="days">00</span>
+                    <p>Días</p>
+                </div>
+                <div class="countdown-item">
+                    <span id="hours">00</span>
+                    <p>Horas</p>
+                </div>
+                <div class="countdown-item">
+                    <span id="minutes">00</span>
+                    <p>Minutos</p>
+                </div>
+                <div class="countdown-item">
+                    <span id="seconds">00</span>
+                    <p>Segundos</p>
+                </div>
+            </div>
+            <a href="#rsvp" class="btn-primary fade-in-up delay-4">Confirma tu asistencia</a>
+        </div>
+    </header>
+
+    <!-- Parents & Godparents Section -->
+    <section class="family container section-padding text-center" id="family">
+        <h2 class="script-title family-main-title">Con la Bendición de Nuestros Padres</h2>
+        <div class="divider"></div>
+        
+        
+        <div class="family-flex-container" style="justify-content: center; width: 100%; margin-bottom: 30px;">
+            <div style="text-align: center;">
+                <p class="family-member-name" id="bride-mother" style="font-size: 1.5rem; margin-bottom: 5px;">Adriana Montes</p>
+                <p class="family-member-name" id="bride-father" style="font-size: 1.5rem;">Luis Fernández</p>
+            </div>
+        </div>
+    
+
+        <div class="family-padrinos reveal">
+            <h3 class="family-role-title">Padrinos</h3>
+            <p class="family-member-name">Ángel Patiño y Lucila Osorio</p>
+        </div>
+    </section>
+
+    <!-- Parallax 1 -->
+    <div class="parallax-section parallax-1 reveal"></div>
+
+    <!-- Details Section -->
+    <section class="details container section-padding" id="details">
+        <div class="section-title text-center">
+            <h2 class="script-title">Detalles del Evento</h2>
+            <div class="divider"></div>
+        </div>
+        <div class="grid">
+            <div class="card reveal">
+                <i class="fa-solid fa-church card-icon"></i>
+                <h3>Ceremonia Religiosa</h3>
+                <p>16:00 hrs</p>
+                <p>Iglesia y Ex Convento de San Juan Bautista Centenario 8</p>
+                <p>Villa de Coyoacán, Coyoacán 04000 CDMX</p>
+                <a href="https://maps.google.com/?q=Iglesia+y+Ex+Convento+de+San+Juan+Bautista+Centenario+8,+Coyoacan" target="_blank" class="btn-secondary">Ver en Mapa</a>
+            </div>
+            <div class="card reveal">
+                <i class="fa-solid fa-martini-glass-citrus card-icon"></i>
+                <h3>Recepción</h3>
+                <p>19:00 hrs</p>
+                <p>Salon Miami</p>
+                <p>Boulevar Bosque de Las Naciones 30</p>
+                <p>Bosques de Aragon, 57170 Cdad. Nezahualcóyotl, Méx.</p>
+                <a href="https://maps.google.com/?q=Salon+Miami+Boulevar+Bosque+de+Las+Naciones+30+Nezahualcoyotl" target="_blank" class="btn-secondary">Ver en Mapa</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Itinerary Section -->
+    <section class="itinerary-section section-padding" id="itinerary">
+        <div class="container">
+            <div class="section-title text-center reveal">
+                <h2 class="script-title">Itinerario</h2>
+                <div class="divider"></div>
+            </div>
+            <div class="timeline reveal">
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fa-solid fa-church"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="time">16:00 hrs</span>
+                        <h3>Ceremonia Religiosa</h3>
+                        <p>Iglesia y Ex Convento de San Juan Bautista Centenario 8</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fa-solid fa-martini-glass-citrus"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="time">19:00 hrs</span>
+                        <h3>Recepción</h3>
+                        <p>Salon Miami</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fa-solid fa-champagne-glasses"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="time">19:30 hrs</span>
+                        <h3>Recepción del Salón</h3>
+                        <p>Cóctel de bienvenida</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="time">20:00 hrs</span>
+                        <h3>Cena y Brindis</h3>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="time">21:00 hrs</span>
+                        <h3>Vals de XV Años</h3>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="fa-solid fa-music"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <span class="time">21:30 hrs</span>
+                        <h3>Inicia la Fiesta</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+
+    <!-- Parallax 2 -->
+    <div class="parallax-section parallax-2 reveal"></div>
+
+    
+
+
+
+    
+
+    <!-- Parallax 3 -->
+    <div class="parallax-section parallax-3 reveal"></div>
+
+    <!-- RSVP Section -->
+    <section class="rsvp section-padding" id="rsvp">
+        <div class="container">
+            <div class="rsvp-container reveal">
+                <h2 class="script-title rsvp-title">Confirma tu Asistencia</h2>
+                <p>Por favor, haznos saber si podrás acompañarnos en este día tan especial.</p>
+                <form id="rsvp-form" class="form">
+                    <div class="form-group">
+                        <label for="name">Nombre Completo</label>
+                        <input type="text" id="name" placeholder="Ej. Juan Pérez" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="attendance">¿Asistirás?</label>
+                        <select id="attendance" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="yes">¡Sí, ahí estaré!</option>
+                            <option value="no">Lamentablemente no podré asistir</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="guests">Número de personas</label>
+                        <select id="guests">
+                            <option value="1">1 persona</option>
+                            <option value="2">2 personas</option>
+                            <option value="3">3 personas</option>
+                            <option value="4">4 personas</option>
+                            <option value="5">5 personas</option>
+                            <option value="6">6 personas</option>
+                            <option value="7">7 personas</option>
+                            <option value="8">8 personas</option>
+                            <option value="9">9 personas</option>
+                            <option value="10">10 personas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensaje (Opcional)</label>
+                        <textarea id="message" rows="4" placeholder="Déjanos un mensaje o coméntanos sobre alergias/restricciones..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary w-100">Enviar Confirmación</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>¡Esperamos verte ahí!</p>
+        <h2>P, A & R</h2>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/main.js?v=1780781627972"></script>
+    <script src="../../assets/js/envelopes.js"></script>
+</body>
+</html>

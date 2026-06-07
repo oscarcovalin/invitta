@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitta | Cuestionario del Evento</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --cream: #FAF7F2;
+            --cream-dark: #F2EDE4;
+            --sand: #E8DDD0;
+            --rose: #C9877D;
+            --rose-light: #E8B4AD;
+            --rose-pale: #F5E6E3;
+            --sage: #8A9E7B;
+            --charcoal: #2E2E2E;
+            --warm-grey: #6B6560;
+            --serif: 'Cormorant Garamond', serif;
+            --sans: 'Jost', sans-serif;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: var(--sans);
+            background-color: var(--cream);
+            color: var(--charcoal);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .logo {
+            font-family: var(--serif);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .logo em { font-style: italic; color: var(--rose); }
+
+        header h1 {
+            font-family: var(--serif);
+            font-weight: 400;
+            color: var(--charcoal);
+            font-size: 2.8rem;
+            margin-bottom: 12px;
+            margin-top: 0;
+        }
+
+        header p {
+            color: var(--warm-grey);
+            font-size: 1.05rem;
+            font-weight: 300;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1.5px solid var(--sand);
+        }
+
+        .card h2 {
+            font-family: var(--serif);
+            font-weight: 400;
+            color: var(--rose);
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--sand);
+            padding-bottom: 14px;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: var(--charcoal);
+        }
+
+        input[type="text"], input[type="datetime-local"], select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1.5px solid var(--sand);
+            border-radius: 8px;
+            font-family: var(--sans);
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: var(--cream);
+            color: var(--charcoal);
+            transition: all 0.3s ease;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: #b5afa6;
+            font-weight: 300;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--rose-light);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px var(--rose-pale);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        h3 {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 1.4rem;
+            color: var(--charcoal);
+            margin-top: 30px;
+            margin-bottom: 16px;
+        }
+
+        .btn-download {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--rose);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-family: var(--sans);
+        }
+
+        .btn-download:hover {
+            background-color: #b5736a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(201,135,125,0.3);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { padding: 12px; border: 1px solid var(--sand); text-align: left; }
+        th { background-color: var(--cream-dark); font-weight: 500; color: var(--charcoal); }
+        td input { padding: 10px !important; }
+        
+        .btn-add {
+            background-color: transparent;
+            color: var(--rose);
+            border: 1.5px solid var(--rose-light);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: var(--sans);
+            transition: all 0.3s ease;
+        }
+        .btn-add:hover {
+            background-color: var(--rose-pale);
+            border-color: var(--rose);
+        }
+        
+        .btn-delete {
+            background: transparent; color: #e74c3c; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+        .btn-delete:hover { transform: scale(1.1); }
+        
+        .toast {
+            position: fixed; top: 20px; right: 20px; background: var(--sage); color: white;
+            padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(138,158,123,0.3);
+            transform: translateX(200%); transition: transform 0.3s ease; z-index: 1000;
+            font-weight: 500; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { transform: translateX(0); }
+
+        @media (max-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr; gap: 16px; }
+            .card { padding: 24px; }
+            header h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-check-circle"></i> <span id="toast-msg">¡Respuestas descargadas con éxito!</span>
+    </div>
+
+    <div class="container">
+        <header>
+            <a href="../index.html" class="logo">Inv<em>itta</em></a>
+            <h1>Detalles de tu Evento</h1>
+            <p>Por favor, llena este cuestionario con la información de tu evento. Al finalizar, descarga el archivo y envíaselo a tu diseñador.</p>
+        </header>
+
+        <form id="client-form" onsubmit="downloadData(event)">
+            
+            <!-- SECCIÓN 1 -->
+            <div class="card">
+                <h2>1. Identidad y Fechas</h2>
+                <div class="form-group">
+                    <label for="eventType">Tipo de Evento</label>
+                    <select id="eventType" onchange="toggleEventFields()">
+                        <option value="boda">Boda</option>
+                        <option value="xv">Mis XV Años</option>
+                        <option value="bautizo">Bautizo</option>
+                        <option value="cumpleanos">Cumpleaños</option>
+                        <option value="otro">Otro Evento Social</option>
+                    </select>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label id="labelBrideName" for="brideName">Nombre Principal / Novia</label>
+                        <input type="text" id="brideName" placeholder="Ej. Paulina Anael">
+                    </div>
+                    <div class="form-group" id="groupGroomName">
+                        <label for="groomName">Nombre Secundario / Novio</label>
+                        <input type="text" id="groomName" placeholder="Ej. Rodrigo">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="brideGroomInitials">Iniciales del Evento (Opcional)</label>
+                        <input type="text" id="brideGroomInitials" placeholder="Ej. P & R">
+                    </div>
+                    <div class="form-group">
+                        <label for="hashtag">Hashtag del Evento</label>
+                        <input type="text" id="hashtag" placeholder="Ej. #BodaPaulinaYRodrigo">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="quote">Pensamiento / Cita (Opcional)</label>
+                    <textarea id="quote" rows="3" placeholder="Ej. Hay momentos en la vida que son especiales por sí solos..."></textarea>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="weddingDateText">Fecha Legible (Para la Portada)</label>
+                        <input type="text" id="weddingDateText" placeholder="Ej. 11 de Julio, 2026">
+                    </div>
+                    <div class="form-group">
+                        <label for="countdownDateTime">Fecha & Hora Exacta (Para la Cuenta Regresiva)</label>
+                        <input type="datetime-local" id="countdownDateTime">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2 -->
+            <div class="card">
+                <h2>2. Padres y Padrinos</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label id="labelBrideMother" for="brideMother">Mamá (Anfitrión 1)</label>
+                        <input type="text" id="brideMother">
+                    </div>
+                    <div class="form-group">
+                        <label id="labelBrideFather" for="brideFather">Papá (Anfitrión 2)</label>
+                        <input type="text" id="brideFather">
+                    </div>
+                    <div class="form-group" id="groupGroomMother">
+                        <label for="groomMother">Mamá del Novio</label>
+                        <input type="text" id="groomMother">
+                    </div>
+                    <div class="form-group" id="groupGroomFather">
+                        <label for="groomFather">Papá del Novio</label>
+                        <input type="text" id="groomFather">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="padrinos">Padrinos / Padrinos de Velación (Opcional)</label>
+                    <input type="text" id="padrinos" placeholder="Nombres separados por &">
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3 -->
+            <div class="card">
+                <h2>3. Ceremonia (Religiosa o Civil)</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="ceremoniaTitle">Nombre Ceremonia</label>
+                        <input type="text" id="ceremoniaTitle" placeholder="Ej. Ceremonia Religiosa" value="Ceremonia Religiosa">
+                    </div>
+                    <div class="form-group">
+                        <label for="ceremoniaTime">Hora Ceremonia</label>
+                        <input type="text" id="ceremoniaTime" placeholder="Ej. 16:00 hrs">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ceremoniaPlace">Nombre del Templo / Registro Civil</label>
+                    <input type="text" id="ceremoniaPlace">
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="ceremoniaAddress1">Calle y Número</label>
+                        <input type="text" id="ceremoniaAddress1">
+                    </div>
+                    <div class="form-group">
+                        <label for="ceremoniaAddress2">Colonia, Municipio, C.P.</label>
+                        <input type="text" id="ceremoniaAddress2">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ceremoniaMapQuery">Búsqueda Maps (Para el botón de GPS)</label>
+                    <input type="text" id="ceremoniaMapQuery" placeholder="Ej. Parroquia+San+Miguel">
+                </div>
+            </div>
+
+            <!-- SECCIÓN 4 -->
+            <div class="card">
+                <h2>4. Banquete / Recepción</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="recepcionTitle">Nombre Recepción</label>
+                        <input type="text" id="recepcionTitle" placeholder="Ej. Recepción" value="Recepción">
+                    </div>
+                    <div class="form-group">
+                        <label for="recepcionTime">Hora Recepción</label>
+                        <input type="text" id="recepcionTime" placeholder="Ej. 19:00 hrs">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="recepcionPlace">Nombre del Salón / Jardín</label>
+                    <input type="text" id="recepcionPlace">
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="recepcionAddress1">Calle y Número</label>
+                        <input type="text" id="recepcionAddress1">
+                    </div>
+                    <div class="form-group">
+                        <label for="recepcionAddress2">Colonia, Municipio, C.P.</label>
+                        <input type="text" id="recepcionAddress2">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="recepcionMapQuery">Búsqueda Maps (Para el botón de GPS)</label>
+                    <input type="text" id="recepcionMapQuery" placeholder="Ej. Salon+Las+Lomas">
+                </div>
+            </div>
+
+            <!-- SECCIÓN 5 -->
+            <div class="card">
+                <h2>5. Itinerario</h2>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Evento</th>
+                                <th>Descripción</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itinerary-table-body">
+                            <!-- Fila dinámicas -->
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn-add" onclick="addItineraryRow()"><i class="fa-solid fa-plus"></i> Añadir Evento al Itinerario</button>
+            </div>
+
+            <!-- SECCIÓN 6 -->
+            <div class="card">
+                <h2>6. Vestimenta & Mesa de Regalos</h2>
+                
+                <h3>Código de Vestimenta</h3>
+                <div class="form-group">
+                    <label for="dressCodeTitle">Etiqueta General</label>
+                    <input type="text" id="dressCodeTitle" placeholder="Ej. Formal / Elegante">
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="dressWomenDesc">Mujeres</label>
+                        <input type="text" id="dressWomenDesc" placeholder="Ej. Vestido Largo">
+                    </div>
+                    <div class="form-group">
+                        <label for="dressWomenNote">Nota Especial Mujeres</label>
+                        <input type="text" id="dressWomenNote" placeholder="Ej. Se reserva el color blanco">
+                    </div>
+                    <div class="form-group">
+                        <label for="dressMenDesc">Hombres</label>
+                        <input type="text" id="dressMenDesc" placeholder="Ej. Traje y Corbata">
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--sand); margin: 30px 0;">
+
+                <h3>Mesa de Regalos</h3>
+                <div class="form-group">
+                    <label for="registryDesc">Mensaje Introductorio</label>
+                    <textarea id="registryDesc" rows="2" placeholder="Ej. El mejor regalo es tu presencia..."></textarea>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="registry1Name">Mesa 1 (Nombre)</label>
+                        <input type="text" id="registry1Name" placeholder="Ej. Liverpool">
+                    </div>
+                    <div class="form-group">
+                        <label for="registry1Url">Mesa 1 (Enlace / URL)</label>
+                        <input type="text" id="registry1Url">
+                    </div>
+                    <div class="form-group">
+                        <label for="registry2Name">Mesa 2 (Nombre)</label>
+                        <input type="text" id="registry2Name" placeholder="Ej. Amazon">
+                    </div>
+                    <div class="form-group">
+                        <label for="registry2Url">Mesa 2 (Enlace / URL)</label>
+                        <input type="text" id="registry2Url">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lluviaSobres">¿Incluir Lluvia de Sobres?</label>
+                    <select id="lluviaSobres">
+                        <option value="yes">Sí</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- SECCIÓN 7: HOSPEDAJE -->
+            <div class="card">
+                <h2>7. Hospedaje Recomendado (Opcional)</h2>
+                <div class="form-group">
+                    <label for="incluirHospedaje">¿Incluir sección de hospedaje?</label>
+                    <select id="incluirHospedaje">
+                        <option value="no">No</option>
+                        <option value="yes">Sí</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="hospedajeDesc">Mensaje Descriptivo</label>
+                    <input type="text" id="hospedajeDesc" placeholder="Ej. Hemos seleccionado algunas opciones...">
+                </div>
+
+                <h3>Opción 1</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="hotel1Name">Nombre del Hotel</label>
+                        <input type="text" id="hotel1Name" placeholder="Ej. Fiesta Americana">
+                    </div>
+                    <div class="form-group">
+                        <label for="hotel1Address">Dirección</label>
+                        <input type="text" id="hotel1Address" placeholder="Ej. Paseo de la Reforma 80">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="hotel1Phone">Teléfono</label>
+                        <input type="text" id="hotel1Phone" placeholder="Ej. 55 1234 5678">
+                    </div>
+                    <div class="form-group">
+                        <label for="hotel1Url">Sitio Web / Link de Reserva</label>
+                        <input type="text" id="hotel1Url">
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--sand); margin: 20px 0;">
+
+                <h3>Opción 2</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="hotel2Name">Nombre del Hotel</label>
+                        <input type="text" id="hotel2Name" placeholder="Ej. Hotel Boutique Coyoacán">
+                    </div>
+                    <div class="form-group">
+                        <label for="hotel2Address">Dirección</label>
+                        <input type="text" id="hotel2Address" placeholder="Ej. Ignacio Allende 45">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="hotel2Phone">Teléfono</label>
+                        <input type="text" id="hotel2Phone" placeholder="Ej. 55 8765 4321">
+                    </div>
+                    <div class="form-group">
+                        <label for="hotel2Url">Sitio Web / Link de Reserva</label>
+                        <input type="text" id="hotel2Url">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SECCIÓN 8 -->
+            <div class="card">
+                <h2>8. Confirmación de Asistencia (RSVP)</h2>
+                <div class="form-group">
+                    <label for="rsvpTitle">Título RSVP</label>
+                    <input type="text" id="rsvpTitle" placeholder="Ej. Confirma tu Asistencia" value="Confirma tu Asistencia">
+                </div>
+                <div class="form-group">
+                    <label for="rsvpDesc">Mensaje de RSVP</label>
+                    <input type="text" id="rsvpDesc" placeholder="Por favor confírmanos antes del...">
+                </div>
+                <div class="form-group">
+                    <label for="rsvpWhatsAppNumber">Tu Número de WhatsApp Principal (Con código de país, ej. 525512345678)</label>
+                    <input type="text" id="rsvpWhatsAppNumber" placeholder="Ej. 525512345678">
+                </div>
+                <div class="form-group">
+                    <label for="rsvpWhatsAppNumber2">Segundo Número de WhatsApp (Opcional - ej. Número del novio)</label>
+                    <input type="text" id="rsvpWhatsAppNumber2" placeholder="Ej. 525587654321">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-download"><i class="fa-solid fa-download"></i> Descargar mis Respuestas</button>
+            <p style="text-align: center; color: var(--light-grey); font-size: 0.95rem; margin-top: 20px;">Al descargar, envíale este archivo JSON a tu diseñador para generar la invitación.</p>
+        </form>
+    </div>
+
+    <script>
+        function toggleEventFields() {
+            const eventType = document.getElementById("eventType").value;
+            const isBoda = eventType === "boda";
+
+            document.getElementById("labelBrideName").innerText = isBoda ? "Nombre de la Novia" : "Festejado / Festejada / Quinceañera";
+            document.getElementById("groupGroomName").style.display = isBoda ? "block" : "none";
+
+            document.getElementById("labelBrideMother").innerText = isBoda ? "Mamá de la Novia" : "Mamá / Anfitrión 1";
+            document.getElementById("labelBrideFather").innerText = isBoda ? "Papá de la Novia" : "Papá / Anfitrión 2";
+            document.getElementById("groupGroomMother").style.display = isBoda ? "block" : "none";
+            document.getElementById("groupGroomFather").style.display = isBoda ? "block" : "none";
+        }
+
+        function addItineraryRow() {
+            const tbody = document.getElementById("itinerary-table-body");
+            const tr = document.createElement("tr");
+            
+            tr.innerHTML = `
+                <td><input type="text" class="iti-time" placeholder="16:00 hrs"></td>
+                <td><input type="text" class="iti-title" placeholder="Ej. Ceremonia"></td>
+                <td><input type="text" class="iti-desc" placeholder="Breve descripción"></td>
+                <td style="text-align: center;"><button type="button" class="btn-delete" onclick="this.closest('tr').remove()"><i class="fa-solid fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        // Add 3 default rows
+        window.onload = () => {
+            addItineraryRow();
+            addItineraryRow();
+            addItineraryRow();
+            toggleEventFields(); // Ejecutar lógica inicial para renombrar labels
+        };
+
+        function downloadData(e) {
+            e.preventDefault();
+            
+            const itineraryItems = [];
+            const rows = document.querySelectorAll("#itinerary-table-body tr");
+            rows.forEach(tr => {
+                const time = tr.querySelector('.iti-time').value;
+                const title = tr.querySelector('.iti-title').value;
+                const desc = tr.querySelector('.iti-desc').value;
+                if (time || title) {
+                    itineraryItems.push({ time, title, description: desc, icon: "fa-circle-check" });
+                }
+            });
+
+            const clientData = {
+                eventType: document.getElementById("eventType").value,
+                brideName: document.getElementById("brideName").value,
+                groomName: document.getElementById("groomName").value,
+                brideGroomInitials: document.getElementById("brideGroomInitials").value,
+                hashtag: document.getElementById("hashtag").value,
+                quote: document.getElementById("quote").value,
+                weddingDateText: document.getElementById("weddingDateText").value,
+                
+                countdownDate: {
+                    targetDateTime: document.getElementById("countdownDateTime").value
+                },
+
+                family: {
+                    brideParents: { mother: document.getElementById("brideMother").value, father: document.getElementById("brideFather").value },
+                    groomParents: { mother: document.getElementById("groomMother").value, father: document.getElementById("groomFather").value },
+                    godparents: document.getElementById("padrinos").value
+                },
+
+                ceremonia: {
+                    title: document.getElementById("ceremoniaTitle").value,
+                    time: document.getElementById("ceremoniaTime").value,
+                    place: document.getElementById("ceremoniaPlace").value,
+                    address1: document.getElementById("ceremoniaAddress1").value,
+                    address2: document.getElementById("ceremoniaAddress2").value,
+                    mapQuery: document.getElementById("ceremoniaMapQuery").value
+                },
+
+                recepcion: {
+                    title: document.getElementById("recepcionTitle").value,
+                    time: document.getElementById("recepcionTime").value,
+                    place: document.getElementById("recepcionPlace").value,
+                    address1: document.getElementById("recepcionAddress1").value,
+                    address2: document.getElementById("recepcionAddress2").value,
+                    mapQuery: document.getElementById("recepcionMapQuery").value
+                },
+
+                itinerary: itineraryItems,
+
+                dressCode: {
+                    title: document.getElementById("dressCodeTitle").value,
+                    women: { title: "Mujeres", desc: document.getElementById("dressWomenDesc").value, note: document.getElementById("dressWomenNote").value },
+                    men: { title: "Hombres", desc: document.getElementById("dressMenDesc").value }
+                },
+
+                registry: {
+                    description: document.getElementById("registryDesc").value,
+                    registry1: { name: document.getElementById("registry1Name").value, url: document.getElementById("registry1Url").value },
+                    registry2: { name: document.getElementById("registry2Name").value, url: document.getElementById("registry2Url").value },
+                    lluviaSobres: document.getElementById("lluviaSobres").value === "yes"
+                },
+
+                incluirHospedaje: document.getElementById("incluirHospedaje").value === "yes",
+                hospedaje: {
+                    description: document.getElementById("hospedajeDesc").value,
+                    opciones: [
+                        { name: document.getElementById("hotel1Name").value, address: document.getElementById("hotel1Address").value, phone: document.getElementById("hotel1Phone").value, url: document.getElementById("hotel1Url").value },
+                        { name: document.getElementById("hotel2Name").value, address: document.getElementById("hotel2Address").value, phone: document.getElementById("hotel2Phone").value, url: document.getElementById("hotel2Url").value }
+                    ]
+                },
+
+                rsvp: {
+                    title: document.getElementById("rsvpTitle").value,
+                    description: document.getElementById("rsvpDesc").value,
+                    whatsappNumber: document.getElementById("rsvpWhatsAppNumber").value,
+                    whatsappNumber2: document.getElementById("rsvpWhatsAppNumber2").value
+                }
+            };
+
+            const dataStr = JSON.stringify(clientData, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "datos_evento.json";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            const toast = document.getElementById("toast");
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3500);
+        }
+    </script>
+</body>
+</html>

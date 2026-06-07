@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Ana & Carlos — Boda 28 Septiembre 2026</title>
+  <meta name="description" content="Estás cordialmente invitado a la boda de Ana & Carlos, 28 de Septiembre de 2026.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream:      #FAF6EF;
+      --cream-mid:  #F3EBE0;
+      --cream-dark: #E8DDD0;
+      --gold:       #B89B6A;
+      --gold-light: #D4BC94;
+      --gold-pale:  #F5EDD8;
+      --sage:       #7A9068;
+      --charcoal:   #2C2C2C;
+      --warm:       #5E584F;
+      --muted:      #9E9890;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans:  'Jost', sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--cream);
+      color: var(--charcoal);
+      overflow-x: hidden;
+    }
+
+    /* ── PORTADA ── */
+    .cover {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 28px;
+      background: var(--cream);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Ornamento de esquina SVG */
+    .corner { position: absolute; width: 140px; opacity: .55; }
+    .corner-tl { top: 0; left: 0; }
+    .corner-br { bottom: 0; right: 0; transform: rotate(180deg); }
+    .corner-tr { top: 0; right: 0; transform: scaleX(-1); }
+    .corner-bl { bottom: 0; left: 0; transform: scaleY(-1); }
+
+    .cover-label {
+      font-family: var(--sans);
+      font-size: .68rem;
+      font-weight: 500;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+      animation: fadeDown .9s ease both;
+    }
+
+    .cover-names {
+      font-family: var(--serif);
+      font-size: clamp(3.6rem, 12vw, 6.5rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--charcoal);
+      line-height: 1.05;
+      animation: fadeDown .9s .15s ease both;
+    }
+    .cover-amp {
+      font-size: clamp(2.4rem, 8vw, 4.2rem);
+      color: var(--gold);
+      display: block;
+      font-weight: 300;
+      margin: 4px 0;
+    }
+
+    .cover-line {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 32px auto;
+      width: 200px;
+      animation: fadeDown .9s .3s ease both;
+    }
+    .cover-line::before, .cover-line::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gold-light);
+    }
+    .cover-line span {
+      font-size: 1rem;
+      color: var(--gold-light);
+      font-family: var(--serif);
+    }
+
+    .cover-date {
+      font-family: var(--serif);
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      font-weight: 400;
+      letter-spacing: .12em;
+      color: var(--warm);
+      text-transform: uppercase;
+      animation: fadeDown .9s .45s ease both;
+    }
+
+    .cover-place {
+      font-size: .82rem;
+      font-weight: 300;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-top: 8px;
+      animation: fadeDown .9s .55s ease both;
+    }
+
+    .cover-scroll {
+      margin-top: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .7rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      animation: fadeDown .9s .7s ease both;
+    }
+    .cover-scroll-arrow {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--gold-light), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse { 0%,100%{opacity:.4;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(1.15)} }
+
+    /* ── CONTADOR ── */
+    .countdown-section {
+      background: var(--cream-mid);
+      padding: 60px 28px;
+      text-align: center;
+      border-top: 1px solid var(--cream-dark);
+      border-bottom: 1px solid var(--cream-dark);
+    }
+    .countdown-label {
+      font-size: .68rem;
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 32px;
+    }
+    .countdown-grid {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .cd-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--cream);
+      border: 1px solid var(--cream-dark);
+      border-radius: 12px;
+      padding: 20px 28px;
+      min-width: 76px;
+    }
+    .cd-num {
+      font-family: var(--serif);
+      font-size: 2.8rem;
+      font-weight: 300;
+      color: var(--charcoal);
+      line-height: 1;
+    }
+    .cd-unit {
+      font-size: .62rem;
+      font-weight: 500;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .cd-sep {
+      font-family: var(--serif);
+      font-size: 2rem;
+      color: var(--gold-light);
+      align-self: center;
+      padding-bottom: 12px;
+    }
+
+    /* ── SECCIÓN GENÉRICA ── */
+    .section {
+      padding: 70px 28px;
+      max-width: 680px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .section-tag {
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(1.9rem, 5vw, 2.8rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--charcoal);
+      line-height: 1.25;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: .95rem;
+      font-weight: 300;
+      color: var(--warm);
+      line-height: 1.85;
+    }
+    .ornament {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 28px auto;
+      max-width: 280px;
+    }
+    .ornament::before, .ornament::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--cream-dark);
+    }
+    .ornament span {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      color: var(--gold-light);
+    }
+
+    /* ── ITINERARIO ── */
+    .itinerary-section {
+      background: var(--cream-mid);
+      border-top: 1px solid var(--cream-dark);
+      border-bottom: 1px solid var(--cream-dark);
+    }
+    .itinerary-inner {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 70px 28px;
+    }
+    .itin-item {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 0 20px;
+      margin-bottom: 0;
+      position: relative;
+    }
+    .itin-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 27px;
+      top: 52px;
+      bottom: -28px;
+      width: 1px;
+      background: var(--cream-dark);
+    }
+    .itin-item + .itin-item { margin-top: 28px; }
+    .itin-time {
+      font-family: var(--serif);
+      font-size: .85rem;
+      font-style: italic;
+      color: var(--gold);
+      text-align: right;
+      padding-top: 14px;
+      line-height: 1.3;
+    }
+    .itin-dot-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .itin-dot {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--cream);
+      border: 2px solid var(--gold-light);
+      margin-top: 14px;
+      flex-shrink: 0;
+    }
+    /* reuse grid for timeline: col1=time, then dot+content */
+    .itin-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 28px;
+      align-items: flex-start;
+      position: relative;
+    }
+    .itin-row:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 90px;
+      top: 52px;
+      height: calc(100% + 4px);
+      width: 1px;
+      background: var(--cream-dark);
+    }
+    .itin-time-col {
+      width: 72px;
+      flex-shrink: 0;
+      font-family: var(--serif);
+      font-size: .9rem;
+      font-style: italic;
+      color: var(--gold);
+      text-align: right;
+      padding-top: 1px;
+      line-height: 1.4;
+    }
+    .itin-dot-col {
+      width: 14px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 5px;
+    }
+    .itin-dot-col span {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--cream);
+      border: 2px solid var(--gold);
+      display: block;
+    }
+    .itin-content { flex: 1; }
+    .itin-event {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--charcoal);
+      margin-bottom: 3px;
+    }
+    .itin-venue {
+      font-size: .8rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    /* ── UBICACIONES ── */
+    .locations-section { padding: 70px 28px; }
+    .loc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 560px;
+      margin: 36px auto 0;
+    }
+    .loc-card {
+      background: var(--cream-mid);
+      border: 1px solid var(--cream-dark);
+      border-radius: 16px;
+      padding: 28px 22px;
+      text-align: center;
+      text-decoration: none;
+      transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+    .loc-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 36px rgba(184,155,106,.15);
+      border-color: var(--gold-light);
+    }
+    .loc-icon {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--gold-pale);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 1.3rem;
+    }
+    .loc-type {
+      font-size: .62rem;
+      font-weight: 500;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .loc-name {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+    .loc-address {
+      font-size: .78rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .loc-time {
+      font-family: var(--serif);
+      font-size: .9rem;
+      font-style: italic;
+      color: var(--warm);
+    }
+    .loc-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 14px;
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .08em;
+      color: var(--gold);
+      border-bottom: 1px solid var(--gold-light);
+      padding-bottom: 1px;
+    }
+
+    /* ── VESTIMENTA ── */
+    .dress-section {
+      background: var(--cream-mid);
+      border-top: 1px solid var(--cream-dark);
+      border-bottom: 1px solid var(--cream-dark);
+      padding: 70px 28px;
+      text-align: center;
+    }
+    .dress-palette {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 32px auto 20px;
+      max-width: 400px;
+    }
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .swatch-circle {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.6);
+      box-shadow: 0 4px 14px rgba(0,0,0,.1);
+    }
+    .swatch-name {
+      font-size: .62rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .dress-note {
+      font-size: .82rem;
+      font-weight: 300;
+      color: var(--muted);
+      max-width: 320px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    .dress-avoid {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      background: #fff5f5;
+      border: 1px solid #fdd;
+      border-radius: 30px;
+      padding: 6px 14px;
+      font-size: .75rem;
+      color: #c0665a;
+    }
+
+    /* ── MESA DE REGALOS ── */
+    .gifts-section { padding: 70px 28px; text-align: center; }
+    .gift-card-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 36px;
+    }
+    .gift-card {
+      background: var(--cream-mid);
+      border: 1px solid var(--cream-dark);
+      border-radius: 16px;
+      padding: 28px 32px;
+      text-align: center;
+      min-width: 200px;
+      transition: transform .3s, box-shadow .3s, border-color .3s;
+    }
+    .gift-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(184,155,106,.13); border-color: var(--gold-light); }
+    .gift-icon { font-size: 2rem; margin-bottom: 12px; }
+    .gift-store {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--charcoal);
+      margin-bottom: 6px;
+    }
+    .gift-desc { font-size: .78rem; color: var(--muted); font-weight: 300; margin-bottom: 16px; line-height: 1.5; }
+    .gift-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 20px;
+      background: var(--charcoal);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 30px;
+      font-size: .75rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      transition: background .3s;
+    }
+    .gift-btn:hover { background: var(--gold); }
+    .gift-cash {
+      margin-top: 20px;
+      background: var(--gold-pale);
+      border: 1px solid var(--gold-light);
+      border-radius: 14px;
+      padding: 20px 28px;
+      text-align: center;
+      max-width: 340px;
+      margin: 20px auto 0;
+    }
+    .gift-cash p { font-size: .85rem; color: var(--warm); font-weight: 300; line-height: 1.6; margin-top: 8px; }
+    .gift-cash strong { font-family: var(--serif); font-size: 1.05rem; font-weight: 400; color: var(--charcoal); display: block; margin-bottom: 4px; }
+
+    /* ── RSVP ── */
+    .rsvp-section {
+      background: var(--charcoal);
+      padding: 80px 28px;
+      text-align: center;
+    }
+    .rsvp-section .section-tag { color: var(--gold-light); }
+    .rsvp-section .section-title { color: #fff; }
+    .rsvp-section .section-body { color: rgba(255,255,255,.55); }
+    .rsvp-deadline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 30px;
+      padding: 7px 16px;
+      font-size: .75rem;
+      color: rgba(255,255,255,.55);
+      margin: 20px 0 32px;
+      letter-spacing: .06em;
+    }
+    .rsvp-deadline span { color: var(--gold-light); font-weight: 500; }
+    .rsvp-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 36px;
+      background: #25D366;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      box-shadow: 0 8px 28px rgba(37,211,102,.35);
+      transition: transform .3s, box-shadow .3s;
+    }
+    .rsvp-btn:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(37,211,102,.45); }
+    .rsvp-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .rsvp-note {
+      margin-top: 20px;
+      font-size: .78rem;
+      color: rgba(255,255,255,.3);
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: #1e1e1e;
+      padding: 36px 28px;
+      text-align: center;
+    }
+    .footer-logo {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-style: italic;
+      color: rgba(255,255,255,.3);
+    }
+    .footer-logo a {
+      color: var(--gold-light);
+      text-decoration: none;
+      font-style: italic;
+    }
+    .footer-logo a:hover { text-decoration: underline; }
+    .footer-copy {
+      font-size: .68rem;
+      color: rgba(255,255,255,.18);
+      margin-top: 6px;
+      letter-spacing: .06em;
+    }
+
+    /* ── BADGE DEMO ── */
+    .demo-badge {
+      position: fixed;
+      top: 16px; right: 16px;
+      background: rgba(44,44,44,.92);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      font-size: .68rem;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,.1);
+      z-index: 999;
+    }
+    .demo-badge em { color: var(--gold-light); font-style: normal; }
+
+    /* ── ANIMACIONES ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .75s ease, transform .75s ease;
+    }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .loc-grid { grid-template-columns: 1fr; }
+      .cd-box { padding: 16px 20px; min-width: 64px; }
+      .cd-num { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Badge demo -->
+  <div class="demo-badge">Demo &mdash; <em>Paquete Esencial</em></div>
+
+  <!-- ══ PORTADA ══ -->
+  <section class="cover">
+    <!-- Ornamentos de esquina -->
+    <svg class="corner corner-tl" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0 Q50 0 50 50" stroke="#B89B6A" stroke-width="1" opacity=".4" fill="none"/>
+      <path d="M0 10 Q40 10 40 50" stroke="#B89B6A" stroke-width=".6" opacity=".25" fill="none"/>
+      <path d="M10 0 Q10 40 50 40" stroke="#B89B6A" stroke-width=".6" opacity=".25" fill="none"/>
+      <circle cx="52" cy="52" r="3" fill="#B89B6A" opacity=".35"/>
+      <circle cx="20" cy="8"  r="2" fill="#B89B6A" opacity=".25"/>
+      <circle cx="8"  cy="20" r="2" fill="#B89B6A" opacity=".25"/>
+      <path d="M30 0 Q30 15 45 15" stroke="#7A9068" stroke-width=".8" opacity=".3" fill="none"/>
+      <ellipse cx="46" cy="14" rx="8" ry="4" fill="#7A9068" opacity=".2" transform="rotate(-20 46 14)"/>
+      <ellipse cx="28" cy="32" rx="6" ry="3" fill="#7A9068" opacity=".18" transform="rotate(10 28 32)"/>
+    </svg>
+    <svg class="corner corner-tr" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0 Q50 0 50 50" stroke="#B89B6A" stroke-width="1" opacity=".4" fill="none"/>
+      <path d="M0 10 Q40 10 40 50" stroke="#B89B6A" stroke-width=".6" opacity=".25" fill="none"/>
+      <circle cx="52" cy="52" r="3" fill="#B89B6A" opacity=".35"/>
+      <ellipse cx="46" cy="14" rx="8" ry="4" fill="#7A9068" opacity=".2" transform="rotate(-20 46 14)"/>
+    </svg>
+    <svg class="corner corner-bl" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0 Q50 0 50 50" stroke="#B89B6A" stroke-width="1" opacity=".4" fill="none"/>
+      <circle cx="52" cy="52" r="3" fill="#B89B6A" opacity=".35"/>
+      <ellipse cx="28" cy="32" rx="6" ry="3" fill="#7A9068" opacity=".18" transform="rotate(10 28 32)"/>
+    </svg>
+    <svg class="corner corner-br" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0 Q50 0 50 50" stroke="#B89B6A" stroke-width="1" opacity=".4" fill="none"/>
+      <path d="M0 10 Q40 10 40 50" stroke="#B89B6A" stroke-width=".6" opacity=".25" fill="none"/>
+      <circle cx="52" cy="52" r="3" fill="#B89B6A" opacity=".35"/>
+      <ellipse cx="46" cy="14" rx="8" ry="4" fill="#7A9068" opacity=".2" transform="rotate(-20 46 14)"/>
+    </svg>
+
+    <p class="cover-label">Te invitamos a celebrar nuestra boda</p>
+
+    <h1 class="cover-names">
+      Ana<span class="cover-amp">&amp;</span>Carlos
+    </h1>
+
+    <div class="cover-line"><span>✦</span></div>
+
+    <p class="cover-date">Lunes · 28 de Septiembre · 2026</p>
+    <p class="cover-place">Ciudad de México, México</p>
+
+    <div class="cover-scroll">
+      <div class="cover-scroll-arrow"></div>
+      <span>Desliza para ver</span>
+    </div>
+  </section>
+
+  <!-- ══ CUENTA REGRESIVA ══ -->
+  <section class="countdown-section">
+    <p class="countdown-label">Faltan</p>
+    <div class="countdown-grid">
+      <div class="cd-box"><span class="cd-num" id="cd-d">000</span><span class="cd-unit">Días</span></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-box"><span class="cd-num" id="cd-h">00</span><span class="cd-unit">Horas</span></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-box"><span class="cd-num" id="cd-m">00</span><span class="cd-unit">Min</span></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-box"><span class="cd-num" id="cd-s">00</span><span class="cd-unit">Seg</span></div>
+    </div>
+  </section>
+
+  <!-- ══ MENSAJE ══ -->
+  <section class="section reveal">
+    <p class="section-tag">Con todo nuestro amor</p>
+    <h2 class="section-title">Queremos compartir este día tan especial contigo</h2>
+    <div class="ornament"><span>✦</span></div>
+    <p class="section-body">
+      Después de caminar juntos por la vida, ha llegado el momento de unirnos ante Dios, nuestra familia y amigos.<br><br>
+      Tu presencia hará que este día sea aún más memorable. Con cariño, <em>Ana &amp; Carlos</em>.
+    </p>
+  </section>
+
+  <!-- ══ ITINERARIO ══ -->
+  <section class="itinerary-section">
+    <div class="itinerary-inner reveal">
+      <p class="section-tag" style="text-align:center;">El gran día</p>
+      <h2 class="section-title" style="text-align:center;">Itinerario</h2>
+      <div class="ornament"><span>✦</span></div>
+
+      <div class="itin-row">
+        <div class="itin-time-col">1:00<br><small style="font-size:.7rem;color:var(--muted)">pm</small></div>
+        <div class="itin-dot-col"><span></span></div>
+        <div class="itin-content">
+          <p class="itin-event">Ceremonia Religiosa</p>
+          <p class="itin-venue">Parroquia de San José · Col. Condesa</p>
+        </div>
+      </div>
+
+      <div class="itin-row">
+        <div class="itin-time-col">3:00<br><small style="font-size:.7rem;color:var(--muted)">pm</small></div>
+        <div class="itin-dot-col"><span></span></div>
+        <div class="itin-content">
+          <p class="itin-event">Coctel de Bienvenida</p>
+          <p class="itin-venue">Jardines del Hacienda San Ángel</p>
+        </div>
+      </div>
+
+      <div class="itin-row">
+        <div class="itin-time-col">5:00<br><small style="font-size:.7rem;color:var(--muted)">pm</small></div>
+        <div class="itin-dot-col"><span></span></div>
+        <div class="itin-content">
+          <p class="itin-event">Recepción &amp; Banquete</p>
+          <p class="itin-venue">Salón Imperial · Salida San Ángel</p>
+        </div>
+      </div>
+
+      <div class="itin-row">
+        <div class="itin-time-col">7:00<br><small style="font-size:.7rem;color:var(--muted)">pm</small></div>
+        <div class="itin-dot-col"><span style="border-color:var(--gold);background:var(--gold-pale);"></span></div>
+        <div class="itin-content">
+          <p class="itin-event" style="color:var(--gold);">¡Fiesta hasta el amanecer!</p>
+          <p class="itin-venue">Música en vivo &amp; DJ</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ UBICACIONES ══ -->
+  <section class="locations-section reveal">
+    <div style="text-align:center;">
+      <p class="section-tag">Dónde nos vemos</p>
+      <h2 class="section-title">Lugares del evento</h2>
+      <div class="ornament"><span>✦</span></div>
+    </div>
+    <div class="loc-grid">
+      <a class="loc-card" href="https://maps.google.com/?q=Parroquia+San+Jose+Condesa+CDMX" target="_blank" rel="noopener">
+        <div class="loc-icon">⛪</div>
+        <p class="loc-type">Ceremonia</p>
+        <p class="loc-name">Parroquia de San José</p>
+        <p class="loc-address">Av. Ámsterdam 148, Hipódromo Condesa, CDMX</p>
+        <p class="loc-time"><em>1:00 pm</em></p>
+        <span class="loc-cta">Ver en mapa ↗</span>
+      </a>
+      <a class="loc-card" href="https://maps.google.com/?q=San+Angel+CDMX" target="_blank" rel="noopener">
+        <div class="loc-icon">🌿</div>
+        <p class="loc-type">Recepción</p>
+        <p class="loc-name">Hacienda San Ángel</p>
+        <p class="loc-address">Calz. del Hueso 911, San Ángel, CDMX</p>
+        <p class="loc-time"><em>3:00 pm</em></p>
+        <span class="loc-cta">Ver en mapa ↗</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ VESTIMENTA ══ -->
+  <section class="dress-section reveal">
+    <p class="section-tag">Dress code</p>
+    <h2 class="section-title">Código de vestimenta</h2>
+    <div class="ornament"><span>✦</span></div>
+    <p class="section-body" style="max-width:340px;margin:0 auto 28px;">
+      <strong style="font-family:var(--serif);font-weight:400;font-size:1.1rem;">Formal · Etiqueta</strong>
+    </p>
+    <div class="dress-palette">
+      <div class="swatch">
+        <div class="swatch-circle" style="background:#2C2C2C;"></div>
+        <span class="swatch-name">Negro</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-circle" style="background:#8C7B68;"></div>
+        <span class="swatch-name">Taupe</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-circle" style="background:#B89B6A;"></div>
+        <span class="swatch-name">Dorado</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-circle" style="background:#7A9068;"></div>
+        <span class="swatch-name">Salvia</span>
+      </div>
+      <div class="swatch">
+        <div class="swatch-circle" style="background:#D4C0AE;"></div>
+        <span class="swatch-name">Nude</span>
+      </div>
+    </div>
+    <p class="dress-note">Elige tonos tierra, dorados o formales. ¡Nos encantará verte elegante!</p>
+    <div>
+      <span class="dress-avoid">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        Por favor evitar el blanco y los estampados florales grandes
+      </span>
+    </div>
+  </section>
+
+  <!-- ══ MESA DE REGALOS ══ -->
+  <section class="gifts-section reveal">
+    <p class="section-tag">Si deseas obsequiarnos algo</p>
+    <h2 class="section-title">Mesa de regalos</h2>
+    <div class="ornament"><span>✦</span></div>
+    <p class="section-body" style="max-width:380px;margin:0 auto 8px;">
+      Tu presencia es nuestro mejor regalo, pero si deseas obsequiarnos algo, aquí te dejamos nuestras opciones:
+    </p>
+    <div class="gift-card-wrap">
+      <div class="gift-card">
+        <div class="gift-icon">🏠</div>
+        <p class="gift-store">Liverpool</p>
+        <p class="gift-desc">Mesa de regalos #4829157<br>Artículos para el hogar</p>
+        <a href="#" class="gift-btn">Ver mesa ↗</a>
+      </div>
+      <div class="gift-card">
+        <div class="gift-icon">✈️</div>
+        <p class="gift-store">Viaje de Novios</p>
+        <p class="gift-desc">Contribuye a nuestra<br>luna de miel en Europa</p>
+        <a href="#" class="gift-btn">Contribuir ↗</a>
+      </div>
+    </div>
+    <div class="gift-cash">
+      <strong>💳 &nbsp;Transferencia / Efectivo</strong>
+      <p>Si prefieres hacerlo de forma directa, con gusto te compartimos los datos el día del evento.</p>
+    </div>
+  </section>
+
+  <!-- ══ RSVP ══ -->
+  <section class="rsvp-section reveal">
+    <p class="section-tag">Confirmación de asistencia</p>
+    <h2 class="section-title" style="font-size:clamp(1.8rem,5vw,2.6rem);">¿Nos confirmas tu asistencia?</h2>
+    <div class="ornament" style="max-width:200px;"><span style="color:rgba(255,255,255,.2);">✦</span></div>
+    <p class="section-body">Necesitamos saber si contamos contigo para poder recibirte como mereces.</p>
+    <div>
+      <div class="rsvp-deadline">
+        Fecha límite: <span>15 de Septiembre de 2026</span>
+      </div>
+    </div>
+    <a href="https://wa.me/525566790073?text=Hola!%20Confirmo%20mi%20asistencia%20a%20la%20boda%20de%20Ana%20%26%20Carlos%20el%2028%20de%20Septiembre.%20%0A%0ANombre%3A%20%0AN%C3%BAmero%20de%20personas%3A%20" target="_blank" class="rsvp-btn">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Confirmar por WhatsApp
+    </a>
+    <p class="rsvp-note">Al hacer clic se abrirá WhatsApp con un mensaje prellenado</p>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <p class="footer-logo">
+      Ana &amp; Carlos · 28.09.2026<br>
+      <small style="font-size:.7rem;font-style:normal;font-family:var(--sans);">Invitación creada por </small>
+      <a href="https://invitta.mx" target="_blank">Invitta</a>
+    </p>
+    <p class="footer-copy">Hecho con amor &hearts;</p>
+  </footer>
+
+  <script>
+    // Cuenta regresiva
+    (function() {
+      const target = new Date('2026-09-28T13:00:00').getTime();
+      function tick() {
+        const now = Date.now();
+        const diff = target - now;
+        if (diff <= 0) {
+          document.getElementById('cd-d').textContent = '000';
+          document.getElementById('cd-h').textContent = '00';
+          document.getElementById('cd-m').textContent = '00';
+          document.getElementById('cd-s').textContent = '00';
+          return;
+        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('cd-d').textContent = String(d).padStart(3,'0');
+        document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+        document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+        document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+      }
+      tick();
+      setInterval(tick, 1000);
+    })();
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    revealEls.forEach(el => obs.observe(el));
+  </script>
+</body>
+</html>

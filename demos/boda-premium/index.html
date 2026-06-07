@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="tab-title">Ana & Carlos</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css?v=1780781627969">
+
+    <!-- Open Graph for WhatsApp & Social Media Previews -->
+    <meta property="og:title" id="og-title" content="Nuestra Boda">
+    <meta property="og:description" id="og-desc" content="¡Estás invitado a nuestra boda! Acompáñanos en este día tan especial.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tudominio.com/">
+    <!-- Nota: WhatsApp requiere un enlace absoluto de internet (https://...) para mostrar la imagen -->
+    <meta property="og:image" content="https://tudominio.com/assets/hero_bg.jpg">
+    <link rel="stylesheet" href="../../assets/css/envelopes.css">
+</head>
+<body>
+
+    <!-- Envelope Overlay (Sobre Digital) -->
+    <div id="envelope-overlay" class="envelope-overlay env-boda-premium env-arch">
+        <div class="envelope-container">
+            <div class="envelope-flap" id="envelope-flap"></div>
+            <div class="envelope-back"></div>
+            <div class="envelope-liner"></div>
+            <div class="envelope-front"></div>
+            <div class="envelope-seal" id="envelope-seal">
+                <i class="fa-solid fa-envelope-open" style="font-size:1.2rem;"></i>
+            </div>
+        </div>
+    </div>
+
+
+    
+
+    <!-- Background Music -->
+    <audio id="bg-music" loop>
+        <source id="bg-music-source" src="" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <!-- Floating Music Button -->
+    <button id="music-btn" class="music-btn">
+        <i class="fa-solid fa-music"></i>
+    </button>
+
+    <!-- Hero Section -->
+    <header class="hero" id="home">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h2 class="pre-title fade-in-up" id="hero-pre-title">Nuestra Boda</h2>
+            <h1 class="title fade-in-up delay-1" id="hero-title">Ana & Carlos</h1>
+            <p class="date fade-in-up delay-2" id="hero-date">28 de Noviembre, 2026</p>
+            
+            <div class="countdown-wrapper fade-in-up delay-3">
+                <div class="countdown-item">
+                    <span id="days">00</span>
+                    <p>Días</p>
+                </div>
+                <div class="countdown-item">
+                    <span id="hours">00</span>
+                    <p>Horas</p>
+                </div>
+                <div class="countdown-item">
+                    <span id="minutes">00</span>
+                    <p>Minutos</p>
+                </div>
+                <div class="countdown-item">
+                    <span id="seconds">00</span>
+                    <p>Segundos</p>
+                </div>
+            </div>
+            <a href="#rsvp" class="btn-primary fade-in-up delay-4">Confirma tu asistencia</a>
+        </div>
+    </header>
+
+    <!-- Quote / Pensamiento Section -->
+    <section class="quote-section section-padding text-center" id="quote-section" style="display: none; background-color: var(--bg-color);">
+        <div class="container reveal">
+            <i class="fa-solid fa-quote-left" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+            <p id="main-quote" style="font-family: var(--font-secondary); font-size: 1.3rem; max-width: 800px; margin: 0 auto; color: var(--text-color); font-style: italic; line-height: 1.8; padding: 0 20px;">"El destino nos unió para siempre."</p>
+        </div>
+    </section>
+
+    <!-- Parents & Godparents Section -->
+    <section class="family container section-padding text-center" id="family">
+        <h2 class="script-title family-main-title" id="family-title">Con la Bendición de Nuestros Padres</h2>
+        <div class="divider"></div>
+        <div class="family-flex-container">
+            <div class="reveal">
+                <h3 class="family-role-title">Padres de la Novia</h3>
+                <p class="family-member-name" id="bride-mother">Claudia Guadalupe Aguirre Coahonte</p>
+                <p class="family-member-name" id="bride-father">Oscar Pineda Lozada</p>
+            </div>
+            <div class="reveal">
+                <h3 class="family-role-title">Padres del Novio</h3>
+                <p class="family-member-name" id="groom-mother">Angelina Córdova García</p>
+                <p class="family-member-name" id="groom-father">Jaime Correa Correa</p>
+            </div>
+        </div>
+        <div class="family-padrinos reveal" id="padrinos-container">
+            <h3 class="family-role-title">Padrinos</h3>
+            <p class="family-member-name" id="padrinos-names">Ángel Patiño y Lucila Osorio</p>
+        </div>
+    </section>
+
+    <!-- Parallax 1 -->
+    <div class="parallax-section parallax-1 reveal"></div>
+
+    <!-- Details Section -->
+    <section class="details container section-padding" id="details">
+        <div class="section-title text-center">
+            <h2 class="script-title">Detalles del Evento</h2>
+            <div class="divider"></div>
+        </div>
+        <div class="grid">
+            <!-- Ceremonia Religiosa -->
+            <div class="card reveal">
+                <i class="fa-solid fa-church card-icon"></i>
+                <h3 id="ceremonia-title">Ceremonia Religiosa</h3>
+                <p id="ceremonia-time">16:00 hrs</p>
+                <p id="ceremonia-place" style="font-weight: bold; color: var(--secondary-color); margin-top: 10px;">Parroquia San Miguel Arcángel</p>
+                <p id="ceremonia-address">Ciudad de México</p>
+                <a href="#" id="ceremonia-map" target="_blank" class="btn-secondary">Ver en Mapa</a>
+            </div>
+            <!-- Recepción -->
+            <div class="card reveal">
+                <i class="fa-solid fa-martini-glass-citrus card-icon"></i>
+                <h3 id="recepcion-title">Recepción</h3>
+                <p id="recepcion-time">19:00 hrs</p>
+                <p id="recepcion-place" style="font-weight: bold; color: var(--secondary-color); margin-top: 10px;">Salón Lomas</p>
+                <p id="recepcion-address">Lomas de Chapultepec, CDMX</p>
+                <a href="#" id="recepcion-map" target="_blank" class="btn-secondary">Ver en Mapa</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Itinerary Section -->
+    <section class="itinerary-section section-padding" id="itinerary">
+        <div class="container">
+            <div class="section-title text-center reveal">
+                <h2 class="script-title">Itinerario</h2>
+                <div class="divider"></div>
+            </div>
+            <div class="timeline reveal" id="timeline-container">
+                <!-- Se poblará dinámicamente desde js/config.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Hospedaje Section -->
+    <section class="hospedaje-section section-padding" id="hospedaje" style="display: none; background-color: var(--bg-color);">
+        <div class="container text-center">
+            <div class="section-title text-center reveal">
+                <h2 class="script-title">Hospedaje Sugerido</h2>
+                <div class="divider"></div>
+                <p id="hospedaje-desc" style="margin-bottom: 30px; font-size: 1.1rem;"></p>
+            </div>
+            <div class="grid reveal" id="hospedaje-container" style="justify-content: center;">
+                <!-- Se poblará dinámicamente desde js/config.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Dress Code Section -->
+    <section class="dress-code-section section-padding" id="dress-code">
+        <div class="container text-center">
+            <div class="section-title text-center reveal">
+                <h2 class="script-title dress-code-title" id="dress-code-title">Código de Vestimenta</h2>
+                <h3 class="section-subtitle-elegant" id="dress-code-subtitle">Formal / Elegante</h3>
+                <div class="divider"></div>
+            </div>
+            <div class="dress-code-flex reveal">
+                <!-- Tarjeta Mujeres -->
+                <div class="dress-code-card">
+                    <img src="assets/dress_female.png" alt="Dress Code Mujeres" class="dress-code-img" id="dress-women-img">
+                    <h3 id="dress-women-title">Mujeres</h3>
+                    <p class="dress-code-desc" id="dress-women-desc">Vestido Largo</p>
+                    <p class="dress-code-note" id="dress-women-note">Se reserva el color blanco para la novia</p>
+                </div>
+                <!-- Tarjeta Hombres -->
+                <div class="dress-code-card">
+                    <img src="assets/dress_male.png" alt="Dress Code Hombres" class="dress-code-img" id="dress-men-img">
+                    <h3 id="dress-men-title">Hombres</h3>
+                    <p class="dress-code-desc" id="dress-men-desc">Traje y Corbata</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parallax 2 -->
+    <div class="parallax-section parallax-2 reveal"></div>
+
+    <!-- Gift Registry Section -->
+    <section class="registry section-padding text-center" id="registry">
+        <div class="container reveal">
+            <h2 class="script-title registry-title">Mesa de Regalos</h2>
+            <div class="divider"></div>
+            <p class="registry-desc" id="registry-desc">El mejor regalo es tu presencia, pero si deseas tener un detalle con nosotros:</p>
+            
+            <div class="registry-buttons-wrapper" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 30px; align-items: center;">
+                <!-- Boton 1 -->
+                <a href="#" id="registry-btn-1" target="_blank" class="btn-primary registry-btn" style="display:none; align-items: center; justify-content: center; gap: 8px; height: auto; padding: 12px 30px;"><i class="fa-solid fa-gift"></i> <span id="registry-name-1">Mesa 1</span></a>
+                <!-- Boton 2 -->
+                <a href="#" id="registry-btn-2" target="_blank" class="btn-primary registry-btn" style="display:none; align-items: center; justify-content: center; gap: 8px; height: auto; padding: 12px 30px;"><i class="fa-solid fa-gift"></i> <span id="registry-name-2">Mesa 2</span></a>
+            </div>
+            
+            <!-- Lluvia de sobres -->
+            <div id="lluvia-sobres-card" class="card" style="display:none; background: transparent; border: 2px dashed var(--primary-color); padding: 30px; border-radius: 10px; width: 100%; max-width: 500px; margin: 40px auto 0; box-shadow: none;">
+                <i class="fa-solid fa-envelope-open-text" style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+                <h3 style="color: var(--primary-color); font-family: var(--font-primary); font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;">Lluvia de Sobres</h3>
+                <p style="font-size: 0.95rem; color: var(--text-color); margin-bottom: 0; opacity: 0.85; line-height: 1.6;">La tradición de la lluvia de sobres consiste en un regalo en efectivo que se deposita en un buzón o sobre especial el día del evento.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- The Pass Section (Pase de Invitación) -->
+    <section class="pass-section section-padding" id="pass">
+        <div class="container">
+            <div class="ticket-card reveal">
+                <div class="ticket-left">
+                    <img src="" alt="QR Code" id="ticket-qr" class="qr-code">
+                </div>
+                <div class="ticket-right">
+                    <h3 class="ticket-title" id="ticket-title">Pase de Invitación</h3>
+                    <p class="ticket-subtitle" id="ticket-subtitle">Válido para:</p>
+                    <h4 class="guest-name" id="ticket-guest-name">Familia Invitada</h4>
+                    <div class="ticket-info">
+                        <div>
+                            <span>Personas</span>
+                            <strong id="ticket-passes">2</strong>
+                        </div>
+                        <div>
+                            <span>Mesa</span>
+                            <strong id="ticket-table">14</strong>
+                        </div>
+                    </div>
+                    <p class="ticket-message" id="ticket-message">"Con alegría en el corazón, los esperamos para compartir nuestra unión."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Photo Gallery Parallax -->
+    <section class="photo-gallery-parallax" id="photo-grid">
+        <div class="section-title text-center reveal gallery-title-wrapper">
+            <h2 class="script-title" id="gallery-title">Nuestra Galería</h2>
+            <div class="divider"></div>
+        </div>
+    </section>
+
+    <!-- Parallax 3 -->
+    <div class="parallax-section parallax-3 reveal"></div>
+
+    <!-- RSVP Section -->
+    <section class="rsvp section-padding" id="rsvp">
+        <div class="container">
+            <div class="rsvp-container reveal">
+                <h2 class="script-title rsvp-title" id="rsvp-title">Confirma tu Asistencia</h2>
+                <p id="rsvp-desc">Por favor, haznos saber si podrás acompañarnos en este día tan especial.</p>
+                <form id="rsvp-form" class="form">
+                    <div class="form-group">
+                        <label for="name">Nombre Completo</label>
+                        <input type="text" id="name" placeholder="Ej. Juan Pérez" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="attendance">¿Asistirás?</label>
+                        <select id="attendance" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="yes">¡Sí, ahí estaré!</option>
+                            <option value="no">Lamentablemente no podré asistir</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="guests">Número de personas</label>
+                        <select id="guests">
+                            <!-- Se rellena de manera dinámica según pases -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensaje (Opcional)</label>
+                        <textarea id="message" rows="4" placeholder="Déjanos un mensaje o coméntanos sobre alergias/restricciones..."></textarea>
+                    </div>
+                    <div id="rsvp-buttons-container" style="display: flex; flex-direction: column; gap: 10px;">
+                        <button type="submit" id="btn-rsvp-1" class="btn-primary w-100">Enviar Confirmación</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p id="footer-p">¡Esperamos verte ahí!</p>
+        <h2 id="footer-title">P, A & R</h2>
+        
+        <!-- Créditos y Contacto de Desarrollo -->
+        <div class="developer-credit" style="margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 25px;">
+            <p style="font-size: 0.85rem; font-family: var(--font-secondary); margin-bottom: 10px; opacity: 0.9;">¿Te gustó esta invitación? Solicita informes para tus Eventos</p>
+            <a href="https://wa.me/525566790073?text=Hola,%20me%20interesa%20pedir%20informes%20sobre%20las%20invitaciones%20digitales" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background-color: #25D366; color: white; padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-family: var(--font-secondary); font-weight: 600; transition: opacity 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                <i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp
+            </a>
+        </div>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close" id="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js?v=1780781627969"></script>
+    <script src="js/main.js?v=1780781627969"></script>
+    <script src="../../assets/js/envelopes.js"></script>
+</body>
+</html>
