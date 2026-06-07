@@ -961,11 +961,10 @@
     <!-- MENÚ MÓVIL -->
     <div class="mobile-menu" id="mobileMenu">
         <button class="mobile-close" id="mobileClose" aria-label="Cerrar menú"><i class="fa-solid fa-xmark"></i></button>
-        <a href="#modelos" onclick="closeMobileMenu()">Muestras</a>
-        <a href="#precios" onclick="closeMobileMenu()">Paquetes</a>
-        <a href="#proceso" onclick="closeMobileMenu()">Cómo funciona</a>
-        <a href="#testimonios" onclick="closeMobileMenu()">Testimonios</a>
-        <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20quiero%20solicitar%20una%20invitaci%C3%B3n" target="_blank" class="btn-primary" style="font-family:var(--sans);">
+        <a href="#modelos" onclick="closeMobileMenu()">Ver Ejemplos</a>
+        <a href="#" onclick="closeMobileMenu(); openModal();">Solicitar Propuesta</a>
+        <a href="administracion/dashboard.html" style="font-weight: 600;">Acceder</a>
+        <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20quiero%20solicitar%20una%20invitaci%C3%B3n" target="_blank" class="btn-primary" style="font-family:var(--sans); margin-top: 20px;">
             <i class="fa-brands fa-whatsapp"></i> Hablar por WhatsApp
         </a>
     </div>
@@ -975,13 +974,11 @@
         <div class="container nav-wrapper">
             <a href="#" class="logo">Inv<em>itta</em></a>
             <ul class="nav-links">
-                <li><a href="#modelos">Muestras</a></li>
-                <li><a href="#precios">Paquetes</a></li>
-                <li><a href="#proceso">Cómo funciona</a></li>
-                <li><a href="#testimonios">Testimonios</a></li>
+                <li><a href="#modelos">Ver Ejemplos</a></li>
+                <li><a href="#" onclick="openModal()">Solicitar Propuesta</a></li>
                 <li>
-                    <a href="administracion/formulario-cliente.html" class="btn-nav">
-                        <i class="fa-solid fa-file-pen"></i> Solicitar Invitación
+                    <a href="administracion/dashboard.html" class="btn-nav" style="background: var(--charcoal); color: #fff; border: none; padding: 10px 24px; border-radius: 8px;">
+                        Acceder
                     </a>
                 </li>
             </ul>
