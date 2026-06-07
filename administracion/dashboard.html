@@ -86,12 +86,65 @@
         /* EMPTY STATE */
         .empty-state { padding: 40px; text-align: center; color: var(--text-muted); display: none; }
 
+        /* TABS */
+        .tabs-nav { display: flex; gap: 32px; border-bottom: 1px solid var(--border-color); margin-bottom: 32px; overflow-x: auto; }
+        .tab-btn { background: none; border: none; padding: 12px 0; font-family: var(--sans); font-size: 0.95rem; font-weight: 500; color: var(--text-muted); cursor: pointer; position: relative; white-space: nowrap; }
+        .tab-btn.active { color: var(--text-main); font-weight: 600; }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--text-main); }
+        .tab-pane { display: none; animation: fadeIn 0.3s; }
+        .tab-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* QR MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-box { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 24px; padding: 32px; position: relative; text-align: center; transform: translateY(20px); transition: transform 0.3s; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .modal-overlay.active .modal-box { transform: translateY(0); }
+        .modal-close { position: absolute; top: 20px; right: 24px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
+        .qr-placeholder { width: 200px; height: 200px; margin: 24px auto; background-color: #f5f5f5; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 12px; background-size: cover; background-position: center; }
+        .modal-guest-name { font-family: var(--serif); font-size: 1.8rem; margin-bottom: 8px; }
+        .modal-guest-details { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+        .btn-full { width: 100%; padding: 14px; background: var(--text-main); color: #fff; border: none; border-radius: 8px; font-weight: 500; font-family: var(--sans); cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 0.95rem; transition: background 0.2s; }
+        .btn-full:hover { background: #333; }
+
+        /* RECORDATORIOS TIMELINE */
+        .timeline { max-width: 600px; margin: 0 auto; padding: 20px 0; }
+        .tl-item { display: flex; gap: 24px; margin-bottom: 32px; position: relative; }
+        .tl-item::before { content: ''; position: absolute; left: 19px; top: 40px; bottom: -32px; width: 2px; background: var(--border-color); }
+        .tl-item:last-child::before { display: none; }
+        .tl-icon { width: 40px; height: 40px; background: var(--card-bg); border: 2px solid var(--border-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--text-muted); z-index: 2; position: relative; }
+        .tl-item.done .tl-icon { border-color: var(--status-conf); color: var(--status-conf); background: #E8F5E9; }
+        .tl-item.active .tl-icon { border-color: var(--accent); color: var(--accent); background: #FFFDE7; }
+        .tl-content { flex: 1; background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); }
+        .tl-title { font-weight: 600; margin-bottom: 4px; display: flex; justify-content: space-between; }
+        .tl-status { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .done .tl-status { color: var(--status-conf); }
+        .active .tl-status { color: var(--accent); }
+        .tl-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 12px; }
+        .tl-stats { display: flex; gap: 16px; font-size: 0.85rem; color: var(--text-main); font-weight: 500; }
+
+        /* AJUSTES / URLS */
+        .settings-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 32px; max-width: 800px; margin: 0 auto 32px; }
+        .settings-card h3 { font-family: var(--serif); font-size: 1.5rem; margin-bottom: 8px; }
+        .settings-card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.6; }
+        .url-box { display: flex; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
+        .url-box input { flex: 1; padding: 14px 16px; background: transparent; border: none; font-family: var(--sans); font-size: 0.95rem; color: var(--text-muted); outline: none; }
+        .url-box button { padding: 0 24px; background: var(--text-main); color: #fff; border: none; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+        .url-box button:hover { background: #333; }
+        .premium-upsell { background: linear-gradient(135deg, #FAF8F5, #F5EFE6); border: 1px solid var(--accent); position: relative; overflow: hidden; }
+        .premium-upsell::before { content: 'PLATINUM'; position: absolute; top: 12px; right: -30px; background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 4px 30px; transform: rotate(45deg); letter-spacing: 0.1em; }
+        .upsell-btn { background: var(--accent); color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 500; display: inline-block; margin-top: 16px; transition: opacity 0.2s; }
+        .upsell-btn:hover { opacity: 0.9; }
+
         @media (max-width: 768px) {
             .controls { flex-direction: column; align-items: stretch; }
             .search-box { width: 100%; }
             .filters { overflow-x: auto; padding-bottom: 8px; }
             .table-container { overflow-x: auto; }
             .event-title { font-size: 2rem; }
+            .tabs-nav { gap: 20px; }
+            .tl-item { flex-direction: column; gap: 12px; }
+            .tl-item::before { display: none; }
         }
     </style>
 </head>
@@ -117,6 +170,15 @@
             </div>
         </section>
 
+        <!-- TABS NAV -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('resumen', this)">Resumen e Invitados</button>
+            <button class="tab-btn" onclick="switchTab('recordatorios', this)">Recordatorios</button>
+            <button class="tab-btn" onclick="switchTab('ajustes', this)">Ajustes y Enlaces</button>
+        </div>
+
+        <!-- TAB: RESUMEN -->
+        <div id="tab-resumen" class="tab-pane active">
         <section class="metrics">
             <div class="metrics-grid">
                 <div class="metric-card conf">
@@ -181,7 +243,75 @@
                 <div class="empty-state" id="emptyState">No se encontraron invitados.</div>
             </div>
         </section>
+        </div> <!-- End Tab Resumen -->
+
+        <!-- TAB: RECORDATORIOS -->
+        <div id="tab-recordatorios" class="tab-pane">
+            <div class="timeline">
+                <div class="tl-item done">
+                    <div class="tl-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+                    <div class="tl-content">
+                        <div class="tl-title">Save the Date <span class="tl-status">Enviado</span></div>
+                        <div class="tl-desc">Se envió el enlace inicial de la invitación por WhatsApp a la base de datos de invitados.</div>
+                        <div class="tl-stats"><i class="fa-solid fa-check-double"></i> 118 entregados</div>
+                    </div>
+                </div>
+                <div class="tl-item active">
+                    <div class="tl-icon"><i class="fa-regular fa-clock"></i></div>
+                    <div class="tl-content">
+                        <div class="tl-title">Recordatorio RSVP <span class="tl-status">Programado</span></div>
+                        <div class="tl-desc">Mensaje automático para solicitar confirmación a los 23 invitados que permanecen pendientes.</div>
+                        <div class="tl-stats"><i class="fa-regular fa-calendar-check"></i> 1 Noviembre 2026</div>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                    <div class="tl-content">
+                        <div class="tl-title">Día del Evento <span class="tl-status">Pendiente</span></div>
+                        <div class="tl-desc">Mensaje con el enlace a la ubicación en Google Maps y el pase QR único.</div>
+                        <div class="tl-stats"><i class="fa-regular fa-calendar-check"></i> 15 Noviembre 2026 (10:00 AM)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: AJUSTES -->
+        <div id="tab-ajustes" class="tab-pane">
+            <div class="settings-card">
+                <h3>Tu Enlace de Invitación</h3>
+                <p>Copia este enlace para enviarlo manualmente a tus invitados o publicarlo en tus redes. Es el acceso universal al evento.</p>
+                <div class="url-box">
+                    <input type="text" value="https://invittia.com/boda/paulina-y-roy-2026" readonly id="inviteUrl">
+                    <button onclick="copyUrl()"><i class="fa-regular fa-copy"></i> Copiar</button>
+                </div>
+            </div>
+
+            <div class="settings-card premium-upsell">
+                <h3>Conecta tu propio Dominio</h3>
+                <p>Dale un toque más exclusivo a tu evento con un enlace personalizado y memorable (ej. <strong>www.paulina-y-roy.com</strong>).</p>
+                <ul style="list-style:none; margin-bottom: 20px; font-size:0.9rem; color:var(--text-muted);">
+                    <li style="margin-bottom:8px;"><i class="fa-solid fa-check" style="color:var(--accent);"></i> Más fácil de recordar y escribir</li>
+                    <li style="margin-bottom:8px;"><i class="fa-solid fa-check" style="color:var(--accent);"></i> Experiencia 100% marca blanca para los invitados</li>
+                    <li style="margin-bottom:8px;"><i class="fa-solid fa-check" style="color:var(--accent);"></i> Incluye soporte para configuración de DNS</li>
+                </ul>
+                <a href="#" class="upsell-btn" onclick="alert('Solicitando Upgrade a Platinum')">Actualizar a Platinum</a>
+            </div>
+        </div>
+
     </main>
+
+    <!-- QR MODAL -->
+    <div class="modal-overlay" id="qrModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeQrModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="qr-placeholder" id="qrImage"></div>
+            <div class="modal-guest-name" id="qrName">Nombre</div>
+            <div class="modal-guest-details" id="qrDetails">Mesa X &middot; X Acompañantes</div>
+            <button class="btn-full" onclick="alert('Enviando código QR por WhatsApp automatizado...')">
+                <i class="fa-brands fa-whatsapp"></i> Enviar QR por WhatsApp
+            </button>
+        </div>
+    </div>
 
     <script>
         // Simulando Base de Datos (con campos adicionales para el CSV)
@@ -238,7 +368,7 @@
                         <td>${g.companions}</td>
                         <td>${g.table}</td>
                         <td>
-                            ${g.status === 'Confirmado' ? '<button class="qr-btn"><i class="fa-solid fa-qrcode"></i> Ver QR</button>' : '<span style="color:#A09A94;font-size:0.85rem;">No disp.</span>'}
+                            ${g.status === 'Confirmado' ? `<button class="qr-btn" onclick="openQrModal('${g.name}', '${g.table}', ${g.companions})"><i class="fa-solid fa-qrcode"></i> Ver QR</button>` : '<span style="color:#A09A94;font-size:0.85rem;">No disp.</span>'}
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -265,7 +395,7 @@
         // Export CSV Logic
         document.getElementById('exportBtn').addEventListener('click', () => {
             const headers = ['Nombre', 'Familia', 'Estado', 'Acompañantes', 'Mesa', 'Email', 'Teléfono', 'Fecha Confirmación'];
-            let csvContent = headers.join(',') + '\\n';
+            let csvContent = headers.join(',') + '\n';
 
             guests.forEach(g => {
                 const row = [
@@ -278,7 +408,7 @@
                     `"${g.phone}"`, 
                     `"${g.date}"`
                 ];
-                csvContent += row.join(',') + '\\n';
+                csvContent += row.join(',') + '\n';
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -290,6 +420,34 @@
             link.click();
             document.body.removeChild(link);
         });
+
+        // Tab Logic
+        function switchTab(tabId, btnContext) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            btnContext.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        // URL Logic
+        function copyUrl() {
+            const input = document.getElementById('inviteUrl');
+            input.select();
+            document.execCommand('copy');
+            alert('¡Enlace copiado al portapapeles!');
+        }
+
+        // QR Modal Logic
+        const qrModal = document.getElementById('qrModal');
+        function openQrModal(name, table, companions) {
+            document.getElementById('qrName').textContent = name;
+            document.getElementById('qrDetails').innerHTML = `Mesa ${table} &middot; ${companions} Acompañante(s)`;
+            document.getElementById('qrImage').style.backgroundImage = `url('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Invittia_${encodeURIComponent(name)}')`;
+            qrModal.classList.add('active');
+        }
+        function closeQrModal() {
+            qrModal.classList.remove('active');
+        }
 
         // Init
         renderTable();
