@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Invittia</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/env.js"></script>
+    <script src="../assets/js/supabase-client.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FAF8F5;
+            --card-bg: #FFFFFF;
+            --border-color: #EAE4DD;
+            --text-main: #111111;
+            --text-muted: #6B6560;
+            --accent: #D4AF37;
+            --error: #B3261E;
+            --sans: 'Inter', sans-serif;
+            --serif: 'Playfair Display', serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { min-height: 100vh; font-family: var(--sans); background: var(--bg-color); color: var(--text-main); display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .login-shell { width: 100%; max-width: 420px; }
+        .logo { display: inline-block; margin-bottom: 28px; font-family: var(--serif); font-size: 1.8rem; font-weight: 600; text-decoration: none; color: var(--text-main); }
+        .logo em { font-style: italic; color: var(--accent); }
+        .login-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        h1 { font-family: var(--serif); font-size: 2rem; font-weight: 600; margin-bottom: 8px; }
+        .intro { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 28px; }
+        label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+        input { width: 100%; padding: 13px 14px; border: 1px solid var(--border-color); border-radius: 8px; font: inherit; color: var(--text-main); outline: none; background: #fff; transition: border-color 0.2s; }
+        input:focus { border-color: var(--accent); }
+        .field { margin-bottom: 18px; }
+        .error-box { display: none; margin-bottom: 18px; padding: 12px 14px; border-radius: 8px; background: #FCEEEE; color: var(--error); font-size: 0.9rem; line-height: 1.4; }
+        .error-box.active { display: block; }
+        .login-btn { width: 100%; padding: 14px; border: none; border-radius: 8px; background: var(--text-main); color: #fff; font: inherit; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+        .login-btn:hover { background: #333; }
+        .login-btn:disabled { cursor: not-allowed; opacity: 0.65; }
+    </style>
+</head>
+<body>
+    <main class="login-shell">
+        <a href="../index.html" class="logo">Inv<em>itta</em></a>
+        <section class="login-card">
+            <h1>Acceso</h1>
+            <p class="intro">Ingresa con el usuario autorizado para administrar tu evento.</p>
+            <div class="error-box" id="loginError" role="alert"></div>
+            <form id="loginForm" novalidate>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required>
+                </div>
+                <div class="field">
+                    <label for="password">Contrasena</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required>
+                </div>
+                <button class="login-btn" id="loginButton" type="submit">Entrar al dashboard</button>
+            </form>
+        </section>
+    </main>
+    <script src="../assets/js/login.js"></script>
+</body>
+</html>
