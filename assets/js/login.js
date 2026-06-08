@@ -34,14 +34,35 @@
         loginButton.textContent = isLoading ? "Validando..." : "Entrar al dashboard";
     }
 
+    async function redirectByRole() {
+        const roleInfo = await window.InvittiaAuth.getCurrentUserRole();
+        const role = roleInfo.role;
+
+        if (!role) {
+            throw new Error("Tu usuario no está asociado a ningún evento.");
+        }
+
+        if (role === "staff") {
+            window.location.href = "checkin.html";
+            return;
+        }
+
+        if (role === "owner" || role === "admin") {
+            window.location.href = getNextUrl();
+            return;
+        }
+
+        throw new Error("No tienes permiso para acceder a esta sección.");
+    }
+
     async function redirectIfAuthenticated() {
         try {
             const session = await window.InvittiaAuth.getSession();
             if (session) {
-                window.location.href = getNextUrl();
+                await redirectByRole();
             }
         } catch (error) {
-            setError(error.message || "No se pudo validar la sesion.");
+            setError(error.message || "No se pudo validar la sesión.");
         }
     }
 
@@ -53,16 +74,16 @@
         const password = passwordInput.value;
 
         if (!email || !password) {
-            setError("Ingresa email y contrasena.");
+            setError("Ingresa email y contraseña.");
             return;
         }
 
         try {
             setLoading(true);
             await window.InvittiaAuth.signIn(email, password);
-            window.location.href = getNextUrl();
+            await redirectByRole();
         } catch (error) {
-            setError(error.message || "No se pudo iniciar sesion.");
+            setError(error.message || "No se pudo iniciar sesión.");
         } finally {
             setLoading(false);
         }

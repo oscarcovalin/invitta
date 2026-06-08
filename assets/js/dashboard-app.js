@@ -442,6 +442,12 @@
   }
 
   async function init() {
+    const access = await window.InvittiaAuth.requireRole(["owner", "admin"], {
+      staffRedirect: "/administracion/checkin.html",
+      signOutOnMissingRole: true
+    });
+    if (!access) return;
+
     const dashboard = await window.InvittiaDashboardData.loadDashboard();
     activeEvent = dashboard?.event || null;
     guests = Array.isArray(dashboard?.guests) ? dashboard.guests : [];

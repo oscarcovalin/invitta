@@ -547,8 +547,9 @@
     }
 
     async function init() {
-        session = await window.InvittiaAuth.requireSession();
-        if (!session) return;
+        const access = await window.InvittiaAuth.requireRole(["owner", "admin", "staff"]);
+        if (!access) return;
+        session = access.session;
 
         await loadStaffGuests();
 
