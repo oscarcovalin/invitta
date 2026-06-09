@@ -39,7 +39,6 @@
   function getGuestEmail(g) { return g?.email ?? '-'; }
   function getGuestPhone(g) { return g?.phone ?? g?.telefono ?? '-'; }
   function getGuestNotes(g) { return g?.notes ?? g?.notas ?? '-'; }
-  function getGuestQr(g) { return g?.qrToken || g?.qr_token || g?.qr_id || g?.id || ''; }
   function getGuestAssigned(g) { return Number(g?.passesAssigned ?? g?.pases_asignados ?? getGuestCompanions(g)); }
   function getGuestConfirmed(g) { return Number(g?.passesConfirmed ?? g?.pases_confirmados ?? 0); }
 
@@ -204,22 +203,39 @@
   }
 
   function getQrImageUrl(guest) {
-    const token = getGuestQr(guest);
+    const token = guest.qrToken || guest.qr_token;
     if (!token) {
-      console.error('[Invittia QR] Invitado sin qr_token', guest);
+      console.error('[Invitta QR] Invitado sin qr_token', guest);
       return null;
     }
 
     const checkinUrl = `${window.location.origin}/administracion/checkin.html?token=${encodeURIComponent(token)}`;
-    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkinUrl)}`;
+    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(checkinUrl)}`;
 
+    console.log('[Invitta QR] token:', token);
+    console.log('[Invitta QR] checkinUrl:', checkinUrl);
+    console.log('[Invitta QR] qrImageUrl:', qrImageUrl);
 
     return { token, qrImageUrl };
   }
 
   function renderQrImage(guest, imageId, tokenId = null) {
     const qr = getQrImageUrl(guest);
-    if (!qr) return;
+    if (!qr) {
+      const imageEl = $(imageId);
+      if (imageEl) {
+        imageEl.style.backgroundImage = '';
+        imageEl.style.display = 'none';
+      }
+      if (tokenId) {
+        const tokenEl = $(tokenId);
+        if (tokenEl) {
+          tokenEl.textContent = '';
+          tokenEl.style.display = 'none';
+        }
+      }
+      return null;
+    }
 
     const imageEl = $(imageId);
     if (imageEl) {
@@ -234,15 +250,19 @@
         tokenEl.style.display = 'inline-block';
       }
     }
+
+    return qr;
   }
 
   function openQrModal(guest) {
+    const qr = renderQrImage(guest, 'qrImage');
+    if (!qr) return;
+
     setText('qrName', getGuestName(guest));
     const qrDetails = $('qrDetails');
     if (qrDetails) {
-      qrDetails.innerHTML = `Mesa ${escapeHtml(getGuestTable(guest))} &middot; ${escapeHtml(getGuestCompanions(guest))} Acompa&ntilde;ante(s)`;
+      qrDetails.innerHTML = `Mesa ${escapeHtml(getGuestTable(guest))} &middot; ${escapeHtml(getGuestCompanions(guest))} Acompa&ntilde;ante(s)<br>${escapeHtml(qr.token)}`;
     }
-    renderQrImage(guest, 'qrImage');
     $('qrModal')?.classList.add('active');
   }
 
