@@ -464,7 +464,10 @@
         if (!result?.ok) {
             const message = result?.message || "No se pudo confirmar la entrada.";
             setState("warning", message, message);
-            if (result?.invitado) showGuest(result.invitado);
+            if (result?.invitado) {
+                currentGuest = result.invitado;
+                showGuest(result.invitado);
+            }
             if (String(message).toLowerCase().includes("utilizado") || String(message).toLowerCase().includes("ingres")) {
                 hideConfirmButton();
             }
@@ -478,8 +481,13 @@
             return null;
         }
 
+        currentGuest = updatedGuest;
         showGuest(updatedGuest);
-        setState("valid", "Ya ingresó", "Ya ingresó.");
+        if (result.already_checked_in === true) {
+            setState("warning", "QR ya utilizado", "QR ya utilizado.");
+        } else {
+            setState("valid", "Entrada confirmada", "Entrada confirmada.");
+        }
         hideConfirmButton();
         await loadStaffGuests();
         return updatedGuest;
