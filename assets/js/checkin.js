@@ -446,13 +446,11 @@
             setState("error", "QR sin token valido", "No hay un token valido para confirmar la entrada.");
             return null;
         }
-        if (!session?.user?.id) {
-            setState("error", "Sesion no valida", "Inicia sesion de nuevo para confirmar entradas.");
-            return null;
-        }
 
         const supabase = window.InvittiaSupabase.getClient();
-        const { data, error } = await supabase.rpc("confirmar_checkin", { p_qr_token: token });
+        const { data, error } = await supabase.rpc("confirmar_checkin", {
+            p_qr_token: token
+        });
 
         if (error) {
             console.error("[Invittia Check-in] Error en RPC confirmar_checkin:", error);
@@ -460,37 +458,28 @@
             return null;
         }
 
-        const result = Array.isArray(data) ? data[0] : data;
-        if (!result?.ok) {
-            const message = result?.message || "No se pudo confirmar la entrada.";
+        if (data?.ok === false) {
+            const message = data.message || "No se pudo confirmar la entrada.";
             setState("warning", message, message);
-            if (result?.invitado) {
-                currentGuest = result.invitado;
-                showGuest(result.invitado);
-            }
-            if (String(message).toLowerCase().includes("utilizado") || String(message).toLowerCase().includes("ingres")) {
-                hideConfirmButton();
-            }
-            await loadStaffGuests();
-            return result?.invitado || null;
+            return null;
         }
 
-        const updatedGuest = result.invitado;
-        if (!updatedGuest) {
+        if (data?.ok !== true || !data.invitado) {
             setState("error", "Error de check-in", "No se pudo confirmar la entrada del invitado.");
             return null;
         }
 
-        currentGuest = updatedGuest;
-        showGuest(updatedGuest);
-        if (result.already_checked_in === true) {
+        currentGuest = data.invitado;
+        showGuest(data.invitado);
+        hideConfirmButton();
+        await loadStaffGuests();
+
+        if (data.already_checked_in === true) {
             setState("warning", "QR ya utilizado", "QR ya utilizado.");
         } else {
             setState("valid", "Entrada confirmada", "Entrada confirmada.");
         }
-        hideConfirmButton();
-        await loadStaffGuests();
-        return updatedGuest;
+        return data.invitado;
     }
 
     async function confirmEntry() {
