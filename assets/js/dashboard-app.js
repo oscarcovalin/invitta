@@ -51,6 +51,43 @@
     if (el) el.textContent = String(value);
   }
 
+  function getGuestToken(guest) {
+    return String(guest.qrToken || guest.qr_token || '').trim();
+  }
+
+  async function attachGuestQrTokens() {
+    if (!activeEvent?.id || !guests.length) return;
+
+    const supabase = window.InvittiaSupabase.getClient();
+    const { data, error } = await supabase
+      .from('invitados')
+      .select('id, qr_token')
+      .eq('evento_id', activeEvent.id);
+
+    if (error) {
+      console.error('[Invitta QR] No se pudieron cargar qr_token de invitados', error);
+      return;
+    }
+
+    const tokensByGuestId = new Map((data || []).map((row) => [String(row.id), row.qr_token]));
+    guests = guests.map((guest) => ({
+      ...guest,
+      qr_token: guest.qr_token || tokensByGuestId.get(String(guest.id)) || ''
+    }));
+  }
+
+  function showQrUnavailable(guest) {
+    setText('qrName', getGuestName(guest) || 'QR no disponible');
+    const qrDetails = $('qrDetails');
+    if (qrDetails) qrDetails.textContent = 'No hay un token QR disponible para este invitado.';
+    const qrImage = $('qrImage');
+    if (qrImage) {
+      qrImage.style.backgroundImage = '';
+      qrImage.style.display = 'none';
+    }
+    $('qrModal')?.classList.add('active');
+  }
+
   function formatEventDate(value) {
     if (window.InvittiaDashboardData?.formatEventDate) {
       return window.InvittiaDashboardData.formatEventDate(value);
@@ -131,7 +168,7 @@
           <td><span class="status-badge ${getStatusClass(g)}"><i class="fa-solid ${getStatusIcon(g)}"></i> ${escapeHtml(status)}</span></td>
           <td>${escapeHtml(getGuestCompanions(g))}</td>
           <td>${escapeHtml(getGuestTable(g))}</td>
-          <td>${isConfirmed(g) ? '<button class="qr-btn" type="button">Ver QR</button>' : '<span style="color:#A09A94;font-size:0.85rem;">No disp.</span>'}</td>
+          <td>${isConfirmed(g) ? `<button class="qr-btn" type="button" data-action="view-qr" data-guest-id="${escapeHtml(g.id)}">Ver QR</button>` : '<span style="color:#A09A94;font-size:0.85rem;">No disp.</span>'}</td>
         </tr>`;
     }).join('');
 
@@ -143,7 +180,8 @@
 
       row.querySelector('.qr-btn')?.addEventListener('click', (event) => {
         event.stopPropagation();
-        const guest = guests.find((g) => String(g.id) === String(row.dataset.guestId));
+        const guestId = event.currentTarget.getAttribute('data-guest-id') || row.dataset.guestId;
+        const guest = guests.find((g) => String(g.id) === String(guestId));
         if (guest) openQrModal(guest);
       });
     });
@@ -203,7 +241,7 @@
   }
 
   function getQrImageUrl(guest) {
-    const token = guest.qrToken || guest.qr_token;
+    const token = getGuestToken(guest);
     if (!token) {
       console.error('[Invitta QR] Invitado sin qr_token', guest);
       return null;
@@ -256,7 +294,10 @@
 
   function openQrModal(guest) {
     const qr = renderQrImage(guest, 'qrImage');
-    if (!qr) return;
+    if (!qr) {
+      showQrUnavailable(guest);
+      return;
+    }
 
     setText('qrName', getGuestName(guest));
     const qrDetails = $('qrDetails');
@@ -369,6 +410,7 @@
     const dashboard = await window.InvittiaDashboardData.loadDashboard();
     activeEvent = dashboard?.event || null;
     guests = Array.isArray(dashboard?.guests) ? dashboard.guests : [];
+    await attachGuestQrTokens();
     updateEventSummary();
     refreshDashboard();
   }
@@ -471,6 +513,7 @@
     const dashboard = await window.InvittiaDashboardData.loadDashboard();
     activeEvent = dashboard?.event || null;
     guests = Array.isArray(dashboard?.guests) ? dashboard.guests : [];
+    await attachGuestQrTokens();
     updateEventSummary();
     refreshDashboard();
     bindEvents();
