@@ -2,6 +2,7 @@
     "use strict";
 
     const GUEST_SELECT = "id, evento_id, nombre, familia, telefono, email, mesa, pases_asignados, pases_confirmados, estado, qr_token, qr_status, checked_in, checked_in_at";
+    const CHECKIN_GUEST_SELECT = "id, evento_id, nombre, familia, mesa, estado, pases_asignados, pases_confirmados, qr_token, qr_status, checked_in, checked_in_at";
 
     let session = null;
     let currentGuest = null;
@@ -477,9 +478,9 @@
         }
 
         const supabase = window.InvittiaSupabase.getClient();
-        const { data: currentGuestRecord, error: currentError } = await supabase
+        const { data: currentGuest, error: currentError } = await supabase
             .from("invitados")
-            .select("id, evento_id, qr_token, qr_status, checked_in, checked_in_at")
+            .select(CHECKIN_GUEST_SELECT)
             .eq("id", guest.id)
             .maybeSingle();
 
@@ -489,16 +490,17 @@
             return null;
         }
 
-        if (!currentGuestRecord) {
+        if (!currentGuest) {
             setState("error", "Invitado no encontrado", "Invitado no encontrado.");
             return null;
         }
 
-        if (currentGuestRecord.checked_in === true || currentGuestRecord.qr_status === "used") {
-            setState("warning", checkinSource === "qr" ? "QR ya utilizado" : "Ya ingreso", "Ya ingreso.");
+        if (currentGuest.checked_in === true || currentGuest.qr_status === "used") {
+            showGuest(currentGuest);
+            setState("warning", checkinSource === "qr" ? "QR ya utilizado" : "Ya ingresó", checkinSource === "qr" ? "QR ya utilizado" : "Ya ingresó.");
             hideConfirmButton();
             await loadStaffGuests();
-            return currentGuestRecord;
+            return currentGuest;
         }
 
         const { data: updatedGuest, error: updateError } = await supabase
@@ -509,9 +511,9 @@
                 checked_in_by: session.user.id,
                 qr_status: "used"
             })
-            .eq("id", currentGuestRecord.id)
-            .eq("evento_id", currentGuestRecord.evento_id)
-            .select(GUEST_SELECT)
+            .eq("id", currentGuest.id)
+            .eq("evento_id", currentGuest.evento_id)
+            .select(CHECKIN_GUEST_SELECT)
             .maybeSingle();
 
         if (updateError) {
@@ -527,26 +529,24 @@
 
         try {
             await insertCheckin({
-                evento_id: updatedGuest.evento_id,
-                invitado_id: updatedGuest.id,
-                qr_token: updatedGuest.qr_token,
+                evento_id: currentGuest.evento_id,
+                invitado_id: currentGuest.id,
+                qr_token: currentGuest.qr_token,
                 scanned_by: session.user.id,
                 status: "valid",
-                notes: checkinSource === "qr" ? "Check-in confirmado desde QR" : "Check-in confirmado desde busqueda manual"
+                notes: "Check-in confirmado"
             });
         } catch (checkinError) {
             console.error("[Invittia Check-in] Entrada actualizada, pero fallo el registro en checkins:", checkinError);
-            setState("warning", "Entrada confirmada", "La entrada quedo confirmada, pero no se pudo guardar el registro de auditoria.");
-            currentGuest = updatedGuest;
+            setState("warning", "Entrada confirmada", "La entrada quedó confirmada, pero no se pudo registrar el check-in.");
             showGuest(updatedGuest);
             hideConfirmButton();
             await loadStaffGuests();
             return updatedGuest;
         }
 
-        currentGuest = updatedGuest;
         showGuest(updatedGuest);
-        setState("valid", "Ya ingreso", "Ya ingreso.");
+        setState("valid", "Ya ingresó", "Ya ingresó.");
         hideConfirmButton();
         await loadStaffGuests();
         return updatedGuest;
@@ -571,15 +571,6 @@
 
             if (!latestGuest) {
                 setState("error", "QR invalido", "El invitado ya no existe.");
-                return;
-            }
-
-            if (guestHasEntered(latestGuest)) {
-                currentGuest = latestGuest;
-                showGuest(latestGuest);
-                setState("warning", "QR ya utilizado", "Este pase ya fue registrado previamente.");
-                hideConfirmButton();
-                await loadStaffGuests();
                 return;
             }
 
