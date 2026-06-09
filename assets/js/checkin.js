@@ -115,9 +115,9 @@
             .from("invitados")
             .select(GUEST_SELECT)
             .eq("qr_token", token)
-            .maybeSingle();
+            .limit(1);
 
-        return { data, error };
+        return { data: Array.isArray(data) ? data[0] : null, error };
     }
 
     async function validateToken(token) {
@@ -237,10 +237,10 @@
             .from("invitados")
             .select(GUEST_SELECT)
             .eq("id", guestId)
-            .maybeSingle();
+            .limit(1);
 
         if (error) throw error;
-        return data;
+        return Array.isArray(data) ? data[0] : null;
     }
 
     async function getActiveEvent() {
@@ -478,11 +478,13 @@
         }
 
         const supabase = window.InvittiaSupabase.getClient();
-        const { data: currentGuest, error: currentError } = await supabase
+        const { data: currentRows, error: currentError } = await supabase
             .from("invitados")
             .select(CHECKIN_GUEST_SELECT)
             .eq("id", guest.id)
-            .maybeSingle();
+            .limit(1);
+
+        const currentGuest = Array.isArray(currentRows) ? currentRows[0] : null;
 
         if (currentError) {
             console.error("[Invittia Check-in] Error releyendo invitado:", currentError);
@@ -503,7 +505,7 @@
             return currentGuest;
         }
 
-        const { data: updatedGuest, error: updateError } = await supabase
+        const { data: updatedRows, error: updateError } = await supabase
             .from("invitados")
             .update({
                 checked_in: true,
@@ -514,7 +516,9 @@
             .eq("id", currentGuest.id)
             .eq("evento_id", currentGuest.evento_id)
             .select(CHECKIN_GUEST_SELECT)
-            .maybeSingle();
+            .limit(1);
+
+        const updatedGuest = Array.isArray(updatedRows) ? updatedRows[0] : null;
 
         if (updateError) {
             console.error("[Invittia Check-in] Error actualizando invitado:", updateError);
