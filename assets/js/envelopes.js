@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (music) {
                     music.play().then(() => {
                         if (musicBtn) musicBtn.classList.add('playing');
-                    }).catch(() => {});
+                    }).catch(e => console.log('Autoplay bloqueado', e));
                 }
             });
         }
