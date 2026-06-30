@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isXv = activeConfig.eventType === "xv";
     const mainTitleText = isXv ? activeConfig.brideName : `${activeConfig.brideName} & ${activeConfig.groomName}`;
     const pageTitle = isXv ? `Mis XV Años - ${mainTitleText}` : `Nuestra Boda - ${mainTitleText}`;
-    const defaultPreTitle = isXv ? "Tenemos el honor de invitarte a los XV Años de" : "Tenemos el honor de invitarte a la boda de";
+    const defaultPreTitle = isXv ? "Tenemos el honor de invitarte a los XV Años de" : "Tenemos el honor de invitarte a esta celebración de";
 
     // 1. Metadatos e Identidad
     document.title = pageTitle;
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const oldItems = galleryContainer.querySelectorAll('.parallax-section');
             oldItems.forEach(item => item.remove());
 
-            // Recorrer las ranuras grid1 a grid12
+            // Recorrer las ranuras disponibles de galería
             for (let i = 1; i <= 12; i++) {
                 const imgKey = `grid${i}`;
                 const imgUrl = images[imgKey];
@@ -366,7 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             let textMessage = "";
             const greetingNames = isXv ? activeConfig.brideName : `${activeConfig.brideName} y ${activeConfig.groomName}`;
-            const eventWord = isXv ? "mis XV Años" : "su boda";
+            const eventWord = isXv ? "mis XV Años" : "su celebración";
             const emojiRing = isXv ? "👑" : "💍";
             
             if (attendance === 'yes') {

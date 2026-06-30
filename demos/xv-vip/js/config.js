@@ -11,8 +11,8 @@ const WEDDING_CONFIG = {
     "weddingDateText": "21 de Noviembre, 2026",
     "countdownDate": {
         "year": 2026,
-        "month": 7,
-        "day": 15,
+        "month": 10,
+        "day": 21,
         "hour": 20,
         "minute": 0,
         "second": 0
@@ -75,7 +75,7 @@ const WEDDING_CONFIG = {
         "women": {
             "title": "Mujeres",
             "desc": "Vestido elegante",
-            "note": "Evitar color blanco"
+            "note": "Se reserva el color principal para la quinceañera"
         },
         "men": {
             "title": "Hombres",
@@ -99,16 +99,16 @@ const WEDDING_CONFIG = {
         "description": "Opciones recomendadas.",
         "opciones": [
             {
-                "name": "Hotel Grand Plaza",
-                "address": "Dirección 1",
-                "phone": "5555555555",
-                "url": "https://example.com"
+                "name": "Hotel Demo Centro",
+                "address": "Datos de hospedaje personalizables para cada evento.",
+                "phone": "Tel. 55 1234 5678",
+                "url": "https://hotel-demo.invitta.mx"
             },
             {
-                "name": "Hotel Boutique Centro",
-                "address": "Dirección 2",
-                "phone": "5555555556",
-                "url": "https://example.com"
+                "name": "Hotel Demo Jardín",
+                "address": "Datos de hospedaje personalizables para cada evento.",
+                "phone": "Tel. 55 8765 4321",
+                "url": "https://hotel-demo.invitta.mx"
             }
         ]
     },
@@ -127,14 +127,7 @@ const WEDDING_CONFIG = {
         "grid2": "assets/grid_2.jpg",
         "grid3": "assets/grid_3.jpg",
         "grid4": "assets/grid_4.jpg",
-        "grid5": "assets/grid_5.jpg",
-        "grid6": "",
-        "grid7": "",
-        "grid8": "",
-        "grid9": "",
-        "grid10": "",
-        "grid11": "",
-        "grid12": ""
+        "grid5": "assets/grid_5.jpg"
     },
     "theme": {
         "primaryColor": "#8CA5D3",
@@ -152,7 +145,7 @@ const WEDDING_CONFIG = {
         "defaultGuestName": "Familia Invitada",
         "defaultPasses": 2,
         "defaultTable": "14",
-        "message": "\"Con alegría en el corazón, los esperamos para compartir nuestra unión.\"",
-        "qrDataPrefix": "PaulinaAnaelRodrigoBoda2026"
+        "message": "\"Gracias por acompañarme en esta celebración tan especial.\"",
+        "qrPrefix": "CamilaXV2026"
     }
 };
