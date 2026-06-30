@@ -130,10 +130,35 @@ const WEDDING_CONFIG = {
         "grid5": "assets/grid_5.jpg"
     },
     "theme": {
+        "colors": {
+            "background": "#F8F3EA",
+            "surface": "#FFFFFF",
+            "primary": "#A68A64",
+            "secondary": "#6F7D5F",
+            "accent": "#C58A5C",
+            "text": "#2C2924",
+            "muted": "#756E65"
+        },
+        "typography": {
+            "script": "Great Vibes",
+            "heading": "Playfair Display",
+            "body": "Playfair Display"
+        },
+        "images": {
+            "hero": "assets/hero_bg.jpg",
+            "ogImage": "assets/hero_bg.jpg",
+            "gallery": [
+                "assets/gallery_1.jpg",
+                "assets/gallery_2.jpg",
+                "assets/gallery_3.jpg",
+                "assets/grid_1.jpg",
+                "assets/grid_2.jpg"
+            ]
+        },
         "primaryColor": "#A68A64",
-        "secondaryColor": "#4A4641",
-        "bgColor": "#FDFBF7",
-        "textColor": "#333333",
+        "secondaryColor": "#6F7D5F",
+        "bgColor": "#F8F3EA",
+        "textColor": "#2C2924",
         "bgImage": "",
         "fontScript": "Great Vibes",
         "fontPrimary": "Playfair Display",

@@ -130,10 +130,35 @@ const WEDDING_CONFIG = {
         "grid5": "assets/grid_5.jpg"
     },
     "theme": {
-        "primaryColor": "#C5A059",
-        "secondaryColor": "#D4AF37",
-        "bgColor": "#111111",
-        "textColor": "#EAEAEA",
+        "colors": {
+            "background": "#100C10",
+            "surface": "#1D171C",
+            "primary": "#D4AF37",
+            "secondary": "#4A1832",
+            "accent": "#B8895B",
+            "text": "#FFF8EF",
+            "muted": "#C8B8AE"
+        },
+        "typography": {
+            "script": "Pinyon Script",
+            "heading": "Cinzel",
+            "body": "Cinzel"
+        },
+        "images": {
+            "hero": "assets/hero_bg.jpg",
+            "ogImage": "assets/hero_bg.jpg",
+            "gallery": [
+                "assets/gallery_1.jpg",
+                "assets/gallery_2.jpg",
+                "assets/gallery_3.jpg",
+                "assets/grid_1.jpg",
+                "assets/grid_2.jpg"
+            ]
+        },
+        "primaryColor": "#D4AF37",
+        "secondaryColor": "#4A1832",
+        "bgColor": "#100C10",
+        "textColor": "#FFF8EF",
         "bgImage": "",
         "fontScript": "Pinyon Script",
         "fontPrimary": "Cinzel",
