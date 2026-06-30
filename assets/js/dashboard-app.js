@@ -222,22 +222,133 @@
     updateChart();
   }
 
-  function exportGuestsCsv() {
-    const headers = ['Nombre', 'Familia', 'Estado', 'Acompañantes', 'Mesa', 'Email', 'Teléfono', 'Notas'];
-    const rows = guests.map((g) => [
-      getGuestName(g), getGuestFamily(g), getGuestStatus(g), getGuestCompanions(g), getGuestTable(g), getGuestEmail(g), getGuestPhone(g), getGuestNotes(g)
-    ]);
-    const escapeCsv = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const csv = [headers, ...rows].map((row) => row.map(escapeCsv).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  function getGuestCheckIn(g) {
+    const value = g?.checkedIn ?? g?.checked_in ?? g?.checkin ?? g?.check_in ?? g?.ingreso ?? getGuestCheckInTime(g);
+    if (typeof value === 'string') {
+      const normalized = value.toLowerCase().trim();
+      if (!normalized || ['false', 'no', '0'].includes(normalized)) return 'No';
+      return 'Sí';
+    }
+    return value ? 'Sí' : 'No';
+  }
+
+  function getGuestCheckInTime(g) {
+    return g?.checkedInAt ?? g?.checked_in_at ?? g?.checkin_at ?? g?.check_in_at ?? g?.ingreso_at ?? g?.hora_ingreso ?? '';
+  }
+
+  function escapeCsvValue(value) {
+    return `"${String(value ?? '').replace(/"/g, '""')}"`;
+  }
+
+  function downloadCsv(filename, headers, rows) {
+    const csv = [headers, ...rows]
+      .map((row) => row.map(escapeCsvValue).join(','))
+      .join('\r\n');
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'invitados.csv';
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  }
+
+  function sortGuestsByTableAndName(list) {
+    return [...list].sort((a, b) => {
+      const tableA = getGuestTable(a);
+      const tableB = getGuestTable(b);
+      const numericA = Number(tableA);
+      const numericB = Number(tableB);
+      const bothNumeric = Number.isFinite(numericA) && Number.isFinite(numericB);
+      const tableCompare = bothNumeric
+        ? numericA - numericB
+        : String(tableA).localeCompare(String(tableB), 'es', { numeric: true, sensitivity: 'base' });
+
+      if (tableCompare !== 0) return tableCompare;
+      return getGuestName(a).localeCompare(getGuestName(b), 'es', { sensitivity: 'base' });
+    });
+  }
+
+  const exportDefinitions = {
+    complete: {
+      filename: 'invitta-lista-completa.csv',
+      headers: ['Nombre', 'Familia', 'Teléfono', 'Email', 'Mesa', 'Pases asignados', 'Pases confirmados', 'Estado RSVP', 'Check-in', 'Hora de ingreso'],
+      getRows: () => guests.map((g) => [
+        getGuestName(g),
+        getGuestFamily(g),
+        getGuestPhone(g),
+        getGuestEmail(g),
+        getGuestTable(g),
+        getGuestAssigned(g),
+        getGuestConfirmed(g),
+        getGuestStatus(g),
+        getGuestCheckIn(g),
+        getGuestCheckInTime(g)
+      ])
+    },
+    access: {
+      filename: 'invitta-lista-acceso.csv',
+      headers: ['Nombre', 'Familia', 'Mesa', 'Pases confirmados', 'Check-in', 'Hora de ingreso'],
+      getRows: () => guests.map((g) => [
+        getGuestName(g),
+        getGuestFamily(g),
+        getGuestTable(g),
+        getGuestConfirmed(g),
+        getGuestCheckIn(g),
+        getGuestCheckInTime(g)
+      ])
+    },
+    tables: {
+      filename: 'invitta-lista-por-mesa.csv',
+      headers: ['Mesa', 'Nombre', 'Familia', 'Pases confirmados', 'Estado RSVP', 'Check-in'],
+      getRows: () => sortGuestsByTableAndName(guests).map((g) => [
+        getGuestTable(g),
+        getGuestName(g),
+        getGuestFamily(g),
+        getGuestConfirmed(g),
+        getGuestStatus(g),
+        getGuestCheckIn(g)
+      ])
+    },
+    confirmed: {
+      filename: 'invitta-confirmados.csv',
+      headers: ['Nombre', 'Familia', 'Teléfono', 'Mesa', 'Pases confirmados', 'Check-in'],
+      getRows: () => guests.filter(isConfirmed).map((g) => [
+        getGuestName(g),
+        getGuestFamily(g),
+        getGuestPhone(g),
+        getGuestTable(g),
+        getGuestConfirmed(g),
+        getGuestCheckIn(g)
+      ])
+    },
+    pending: {
+      filename: 'invitta-pendientes.csv',
+      headers: ['Nombre', 'Familia', 'Teléfono', 'Mesa', 'Pases asignados', 'Estado RSVP'],
+      getRows: () => guests.filter(isPending).map((g) => [
+        getGuestName(g),
+        getGuestFamily(g),
+        getGuestPhone(g),
+        getGuestTable(g),
+        getGuestAssigned(g),
+        getGuestStatus(g)
+      ])
+    }
+  };
+
+  function exportGuestsCsv(exportType) {
+    const definition = exportDefinitions[exportType];
+    if (!definition) return;
+
+    const rows = definition.getRows();
+    if (!rows.length) {
+      alert('No hay invitados para exportar en esta lista.');
+      return;
+    }
+
+    downloadCsv(definition.filename, definition.headers, rows);
   }
 
   function getQrImageUrl(guest) {
@@ -489,7 +600,11 @@
         renderTable();
       });
     });
-    $('exportBtn')?.addEventListener('click', exportGuestsCsv);
+    document.querySelectorAll('[data-export-type]').forEach((btn) => {
+      btn.addEventListener('click', (event) => {
+        exportGuestsCsv(event.currentTarget.getAttribute('data-export-type'));
+      });
+    });
     $('addGuestBtn')?.addEventListener('click', () => openGuestForm(null));
     $('editGuestBtn')?.addEventListener('click', () => {
       if (!selectedGuest) return;
