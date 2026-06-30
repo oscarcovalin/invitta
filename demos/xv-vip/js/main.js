@@ -6,58 +6,131 @@ let activeConfig = null;
 if (typeof WEDDING_CONFIG !== "undefined") {
     activeConfig = WEDDING_CONFIG;
 }
-// --- INYECCIÓN DINÁMICA DE ESTILOS & FUENTES ---
-if (activeConfig && activeConfig.theme) {
-    const root = document.documentElement;
-    const theme = activeConfig.theme;
-    if (theme) {
-        root.style.setProperty('--primary-color', theme.primaryColor || '#8C7B5D');
-        root.style.setProperty('--secondary-color', theme.secondaryColor || '#2F3E46');
-        root.style.setProperty('--bg-color', theme.bgColor || '#F8F5F0');
-        root.style.setProperty('--text-color', theme.textColor || '#333333');
-        
-        root.style.setProperty('--font-script', `'${theme.fontScript}', cursive`);
-        root.style.setProperty('--font-primary', `'${theme.fontPrimary}', sans-serif`);
-        root.style.setProperty('--font-secondary', `'${theme.fontSecondary}', sans-serif`);
-        
-        if (theme.bgImage && theme.bgImage.trim() !== "") {
-            root.style.setProperty('--global-bg-image', `url('${theme.bgImage}')`);
-            root.style.setProperty('--global-bg-opacity', '1');
-        } else {
-            root.style.setProperty('--global-bg-image', 'none');
-        }
-    }
 
-    // 2. Cargar & Inyectar Tipografías de Google
-    if (theme.fontScript) {
-        loadGoogleFont(theme.fontScript);
-        root.style.setProperty('--font-script', `'${theme.fontScript}', cursive`);
-    }
-    if (theme.fontPrimary) {
-        loadGoogleFont(theme.fontPrimary);
-        root.style.setProperty('--font-primary', `'${theme.fontPrimary}', sans-serif`);
-        root.style.setProperty('--font-secondary', `'${theme.fontPrimary}', sans-serif`);
-    }
-}
-
-// Función para importar dinámicamente tipografías desde Google Fonts
 function loadGoogleFont(fontName) {
-    // Evitar cargar las fuentes locales clásicas
-    if (fontName === 'Sweet Pea' || fontName === 'Champagne Limousines' || !fontName) return;
+    if (!fontName || typeof fontName !== "string") return;
 
-    const fontId = `gfont-${fontName.toLowerCase().replace(/ /g, '-')}`;
-    if (document.getElementById(fontId)) return; // Ya está cargada
+    const normalizedFontName = fontName.trim();
+    if (!normalizedFontName) return;
+
+    if (normalizedFontName === 'Sweet Pea' || normalizedFontName === 'Champagne Limousines') return;
+
+    const fontId = `gfont-${normalizedFontName.toLowerCase().replace(/ /g, '-')}`;
+    if (document.getElementById(fontId)) return;
 
     const link = document.createElement('link');
     link.id = fontId;
     link.rel = 'stylesheet';
-    link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}:ital,wght@0,300;0,400;0,700;1,400&display=swap`;
+    link.href = `https://fonts.googleapis.com/css2?family=${normalizedFontName.replace(/ /g, '+')}:ital,wght@0,300;0,400;0,700;1,400&display=swap`;
     document.head.appendChild(link);
+}
+
+function applyVisualTheme(config) {
+    if (!config || typeof document === "undefined") return;
+
+    const root = document.documentElement;
+    const theme = config.theme || {};
+    const colors = theme.colors || {};
+    const typography = theme.typography || {};
+    const images = theme.images || {};
+
+    const setVar = (property, value, fallback) => {
+        if (typeof value === "string" && value.trim() !== "") {
+            root.style.setProperty(property, value.trim());
+        } else if (fallback !== undefined) {
+            root.style.setProperty(property, fallback);
+        }
+    };
+
+    setVar('--primary-color', colors.primary || theme.primaryColor || '#8C7B5D', '#8C7B5D');
+    setVar('--secondary-color', colors.secondary || theme.secondaryColor || '#2F3E46', '#2F3E46');
+    setVar('--accent-color', colors.accent || '#C9877D', '#C9877D');
+    setVar('--bg-color', colors.background || theme.bgColor || '#F8F5F0', '#F8F5F0');
+    setVar('--surface-color', colors.surface || '#FFFFFF', '#FFFFFF');
+    setVar('--text-color', colors.text || theme.textColor || '#333333', '#333333');
+    setVar('--muted-color', colors.muted || '#6B6560', '#6B6560');
+
+    const backgroundImage = (theme.bgImage || colors.backgroundImage || '').trim();
+    if (backgroundImage) {
+        root.style.setProperty('--global-bg-image', `url('${backgroundImage}')`);
+        root.style.setProperty('--global-bg-opacity', '1');
+    } else {
+        root.style.setProperty('--global-bg-image', 'none');
+        root.style.setProperty('--global-bg-opacity', '0');
+    }
+
+    const fontScript = typography.script || typography.accent || typography.fontScript || theme.fontScript || '';
+    const fontPrimary = typography.heading || typography.primary || typography.fontPrimary || theme.fontPrimary || '';
+    const fontSecondary = typography.body || typography.secondary || typography.fontSecondary || theme.fontSecondary || '';
+
+    if (fontScript) {
+        loadGoogleFont(fontScript);
+        root.style.setProperty('--font-script', `'${fontScript}', cursive`);
+    }
+    if (fontPrimary) {
+        loadGoogleFont(fontPrimary);
+        root.style.setProperty('--font-primary', `'${fontPrimary}', sans-serif`);
+    }
+    if (fontSecondary) {
+        loadGoogleFont(fontSecondary);
+        root.style.setProperty('--font-secondary', `'${fontSecondary}', sans-serif`);
+    }
+
+    const heroUrl = (images.hero || images.background || (config.images && config.images.hero) || '').trim();
+    if (heroUrl) {
+        document.querySelectorAll('.hero, header.hero, #hero').forEach((element) => {
+            element.style.setProperty('background-image', `url('${heroUrl}')`, 'important');
+        });
+    }
+
+    const ogImageUrl = (images.ogImage || images.og || (config.images && config.images.hero) || '').trim();
+    if (ogImageUrl) {
+        let metaTag = document.querySelector('meta[property="og:image"]') || document.querySelector('meta[name="og:image"]');
+        if (!metaTag) {
+            metaTag = document.createElement('meta');
+            metaTag.setAttribute('property', 'og:image');
+            document.head.appendChild(metaTag);
+        }
+        metaTag.setAttribute('content', ogImageUrl);
+    }
+
+    const galleryContainer = document.getElementById('photo-grid');
+    if (galleryContainer) {
+        galleryContainer.querySelectorAll('.parallax-section').forEach((item) => item.remove());
+
+        const galleryImages = Array.isArray(images.gallery)
+            ? images.gallery.filter((image) => typeof image === 'string' && image.trim() !== '')
+            : [];
+
+        const fallbackGallery = [];
+        if (galleryImages.length === 0) {
+            for (let index = 1; index <= 12; index += 1) {
+                const imageValue = config.images && config.images[`grid${index}`];
+                if (typeof imageValue === 'string' && imageValue.trim() !== '') {
+                    fallbackGallery.push(imageValue.trim());
+                }
+            }
+        }
+
+        const finalGalleryImages = galleryImages.length > 0 ? galleryImages : fallbackGallery;
+        finalGalleryImages.forEach((imageUrl, index) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = `parallax-section gallery-item-${index + 1} reveal`;
+            itemDiv.style.setProperty('background-image', `url('${imageUrl}')`, 'important');
+            galleryContainer.appendChild(itemDiv);
+        });
+    }
+}
+
+if (activeConfig) {
+    applyVisualTheme(activeConfig);
 }
 
 // --- RENDERIZADO DINÁMICO DE DATOS (MACHOTE) ---
 document.addEventListener("DOMContentLoaded", () => {
     if (!activeConfig) return;
+
+    applyVisualTheme(activeConfig);
 
     const isXv = activeConfig.eventType === "xv";
     const mainTitleText = isXv ? activeConfig.brideName : `${activeConfig.brideName} & ${activeConfig.groomName}`;

@@ -130,12 +130,37 @@ const WEDDING_CONFIG = {
         "grid5": "assets/grid_5.jpg"
     },
     "theme": {
-        "primaryColor": "#722F37",
-        "secondaryColor": "#4A1C24",
-        "bgColor": "#1A1A1A",
-        "textColor": "#F0E6D2",
+        "colors": {
+            "background": "#FAF6F1",
+            "surface": "#FFFFFF",
+            "primary": "#C9A46A",
+            "secondary": "#D8A7A7",
+            "accent": "#B8895B",
+            "text": "#2B2522",
+            "muted": "#7B6F68"
+        },
+        "typography": {
+            "script": "Parisienne",
+            "heading": "Cormorant Garamond",
+            "body": "Cormorant Garamond"
+        },
+        "images": {
+            "hero": "assets/hero_bg.jpg",
+            "ogImage": "assets/hero_bg.jpg",
+            "gallery": [
+                "assets/gallery_1.jpg",
+                "assets/gallery_2.jpg",
+                "assets/gallery_3.jpg",
+                "assets/grid_1.jpg",
+                "assets/grid_2.jpg"
+            ]
+        },
+        "primaryColor": "#C9A46A",
+        "secondaryColor": "#D8A7A7",
+        "bgColor": "#FAF6F1",
+        "textColor": "#2B2522",
         "bgImage": "",
-        "fontScript": "Dancing Script",
+        "fontScript": "Parisienne",
         "fontPrimary": "Cormorant Garamond",
         "fontSecondary": "Cormorant Garamond"
     },
