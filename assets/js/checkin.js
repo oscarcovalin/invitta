@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const CHECKIN_CHECKIN_GUEST_SELECT = "id, evento_id, nombre, familia, telefono, email, mesa, pases_asignados, pases_confirmados, estado, qr_token, qr_status, checked_in, checked_in_at, checked_in_by";
+   const CHECKIN_GUEST_SELECT = "id, evento_id, nombre, familia, telefono, email, mesa, pases_asignados, pases_confirmados, estado, qr_token, qr_status, checked_in, checked_in_at, checked_in_by";
 
     let session = null;
     let currentGuest = null;
