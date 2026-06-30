@@ -112,9 +112,9 @@ if (rsvpForm) {
         
         let textMessage = "";
         if (attendance === 'yes') {
-            textMessage = `¡Hola Paulina y Rodrigo! \uD83D\uDC8D\n\nConfirmo mi asistencia para su boda. \uD83E\uDD42\u2728\n\n*Nombre:* ${name}\n*Asistentes:* ${guestsCount}`;
+            textMessage = `¡Hola! \uD83C\uDF89\n\nConfirmo mi asistencia a los XV años de Valentina. \uD83E\uDD42\u2728\n\n*Nombre:* ${name}\n*Asistentes:* ${guestsCount}`;
         } else {
-            textMessage = `¡Hola Paulina y Rodrigo! \uD83E\uDD0D\n\nLamento informar que no podré asistir a la boda.\n\n*Nombre:* ${name}`;
+            textMessage = `¡Hola! \uD83E\uDD0D\n\nLamento informar que no podré asistir a los XV años de Valentina.\n\n*Nombre:* ${name}`;
         }
         
         if (message) {

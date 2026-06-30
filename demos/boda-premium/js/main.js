@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const oldItems = galleryContainer.querySelectorAll('.parallax-section');
             oldItems.forEach(item => item.remove());
 
-            // Recorrer las ranuras grid1 a grid12
+            // Recorrer las ranuras disponibles de galería
             for (let i = 1; i <= 12; i++) {
                 const imgKey = `grid${i}`;
                 const imgUrl = images[imgKey];

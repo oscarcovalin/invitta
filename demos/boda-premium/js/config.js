@@ -12,7 +12,7 @@ const WEDDING_CONFIG = {
     "countdownDate": {
         "year": 2026,
         "month": 10,
-        "day": 28,
+        "day": 14,
         "hour": 18,
         "minute": 0,
         "second": 0
@@ -99,16 +99,16 @@ const WEDDING_CONFIG = {
         "description": "Opciones recomendadas.",
         "opciones": [
             {
-                "name": "Hotel Grand Plaza",
-                "address": "Dirección 1",
-                "phone": "5555555555",
-                "url": "https://example.com"
+                "name": "Hotel Demo Centro",
+                "address": "Datos de hospedaje personalizables para cada evento.",
+                "phone": "Tel. 55 1234 5678",
+                "url": "https://hotel-demo.invitta.mx"
             },
             {
-                "name": "Hotel Boutique Centro",
-                "address": "Dirección 2",
-                "phone": "5555555556",
-                "url": "https://example.com"
+                "name": "Hotel Demo Jardín",
+                "address": "Datos de hospedaje personalizables para cada evento.",
+                "phone": "Tel. 55 8765 4321",
+                "url": "https://hotel-demo.invitta.mx"
             }
         ]
     },
@@ -127,14 +127,7 @@ const WEDDING_CONFIG = {
         "grid2": "assets/grid_2.jpg",
         "grid3": "assets/grid_3.jpg",
         "grid4": "assets/grid_4.jpg",
-        "grid5": "assets/grid_5.jpg",
-        "grid6": "",
-        "grid7": "",
-        "grid8": "",
-        "grid9": "",
-        "grid10": "",
-        "grid11": "",
-        "grid12": ""
+        "grid5": "assets/grid_5.jpg"
     },
     "theme": {
         "primaryColor": "#A68A64",
@@ -153,6 +146,6 @@ const WEDDING_CONFIG = {
         "defaultPasses": 2,
         "defaultTable": "14",
         "message": "\"Con alegría en el corazón, los esperamos para compartir nuestra unión.\"",
-        "qrDataPrefix": "PaulinaAnaelRodrigoBoda2026"
+        "qrPrefix": "MarianaDiegoBoda2026"
     }
 };
