@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const GUEST_SELECT = "id, evento_id, nombre, familia, telefono, email, mesa, pases_asignados, pases_confirmados, estado, qr_token, qr_status, checked_in, checked_in_at";
+    const CHECKIN_CHECKIN_GUEST_SELECT = "id, evento_id, nombre, familia, telefono, email, mesa, pases_asignados, pases_confirmados, estado, qr_token, qr_status, checked_in, checked_in_at, checked_in_by";
 
     let session = null;
     let currentGuest = null;
@@ -92,7 +92,7 @@
         const supabase = window.InvittiaSupabase.getClient();
         const { data, error } = await supabase
             .from("invitados")
-            .select(GUEST_SELECT)
+            .select(CHECKIN_GUEST_SELECT)
             .eq("qr_token", token)
             .limit(1);
 
@@ -214,7 +214,7 @@
         const supabase = window.InvittiaSupabase.getClient();
         const { data, error } = await supabase
             .from("invitados")
-            .select(GUEST_SELECT)
+            .select(CHECKIN_GUEST_SELECT)
             .eq("id", guestId)
             .limit(1);
 
@@ -253,7 +253,7 @@
         const supabase = window.InvittiaSupabase.getClient();
         const { data, error } = await supabase
             .from("invitados")
-            .select(GUEST_SELECT)
+            .select(CHECKIN_GUEST_SELECT)
             .eq("evento_id", activeEvent.id)
             .order("nombre", { ascending: true });
 
@@ -441,45 +441,86 @@
             setState("error", "Invitado invalido", "Selecciona un invitado valido para confirmar.");
             return null;
         }
-        const token = guest.qr_token || currentToken;
-        if (!token) {
-            setState("error", "QR sin token valido", "No hay un token valido para confirmar la entrada.");
+
+        const supabase = window.InvittiaSupabase.getClient();
+        const { data: currentRows, error: currentError } = await supabase
+            .from("invitados")
+            .select(CHECKIN_GUEST_SELECT)
+            .eq("id", guest.id)
+            .limit(1);
+
+        const currentGuest = Array.isArray(currentRows) ? currentRows[0] : null;
+
+        if (currentError) {
+            console.error("[Invittia Check-in] Error releyendo invitado:", currentError);
+            setState("error", "Error de check-in", "No se pudo validar el invitado.");
             return null;
         }
 
-        const supabase = window.InvittiaSupabase.getClient();
-        const { data, error } = await supabase.rpc("confirmar_checkin", {
-            p_qr_token: token
-        });
+        if (!currentGuest) {
+            setState("error", "Invitado no encontrado", "Invitado no encontrado.");
+            return null;
+        }
 
-        if (error) {
-            console.error("[Invittia Check-in] Error en RPC confirmar_checkin:", error);
+        if (currentGuest.checked_in === true || currentGuest.qr_status === "used") {
+            setState("warning", "QR ya utilizado", "QR ya utilizado");
+            showGuest(currentGuest);
+            hideConfirmButton();
+            return currentGuest;
+        }
+
+        if (currentGuest.qr_status === "cancelled") {
+            setState("error", "QR cancelado", "QR cancelado");
+            showGuest(currentGuest);
+            hideConfirmButton();
+            return null;
+        }
+
+        const { data: updatedRows, error: updateError } = await supabase
+            .from("invitados")
+            .update({
+                checked_in: true,
+                checked_in_at: new Date().toISOString(),
+                checked_in_by: session.user.id,
+                qr_status: "used"
+            })
+            .eq("id", currentGuest.id)
+            .eq("evento_id", currentGuest.evento_id)
+            .select(CHECKIN_GUEST_SELECT)
+            .limit(1);
+
+        const updatedGuest = Array.isArray(updatedRows) ? updatedRows[0] : null;
+
+        if (updateError) {
+            console.error("[Invittia Check-in] Error actualizando invitado:", updateError);
             setState("error", "Error de check-in", "No se pudo confirmar la entrada.");
             return null;
         }
 
-        if (data?.ok === false) {
-            const message = data.message || "No se pudo confirmar la entrada.";
-            setState("warning", message, message);
-            return null;
-        }
-
-        if (data?.ok !== true || !data.invitado) {
+        if (!updatedGuest) {
             setState("error", "Error de check-in", "No se pudo confirmar la entrada del invitado.");
             return null;
         }
 
-        currentGuest = data.invitado;
-        showGuest(data.invitado);
+        const { error: checkinError } = await supabase
+            .from("checkins")
+            .insert({
+                evento_id: updatedGuest.evento_id,
+                invitado_id: updatedGuest.id,
+                checked_in_by: session.user.id,
+                method: currentToken ? "qr" : "manual"
+            });
+
+        if (checkinError) {
+            console.warn("[Invittia Check-in] Entrada confirmada, pero fallo el registro en checkins:", checkinError);
+        }
+
+        currentGuest = updatedGuest;
+        showGuest(updatedGuest);
         hideConfirmButton();
         await loadStaffGuests();
-
-        if (data.already_checked_in === true) {
-            setState("warning", "QR ya utilizado", "QR ya utilizado.");
-        } else {
-            setState("valid", "Entrada confirmada", "Entrada confirmada.");
-        }
-        return data.invitado;
+        setState("valid", "Entrada confirmada", "Entrada confirmada.");
+        return updatedGuest;
     }
 
     async function confirmEntry() {
@@ -553,3 +594,4 @@
         hideConfirmButton();
     });
 })();
+
