@@ -162,34 +162,85 @@
             transition: var(--transition);
         }
         .mobile-menu {
-            display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--cream);
+            background: #FAF8F5;
             z-index: 200;
-            flex-direction: column;
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 32px;
+            padding: 84px 24px 40px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(-8px);
+            transition: opacity 0.28s ease, visibility 0.28s ease, transform 0.28s ease;
         }
-        .mobile-menu.open { display: flex; }
+        .mobile-menu.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        .mobile-menu-inner {
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 26px;
+        }
         .mobile-menu a {
             font-family: var(--serif);
-            font-size: 2rem;
+            font-size: clamp(1.4rem, 7vw, 1.8rem);
             font-weight: 400;
             color: var(--charcoal);
             text-decoration: none;
             font-style: italic;
+            line-height: 1.1;
+            transition: var(--transition);
         }
         .mobile-menu a:hover { color: var(--rose); }
+        .mobile-menu a.mobile-access {
+            font-weight: 600;
+            font-style: normal;
+        }
+        .mobile-menu .mobile-wa {
+            width: 100%;
+            max-width: 320px;
+            margin-top: 6px;
+            padding: 16px 22px;
+            border-radius: 999px;
+            font: 600 0.9rem var(--sans);
+            font-style: normal;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 28px rgba(201,135,125,0.24);
+        }
+        .mobile-menu .mobile-wa i {
+            font-size: 1.05rem;
+        }
         .mobile-close {
             position: absolute;
-            top: 24px; right: 28px;
-            background: none; border: none;
-            font-size: 1.5rem;
+            top: 22px; right: 22px;
+            width: 42px; height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.72);
+            border: 1px solid var(--sand);
+            border-radius: 50%;
+            font-size: 1rem;
             color: var(--warm-grey);
             cursor: pointer;
+            box-shadow: 0 8px 22px rgba(46,46,46,0.06);
+            transition: var(--transition);
         }
+        .mobile-close:hover { color: var(--charcoal); border-color: var(--rose-light); transform: translateY(-1px); }
+        body.mobile-menu-open { overflow: hidden; }
+        body.mobile-menu-open .wa-float { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(12px); animation: none; }
 
         /* HERO */
         .hero {
@@ -961,12 +1012,14 @@
     <!-- MENÚ MÓVIL -->
     <div class="mobile-menu" id="mobileMenu">
         <button class="mobile-close" id="mobileClose" aria-label="Cerrar menú"><i class="fa-solid fa-xmark"></i></button>
-        <a href="#modelos" onclick="closeMobileMenu()">Ver Ejemplos</a>
-        <a href="#" onclick="closeMobileMenu(); openModal();">Solicitar Propuesta</a>
-        <a href="administracion/dashboard.html" style="font-weight: 600;">Acceder</a>
-        <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20quiero%20solicitar%20una%20invitaci%C3%B3n" target="_blank" class="btn-primary" style="font-family:var(--sans); margin-top: 20px;">
-            <i class="fa-brands fa-whatsapp"></i> Hablar por WhatsApp
-        </a>
+        <div class="mobile-menu-inner">
+            <a href="#modelos" onclick="closeMobileMenu()">Ver ejemplos</a>
+            <a href="administracion/formulario-cliente.html" onclick="closeMobileMenu()">Solicitar propuesta</a>
+            <a href="administracion/dashboard.html" class="mobile-access">Acceder</a>
+            <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20quiero%20solicitar%20una%20invitaci%C3%B3n" target="_blank" class="btn-primary mobile-wa" onclick="closeMobileMenu()">
+                <i class="fa-brands fa-whatsapp"></i> Hablar por WhatsApp
+            </a>
+        </div>
     </div>
 
     <!-- HEADER -->
@@ -975,7 +1028,7 @@
             <a href="#" class="logo">Inv<em>itta</em></a>
             <ul class="nav-links">
                 <li><a href="#modelos">Ver Ejemplos</a></li>
-                <li><a href="#" onclick="openModal()">Solicitar Propuesta</a></li>
+                <li><a href="administracion/formulario-cliente.html">Solicitar Propuesta</a></li>
                 <li>
                     <a href="administracion/dashboard.html" class="btn-nav" style="background: var(--charcoal); color: #fff; border: none; padding: 10px 24px; border-radius: 8px;">
                         Acceder
@@ -1527,12 +1580,21 @@
         const mobileMenu = document.getElementById('mobileMenu');
         const mobileClose = document.getElementById('mobileClose');
 
-        hamburger.addEventListener('click', () => mobileMenu.classList.add('open'));
-        mobileClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
+        function openMobileMenu() {
+            mobileMenu.classList.add('open');
+            document.body.classList.add('mobile-menu-open');
+        }
 
         function closeMobileMenu() {
             mobileMenu.classList.remove('open');
+            document.body.classList.remove('mobile-menu-open');
         }
+
+        hamburger.addEventListener('click', openMobileMenu);
+        mobileClose.addEventListener('click', closeMobileMenu);
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') closeMobileMenu();
+        });
 
         // Scroll reveal
         const revealEls = document.querySelectorAll('.reveal');
