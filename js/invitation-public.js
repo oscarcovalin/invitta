@@ -27,10 +27,12 @@
   /* ─── Parámetros de URL ───────────────────────────────────────────── */
   const params = new URLSearchParams(window.location.search);
 
-  const slug  = sanitizeText(params.get("slug") || "");
-  const guest = sanitizeText(params.get("n")    || "");
+  const slug  = params.get("slug") || "";
+  const guest = sanitizeText(params.get("n") || "");
   const pases = clampInt(params.get("p"), 1, 20);
-  const mesa  = sanitizeText(params.get("m")    || "");
+  const mesa  = sanitizeText(params.get("m") || "");
+
+  console.log("slug recibido:", slug);
 
   /* ─── Arranque ────────────────────────────────────────────────────── */
   if (!slug) {
@@ -56,10 +58,17 @@
       .select("*")
       .eq("slug", slug)
       .eq("published", true)
-      .single();
+      .maybeSingle();
 
-    if (error || !data) {
-      throw new Error("Invitación no encontrada o no disponible.");
+    console.log("slug recibido:", slug);
+    console.log("data invitación:", data);
+    console.log("error Supabase:", error);
+
+    if (error) {
+      throw new Error("Error al consultar Supabase: " + error.message);
+    }
+    if (!data) {
+      throw new Error("Invitación no encontrada o no publicada.");
     }
     return data;
   }
