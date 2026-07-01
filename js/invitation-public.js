@@ -2,77 +2,91 @@
  * invitation-public.js
  * Invitta Studio — Página pública de invitación
  *
- * URL esperada: /invitacion.html?slug=paola-xv&n=Familia+Garcia&p=4&m=5
- * Tabla:        studio_invitations (SELECT anon, published = true)
+ * URL: /invitacion.html?slug=paola-xv&n=Familia+Garcia&p=4&m=5
+ * Tabla: studio_invitations (SELECT anon, published = true)
  *
  * Solo lectura. No modifica tablas. No requiere autenticación.
+ *
+ * NOTA: Este script se carga al final del <body>, por lo que el DOM ya
+ * está listo. No se usa DOMContentLoaded para evitar que el evento
+ * ya haya disparado antes de que se registre el listener.
  */
 
 (function () {
   "use strict";
 
-  /* ─── Supabase client ─────────────────────────────────────────────── */
-  const SUPABASE_URL = window.INVITTIA_ENV?.SUPABASE_URL   || "";
-  const SUPABASE_KEY = window.INVITTIA_ENV?.SUPABASE_ANON_KEY || "";
+  /* ─── Supabase ────────────────────────────────────────────────────── */
+  const SUPABASE_URL = (window.INVITTIA_ENV && window.INVITTIA_ENV.SUPABASE_URL)   || "";
+  const SUPABASE_KEY = (window.INVITTIA_ENV && window.INVITTIA_ENV.SUPABASE_ANON_KEY) || "";
 
-  let db; /* se inicializa dentro de DOMContentLoaded */
+  let db;
+  try {
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } catch (e) {
+    console.error("Error al inicializar Supabase:", e);
+    showError("No se pudo inicializar la conexión. Recarga la página.");
+    return;
+  }
 
   /* ─── Parámetros de URL ───────────────────────────────────────────── */
-  const params   = new URLSearchParams(window.location.search);
-  const slug      = params.get("slug") || "";
-  const guestName = sanitize(params.get("n") || "");
-  const maxPasses = clampInt(params.get("p"), 1, 20);
-  const tableNum  = sanitize(params.get("m") || "");
+  var params      = new URLSearchParams(window.location.search);
+  var slug        = params.get("slug") || "";
+  var guestName   = sanitize(params.get("n") || "");
+  var maxPasses   = clampInt(params.get("p"), 1, 20);
+  var tableNum    = sanitize(params.get("m") || "");
 
-  /* ─── Arranque ──────────────────────────────────────────────────── */
-  document.addEventListener("DOMContentLoaded", function () {
-    /* Init Supabase aquí para que showError() pueda acceder al DOM */
-    try {
-      db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } catch (e) {
-      showError("No se pudo inicializar la conexión. Recarga la página.");
-      return;
-    }
-
-    if (!slug) {
-      showError("No se encontró el identificador de la invitación.");
-      return;
-    }
+  /* ─── Iniciar inmediatamente (DOM ya listo al final del body) ─────── */
+  if (!slug) {
+    showError("No se encontró el slug de la invitación.");
+  } else {
     loadInvitation();
-  });
+  }
 
   /* ─── Carga ───────────────────────────────────────────────────────── */
   async function loadInvitation() {
-    const { data, error } = await db
-      .from("studio_invitations")
-      .select("*")
-      .eq("slug", slug)
-      .eq("published", true)
-      .maybeSingle();
+    try {
+      console.log("slug recibido:", slug);
 
-    console.log("slug recibido:", slug);
-    console.log("data invitación:", data);
-    console.log("error Supabase:", error);
+      var result = await db
+        .from("studio_invitations")
+        .select("*")
+        .eq("slug", slug)
+        .eq("published", true)
+        .maybeSingle();
 
-    if (error) {
-      showError("Error al cargar la invitación: " + error.message);
-      return;
+      var data  = result.data;
+      var error = result.error;
+
+      console.log("data invitación:", data);
+      console.log("error Supabase:", error);
+
+      if (error) {
+        console.error("Error real de Supabase:", error);
+        showError("Error al consultar la invitación.");
+        return;
+      }
+
+      if (!data) {
+        showError("Invitación no encontrada o no publicada.");
+        return;
+      }
+
+      console.log("Antes de renderInvitation");
+      renderInvitation(data);
+      console.log("Después de renderInvitation");
+
+    } catch (err) {
+      console.error("Error real en loadInvitation:", err);
+      showError("Ocurrió un error al cargar la invitación. Revisa la consola.");
     }
-
-    if (!data) {
-      showError("Invitación no encontrada o no publicada.");
-      return;
-    }
-
-    renderInvitation(data);
   }
 
   /* ─── Renderizado ─────────────────────────────────────────────────── */
   function renderInvitation(inv) {
-    /* 1. Ocultar loader y error; mostrar contenido */
-    const loader  = el("inv-loader");
-    const errBox  = el("inv-error");
-    const content = el("inv-content");
+    /* 1. Mostrar contenido, ocultar loader y error */
+    var loader  = document.getElementById("inv-loader");
+    var errBox  = document.getElementById("inv-error");
+    var content = document.getElementById("inv-content");
 
     if (loader)  loader.style.display  = "none";
     if (errBox)  { errBox.style.display = "none"; errBox.textContent = ""; }
@@ -89,7 +103,7 @@
 
     /* 4. Fecha y hora */
     setText("inv-date", formatDate(inv.event_date));
-    const timeStr = formatTime(inv.event_time);
+    var timeStr = formatTime(inv.event_time);
     setText("inv-time", timeStr);
     toggle("inv-time-block", !!timeStr);
 
@@ -103,7 +117,7 @@
     buildPassSelector(maxPasses);
 
     /* 7. Ceremonia */
-    const hasCeremony = !!(inv.ceremony_name || inv.ceremony_address);
+    var hasCeremony = !!(inv.ceremony_name || inv.ceremony_address);
     toggle("inv-ceremony-block", hasCeremony);
     if (hasCeremony) {
       setText("inv-ceremony-name",    inv.ceremony_name    || "Ceremonia");
@@ -117,7 +131,7 @@
     }
 
     /* 8. Recepción */
-    const hasReception = !!(inv.reception_name || inv.reception_address);
+    var hasReception = !!(inv.reception_name || inv.reception_address);
     toggle("inv-reception-block", hasReception);
     if (hasReception) {
       setText("inv-reception-name",    inv.reception_name    || "Recepción");
@@ -149,35 +163,35 @@
 
   /* ─── Selector de pases ───────────────────────────────────────────── */
   function buildPassSelector(max) {
-    const sel = el("inv-confirm-pases");
+    var sel = document.getElementById("inv-confirm-pases");
     if (!sel) return;
     sel.innerHTML = "";
-    for (let i = 1; i <= max; i++) {
-      const opt = document.createElement("option");
+    for (var i = 1; i <= max; i++) {
+      var opt = document.createElement("option");
       opt.value = i;
       opt.textContent = i === 1 ? "1 persona" : i + " personas";
       sel.appendChild(opt);
     }
   }
 
-  /* ─── Botón WhatsApp ──────────────────────────────────────────────── */
+  /* ─── WhatsApp ────────────────────────────────────────────────────── */
   function buildWhatsAppButton(inv) {
-    const phone = (inv.whatsapp_number || "").replace(/\D/g, "");
+    var phone = (inv.whatsapp_number || "").replace(/\D/g, "");
     if (!phone) {
       hide("inv-wa-block");
       return;
     }
     show("inv-wa-block");
 
-    const btn = el("inv-wa-btn");
+    var btn = document.getElementById("inv-wa-btn");
     if (!btn) return;
 
     btn.addEventListener("click", function () {
-      const selected = el("inv-confirm-pases")?.value || maxPasses;
-      const title    = inv.title || "el evento";
-      const mesa     = tableNum ? "\nMesa: " + tableNum : "";
+      var selected = (document.getElementById("inv-confirm-pases") || {}).value || maxPasses;
+      var title    = inv.title || "el evento";
+      var mesa     = tableNum ? "\nMesa: " + tableNum : "";
 
-      const msg =
+      var msg =
         "Hola, confirmo mi asistencia al evento " + title + ".\n\n" +
         "Invitado: " + (guestName || "Invitado") + "\n" +
         "Pases confirmados: " + selected + "\n" +
@@ -192,36 +206,55 @@
     });
   }
 
+  /* ─── showError ───────────────────────────────────────────────────── */
+  function showError(message) {
+    console.trace("showError llamado con:", message);
+
+    var loader  = document.getElementById("inv-loader");
+    var content = document.getElementById("inv-content");
+    var errBox  = document.getElementById("inv-error");
+
+    if (loader)  loader.style.display  = "none";
+    if (content) content.style.display = "none";
+    if (errBox) {
+      errBox.textContent   = message;
+      errBox.style.display = "block";
+    }
+  }
+
   /* ─── Tema de colores ─────────────────────────────────────────────── */
   function applyTheme(primary, secondary) {
-    const root = document.documentElement;
+    var root = document.documentElement;
     root.style.setProperty("--inv-primary",        primary);
     root.style.setProperty("--inv-primary-light",  hexAlpha(primary, 0.12));
     root.style.setProperty("--inv-primary-border", hexAlpha(primary, 0.35));
     root.style.setProperty("--inv-secondary",      secondary);
   }
 
-  /* ─── showError ───────────────────────────────────────────────────── */
-  function showError(msg) {
-    const loader  = el("inv-loader");
-    const content = el("inv-content");
-    const errBox  = el("inv-error");
-
-    if (loader)  loader.style.display  = "none";
-    if (content) content.style.display = "none";
-    if (errBox) {
-      errBox.textContent     = msg;
-      errBox.style.display   = "block";
-    }
+  /* ─── Helpers DOM ─────────────────────────────────────────────────── */
+  function setText(id, val) {
+    var e = document.getElementById(id);
+    if (e) e.textContent = String(val);
   }
 
-  /* ─── Helpers DOM ─────────────────────────────────────────────────── */
-  function el(id)            { return document.getElementById(id); }
-  function setText(id, val)  { const e = el(id); if (e) e.textContent = String(val); }
-  function setHref(id, href) { const e = el(id); if (e) e.href = href; }
-  function show(id)          { const e = el(id); if (e) e.style.display = ""; }
-  function hide(id)          { const e = el(id); if (e) e.style.display = "none"; }
-  function toggle(id, show_) { show_ ? show(id) : hide(id); }
+  function setHref(id, href) {
+    var e = document.getElementById(id);
+    if (e) e.href = href;
+  }
+
+  function show(id) {
+    var e = document.getElementById(id);
+    if (e) e.style.display = "";
+  }
+
+  function hide(id) {
+    var e = document.getElementById(id);
+    if (e) e.style.display = "none";
+  }
+
+  function toggle(id, visible) {
+    visible ? show(id) : hide(id);
+  }
 
   /* ─── Helpers texto / números ─────────────────────────────────────── */
   function sanitize(str) {
@@ -229,7 +262,7 @@
   }
 
   function clampInt(val, min, max) {
-    const n = parseInt(val, 10);
+    var n = parseInt(val, 10);
     return isNaN(n) ? min : Math.min(Math.max(n, min), max);
   }
 
@@ -239,24 +272,25 @@
       return new Date(dateStr).toLocaleDateString("es-MX", {
         weekday: "long", year: "numeric", month: "long", day: "numeric"
       });
-    } catch { return dateStr; }
+    } catch (e) { return dateStr; }
   }
 
   function formatTime(timeStr) {
     if (!timeStr) return "";
     try {
-      const [h, m] = timeStr.split(":");
-      const d = new Date();
-      d.setHours(parseInt(h, 10), parseInt(m, 10), 0);
+      var parts = timeStr.split(":");
+      var d = new Date();
+      d.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0);
       return d.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
-    } catch { return timeStr; }
+    } catch (e) { return timeStr; }
   }
 
   /* ─── Color helper ────────────────────────────────────────────────── */
   function hexAlpha(hex, a) {
-    const r = parseInt((hex || "#000000").slice(1, 3), 16) || 0;
-    const g = parseInt((hex || "#000000").slice(3, 5), 16) || 0;
-    const b = parseInt((hex || "#000000").slice(5, 7), 16) || 0;
+    var h = hex || "#C9A46A";
+    var r = parseInt(h.slice(1, 3), 16) || 0;
+    var g = parseInt(h.slice(3, 5), 16) || 0;
+    var b = parseInt(h.slice(5, 7), 16) || 0;
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
   }
 
