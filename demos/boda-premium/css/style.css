@@ -27,12 +27,16 @@
 }
 
 :root {
-    --primary-color: #C9877D; /* Rose from landing */
-    --secondary-color: #f7f6f4; /* Charcoal from landing */
-    --bg-color: #1a1a1a; /* Cream from landing */
-    --border-color: #333; /* Sand border */
-    --text-color: #c4c4c4; /* Warm grey */
-    --white: #222;
+    /* ── Olive Romance · Boda Premium ─────────────── */
+    --primary-color: #A68A64;   /* arena dorada */
+    --secondary-color: #6F7D5F; /* olivo profundo */
+    --accent-color: #C58A5C;    /* terracotta suave */
+    --bg-color: #F8F3EA;        /* marfil natural */
+    --surface-color: #FFFFFF;
+    --border-color: #D8CCB8;    /* arena cálida */
+    --text-color: #2C2924;      /* café editorial */
+    --muted-color: #756E65;     /* gris cálido */
+    --white: #2C2924;
     --font-script: 'Sweet Pea', cursive;
     --font-primary: 'Champagne Limousines', sans-serif;
     --font-secondary: 'Champagne Limousines', sans-serif;
@@ -117,7 +121,12 @@ a {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(47, 62, 70, 0.4); /* Dark overlay */
+    background: linear-gradient(
+        to bottom,
+        rgba(166,138,100,0.20) 0%,
+        rgba(44,41,36,0.50) 55%,
+        rgba(44,41,36,0.78) 100%
+    );
     z-index: 1;
 }
 
@@ -1119,4 +1128,152 @@ body, .section-padding, .quote-section, .hospedaje-section {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
     background-blend-mode: multiply;
 }
+
+/* ═══════════════════════════════════════════════════════
+   OLIVE ROMANCE — BODA PREMIUM · THEME OVERRIDES
+   Romántico Editorial · Natural Premium · Luminoso
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Section backgrounds: warm ivory editorial ── */
+.section-padding {
+    background: linear-gradient(180deg, var(--bg-color) 0%, #F2EBE0 100%);
+}
+.section-padding:nth-child(even) {
+    background: linear-gradient(180deg, #F2EBE0 0%, var(--bg-color) 100%);
+}
+
+/* ── Pass / Ticket section ── */
+.pass-section {
+    background: linear-gradient(135deg, #EDE6D8 0%, #E4DBCb 100%) !important;
+}
+.ticket-card::after {
+    border-left-color: #C8B898 !important;
+}
+.ticket-left {
+    border-right: 1px solid #C8B898;
+}
+.ticket-subtitle, .ticket-info span {
+    color: var(--muted-color) !important;
+}
+.ticket-message {
+    color: var(--muted-color) !important;
+    border-top-color: #C8B898 !important;
+}
+
+/* ── Cards: ivory with olive accent ── */
+.card {
+    background: #FFFFFF !important;
+    border-color: #CDBFA3 !important;
+    box-shadow: 0 4px 20px rgba(44,41,36,0.07) !important;
+}
+.card:hover {
+    border-color: var(--secondary-color) !important;
+    box-shadow: 0 10px 36px rgba(111,125,95,0.18) !important;
+}
+.card p {
+    color: var(--muted-color) !important;
+}
+
+/* ── Timeline ── */
+.timeline-content {
+    background: #FFFFFF !important;
+    border-color: #CDBFA3 !important;
+    box-shadow: 0 4px 18px rgba(44,41,36,0.07) !important;
+}
+.timeline-content p {
+    color: var(--muted-color) !important;
+}
+.timeline-icon {
+    background: var(--secondary-color) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px rgba(111,125,95,0.40) !important;
+}
+.timeline::before {
+    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color)) !important;
+    opacity: 0.35 !important;
+}
+
+/* ── RSVP container ── */
+.rsvp-container {
+    background: #FFFFFF !important;
+    border-color: #CDBFA3 !important;
+    box-shadow: 0 6px 32px rgba(44,41,36,0.08) !important;
+}
+.rsvp-container p {
+    color: var(--muted-color) !important;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+    background: #FDFAF6 !important;
+    border-color: #C8B898 !important;
+    color: var(--text-color) !important;
+}
+.form-group label {
+    color: var(--text-color) !important;
+}
+
+/* ── Ticket info ── */
+.ticket-info strong, .ticket-title, .guest-name {
+    color: var(--text-color) !important;
+}
+
+/* ── Dress code card ── */
+.dress-code-card {
+    background: #FFFFFF !important;
+    border: 1px solid #CDBFA3 !important;
+    box-shadow: 0 4px 20px rgba(44,41,36,0.06) !important;
+}
+.dress-code-note {
+    color: var(--muted-color) !important;
+}
+.dress-code-img {
+    filter: drop-shadow(0 5px 15px rgba(166,138,100,0.22)) !important;
+}
+
+/* ── Button primary: sand-olive editorial ── */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 18px rgba(166,138,100,0.38) !important;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #546048 100%) !important;
+    box-shadow: 0 8px 28px rgba(111,125,95,0.42) !important;
+    transform: translateY(-3px) !important;
+}
+
+/* ── Button secondary ── */
+.btn-secondary {
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+}
+.btn-secondary:hover {
+    background: var(--primary-color) !important;
+    color: #FFFFFF !important;
+}
+
+/* ── Footer: deep editorial warm ── */
+footer {
+    background: linear-gradient(135deg, #2C2924 0%, #3a352e 100%) !important;
+    color: #F8F3EA !important;
+}
+footer p {
+    color: rgba(248,243,234,0.70) !important;
+}
+
+/* ── Parallax overlays: olive editorial ── */
+.parallax-section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(111,125,95,0.15) 0%, rgba(44,41,36,0.35) 100%);
+    pointer-events: none;
+}
+
+/* ── Quote section ── */
+.quote-section {
+    background: linear-gradient(135deg, #EAE3D5 0%, #DDD4C2 100%) !important;
+}
+
         

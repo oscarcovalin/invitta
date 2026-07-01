@@ -27,12 +27,16 @@
 }
 
 :root {
-    --primary-color: #C9877D; /* Rose from landing */
-    --secondary-color: #2E2E2E; /* Charcoal from landing */
-    --bg-color: #FAF7F2; /* Cream from landing */
-    --border-color: #E8DDD0; /* Sand border */
-    --text-color: #6B6560; /* Warm grey */
-    --white: #FFFFFF;
+    /* ── Plum Noir · Boda VIP ───────────────────── */
+    --primary-color: #D4AF37;   /* oro bruñido */
+    --secondary-color: #4A1832; /* ciruela oscura */
+    --accent-color: #B8895B;    /* cobre cálido */
+    --bg-color: #100C10;        /* negro absoluto */
+    --surface-color: #1D171C;
+    --border-color: rgba(212,175,55,0.3); /* borde dorado */
+    --text-color: #FFF8EF;      /* crema blanco */
+    --muted-color: #C8B8AE;     /* rosa cálido */
+    --white: #FFF8EF;
     --font-script: 'Sweet Pea', cursive;
     --font-primary: 'Champagne Limousines', sans-serif;
     --font-secondary: 'Champagne Limousines', sans-serif;
@@ -117,7 +121,12 @@ a {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(47, 62, 70, 0.4); /* Dark overlay */
+    background: linear-gradient(
+        to bottom,
+        rgba(16,12,16,0.40) 0%,
+        rgba(74,24,50,0.55) 45%,
+        rgba(16,12,16,0.90) 100%
+    );
     z-index: 1;
 }
 
@@ -1118,5 +1127,204 @@ body, .section-padding, .quote-section, .hospedaje-section {
     background-color: var(--bg-color);
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
     background-blend-mode: multiply;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PLUM NOIR — BODA VIP · THEME OVERRIDES
+   Lujo Nocturno · Editorial · Exclusivo · Oro
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Section backgrounds: layered black ── */
+.section-padding {
+    background: linear-gradient(180deg, var(--bg-color) 0%, #151015 100%);
+}
+.section-padding:nth-child(even) {
+    background: linear-gradient(180deg, #151015 0%, var(--bg-color) 100%);
+}
+
+/* ── Global text override for dark theme ── */
+body {
+    color: var(--text-color) !important;
+}
+p, .card p, .timeline-content p, .rsvp-container p, .dress-code-desc {
+    color: var(--muted-color) !important;
+}
+h2, h3, h4, .section-title h2 {
+    color: var(--text-color) !important;
+}
+
+/* ── Pass / Ticket section: dark obsidian ── */
+.pass-section {
+    background: linear-gradient(135deg, #151015 0%, #080608 100%) !important;
+}
+.ticket-card {
+    background: var(--surface-color) !important;
+    border-color: rgba(212,175,55,0.25) !important;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.70), 0 0 0 1px rgba(212,175,55,0.15) !important;
+}
+.ticket-left {
+    background: var(--surface-color) !important;
+    border-right-color: rgba(212,175,55,0.25) !important;
+}
+.ticket-right {
+    background: var(--surface-color) !important;
+}
+.ticket-card::after {
+    border-left-color: rgba(212,175,55,0.30) !important;
+}
+.ticket-subtitle, .ticket-info span {
+    color: var(--muted-color) !important;
+}
+.ticket-info strong, .ticket-title, .guest-name {
+    color: var(--text-color) !important;
+}
+.ticket-message {
+    color: var(--muted-color) !important;
+    border-top-color: rgba(212,175,55,0.25) !important;
+}
+
+/* ── Cards: dark glass surface ── */
+.card {
+    background: var(--surface-color) !important;
+    border-color: rgba(212,175,55,0.25) !important;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,175,55,0.1) !important;
+}
+.card:hover {
+    border-color: rgba(212,175,55,0.60) !important;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.65), 0 0 20px rgba(212,175,55,0.15) !important;
+}
+.card h3, .card .card-title {
+    color: var(--text-color) !important;
+}
+
+/* ── Timeline ── */
+.timeline-content {
+    background: var(--surface-color) !important;
+    border-color: rgba(212,175,55,0.25) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.50) !important;
+}
+.timeline-content h3 {
+    color: var(--text-color) !important;
+}
+.timeline-icon {
+    background: var(--primary-color) !important;
+    color: #100C10 !important;
+    box-shadow: 0 4px 16px rgba(212,175,55,0.55) !important;
+}
+.timeline::before {
+    background: linear-gradient(to bottom, rgba(212,175,55,0.7), rgba(74,24,50,0.5)) !important;
+}
+
+/* ── RSVP container ── */
+.rsvp-container {
+    background: var(--surface-color) !important;
+    border-color: rgba(212,175,55,0.30) !important;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.60) !important;
+}
+.rsvp-container h2 {
+    color: var(--text-color) !important;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+    background: rgba(255,255,255,0.06) !important;
+    border-color: rgba(212,175,55,0.30) !important;
+    color: var(--text-color) !important;
+}
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--muted-color) !important;
+}
+.form-group label {
+    color: var(--text-color) !important;
+}
+
+/* ── Dress code card: dark surface ── */
+.dress-code-card {
+    background: var(--surface-color) !important;
+    border: 1px solid rgba(212,175,55,0.25) !important;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.50) !important;
+}
+.dress-code-card h3 {
+    color: var(--text-color) !important;
+}
+.dress-code-note {
+    color: var(--muted-color) !important;
+}
+.dress-code-img {
+    filter: drop-shadow(0 5px 20px rgba(212,175,55,0.35)) !important;
+}
+
+/* ── Button primary: pure gold ── */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #c49d28 100%) !important;
+    color: #100C10 !important;
+    font-weight: bold !important;
+    box-shadow: 0 4px 20px rgba(212,175,55,0.55), 0 0 40px rgba(212,175,55,0.2) !important;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #e5c45b 0%, var(--primary-color) 100%) !important;
+    box-shadow: 0 8px 32px rgba(212,175,55,0.65) !important;
+    transform: translateY(-3px) !important;
+}
+
+/* ── Button secondary ── */
+.btn-secondary {
+    border-color: rgba(212,175,55,0.60) !important;
+    color: var(--primary-color) !important;
+}
+.btn-secondary:hover {
+    background: rgba(212,175,55,0.15) !important;
+    color: var(--primary-color) !important;
+}
+
+/* ── Footer: absolute black ── */
+footer {
+    background: linear-gradient(135deg, #050405 0%, #100C10 100%) !important;
+    color: var(--text-color) !important;
+    border-top: 1px solid rgba(212,175,55,0.25) !important;
+}
+footer p {
+    color: var(--muted-color) !important;
+}
+footer h2 {
+    color: var(--primary-color) !important;
+}
+
+/* ── Parallax overlays: plum-noir deep cinematic ── */
+.parallax-section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(74,24,50,0.30) 0%, rgba(16,12,16,0.65) 100%);
+    pointer-events: none;
+}
+
+/* ── Quote section ── */
+.quote-section {
+    background: linear-gradient(135deg, #181318 0%, #0A080A 100%) !important;
+    border-top: 1px solid rgba(212,175,55,0.20) !important;
+    border-bottom: 1px solid rgba(212,175,55,0.20) !important;
+}
+
+/* ── Section title colors ── */
+.section-title h2 {
+    color: var(--text-color) !important;
+}
+.divider {
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent) !important;
+    height: 1px !important;
+    width: 80px !important;
+    opacity: 0.8;
+}
+
+/* ── Envelope overlay: dark plum ── */
+.envelope-overlay {
+    background: linear-gradient(135deg, #100C10 0%, #181318 100%) !important;
+}
+.envelope-container {
+    background: #1D171C !important;
+    border: 1px solid rgba(212,175,55,0.30) !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 40px rgba(212,175,55,0.15) !important;
 }
         
