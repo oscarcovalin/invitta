@@ -1,0 +1,434 @@
+/* ============================================================
+   invitacion.css — Invitta Studio · Página pública de invitación
+   ============================================================ */
+
+/* ── Variables de tema (sobreescritas por JS con los colores del evento) ── */
+:root {
+  --inv-primary:        #C9A46A;
+  --inv-primary-light:  rgba(201, 164, 106, 0.12);
+  --inv-primary-border: rgba(201, 164, 106, 0.35);
+  --inv-secondary:      #F7E7D7;
+
+  --inv-bg:      #FAF6F1;
+  --inv-surface: #FFFFFF;
+  --inv-text:    #2B2522;
+  --inv-muted:   #7B6F68;
+  --inv-border:  #EAE4DD;
+  --inv-radius:  18px;
+
+  --inv-font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --inv-font-sans:  'Jost', 'Inter', system-ui, sans-serif;
+
+  --inv-shadow-sm: 0 2px 12px rgba(43, 37, 34, 0.06);
+  --inv-shadow-md: 0 8px 32px rgba(43, 37, 34, 0.10);
+
+  --inv-transition: 0.25s ease;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ── Body ── */
+body {
+  font-family: var(--inv-font-sans);
+  background: var(--inv-bg);
+  color: var(--inv-text);
+  min-height: 100dvh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Loader ── */
+#inv-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  gap: 20px;
+  color: var(--inv-muted);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+}
+
+.inv-loader-ring {
+  width: 44px;
+  height: 44px;
+  border: 3px solid var(--inv-primary-border);
+  border-top-color: var(--inv-primary);
+  border-radius: 50%;
+  animation: inv-spin 0.9s linear infinite;
+}
+
+@keyframes inv-spin { to { transform: rotate(360deg); } }
+
+/* ── Error ── */
+#inv-error {
+  display: none;
+  max-width: 400px;
+  margin: 80px auto;
+  text-align: center;
+  padding: 40px 32px;
+  background: var(--inv-surface);
+  border: 1px solid var(--inv-border);
+  border-radius: var(--inv-radius);
+  box-shadow: var(--inv-shadow-sm);
+  color: var(--inv-muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+#inv-error::before {
+  content: "✦";
+  display: block;
+  font-size: 2rem;
+  color: var(--inv-primary);
+  margin-bottom: 16px;
+}
+
+/* ── Layout principal ── */
+#inv-content { display: none; }
+
+.inv-page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 16px 60px;
+}
+
+/* ═══════════════════════════════════════════
+   HERO HEADER
+═══════════════════════════════════════════ */
+.inv-hero {
+  text-align: center;
+  padding: 60px 24px 48px;
+  background: linear-gradient(170deg, var(--inv-secondary) 0%, var(--inv-bg) 100%);
+  border-bottom: 1px solid var(--inv-primary-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.inv-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, var(--inv-primary-light), transparent);
+  pointer-events: none;
+}
+
+.inv-ornament {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--inv-primary);
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.inv-ornament::before,
+.inv-ornament::after {
+  content: "";
+  flex: 1;
+  max-width: 60px;
+  height: 1px;
+  background: var(--inv-primary-border);
+}
+
+.inv-title {
+  font-family: var(--inv-font-serif);
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--inv-text);
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.inv-honoree {
+  font-family: var(--inv-font-serif);
+  font-size: clamp(1.3rem, 5vw, 1.9rem);
+  font-style: italic;
+  color: var(--inv-primary);
+  margin-bottom: 24px;
+}
+
+.inv-welcome {
+  font-size: 0.95rem;
+  color: var(--inv-muted);
+  max-width: 380px;
+  margin: 0 auto;
+  line-height: 1.75;
+}
+
+/* ═══════════════════════════════════════════
+   CARDS / SECCIONES
+═══════════════════════════════════════════ */
+.inv-card {
+  background: var(--inv-surface);
+  border: 1px solid var(--inv-border);
+  border-radius: var(--inv-radius);
+  padding: 28px 24px;
+  margin-top: 20px;
+  box-shadow: var(--inv-shadow-sm);
+  position: relative;
+  overflow: hidden;
+  animation: inv-fadein 0.5s ease both;
+}
+
+.inv-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--inv-primary);
+  opacity: 0.7;
+}
+
+@keyframes inv-fadein {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.inv-card-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--inv-primary);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.inv-card-label i { font-size: 0.75rem; }
+
+/* ── Invitado ── */
+.inv-guest-name {
+  font-family: var(--inv-font-serif);
+  font-size: clamp(1.4rem, 6vw, 2rem);
+  font-weight: 600;
+  color: var(--inv-text);
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.inv-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.inv-info-item {
+  background: var(--inv-bg);
+  border: 1px solid var(--inv-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: center;
+}
+
+.inv-info-item .lbl {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--inv-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.inv-info-item .val {
+  font-family: var(--inv-font-serif);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--inv-primary);
+  line-height: 1;
+}
+
+/* ── Fecha ── */
+.inv-date-display {
+  text-align: center;
+}
+
+.inv-date-text {
+  font-family: var(--inv-font-serif);
+  font-size: clamp(1.1rem, 4.5vw, 1.5rem);
+  font-weight: 600;
+  color: var(--inv-text);
+  text-transform: capitalize;
+  margin-bottom: 6px;
+}
+
+.inv-time-text {
+  font-size: 1rem;
+  color: var(--inv-muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* ── Lugar ── */
+.inv-venue-name {
+  font-family: var(--inv-font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--inv-text);
+  margin-bottom: 6px;
+}
+
+.inv-venue-address {
+  font-size: 0.9rem;
+  color: var(--inv-muted);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+/* ── Botones ── */
+.inv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  font-family: var(--inv-font-sans);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--inv-transition), box-shadow var(--inv-transition), opacity var(--inv-transition);
+  border: none;
+  outline: none;
+}
+
+.inv-btn:active { transform: scale(0.97); }
+
+.inv-btn-primary {
+  background: var(--inv-primary);
+  color: #fff;
+  box-shadow: 0 4px 16px var(--inv-primary-light);
+  width: 100%;
+}
+
+.inv-btn-primary:hover {
+  opacity: 0.9;
+  box-shadow: 0 6px 24px var(--inv-primary-border);
+}
+
+.inv-btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--inv-primary);
+  color: var(--inv-primary);
+  width: 100%;
+}
+
+.inv-btn-outline:hover {
+  background: var(--inv-primary-light);
+}
+
+.inv-btn-map {
+  background: var(--inv-bg);
+  border: 1px solid var(--inv-border);
+  color: var(--inv-muted);
+  font-size: 0.82rem;
+  padding: 10px 18px;
+}
+
+.inv-btn-map:hover { border-color: var(--inv-primary); color: var(--inv-primary); }
+
+/* ── Confirmación ── */
+.inv-confirm-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.inv-confirm-label {
+  font-size: 0.85rem;
+  color: var(--inv-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.inv-select {
+  flex: 1;
+  min-width: 140px;
+  padding: 12px 16px;
+  border: 1.5px solid var(--inv-border);
+  border-radius: 12px;
+  font-family: var(--inv-font-sans);
+  font-size: 0.9rem;
+  color: var(--inv-text);
+  background: var(--inv-surface);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237B6F68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  transition: border-color var(--inv-transition);
+}
+
+.inv-select:focus {
+  outline: none;
+  border-color: var(--inv-primary);
+}
+
+/* ── Dress code ── */
+.inv-dresscode-text {
+  font-family: var(--inv-font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--inv-text);
+  text-align: center;
+}
+
+/* ── Mesa de regalos ── */
+.inv-gifts-text {
+  font-size: 0.9rem;
+  color: var(--inv-muted);
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* ── WhatsApp ── */
+#inv-wa-block .inv-btn-primary {
+  background: #25D366;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.25);
+}
+
+#inv-wa-block .inv-btn-primary:hover {
+  opacity: 0.92;
+  box-shadow: 0 6px 24px rgba(37, 211, 102, 0.35);
+}
+
+/* ── Footer ── */
+.inv-footer {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 0.78rem;
+  color: var(--inv-muted);
+  opacity: 0.65;
+  letter-spacing: 0.04em;
+}
+
+.inv-footer a {
+  color: var(--inv-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* ── Responsive ── */
+@media (max-width: 400px) {
+  .inv-info-grid { grid-template-columns: 1fr; }
+  .inv-card { padding: 22px 18px; }
+}

@@ -1239,100 +1239,400 @@
     </section>
 
     <!-- CATÁLOGO -->
-    <section class="catalog" id="modelos">
+        <section class="catalog" id="modelos">
         <div class="container">
             <div class="catalog-header reveal">
-                <span class="section-label">Nuestras Muestras</span>
-                <h2 class="section-title">Así lucen en <em>un celular real</em></h2>
+                <span class="section-label">Estilos & Modelos</span>
+                <h2 class="section-title">Elige el estilo que <em>te representa</em></h2>
                 <div class="divider-floral"><span>✦</span></div>
                 <p class="section-lead" style="margin:0 auto;text-align:center;">
-                    Cada diseño está pensado para que tus invitados digan "¡Wow!" desde el primer toque. Haz clic para ver el demo en vivo.
+                    10 estilos premium, cada uno diseñado para comunicar una emoción diferente. Haz clic en cualquier tarjeta para ver el demo en vivo.
                 </p>
             </div>
 
-            <div class="catalog-showcase">
-                <!-- Esencial -->
-                <div class="catalog-card reveal">
-                    <div class="catalog-card-img">
-                        <img src="assets/mockup_esencial.png" alt="Paquete Esencial - Invitación clásica" loading="lazy">
-                        <div class="catalog-card-overlay">
-                            <div class="overlay-btn"><i class="fa-solid fa-layer-group"></i>&nbsp; Paquete Base</div>
-                        </div>
-                    </div>
-                    <div class="catalog-card-body">
-                        <span class="catalog-card-tag">PAQUETE ESENCIAL</span>
-                        <h3 class="catalog-card-title">Clásica &amp; Romántica</h3>
-                        <p class="catalog-card-desc">Diseño sobrio con fondo crema y fotos del evento. Elegante y atemporal para cualquier celebración.</p>
-                        <div class="catalog-chip-list">
-                            <span class="catalog-chip">Cuenta regresiva</span>
-                            <span class="catalog-chip">Mapa</span>
-                            <span class="catalog-chip">RSVP WhatsApp</span>
-                        </div>
-                        <div class="catalog-demo-btns">
-                            <a href="demos/boda-esencial/index.html" target="_blank" class="demo-btn demo-btn-rose">Demo Boda</a>
-                            <a href="demos/xv-esencial/index.html" target="_blank" class="demo-btn demo-btn-outline">Demo XV Años</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Premium -->
-                <div class="catalog-card reveal" style="border-color:var(--rose-light);box-shadow:0 8px 32px rgba(201,135,125,0.15);">
-                    <div class="catalog-card-img">
-                        <img src="assets/mockup_premium.png" alt="Paquete Premium - Invitación moderna" loading="lazy">
-                        <div class="catalog-card-overlay">
-                            <div class="overlay-btn"><i class="fa-solid fa-star"></i>&nbsp; Más Popular</div>
-                        </div>
-                    </div>
-                    <div class="catalog-card-body">
-                        <span class="catalog-card-tag">PAQUETE PREMIUM</span>
-                        <h3 class="catalog-card-title">Moderna &amp; Elegante</h3>
-                        <p class="catalog-card-desc">Fondo oscuro de alto impacto con efectos Glassmorphism, galería de fotos y música de fondo.</p>
-                        <div class="catalog-chip-list">
-                            <span class="catalog-chip chip-rose">Música</span>
-                            <span class="catalog-chip chip-rose">Animación entrada</span>
-                            <span class="catalog-chip">Galería fotos</span>
-                            <span class="catalog-chip">Mesa regalos</span>
-                        </div>
-                        <div class="catalog-demo-btns">
-                            <a href="demos/boda-premium/index.html" target="_blank" class="demo-btn demo-btn-rose">Demo Boda</a>
-                            <a href="demos/xv-premium/index.html" target="_blank" class="demo-btn demo-btn-outline">Demo XV Años</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIP -->
-                <div class="catalog-card reveal">
-                    <div class="catalog-card-img">
-                        <img src="assets/mockup_vip.png" alt="Paquete VIP - Invitación animada" loading="lazy">
-                        <div class="catalog-card-overlay">
-                            <div class="overlay-btn"><i class="fa-solid fa-crown"></i>&nbsp; Experiencia Total</div>
-                        </div>
-                    </div>
-                    <div class="catalog-card-body">
-                        <span class="catalog-card-tag">PAQUETE VIP EXPERIENCE</span>
-                        <h3 class="catalog-card-title">Sobre Animado VIP</h3>
-                        <p class="catalog-card-desc">La experiencia definitiva: sobre que se abre, música al instante y pase QR personalizado para entrada.</p>
-                        <div class="catalog-chip-list">
-                            <span class="catalog-chip chip-rose">Sobre animado</span>
-                            <span class="catalog-chip chip-rose">Pase QR</span>
-                            <span class="catalog-chip">Álbum interactivo</span>
-                            <span class="catalog-chip">Todo Premium</span>
-                        </div>
-                        <div class="catalog-demo-btns">
-                            <a href="demos/boda-vip/index.html" target="_blank" class="demo-btn demo-btn-rose">Demo Boda</a>
-                            <a href="demos/xv-vip/index.html" target="_blank" class="demo-btn demo-btn-outline">Demo XV Años</a>
-                        </div>
-                    </div>
-                </div>
+            <!-- Tabs de categoría -->
+            <div class="catalog-tabs reveal">
+                <button class="catalog-tab active" id="tab-all" onclick="filterCatalog('all', this)">
+                    <i class="fa-solid fa-grip"></i> Todos
+                </button>
+                <button class="catalog-tab" id="tab-boda" onclick="filterCatalog('boda', this)">
+                    <i class="fa-solid fa-rings-wedding"></i> Bodas
+                </button>
+                <button class="catalog-tab" id="tab-xv" onclick="filterCatalog('xv', this)">
+                    <i class="fa-solid fa-crown"></i> XV Años
+                </button>
             </div>
 
-            <div style="text-align:center;margin-top:56px;padding-top:40px;border-top:1px solid var(--sand);" class="reveal">
-                <p style="font-size:0.9rem;color:var(--warm-grey);margin-bottom:20px;font-weight:300;">
-                    ¿Tienes dudas sobre cuál elegir? Escríbenos y te asesoramos sin costo.
-                </p>
-                <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20vi%20las%20muestras%20y%20quisiera%20asesor%C3%ADa%20para%20elegir%20mi%20paquete" target="_blank" class="btn-primary">
-                    <i class="fa-brands fa-whatsapp"></i> Pedir asesoría gratis
-                </a>
+            <!-- Leyenda de niveles -->
+            <div class="catalog-legend reveal">
+                <span class="legend-item"><span class="legend-dot esencial"></span>Esencial</span>
+                <span style="color:var(--sand);font-size:0.9rem;">|</span>
+                <span class="legend-item"><span class="legend-dot premium"></span>Premium</span>
+                <span style="color:var(--sand);font-size:0.9rem;">|</span>
+                <span class="legend-item"><span class="legend-dot vip"></span>VIP - Experiencia completa</span>
+            </div>
+
+            <div class="catalog-showcase" id="catalogShowcase">
+                <!-- BODA 1 — Champagne Editorial -->
+                <div class="catalog-card reveal" data-cat="boda">
+                    <div class="catalog-card-accent premium"></div>
+                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#fff8ef 0%,#f5e3c6 40%,#e3b996 100%);">
+                        <div class="catalog-card-meta">
+                            <span class="catalog-card-pill"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
+                            <span class="catalog-level-badge premium"><i class="fa-solid fa-gem"></i> Premium</span>
+                        </div>
+                        <div class="catalog-preview-screen">
+                            <div class="catalog-preview-ornament">✦ Invitación Digital ✦</div>
+                            <div class="catalog-preview-title">Champagne Editorial</div>
+                            <div class="catalog-preview-subtitle">Elegancia cálida y sofisticada</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <div class="catalog-card-top">
+                            <span class="catalog-card-tag">Boda • Premium</span>
+                            <div class="catalog-palette">
+                                <span class="color-dot" style="background:#c9a46a"></span>
+                                <span class="color-dot" style="background:#f7e7d7"></span>
+                                <span class="color-dot" style="background:#7b6f68"></span>
+                            </div>
+                        </div>
+                        <h3 class="catalog-card-title">Champagne Editorial</h3>
+                        <p class="catalog-card-desc">Una propuesta visual sobria, elegante y muy comercial para bodas que quieren verse refinadas desde el primer toque.</p>
+                        
+                        <div class="catalog-personalizable-info">
+                            <span class="catalog-personalizable" style="cursor:default; pointer-events:none;"><i class="fa-solid fa-sliders"></i> Personalizable</span>
+                            <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
+                        </div>
+                        
+                        <div class="catalog-card-actions">
+                            <a href="demos/boda-premium/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- BODA 2 — Olive Romance -->
+                <div class="catalog-card reveal" data-cat="boda">
+                    <div class="catalog-card-accent premium"></div>
+                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#f8f3ea 0%,#d9e4c6 50%,#9ead7b 100%);">
+                        <div class="catalog-card-meta">
+                            <span class="catalog-card-pill"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
+                            <span class="catalog-level-badge premium"><i class="fa-solid fa-gem"></i> Premium</span>
+                        </div>
+                        <div class="catalog-preview-screen">
+                            <div class="catalog-preview-ornament">✦ Invitación Digital ✦</div>
+                            <div class="catalog-preview-title">Olive Romance</div>
+                            <div class="catalog-preview-subtitle">Romance natural y cálido</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <div class="catalog-card-top">
+                            <span class="catalog-card-tag">Boda • Premium</span>
+                            <div class="catalog-palette">
+                                <span class="color-dot" style="background:#a68a64"></span>
+                                <span class="color-dot" style="background:#6f7d5f"></span>
+                                <span class="color-dot" style="background:#f8f3ea"></span>
+                            </div>
+                        </div>
+                        <h3 class="catalog-card-title">Olive Romance</h3>
+                        <p class="catalog-card-desc">Un estilo fresco y elegante que combina lujo discreto con una sensación de intimidad y modernidad.</p>
+                        
+                        <div class="catalog-personalizable-info">
+                            <span class="catalog-personalizable" style="cursor:default; pointer-events:none;"><i class="fa-solid fa-sliders"></i> Personalizable</span>
+                            <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
+                        </div>
+                        
+                        <div class="catalog-card-actions">
+                            <a href="demos/boda-premium/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- BODA 3 — Plum Noir VIP -->
+                <div class="catalog-card card-vip reveal" data-cat="boda">
+                    <div class="catalog-card-accent vip"></div>
+                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#140d12 0%,#2a1621 40%,#5a1832 100%);">
+                        <div class="catalog-card-meta">
+                            <span class="catalog-card-pill" style="background:rgba(255,255,255,0.12);color:#fff8ef;"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
+                            <span class="catalog-level-badge vip"><i class="fa-solid fa-crown"></i> VIP</span>
+                        </div>
+                        <div class="catalog-preview-screen" style="background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.15);">
+                            <div class="catalog-preview-ornament" style="color:rgba(212,175,55,0.6);">✦ Experiencia VIP ✦</div>
+                            <div class="catalog-preview-title" style="color:#fff8ef;">Plum Noir VIP</div>
+                            <div class="catalog-preview-subtitle" style="color:#d8c0b7;">Impacto nocturno y exclusivo</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <div class="catalog-card-top">
+                            <span class="catalog-card-tag" style="color:#a07820;">Boda • VIP</span>
+                            <div class="catalog-palette">
+                                <span class="color-dot" style="background:#d4af37"></span>
+                                <span class="color-dot" style="background:#4a1832"></span>
+                                <span class="color-dot" style="background:#b8895b"></span>
+                            </div>
+                        </div>
+                        <h3 class="catalog-card-title">Plum Noir VIP</h3>
+                        <p class="catalog-card-desc">Ideal para bodas de alto impacto que desean un aire sofisticado, oscuro y premium de principio a fin.</p>
+                        
+                        <div class="catalog-personalizable-info">
+                            <span class="catalog-personalizable" style="cursor:default; pointer-events:none;"><i class="fa-solid fa-sliders"></i> Personalizable</span>
+                            <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
+                        </div>
+                        
+                        <div class="catalog-card-actions">
+                            <a href="demos/boda-vip/index.html" target="_blank" class="demo-btn demo-btn-vip"><i class="fa-solid fa-crown"></i> Ver demo VIP</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- BODA 4 — Opalite Chrome -->
+                <div class="catalog-card reveal" data-cat="boda">
+                    <div class="catalog-card-accent premium"></div>
+                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#fcfcfc 0%,#e8eced 50%,#b0b5b9 100%);">
+                        <div class="catalog-card-meta">
+                            <span class="catalog-card-pill"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
+                            <span class="catalog-level-badge premium"><i class="fa-solid fa-gem"></i> Premium</span>
+                        </div>
+                        <div class="catalog-preview-screen">
+                            <div class="catalog-preview-ornament">✦ Invitación Digital ✦</div>
+                            <div class="catalog-preview-title">Opalite Chrome</div>
+                            <div class="catalog-preview-subtitle">Minimalismo contemporáneo</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <div class="catalog-card-top">
+                            <span class="catalog-card-tag">Boda • Premium</span>
+                            <div class="catalog-palette">
+                                <span class="color-dot" style="background:#8a8d91"></span>
+                                <span class="color-dot" style="background:#f0f2f5"></span>
+                                <span class="color-dot" style="background:#333333"></span>
+                            </div>
+                        </div>
+                        <h3 class="catalog-card-title">Opalite Chrome</h3>
+                        <p class="catalog-card-desc">Minimalismo contemporáneo con acentos metálicos y blancos puros, perfecto para bodas modernas.</p>
+                        
+                        <div class="catalog-personalizable-info">
+                            <span class="catalog-personalizable" style="cursor:default; pointer-events:none;"><i class="fa-solid fa-sliders"></i> Personalizable</span>
+                            <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
+                        </div>
+                        
+                        <div class="catalog-card-actions">
+                            <a href="demos/boda-premium/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- BODA 5 — Terracotta Sunset -->
+                <div class="catalog-card reveal" data-cat="boda">
+                    <div class="catalog-card-accent esencial"></div>
+                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#faf2ee 0%,#e6c8b3 50%,#c86b5e 100%);">
+                        <div class="catalog-card-meta">
+                            <span class="catalog-card-pill"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
+                            <span class="catalog-level-badge esencial"><i class="fa-solid fa-gem"></i> Esencial</span>
+                        </div>
+                        <div class="catalog-preview-screen">
+                            <div class="catalog-preview-ornament">✦ Invitación Digital ✦</div>
+                            <div class="catalog-preview-title">Terracotta Sunset</div>
+                            <div class="catalog-preview-subtitle">Calidez rústica y boho</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <div class="catalog-card-top">
+                            <span class="catalog-card-tag">Boda • Esencial</span>
+                            <div class="catalog-palette">
+                                <span class="color-dot" style="background:#c86b5e"></span>
+                                <span class="color-dot" style="background:#e8d3c3"></span>
+                                <span class="color-dot" style="background:#5d4037"></span>
+                            </div>
+                        </div>
+                        <h3 class="catalog-card-title">Terracotta Sunset</h3>
+                        <p class="catalog-card-desc">Colores tierra vibrantes y texturas orgánicas para bodas destino, boho o de día.</p>
+                        
+                        <div class="catalog-personalizable-info">
+                            <span class="catalog-personalizable" style="cursor:default; pointer-events:none;"><i class="fa-solid fa-sliders"></i> Personalizable</span>
+                            <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
+                        </div>
+                        
+                        <div class="catalog-card-actions">
+                            <a href="demos/boda-esencial/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- XV AÑOS 6 — Rosa Champagne -->
+                <div class="catalog-card reveal" data-cat="xv">
+                    <div class="catalog-card-accent premium"></div>
+                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#fffbfb 0%,#fae8e8 50%,#e3bbbb 100%);">
+                        <div class="catalog-card-meta">
+                            <span class="catalog-card-pill"><i class="fa-solid fa-crown"></i> XV Años</span>
+                            <span class="catalog-level-badge premium"><i class="fa-solid fa-gem"></i> Premium</span>
+                        </div>
+                        <div class="catalog-preview-screen">
+                            <div class="catalog-preview-ornament">✦ Mis XV Años ✦</div>
+                            <div class="catalog-preview-title">Rosa Champagne</div>
+                            <div class="catalog-preview-subtitle">Luminoso y elegante</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <div class="catalog-card-top">
+                            <span class="catalog-card-tag">XV Años • Premium</span>
+                            <div class="catalog-palette">
+                                <span class="color-dot" style="background:#d4a3a3"></span>
+                                <span class="color-dot" style="background:#f9f1f1"></span>
+                                <span class="color-dot" style="background:#8c7b7b"></span>
+                            </div>
+                        </div>
+                        <h3 class="catalog-card-title">Rosa Champagne</h3>
+                        <p class="catalog-card-desc">Un clásico reinventado. Tonos rosados luminosos, destellos dorados y una vibra juvenil muy elegante.</p>
+                        
+                        <div class="catalog-personalizable-info">
+                            <span class="catalog-personalizable" style="cursor:default; pointer-events:none;"><i class="fa-solid fa-sliders"></i> Personalizable</span>
+                            <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
+                        </div>
+                        
+                        <div class="catalog-card-actions">
+                            <a href="demos/xv-premium/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- XV AÑOS 7 — Lavanda Dream -->
+                <div class="catalog-card reveal" data-cat="xv">
+                    <div class="catalog-card-accent premium"></div>
+                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#fcfbfd 0%,#eee9f4 50%,#b7a6c9 100%);">
+                        <div class="catalog-card-meta">
+                            <span class="catalog-card-pill"><i class="fa-solid fa-crown"></i> XV Años</span>
+                            <span class="catalog-level-badge premium"><i class="fa-solid fa-gem"></i> Premium</span>
+                        </div>
+                        <div class="catalog-preview-screen">
+                            <div class="catalog-preview-ornament">✦ Mis XV Años ✦</div>
+                            <div class="catalog-preview-title">Lavanda Dream</div>
+                            <div class="catalog-preview-subtitle">Magia y fantasía</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <div class="catalog-card-top">
+                            <span class="catalog-card-tag">XV Años • Premium</span>
+                            <div class="catalog-palette">
+                                <span class="color-dot" style="background:#a993b9"></span>
+                                <span class="color-dot" style="background:#f5f0f8"></span>
+                                <span class="color-dot" style="background:#756285"></span>
+                            </div>
+                        </div>
+                        <h3 class="catalog-card-title">Lavanda Dream</h3>
+                        <p class="catalog-card-desc">Magia y fantasía en tonos lilas y morados suaves. Un estilo muy soñador y delicado.</p>
+                        
+                        <div class="catalog-personalizable-info">
+                            <span class="catalog-personalizable" style="cursor:default; pointer-events:none;"><i class="fa-solid fa-sliders"></i> Personalizable</span>
+                            <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
+                        </div>
+                        
+                        <div class="catalog-card-actions">
+                            <a href="demos/xv-premium/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- XV AÑOS 8 — Cool Blue -->
+                <div class="catalog-card reveal" data-cat="xv">
+                    <div class="catalog-card-accent esencial"></div>
+                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#f7fafc 0%,#dbe7f0 50%,#9ebad1 100%);">
+                        <div class="catalog-card-meta">
+                            <span class="catalog-card-pill"><i class="fa-solid fa-crown"></i> XV Años</span>
+                            <span class="catalog-level-badge esencial"><i class="fa-solid fa-gem"></i> Esencial</span>
+                        </div>
+                        <div class="catalog-preview-screen">
+                            <div class="catalog-preview-ornament">✦ Mis XV Años ✦</div>
+                            <div class="catalog-preview-title">Cool Blue</div>
+                            <div class="catalog-preview-subtitle">Fresco e invernal</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <div class="catalog-card-top">
+                            <span class="catalog-card-tag">XV Años • Esencial</span>
+                            <div class="catalog-palette">
+                                <span class="color-dot" style="background:#80a1c1"></span>
+                                <span class="color-dot" style="background:#f0f5f9"></span>
+                                <span class="color-dot" style="background:#566e87"></span>
+                            </div>
+                        </div>
+                        <h3 class="catalog-card-title">Cool Blue</h3>
+                        <p class="catalog-card-desc">Tonos celestes invernales y plateados para fiestas con temáticas de cristal, invierno o estrellas.</p>
+                        
+                        <div class="catalog-personalizable-info">
+                            <span class="catalog-personalizable" style="cursor:default; pointer-events:none;"><i class="fa-solid fa-sliders"></i> Personalizable</span>
+                            <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
+                        </div>
+                        
+                        <div class="catalog-card-actions">
+                            <a href="demos/xv-esencial/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- XV AÑOS 9 — Glam Plum -->
+                <div class="catalog-card card-vip reveal" data-cat="xv">
+                    <div class="catalog-card-accent vip"></div>
+                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#130c12 0%,#2a1621 40%,#6d1f3a 100%);">
+                        <div class="catalog-card-meta">
+                            <span class="catalog-card-pill" style="background:rgba(255,255,255,0.12);color:#fff8ef;"><i class="fa-solid fa-crown"></i> XV Años</span>
+                            <span class="catalog-level-badge vip"><i class="fa-solid fa-crown"></i> VIP</span>
+                        </div>
+                        <div class="catalog-preview-screen" style="background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.15);">
+                            <div class="catalog-preview-ornament" style="color:rgba(212,175,55,0.6);">✦ Experiencia VIP ✦</div>
+                            <div class="catalog-preview-title" style="color:#fff8ef;">Glam Plum</div>
+                            <div class="catalog-preview-subtitle" style="color:#d8c0b7;">Glamour nocturno y VIP</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <div class="catalog-card-top">
+                            <span class="catalog-card-tag" style="color:#a07820;">XV Años • VIP</span>
+                            <div class="catalog-palette">
+                                <span class="color-dot" style="background:#d6b56d"></span>
+                                <span class="color-dot" style="background:#6d1f3a"></span>
+                                <span class="color-dot" style="background:#b8895b"></span>
+                            </div>
+                        </div>
+                        <h3 class="catalog-card-title">Glam Plum</h3>
+                        <p class="catalog-card-desc">Impacto nocturno absoluto. Tonos profundos, contrastes dramáticos y brillos para una fiesta tipo alfombra roja.</p>
+                        
+                        <div class="catalog-personalizable-info">
+                            <span class="catalog-personalizable" style="cursor:default; pointer-events:none;"><i class="fa-solid fa-sliders"></i> Personalizable</span>
+                            <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
+                        </div>
+                        
+                        <div class="catalog-card-actions">
+                            <a href="demos/xv-vip/index.html" target="_blank" class="demo-btn demo-btn-vip"><i class="fa-solid fa-crown"></i> Ver demo VIP</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- XV AÑOS 10 — Jade Garden -->
+                <div class="catalog-card reveal" data-cat="xv">
+                    <div class="catalog-card-accent premium"></div>
+                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#f5f8f5 0%,#daebd9 50%,#87aa85 100%);">
+                        <div class="catalog-card-meta">
+                            <span class="catalog-card-pill"><i class="fa-solid fa-crown"></i> XV Años</span>
+                            <span class="catalog-level-badge premium"><i class="fa-solid fa-gem"></i> Premium</span>
+                        </div>
+                        <div class="catalog-preview-screen">
+                            <div class="catalog-preview-ornament">✦ Mis XV Años ✦</div>
+                            <div class="catalog-preview-title">Jade Garden</div>
+                            <div class="catalog-preview-subtitle">Naturaleza elegante</div>
+                        </div>
+                    </div>
+                    <div class="catalog-card-body">
+                        <div class="catalog-card-top">
+                            <span class="catalog-card-tag">XV Años • Premium</span>
+                            <div class="catalog-palette">
+                                <span class="color-dot" style="background:#799476"></span>
+                                <span class="color-dot" style="background:#f2f6f1"></span>
+                                <span class="color-dot" style="background:#526350"></span>
+                            </div>
+                        </div>
+                        <h3 class="catalog-card-title">Jade Garden</h3>
+                        <p class="catalog-card-desc">Tonos esmeralda y verde bosque. Perfecto para temáticas de jardín encantado o naturaleza elegante.</p>
+                        
+                        <div class="catalog-personalizable-info">
+                            <span class="catalog-personalizable" style="cursor:default; pointer-events:none;"><i class="fa-solid fa-sliders"></i> Personalizable</span>
+                            <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
+                        </div>
+                        
+                        <div class="catalog-card-actions">
+                            <a href="demos/xv-premium/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1433,7 +1733,7 @@
                         <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20me%20interesa%20el%20paquete%20Esencial%20de%20%24399" target="_blank" class="btn-price">
                             <i class="fa-brands fa-whatsapp"></i> Solicitar este paquete
                         </a>
-                        <a href="plantillas/clasica/index.html" target="_blank" class="price-demo-link">Ver demo &rarr;</a>
+                        <a href="demos/boda-esencial/index.html" target="_blank" class="price-demo-link">Ver demo &rarr;</a>
                     </div>
                 </div>
 
@@ -1461,7 +1761,7 @@
                         <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20me%20interesa%20el%20paquete%20Premium%20de%20%24699" target="_blank" class="btn-price btn-price-primary">
                             <i class="fa-brands fa-whatsapp"></i> Solicitar este paquete
                         </a>
-                        <a href="plantillas/moderna/index.html" target="_blank" class="price-demo-link">Ver demo &rarr;</a>
+                        <a href="demos/boda-premium/index.html" target="_blank" class="price-demo-link">Ver demo &rarr;</a>
                     </div>
                 </div>
 
@@ -1488,7 +1788,7 @@
                         <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20me%20interesa%20el%20paquete%20VIP%20Experience%20de%20%24999" target="_blank" class="btn-price">
                             <i class="fa-brands fa-whatsapp"></i> Solicitar este paquete
                         </a>
-                        <a href="plantillas/vip/index.html" target="_blank" class="price-demo-link">Ver demo &rarr;</a>
+                        <a href="demos/boda-vip/index.html" target="_blank" class="price-demo-link">Ver demo &rarr;</a>
                     </div>
                 </div>
             </div>

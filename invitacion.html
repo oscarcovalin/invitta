@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <!-- SEO / Social -->
+  <title>Invitación Digital · Invitta Studio</title>
+  <meta name="description" content="Tu invitación digital personalizada para este evento especial.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Fuentes premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/invitacion.css">
+</head>
+
+<body>
+
+  <!-- ── Estado: Cargando ── -->
+  <div id="inv-loader" role="status" aria-live="polite">
+    <div class="inv-loader-ring"></div>
+    <span>Cargando tu invitación…</span>
+  </div>
+
+  <!-- ── Estado: Error ── -->
+  <div id="inv-error" role="alert" aria-live="assertive">
+    Invitación no encontrada o no disponible.
+  </div>
+
+  <!-- ──────────────────────────────────────────
+       CONTENIDO PRINCIPAL (oculto hasta cargar)
+  ──────────────────────────────────────────── -->
+  <div id="inv-content" aria-label="Invitación digital">
+
+    <!-- HERO -->
+    <header class="inv-hero">
+      <div class="inv-ornament">
+        <i class="fa-solid fa-sparkles"></i>
+        Invitación Digital
+        <i class="fa-solid fa-sparkles"></i>
+      </div>
+      <h1 class="inv-title" id="inv-title">Cargando…</h1>
+      <p  class="inv-honoree" id="inv-honoree"></p>
+      <div id="inv-welcome-block">
+        <p class="inv-welcome" id="inv-welcome"></p>
+      </div>
+    </header>
+
+    <main class="inv-page">
+
+      <!-- ── DATOS DEL INVITADO ── -->
+      <section class="inv-card" aria-label="Datos del invitado">
+        <div class="inv-card-label">
+          <i class="fa-regular fa-id-card"></i> Tu invitación
+        </div>
+        <p class="inv-guest-name" id="inv-guest-name">Invitado</p>
+        <div class="inv-info-grid">
+          <div class="inv-info-item">
+            <div class="lbl">Pases asignados</div>
+            <div class="val" id="inv-pases">—</div>
+          </div>
+          <div class="inv-info-item" id="inv-mesa-block">
+            <div class="lbl">Mesa</div>
+            <div class="val" id="inv-mesa">—</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── FECHA Y HORA ── -->
+      <section class="inv-card" aria-label="Fecha del evento">
+        <div class="inv-card-label">
+          <i class="fa-regular fa-calendar-heart"></i> Fecha del evento
+        </div>
+        <div class="inv-date-display">
+          <p class="inv-date-text" id="inv-date">—</p>
+          <p class="inv-time-text" id="inv-time-block">
+            <i class="fa-regular fa-clock"></i>
+            <span id="inv-time"></span>
+          </p>
+        </div>
+      </section>
+
+      <!-- ── CEREMONIA ── -->
+      <section class="inv-card" id="inv-ceremony-block" aria-label="Ceremonia" style="display:none">
+        <div class="inv-card-label">
+          <i class="fa-solid fa-church"></i> Ceremonia
+        </div>
+        <p class="inv-venue-name"    id="inv-ceremony-name"></p>
+        <p class="inv-venue-address" id="inv-ceremony-address"></p>
+        <a  class="inv-btn inv-btn-map"
+            id="inv-ceremony-map-btn"
+            href="#" target="_blank" rel="noopener noreferrer"
+            style="display:none">
+          <i class="fa-solid fa-map-location-dot"></i> Ver en mapa
+        </a>
+      </section>
+
+      <!-- ── RECEPCIÓN ── -->
+      <section class="inv-card" id="inv-reception-block" aria-label="Recepción" style="display:none">
+        <div class="inv-card-label">
+          <i class="fa-solid fa-champagne-glasses"></i> Recepción
+        </div>
+        <p class="inv-venue-name"    id="inv-reception-name"></p>
+        <p class="inv-venue-address" id="inv-reception-address"></p>
+        <a  class="inv-btn inv-btn-map"
+            id="inv-reception-map-btn"
+            href="#" target="_blank" rel="noopener noreferrer"
+            style="display:none">
+          <i class="fa-solid fa-map-location-dot"></i> Ver en mapa
+        </a>
+      </section>
+
+      <!-- ── DRESS CODE ── -->
+      <section class="inv-card" id="inv-dresscode-block" aria-label="Código de vestimenta" style="display:none">
+        <div class="inv-card-label">
+          <i class="fa-solid fa-shirt"></i> Código de vestimenta
+        </div>
+        <p class="inv-dresscode-text" id="inv-dresscode"></p>
+      </section>
+
+      <!-- ── MESA DE REGALOS ── -->
+      <section class="inv-card" id="inv-gifts-block" aria-label="Mesa de regalos" style="display:none">
+        <div class="inv-card-label">
+          <i class="fa-solid fa-gift"></i> Mesa de regalos
+        </div>
+        <p class="inv-gifts-text">
+          Si deseas hacernos un regalo, aquí te dejamos el enlace a nuestra mesa.
+        </p>
+        <a class="inv-btn inv-btn-outline" id="inv-gifts-link"
+           href="#" target="_blank" rel="noopener noreferrer">
+          <i class="fa-solid fa-link"></i> Ver mesa de regalos
+        </a>
+      </section>
+
+      <!-- ── CONFIRMACIÓN + WHATSAPP ── -->
+      <section class="inv-card" id="inv-wa-block" aria-label="Confirmar asistencia">
+        <div class="inv-card-label">
+          <i class="fa-brands fa-whatsapp"></i> Confirmar asistencia
+        </div>
+
+        <div class="inv-confirm-row">
+          <label class="inv-confirm-label" for="inv-confirm-pases">
+            Asistiré con:
+          </label>
+          <select class="inv-select" id="inv-confirm-pases" aria-label="Número de personas que asistirán">
+            <!-- Opciones generadas por JS según el máximo de pases -->
+            <option value="1">1 persona</option>
+          </select>
+        </div>
+
+        <button class="inv-btn inv-btn-primary" id="inv-wa-btn" type="button">
+          <i class="fa-brands fa-whatsapp"></i>
+          Confirmar por WhatsApp
+        </button>
+      </section>
+
+      <!-- ── FOOTER ── -->
+      <footer class="inv-footer">
+        Invitación creada con <a href="/" target="_blank">Invitta Studio</a>
+      </footer>
+
+    </main>
+  </div><!-- /#inv-content -->
+
+  <!-- ── Scripts ── -->
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Variables de entorno (URL + anon key) -->
+  <script src="assets/js/env.js"></script>
+
+  <!-- Lógica de la invitación pública -->
+  <script src="js/invitation-public.js"></script>
+
+</body>
+</html>

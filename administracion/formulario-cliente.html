@@ -6,7 +6,7 @@
     <title>Invitta | Cuestionario del Evento</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Allura&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Inter:wght@300;400&family=Jost:wght@300;400;500;600&family=Lato:wght@300;400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&family=Nunito+Sans:wght@300;400&family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400&family=Raleway:wght@300;400&family=Sacramento&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -201,6 +201,123 @@
             font-weight: 500; display: flex; align-items: center; gap: 10px;
         }
         .toast.show { transform: translateX(0); }
+
+        /* Typography Cards CSS */
+        .typography-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+            margin-top: 10px;
+        }
+        .typo-card {
+            background: #fff;
+            border: 2px solid var(--sand);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+        .typo-card:hover {
+            border-color: var(--rose-light);
+            box-shadow: 0 4px 15px rgba(201,135,125,0.15);
+        }
+        .typo-card.selected {
+            border-color: var(--rose);
+            background-color: var(--rose-pale);
+            box-shadow: 0 4px 20px rgba(201,135,125,0.25);
+        }
+        .typo-card.selected::after {
+            content: '\f058';
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: var(--rose);
+            font-size: 1.2rem;
+        }
+        .typo-name {
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .typo-badge {
+            background-color: var(--cream-dark);
+            color: var(--warm-grey);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .typo-card.selected .typo-badge {
+            background-color: #fff;
+        }
+        .typo-preview {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 130px;
+            padding: 20px 0;
+            border-top: 1px solid var(--cream-dark);
+            border-bottom: 1px solid var(--cream-dark);
+            margin-bottom: 15px;
+        }
+        .typo-card.selected .typo-preview {
+            border-color: rgba(201,135,125,0.2);
+        }
+        .preview-main {
+            font-size: 2.2rem;
+            line-height: 1.1;
+            margin-bottom: 10px;
+            color: var(--charcoal);
+        }
+        .preview-sub {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            color: var(--warm-grey);
+        }
+        .preview-detail {
+            font-size: 0.75rem;
+            color: var(--warm-grey);
+            opacity: 0.8;
+        }
+        .typo-fonts {
+            font-family: var(--sans);
+            font-size: 0.8rem;
+            color: var(--warm-grey);
+            font-style: italic;
+        }
+        .recommend-card {
+            justify-content: center;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--cream-dark) 100%);
+            border: 2px dashed var(--sand);
+        }
+        .recommend-card .preview-main {
+            font-family: var(--sans);
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin: 0;
+        }
 
         @media (max-width: 600px) {
             .grid-2 { grid-template-columns: 1fr; gap: 16px; }
@@ -528,6 +645,188 @@
                 </div>
             </div>
 
+            <!-- SECCIÓN 9 -->
+            <div class="card">
+                <h2>9. Personalización visual de tu invitación</h2>
+                
+                <div class="form-group">
+                    <label for="visualPalette">Paleta de color preferida</label>
+                    <select id="visualPalette" onchange="toggleCustomPalette()">
+                        <option value="Rosa Champagne">Rosa Champagne</option>
+                        <option value="Lavanda Dream">Lavanda Dream</option>
+                        <option value="Cool Blue">Cool Blue</option>
+                        <option value="Olive Romance">Olive Romance</option>
+                        <option value="Terracotta Sunset">Terracotta Sunset</option>
+                        <option value="Plum Noir VIP">Plum Noir VIP</option>
+                        <option value="Jade Garden">Jade Garden</option>
+                        <option value="Personalizada">Personalizada</option>
+                    </select>
+                </div>
+                <div class="form-group" id="groupCustomPalette" style="display: none;">
+                    <label for="customPalette">Describe tus colores o escribe códigos HEX si los tienes</label>
+                    <input type="text" id="customPalette" placeholder="Ej. Azul marino y dorado, #000080 y #FFD700">
+                </div>
+
+                <div class="form-group">
+                    <label>Combinación tipográfica base</label>
+                    <input type="hidden" id="visualTypography" value="">
+                    
+                    <div class="typography-grid">
+                        <div class="typo-card typo-base" onclick="selectTypoCard(this, 'visualTypography', 'Clásica Editorial')">
+                            <div class="typo-name">Clásica Editorial <span class="typo-badge">Editorial</span></div>
+                            <div class="typo-preview">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Cormorant Garamond', serif;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Jost', sans-serif;">Nuestra Boda</div>
+                                <div class="preview-detail typo-dyn-detail" style="font-family: 'Jost', sans-serif;">Sábado 14 de noviembre · 6:00 PM</div>
+                            </div>
+                            <div class="typo-fonts">Cormorant Garamond + Jost</div>
+                        </div>
+
+                        <div class="typo-card typo-base" onclick="selectTypoCard(this, 'visualTypography', 'Romántica Fina')">
+                            <div class="typo-name">Romántica Fina <span class="typo-badge">Boda</span></div>
+                            <div class="typo-preview">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Playfair Display', serif;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Montserrat', sans-serif;">Nuestra Boda</div>
+                                <div class="preview-detail typo-dyn-detail" style="font-family: 'Montserrat', sans-serif;">Sábado 14 de noviembre · 6:00 PM</div>
+                            </div>
+                            <div class="typo-fonts">Playfair Display + Montserrat</div>
+                        </div>
+
+                        <div class="typo-card typo-base" onclick="selectTypoCard(this, 'visualTypography', 'Lujo Nocturno')">
+                            <div class="typo-name">Lujo Nocturno <span class="typo-badge">Glam</span></div>
+                            <div class="typo-preview">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Bodoni Moda', serif;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Lato', sans-serif;">Nuestra Boda</div>
+                                <div class="preview-detail typo-dyn-detail" style="font-family: 'Lato', sans-serif;">Sábado 14 de noviembre · 6:00 PM</div>
+                            </div>
+                            <div class="typo-fonts">Bodoni Moda + Lato</div>
+                        </div>
+
+                        <div class="typo-card typo-base" onclick="selectTypoCard(this, 'visualTypography', 'Moderna Minimal')">
+                            <div class="typo-name">Moderna Minimal <span class="typo-badge">Moderna</span></div>
+                            <div class="typo-preview">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Libre Baskerville', serif;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Inter', sans-serif;">Nuestra Boda</div>
+                                <div class="preview-detail typo-dyn-detail" style="font-family: 'Inter', sans-serif;">Sábado 14 de noviembre · 6:00 PM</div>
+                            </div>
+                            <div class="typo-fonts">Libre Baskerville + Inter</div>
+                        </div>
+
+                        <div class="typo-card typo-base" onclick="selectTypoCard(this, 'visualTypography', 'Jardín Romántico')">
+                            <div class="typo-name">Jardín Romántico <span class="typo-badge">Boda</span></div>
+                            <div class="typo-preview">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Lora', serif;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Nunito Sans', sans-serif;">Nuestra Boda</div>
+                                <div class="preview-detail typo-dyn-detail" style="font-family: 'Nunito Sans', sans-serif;">Sábado 14 de noviembre · 6:00 PM</div>
+                            </div>
+                            <div class="typo-fonts">Lora + Nunito Sans</div>
+                        </div>
+
+                        <div class="typo-card typo-base" onclick="selectTypoCard(this, 'visualTypography', 'Glam Editorial')">
+                            <div class="typo-name">Glam Editorial <span class="typo-badge">Editorial</span></div>
+                            <div class="typo-preview">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Cinzel', serif;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Raleway', sans-serif;">Nuestra Boda</div>
+                                <div class="preview-detail typo-dyn-detail" style="font-family: 'Raleway', sans-serif;">Sábado 14 de noviembre · 6:00 PM</div>
+                            </div>
+                            <div class="typo-fonts">Cinzel + Raleway</div>
+                        </div>
+
+                        <div class="typo-card typo-base recommend-card" onclick="selectTypoCard(this, 'visualTypography', 'Recomiéndenme una')">
+                            <div class="preview-main"><i class="fa-solid fa-wand-magic-sparkles"></i> Recomiéndenme una</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>¿Quieres estilo handwritten / caligráfico?</label>
+                    <p style="font-size: 0.85rem; color: var(--warm-grey); margin-top: -5px; margin-bottom: 10px; font-style: italic;">
+                        Las tipografías handwritten se recomiendan para nombres y frases principales. Para textos largos se usa una fuente limpia para mantener buena lectura.
+                    </p>
+                    <input type="hidden" id="visualHandwritten" value="">
+                    
+                    <div class="typography-grid">
+                        <div class="typo-card typo-hand" onclick="selectTypoCard(this, 'visualHandwritten', 'Prefiero limpia')">
+                            <div class="typo-name">No, prefiero tipografía limpia</div>
+                            <div class="typo-preview" style="min-height: 80px;">
+                                <div class="preview-main typo-dyn-main" style="font-family: var(--serif); font-size: 1.5rem;">Mariana & Diego</div>
+                            </div>
+                        </div>
+
+                        <div class="typo-card typo-hand" onclick="selectTypoCard(this, 'visualHandwritten', 'Handwritten Romántica')">
+                            <div class="typo-name">Romántica <span class="typo-badge">Boda</span></div>
+                            <div class="typo-preview" style="min-height: 80px;">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Great Vibes', cursive; font-size: 2.8rem;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Poppins', sans-serif; font-size: 0.75rem;">Nuestra Boda</div>
+                            </div>
+                            <div class="typo-fonts">Great Vibes + Poppins</div>
+                        </div>
+
+                        <div class="typo-card typo-hand" onclick="selectTypoCard(this, 'visualHandwritten', 'Handwritten Moderna')">
+                            <div class="typo-name">Moderna <span class="typo-badge">Moderna</span></div>
+                            <div class="typo-preview" style="min-height: 80px;">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Parisienne', cursive; font-size: 2.5rem;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Jost', sans-serif; font-size: 0.75rem;">Nuestra Boda</div>
+                            </div>
+                            <div class="typo-fonts">Parisienne + Jost</div>
+                        </div>
+
+                        <div class="typo-card typo-hand" onclick="selectTypoCard(this, 'visualHandwritten', 'Handwritten de Lujo')">
+                            <div class="typo-name">Lujo <span class="typo-badge">Glam</span></div>
+                            <div class="typo-preview" style="min-height: 80px;">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Allura', cursive; font-size: 2.8rem;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Raleway', sans-serif; font-size: 0.75rem;">Nuestra Boda</div>
+                            </div>
+                            <div class="typo-fonts">Allura + Raleway</div>
+                        </div>
+
+                        <div class="typo-card typo-hand" onclick="selectTypoCard(this, 'visualHandwritten', 'Handwritten Orgánica')">
+                            <div class="typo-name">Orgánica <span class="typo-badge">Jardín</span></div>
+                            <div class="typo-preview" style="min-height: 80px;">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Sacramento', cursive; font-size: 3.2rem; margin-top: -10px;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Nunito Sans', sans-serif; font-size: 0.75rem;">Nuestra Boda</div>
+                            </div>
+                            <div class="typo-fonts">Sacramento + Nunito Sans</div>
+                        </div>
+
+                        <div class="typo-card typo-hand" onclick="selectTypoCard(this, 'visualHandwritten', 'Handwritten Sofisticada')">
+                            <div class="typo-name">Sofisticada <span class="typo-badge">XV</span></div>
+                            <div class="typo-preview" style="min-height: 80px;">
+                                <div class="preview-main typo-dyn-main" style="font-family: 'Alex Brush', cursive; font-size: 2.8rem;">Mariana & Diego</div>
+                                <div class="preview-sub typo-dyn-sub" style="font-family: 'Jost', sans-serif; font-size: 0.75rem;">Nuestra Boda</div>
+                            </div>
+                            <div class="typo-fonts">Alex Brush + Jost</div>
+                        </div>
+
+                        <div class="typo-card typo-hand recommend-card" onclick="selectTypoCard(this, 'visualHandwritten', 'Recomiéndenme una')">
+                            <div class="preview-main"><i class="fa-solid fa-wand-magic-sparkles"></i> Recomiéndenme</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="visualStyle">Estilo visual general</label>
+                    <select id="visualStyle">
+                        <option value="Clásico elegante">Clásico elegante</option>
+                        <option value="Romántico">Romántico</option>
+                        <option value="Minimalista moderno">Minimalista moderno</option>
+                        <option value="Jardín / natural">Jardín / natural</option>
+                        <option value="Glam nocturno">Glam nocturno</option>
+                        <option value="Princesa moderna">Princesa moderna</option>
+                        <option value="Editorial premium">Editorial premium</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="visualPhotos">Fotos</label>
+                    <select id="visualPhotos">
+                        <option value="Usar fotos del cliente">Usar fotos del cliente</option>
+                        <option value="Usar fotos demo mientras se entregan fotos finales">Usar fotos demo mientras se entregan fotos finales</option>
+                        <option value="Aún no tengo fotos">Aún no tengo fotos</option>
+                    </select>
+                </div>
+            </div>
+
             <button type="submit" class="btn-download"><i class="fa-solid fa-download"></i> Descargar mis Respuestas</button>
             <p style="text-align: center; color: var(--light-grey); font-size: 0.95rem; margin-top: 20px;">Al descargar, envíale este archivo JSON a tu diseñador para generar la invitación.</p>
         </form>
@@ -545,6 +844,32 @@
             document.getElementById("labelBrideFather").innerText = isBoda ? "Papá de la Novia" : "Papá / Anfitrión 2";
             document.getElementById("groupGroomMother").style.display = isBoda ? "block" : "none";
             document.getElementById("groupGroomFather").style.display = isBoda ? "block" : "none";
+
+            // Actualizar textos de previsualización tipográfica
+            const mainText = isBoda ? "Mariana & Diego" : "Valentina";
+            const subText = isBoda ? "Nuestra Boda" : "Mis XV Años";
+            const detailText = isBoda ? "Sábado 14 de noviembre · 6:00 PM" : "Sábado 24 de octubre · 7:00 PM";
+            
+            document.querySelectorAll('.typo-dyn-main').forEach(el => el.innerText = mainText);
+            document.querySelectorAll('.typo-dyn-sub').forEach(el => el.innerText = subText);
+            document.querySelectorAll('.typo-dyn-detail').forEach(el => el.innerText = detailText);
+        }
+
+        function toggleCustomPalette() {
+            const palette = document.getElementById("visualPalette").value;
+            document.getElementById("groupCustomPalette").style.display = (palette === "Personalizada") ? "block" : "none";
+        }
+        
+        function selectTypoCard(cardElement, inputId, value) {
+            // Remove selected class from siblings
+            const parent = cardElement.parentElement;
+            parent.querySelectorAll('.typo-card').forEach(c => c.classList.remove('selected'));
+            
+            // Add selected class to clicked card
+            cardElement.classList.add('selected');
+            
+            // Update hidden input
+            document.getElementById(inputId).value = value;
         }
 
         function addItineraryRow() {
@@ -648,6 +973,15 @@
                     description: document.getElementById("rsvpDesc").value,
                     whatsappNumber: document.getElementById("rsvpWhatsAppNumber").value,
                     whatsappNumber2: document.getElementById("rsvpWhatsAppNumber2").value
+                },
+
+                visual: {
+                    palette: document.getElementById("visualPalette").value,
+                    customPalette: document.getElementById("customPalette").value,
+                    typography: document.getElementById("visualTypography").value,
+                    handwritten: document.getElementById("visualHandwritten").value,
+                    style: document.getElementById("visualStyle").value,
+                    photos: document.getElementById("visualPhotos").value
                 }
             };
 
