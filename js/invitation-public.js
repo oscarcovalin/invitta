@@ -15,13 +15,7 @@
   const SUPABASE_URL = window.INVITTIA_ENV?.SUPABASE_URL   || "";
   const SUPABASE_KEY = window.INVITTIA_ENV?.SUPABASE_ANON_KEY || "";
 
-  let db;
-  try {
-    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  } catch (e) {
-    showError("No se pudo inicializar la conexión. Recarga la página.");
-    return;
-  }
+  let db; /* se inicializa dentro de DOMContentLoaded */
 
   /* ─── Parámetros de URL ───────────────────────────────────────────── */
   const params   = new URLSearchParams(window.location.search);
@@ -30,8 +24,16 @@
   const maxPasses = clampInt(params.get("p"), 1, 20);
   const tableNum  = sanitize(params.get("m") || "");
 
-  /* ─── Arranque ────────────────────────────────────────────────────── */
+  /* ─── Arranque ──────────────────────────────────────────────────── */
   document.addEventListener("DOMContentLoaded", function () {
+    /* Init Supabase aquí para que showError() pueda acceder al DOM */
+    try {
+      db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } catch (e) {
+      showError("No se pudo inicializar la conexión. Recarga la página.");
+      return;
+    }
+
     if (!slug) {
       showError("No se encontró el identificador de la invitación.");
       return;
@@ -68,10 +70,13 @@
   /* ─── Renderizado ─────────────────────────────────────────────────── */
   function renderInvitation(inv) {
     /* 1. Ocultar loader y error; mostrar contenido */
-    el("inv-loader").style.display  = "none";
-    el("inv-error").style.display   = "none";
-    el("inv-error").textContent     = "";
-    el("inv-content").style.display = "block";
+    const loader  = el("inv-loader");
+    const errBox  = el("inv-error");
+    const content = el("inv-content");
+
+    if (loader)  loader.style.display  = "none";
+    if (errBox)  { errBox.style.display = "none"; errBox.textContent = ""; }
+    if (content) content.style.display  = "block";
 
     /* 2. Tema de color */
     applyTheme(inv.color_primary || "#C9A46A", inv.color_secondary || "#F7E7D7");
