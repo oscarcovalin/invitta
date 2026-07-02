@@ -1,3 +1,6 @@
+console.log("INVITTA STUDIO JS CARGADO");
+alert("JS de invitación cargado");
+
 /**
  * invitation-public.js
  * Invitta Studio — Página pública de invitación
@@ -14,10 +17,6 @@
 
 (function () {
   "use strict";
-
-  /* DEBUG — borrar después de confirmar que el script carga */
-  console.log("INVITTA STUDIO JS CARGADO");
-  alert("JS de invitación cargado");
 
   /* ─── Supabase ────────────────────────────────────────────────────── */
   const SUPABASE_URL = (window.INVITTIA_ENV && window.INVITTIA_ENV.SUPABASE_URL)   || "";
