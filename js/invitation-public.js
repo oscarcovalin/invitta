@@ -1,277 +1,300 @@
+console.log("INVITTA STUDIO JS CARGADO");
+alert("JS de invitación cargado");
+
 /**
  * invitation-public.js
  * Invitta Studio — Página pública de invitación
  *
- * Lee: ?slug=paola-xv&n=Familia+Garcia&p=4&m=5
- * Consulta: studio_invitations WHERE slug = :slug AND published = true
- * Renderiza la invitación con datos del evento y del invitado.
+ * URL: /invitacion.html?slug=paola-xv&n=Familia+Garcia&p=4&m=5
+ * Tabla: studio_invitations (SELECT anon, published = true)
  *
- * NO modifica tablas. NO guarda datos. Solo lectura.
+ * Solo lectura. No modifica tablas. No requiere autenticación.
+ *
+ * NOTA: Este script se carga al final del <body>, por lo que el DOM ya
+ * está listo. No se usa DOMContentLoaded para evitar que el evento
+ * ya haya disparado antes de que se registre el listener.
  */
 
 (function () {
   "use strict";
 
   /* ─── Supabase ────────────────────────────────────────────────────── */
-  const SUPABASE_URL   = window.INVITTIA_ENV?.SUPABASE_URL   || "";
-  const SUPABASE_KEY   = window.INVITTIA_ENV?.SUPABASE_ANON_KEY || "";
+  const SUPABASE_URL = (window.INVITTIA_ENV && window.INVITTIA_ENV.SUPABASE_URL)   || "";
+  const SUPABASE_KEY = (window.INVITTIA_ENV && window.INVITTIA_ENV.SUPABASE_ANON_KEY) || "";
 
   let db;
   try {
     db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   } catch (e) {
-    showError("No se pudo inicializar la conexión a la base de datos.");
+    console.error("Error al inicializar Supabase:", e);
+    showError("No se pudo inicializar la conexión. Recarga la página.");
     return;
   }
 
   /* ─── Parámetros de URL ───────────────────────────────────────────── */
-  const params = new URLSearchParams(window.location.search);
+  var params      = new URLSearchParams(window.location.search);
+  var slug        = params.get("slug") || "";
+  var guestName   = sanitize(params.get("n") || "");
+  var maxPasses   = clampInt(params.get("p"), 1, 20);
+  var tableNum    = sanitize(params.get("m") || "");
 
-  const slug  = sanitizeText(params.get("slug") || "");
-  const guest = sanitizeText(params.get("n")    || "");
-  const pases = clampInt(params.get("p"), 1, 20);
-  const mesa  = sanitizeText(params.get("m")    || "");
-
-  /* ─── Arranque ────────────────────────────────────────────────────── */
+  /* ─── Iniciar inmediatamente (DOM ya listo al final del body) ─────── */
   if (!slug) {
-    showError("No se proporcionó un identificador de invitación (slug).");
-    return;
+    showError("No se encontró el slug de la invitación.");
+  } else {
+    loadInvitation();
   }
 
-  init();
-
-  /* ─── Flujo principal ─────────────────────────────────────────────── */
-  async function init() {
+  /* ─── Carga ───────────────────────────────────────────────────────── */
+  async function loadInvitation() {
     try {
-      const inv = await fetchInvitation(slug);
-      renderInvitation(inv);
+      console.log("slug recibido:", slug);
+
+      var result = await db
+        .from("studio_invitations")
+        .select("*")
+        .eq("slug", slug)
+        .eq("published", true)
+        .maybeSingle();
+
+      var data  = result.data;
+      var error = result.error;
+
+      console.log("data invitación:", data);
+      console.log("error Supabase:", error);
+
+      if (error) {
+        console.error("Error real de Supabase:", error);
+        showError("Error al consultar la invitación.");
+        return;
+      }
+
+      if (!data) {
+        showError("Invitación no encontrada o no publicada.");
+        return;
+      }
+
+      console.log("Antes de renderInvitation");
+      renderInvitation(data);
+      console.log("Después de renderInvitation");
+
     } catch (err) {
-      showError(err.message || "No se pudo cargar la invitación.");
+      console.error("Error real en loadInvitation:", err);
+      showError("Ocurrió un error al cargar la invitación. Revisa la consola.");
     }
-  }
-
-  async function fetchInvitation(slug) {
-    const { data, error } = await db
-      .from("studio_invitations")
-      .select("*")
-      .eq("slug", slug)
-      .eq("published", true)
-      .single();
-
-    if (error || !data) {
-      throw new Error("Invitación no encontrada o no disponible.");
-    }
-    return data;
   }
 
   /* ─── Renderizado ─────────────────────────────────────────────────── */
   function renderInvitation(inv) {
-    /* Colores dinámicos */
+    /* 1. Mostrar contenido, ocultar loader y error */
+    var loader  = document.getElementById("inv-loader");
+    var errBox  = document.getElementById("inv-error");
+    var content = document.getElementById("inv-content");
+
+    if (loader)  loader.style.display  = "none";
+    if (errBox)  { errBox.style.display = "none"; errBox.textContent = ""; }
+    if (content) content.style.display  = "block";
+
+    /* 2. Tema de color */
     applyTheme(inv.color_primary || "#C9A46A", inv.color_secondary || "#F7E7D7");
 
-    /* Ocultar loader */
-    hide("inv-loader");
-    show("inv-content");
+    /* 3. Encabezado */
+    setText("inv-title",   inv.title        || "Invitación");
+    setText("inv-honoree", inv.honoree_name || "");
+    setText("inv-welcome", inv.welcome_text || "");
+    toggle("inv-welcome-block", !!inv.welcome_text);
 
-    /* ── Encabezado ── */
-    setText("inv-title",       inv.title        || "");
-    setText("inv-honoree",     inv.honoree_name || "");
-    setText("inv-welcome",     inv.welcome_text || "");
+    /* 4. Fecha y hora */
+    setText("inv-date", formatDate(inv.event_date));
+    var timeStr = formatTime(inv.event_time);
+    setText("inv-time", timeStr);
+    toggle("inv-time-block", !!timeStr);
 
-    conditionalBlock("inv-welcome-block", !!inv.welcome_text);
+    /* 5. Datos del invitado */
+    setText("inv-guest-name", guestName || "Invitado");
+    setText("inv-pases",      String(maxPasses));
+    setText("inv-mesa",       tableNum  || "—");
+    toggle("inv-mesa-block",  !!tableNum);
 
-    /* ── Fecha y hora ── */
-    const dateStr = formatDate(inv.event_date);
-    const timeStr = inv.event_time ? formatTime(inv.event_time) : "";
-    setText("inv-date",  dateStr);
-    setText("inv-time",  timeStr);
-    conditionalBlock("inv-time-block", !!timeStr);
+    /* 6. Selector de confirmación */
+    buildPassSelector(maxPasses);
 
-    /* ── Datos del invitado ── */
-    setText("inv-guest-name", guest  || "Invitado");
-    setText("inv-pases",      pases);
-    setText("inv-mesa",       mesa   || "—");
-    conditionalBlock("inv-mesa-block", !!mesa);
-
-    /* ── Selector de confirmación ── */
-    buildPasesSelector(pases);
-
-    /* ── Ceremonia ── */
-    const hasCeremony = inv.ceremony_name || inv.ceremony_address;
-    conditionalBlock("inv-ceremony-block", !!hasCeremony);
+    /* 7. Ceremonia */
+    var hasCeremony = !!(inv.ceremony_name || inv.ceremony_address);
+    toggle("inv-ceremony-block", hasCeremony);
     if (hasCeremony) {
       setText("inv-ceremony-name",    inv.ceremony_name    || "Ceremonia");
       setText("inv-ceremony-address", inv.ceremony_address || "");
-      const mapUrl = inv.ceremony_map_url || "";
-      if (mapUrl) {
-        setAttr("inv-ceremony-map", "href", mapUrl);
+      if (inv.ceremony_map_url) {
+        setHref("inv-ceremony-map-btn", inv.ceremony_map_url);
         show("inv-ceremony-map-btn");
       } else {
         hide("inv-ceremony-map-btn");
       }
     }
 
-    /* ── Recepción ── */
-    const hasReception = inv.reception_name || inv.reception_address;
-    conditionalBlock("inv-reception-block", !!hasReception);
+    /* 8. Recepción */
+    var hasReception = !!(inv.reception_name || inv.reception_address);
+    toggle("inv-reception-block", hasReception);
     if (hasReception) {
       setText("inv-reception-name",    inv.reception_name    || "Recepción");
       setText("inv-reception-address", inv.reception_address || "");
-      const mapUrl2 = inv.reception_map_url || "";
-      if (mapUrl2) {
-        setAttr("inv-reception-map", "href", mapUrl2);
+      if (inv.reception_map_url) {
+        setHref("inv-reception-map-btn", inv.reception_map_url);
         show("inv-reception-map-btn");
       } else {
         hide("inv-reception-map-btn");
       }
     }
 
-    /* ── Mesa de regalos ── */
-    conditionalBlock("inv-gifts-block", !!inv.gift_table_url);
-    if (inv.gift_table_url) {
-      setAttr("inv-gifts-link", "href", inv.gift_table_url);
-    }
-
-    /* ── Dress code ── */
-    conditionalBlock("inv-dresscode-block", !!inv.dress_code);
+    /* 9. Dress code */
+    toggle("inv-dresscode-block", !!inv.dress_code);
     setText("inv-dresscode", inv.dress_code || "");
 
-    /* ── Botón WhatsApp ── */
+    /* 10. Mesa de regalos */
+    toggle("inv-gifts-block", !!inv.gift_table_url);
+    if (inv.gift_table_url) {
+      setHref("inv-gifts-link", inv.gift_table_url);
+    }
+
+    /* 11. WhatsApp */
     buildWhatsAppButton(inv);
 
-    /* ── Título de pestaña y meta ── */
-    document.title = inv.title || "Invitación Digital · Invitta";
+    /* 12. Título de pestaña */
+    document.title = (inv.title || "Invitación Digital") + " · Invitta";
   }
 
   /* ─── Selector de pases ───────────────────────────────────────────── */
-  function buildPasesSelector(max) {
-    const sel = document.getElementById("inv-confirm-pases");
+  function buildPassSelector(max) {
+    var sel = document.getElementById("inv-confirm-pases");
     if (!sel) return;
     sel.innerHTML = "";
-    for (let i = 1; i <= max; i++) {
-      const opt = document.createElement("option");
+    for (var i = 1; i <= max; i++) {
+      var opt = document.createElement("option");
       opt.value = i;
-      opt.textContent = i === 1 ? "1 persona" : `${i} personas`;
+      opt.textContent = i === 1 ? "1 persona" : i + " personas";
       sel.appendChild(opt);
     }
   }
 
   /* ─── WhatsApp ────────────────────────────────────────────────────── */
   function buildWhatsAppButton(inv) {
-    const btn = document.getElementById("inv-wa-btn");
-    if (!btn) return;
-
-    const phone = (inv.whatsapp_number || "").replace(/\D/g, "");
+    var phone = (inv.whatsapp_number || "").replace(/\D/g, "");
     if (!phone) {
       hide("inv-wa-block");
       return;
     }
+    show("inv-wa-block");
+
+    var btn = document.getElementById("inv-wa-btn");
+    if (!btn) return;
 
     btn.addEventListener("click", function () {
-      const selectedPases = document.getElementById("inv-confirm-pases")?.value || pases;
-      const title   = inv.title       || "el evento";
-      const gName   = guest           || "Invitado";
-      const mesaStr = mesa ? `\nMesa: ${mesa}` : "";
+      var selected = (document.getElementById("inv-confirm-pases") || {}).value || maxPasses;
+      var title    = inv.title || "el evento";
+      var mesa     = tableNum ? "\nMesa: " + tableNum : "";
 
-      const msg =
-        `Hola, confirmo mi asistencia al evento ${title}.\n\n` +
-        `Invitado: ${gName}\n` +
-        `Pases confirmados: ${selectedPases}\n` +
-        `Pases asignados: ${pases}` +
-        `${mesaStr}`;
+      var msg =
+        "Hola, confirmo mi asistencia al evento " + title + ".\n\n" +
+        "Invitado: " + (guestName || "Invitado") + "\n" +
+        "Pases confirmados: " + selected + "\n" +
+        "Pases asignados: " + maxPasses +
+        mesa;
 
-      const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-      window.open(waUrl, "_blank", "noopener,noreferrer");
+      window.open(
+        "https://wa.me/" + phone + "?text=" + encodeURIComponent(msg),
+        "_blank",
+        "noopener,noreferrer"
+      );
     });
+  }
+
+  /* ─── showError ───────────────────────────────────────────────────── */
+  function showError(message) {
+    console.trace("showError llamado con:", message);
+
+    var loader  = document.getElementById("inv-loader");
+    var content = document.getElementById("inv-content");
+    var errBox  = document.getElementById("inv-error");
+
+    if (loader)  loader.style.display  = "none";
+    if (content) content.style.display = "none";
+    if (errBox) {
+      errBox.textContent   = message;
+      errBox.style.display = "block";
+    }
   }
 
   /* ─── Tema de colores ─────────────────────────────────────────────── */
   function applyTheme(primary, secondary) {
-    const root = document.documentElement;
-    root.style.setProperty("--inv-primary",         primary);
-    root.style.setProperty("--inv-primary-light",   hexToRgba(primary, 0.12));
-    root.style.setProperty("--inv-primary-border",  hexToRgba(primary, 0.35));
-    root.style.setProperty("--inv-secondary",       secondary);
+    var root = document.documentElement;
+    root.style.setProperty("--inv-primary",        primary);
+    root.style.setProperty("--inv-primary-light",  hexAlpha(primary, 0.12));
+    root.style.setProperty("--inv-primary-border", hexAlpha(primary, 0.35));
+    root.style.setProperty("--inv-secondary",      secondary);
   }
 
   /* ─── Helpers DOM ─────────────────────────────────────────────────── */
-  function setText(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = String(value);
+  function setText(id, val) {
+    var e = document.getElementById(id);
+    if (e) e.textContent = String(val);
   }
 
-  function setAttr(id, attr, value) {
-    const el = document.getElementById(id);
-    if (el) el.setAttribute(attr, value);
+  function setHref(id, href) {
+    var e = document.getElementById(id);
+    if (e) e.href = href;
   }
 
   function show(id) {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "";
+    var e = document.getElementById(id);
+    if (e) e.style.display = "";
   }
 
   function hide(id) {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
+    var e = document.getElementById(id);
+    if (e) e.style.display = "none";
   }
 
-  function conditionalBlock(id, condition) {
-    condition ? show(id) : hide(id);
+  function toggle(id, visible) {
+    visible ? show(id) : hide(id);
   }
 
-  /* ─── Helpers de texto ────────────────────────────────────────────── */
-  /* sanitizeText: seguro para usar con textContent (no necesita escape HTML) */
-  function sanitizeText(str) {
+  /* ─── Helpers texto / números ─────────────────────────────────────── */
+  function sanitize(str) {
     return String(str || "").trim().slice(0, 200);
   }
 
   function clampInt(val, min, max) {
-    const n = parseInt(val, 10);
-    if (isNaN(n)) return min;
-    return Math.min(Math.max(n, min), max);
+    var n = parseInt(val, 10);
+    return isNaN(n) ? min : Math.min(Math.max(n, min), max);
   }
 
   function formatDate(dateStr) {
     if (!dateStr) return "";
     try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString("es-MX", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric"
+      return new Date(dateStr).toLocaleDateString("es-MX", {
+        weekday: "long", year: "numeric", month: "long", day: "numeric"
       });
-    } catch { return dateStr; }
+    } catch (e) { return dateStr; }
   }
 
   function formatTime(timeStr) {
     if (!timeStr) return "";
-    // timeStr puede venir como "18:00:00" o "18:00"
     try {
-      const [h, m] = timeStr.split(":");
-      const d = new Date();
-      d.setHours(parseInt(h, 10), parseInt(m, 10), 0);
+      var parts = timeStr.split(":");
+      var d = new Date();
+      d.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0);
       return d.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
-    } catch { return timeStr; }
+    } catch (e) { return timeStr; }
   }
 
-  /* ─── Color helpers ───────────────────────────────────────────────── */
-  function hexToRgba(hex, alpha) {
-    const r = parseInt(hex.slice(1, 3), 16) || 0;
-    const g = parseInt(hex.slice(3, 5), 16) || 0;
-    const b = parseInt(hex.slice(5, 7), 16) || 0;
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  }
-
-  /* ─── Error global ────────────────────────────────────────────────── */
-  function showError(msg) {
-    hide("inv-loader");
-    hide("inv-content");
-    const el = document.getElementById("inv-error");
-    if (el) {
-      el.textContent = msg;
-      show("inv-error");
-    }
+  /* ─── Color helper ────────────────────────────────────────────────── */
+  function hexAlpha(hex, a) {
+    var h = hex || "#C9A46A";
+    var r = parseInt(h.slice(1, 3), 16) || 0;
+    var g = parseInt(h.slice(3, 5), 16) || 0;
+    var b = parseInt(h.slice(5, 7), 16) || 0;
+    return "rgba(" + r + "," + g + "," + b + "," + a + ")";
   }
 
 })();
