@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Invitación · Invitta Studio</title>
+  <link rel="stylesheet" href="/css/studio.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1 id="page-title">Crear Invitación</h1>
+      </div>
+      <div class="header-actions">
+        <a href="/administracion/studio-dashboard.html" class="btn btn-secondary">Volver al Dashboard</a>
+      </div>
+    </div>
+
+    <div id="form-error" class="alert alert-error"></div>
+    <div id="form-success" class="alert alert-success"></div>
+
+    <form id="invitation-form" class="card" style="display: none;">
+      
+      <h2 style="margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Datos Principales</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="title">Título de Invitación</label>
+          <input type="text" id="title" class="form-control" required placeholder="Ej: XV Años de Paola">
+        </div>
+        <div class="form-group">
+          <label for="slug">Slug (URL)</label>
+          <input type="text" id="slug" class="form-control" required placeholder="paola-xv">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="event_type">Tipo de Evento</label>
+          <select id="event_type" class="form-control" required>
+            <option value="boda">Boda</option>
+            <option value="xv">XV Años</option>
+            <option value="bautizo">Bautizo</option>
+            <option value="cumpleanos">Cumpleaños</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="honoree_name">Nombre del Festejado/a</label>
+          <input type="text" id="honoree_name" class="form-control" placeholder="Paola García">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="event_date">Fecha del Evento</label>
+          <input type="date" id="event_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="event_time">Hora del Evento</label>
+          <input type="time" id="event_time" class="form-control">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="welcome_text">Texto de Bienvenida</label>
+        <textarea id="welcome_text" class="form-control" rows="3" placeholder="Nos encantaría que nos acompañes..."></textarea>
+      </div>
+
+      <h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Colores (Tema)</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="color_primary">Color Primario</label>
+          <input type="color" id="color_primary" class="form-control" value="#C9A46A" style="height: 40px; padding: 2px;">
+        </div>
+        <div class="form-group">
+          <label for="color_secondary">Color Secundario</label>
+          <input type="color" id="color_secondary" class="form-control" value="#F7E7D7" style="height: 40px; padding: 2px;">
+        </div>
+      </div>
+
+      <h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Ubicaciones</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="ceremony_name">Lugar de Ceremonia</label>
+          <input type="text" id="ceremony_name" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="ceremony_address">Dirección de Ceremonia</label>
+          <input type="text" id="ceremony_address" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="ceremony_map_url">URL Mapa Ceremonia</label>
+          <input type="url" id="ceremony_map_url" class="form-control" placeholder="https://maps.app.goo.gl/...">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="reception_name">Lugar de Recepción</label>
+          <input type="text" id="reception_name" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="reception_address">Dirección de Recepción</label>
+          <input type="text" id="reception_address" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="reception_map_url">URL Mapa Recepción</label>
+          <input type="url" id="reception_map_url" class="form-control" placeholder="https://maps.app.goo.gl/...">
+        </div>
+      </div>
+
+      <h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Otros Detalles</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="gift_table_url">URL Mesa de Regalos</label>
+          <input type="url" id="gift_table_url" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="whatsapp_number">WhatsApp (Confirmación)</label>
+          <input type="text" id="whatsapp_number" class="form-control" placeholder="525512345678">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="dress_code">Código de Vestimenta</label>
+        <input type="text" id="dress_code" class="form-control" placeholder="Formal / Etiqueta">
+      </div>
+
+      <div class="form-group" style="margin-top: 20px;">
+        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+          <input type="checkbox" id="published">
+          <span style="font-weight: 500;">Publicar Invitación (Visible al público)</span>
+        </label>
+      </div>
+
+      <div style="margin-top: 30px; display: flex; gap: 15px;">
+        <button type="submit" id="save-btn" class="btn btn-primary">Guardar Invitación</button>
+        <a href="/administracion/studio-dashboard.html" class="btn btn-secondary">Cancelar</a>
+      </div>
+      
+    </form>
+    
+    <div id="loading-indicator" style="text-align: center; padding: 40px; color: #666;">
+      Cargando...
+    </div>
+
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Variables de entorno -->
+  <script src="/assets/js/env.js"></script>
+  <!-- Autenticación de Studio -->
+  <script src="/js/studio-auth.js"></script>
+  <!-- Lógica del Formulario -->
+  <script src="/js/studio-form.js"></script>
+
+</body>
+</html>
