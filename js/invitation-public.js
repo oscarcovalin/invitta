@@ -1,6 +1,3 @@
-console.log("INVITTA STUDIO JS CARGADO");
-alert("JS de invitación cargado");
-
 /**
  * invitation-public.js
  * Invitta Studio — Página pública de invitación
