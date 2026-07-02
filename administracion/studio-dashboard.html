@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · Invitta Studio</title>
+  <link rel="stylesheet" href="/css/studio.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Panel de Estudio</h1>
+        <p id="studio-name">Cargando...</p>
+      </div>
+      <div class="header-actions">
+        <a href="/administracion/studio-invitacion-form.html" class="btn btn-primary">Crear Invitación</a>
+        <button id="logout-btn" class="btn btn-secondary">Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom: 20px;">Tus Invitaciones</h2>
+      
+      <div id="loading-msg" style="text-align: center; color: #666; padding: 20px;">
+        Cargando invitaciones...
+      </div>
+      
+      <div id="empty-msg" class="alert" style="text-align: center; display: none;">
+        No tienes invitaciones creadas. ¡Empieza creando una!
+      </div>
+      
+      <div id="invitation-list" class="invitation-list">
+        <!-- Las invitaciones se cargarán aquí -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Variables de entorno -->
+  <script src="/assets/js/env.js"></script>
+  <!-- Autenticación de Studio -->
+  <script src="/js/studio-auth.js"></script>
+  <!-- Lógica del Dashboard -->
+  <script src="/js/studio-dashboard.js"></script>
+
+</body>
+</html>
