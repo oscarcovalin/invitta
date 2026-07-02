@@ -1,6 +1,3 @@
-console.log("INVITTA STUDIO JS CARGADO");
-alert("JS de invitación cargado");
-
 /**
  * invitation-public.js
  * Invitta Studio — Página pública de invitación
@@ -269,10 +266,16 @@ alert("JS de invitación cargado");
     return isNaN(n) ? min : Math.min(Math.max(n, min), max);
   }
 
+  function parseLocalDate(dateString) {
+    if (!dateString) return null;
+    const [year, month, day] = dateString.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
   function formatDate(dateStr) {
     if (!dateStr) return "";
     try {
-      return new Date(dateStr).toLocaleDateString("es-MX", {
+      return parseLocalDate(dateStr).toLocaleDateString("es-MX", {
         weekday: "long", year: "numeric", month: "long", day: "numeric"
       });
     } catch (e) { return dateStr; }
