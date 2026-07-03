@@ -208,6 +208,9 @@ body {
 }
 .badge-draft { background: #eee; color: #666; }
 .badge-published { background: #e3fcef; color: #0d8246; }
+.badge-media { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+.badge-photo { background: #fff3e0; color: #b45309; }
+.badge-music { background: #ede9fe; color: #6d28d9; }
 
 @media (max-width: 600px) {
   .invitation-item {

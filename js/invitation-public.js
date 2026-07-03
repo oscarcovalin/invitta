@@ -159,6 +159,60 @@
 
     /* 12. Título de pestaña */
     document.title = (inv.title || "Invitación Digital") + " · Invitta";
+
+    /* 13. Foto principal */
+    renderMainPhoto(inv.main_photo_url);
+
+    /* 14. Música */
+    buildMusicPlayer(inv.music_url);
+  }
+
+  /* ─── Foto principal ────────────────────────────────────────────── */
+  function renderMainPhoto(url) {
+    var block = document.getElementById("inv-photo-block");
+    var img   = document.getElementById("inv-main-photo");
+    var hero  = document.getElementById("inv-hero");
+    if (!url || !block || !img) return;
+    img.src = url;
+    block.style.display = "block";
+    // Agregar clase al hero para que tenga foto de fondo elegante
+    if (hero) hero.classList.add("inv-hero--has-photo");
+  }
+
+  /* ─── Reproductor de música ──────────────────────────────────── */
+  function buildMusicPlayer(url) {
+    if (!url) return;
+    var block = document.getElementById("inv-music-block");
+    var btn   = document.getElementById("inv-music-btn");
+    var icon  = document.getElementById("inv-music-icon");
+    var label = document.getElementById("inv-music-label");
+    if (!block || !btn) return;
+
+    // Crear el elemento <audio> (oculto)
+    var audio = document.createElement("audio");
+    audio.src = url;
+    audio.loop = true;
+    audio.preload = "none";
+    audio.style.display = "none";
+    block.appendChild(audio);
+
+    // Mostrar la sección
+    block.style.display = "";
+
+    btn.addEventListener("click", function () {
+      if (audio.paused) {
+        audio.play().then(function () {
+          if (icon)  { icon.className  = "fa-solid fa-pause"; }
+          if (label) { label.textContent = "Pausar música"; }
+        }).catch(function (err) {
+          console.warn("No se pudo reproducir el audio:", err);
+        });
+      } else {
+        audio.pause();
+        if (icon)  { icon.className  = "fa-solid fa-play"; }
+        if (label) { label.textContent = "Reproducir música"; }
+      }
+    });
   }
 
   /* ─── Selector de pases ───────────────────────────────────────────── */

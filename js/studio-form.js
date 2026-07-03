@@ -20,7 +20,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const pageTitle = document.getElementById("page-title");
   const saveBtn = document.getElementById("save-btn");
 
+  // URLs actuales (preservar si no se sube archivo nuevo)
+  let existingPhotoUrl = null;
+  let existingMusicUrl = null;
+
   let currentStudioId = localStorage.getItem("invitta_studio_id");
+  let currentSlug = "";
 
   // Si no tenemos el studio_id, lo buscamos
   if (!currentStudioId) {
@@ -50,7 +55,100 @@ document.addEventListener("DOMContentLoaded", async () => {
     form.style.display = "block";
   }
 
-  // Función para cargar datos
+  // Preview de foto al seleccionar archivo local
+  const mainPhotoInput = document.getElementById("mainPhotoFile");
+  if (mainPhotoInput) {
+    mainPhotoInput.addEventListener("change", () => {
+      const file = mainPhotoInput.files[0];
+      clearMediaError("photo");
+      if (!file) return;
+      const preview = document.getElementById("photo-preview");
+      if (preview) {
+        preview.src = URL.createObjectURL(file);
+        preview.classList.add("visible");
+      }
+    });
+  }
+
+  // ── uploadFileToStorage ──────────────────────────────────────────
+  /**
+   * Sube un archivo al bucket "invitation-assets" en Supabase Storage.
+   * @param {File} file - El archivo a subir.
+   * @param {string} folder - Subcarpeta: "main-photo" o "music".
+   * @param {string} slug - Slug de la invitación.
+   * @returns {Promise<string|null>} URL pública del archivo, o null si falla.
+   */
+  async function uploadFileToStorage(file, folder, slug) {
+    const timestamp = Date.now();
+    // Sanitizar nombre de archivo: sin espacios ni caracteres especiales
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-").toLowerCase();
+    const path = `studio-assets/${currentStudioId}/${slug}/${folder}/${timestamp}-${safeName}`;
+
+    const { data, error } = await db.storage
+      .from("invitation-assets")
+      .upload(path, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (error) {
+      console.error(`Error subiendo ${folder}:`, error);
+      return null;
+    }
+
+    const { data: publicData } = db.storage
+      .from("invitation-assets")
+      .getPublicUrl(path);
+
+    return publicData?.publicUrl || null;
+  }
+
+  // ── Validaciones de archivo ───────────────────────────────────────
+  const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+  const ALLOWED_AUDIO_TYPES = [
+    "audio/mpeg", "audio/mp3", "audio/mp4", "audio/x-m4a",
+    "audio/wav", "audio/ogg", "audio/vnd.wav",
+  ];
+  const MAX_PHOTO_BYTES = 8 * 1024 * 1024;   // 8 MB
+  const MAX_MUSIC_BYTES = 15 * 1024 * 1024;  // 15 MB
+
+  function showMediaError(type, message) {
+    const el = document.getElementById(`${type}-error`);
+    if (el) { el.textContent = message; el.classList.add("visible"); }
+  }
+
+  function clearMediaError(type) {
+    const el = document.getElementById(`${type}-error`);
+    if (el) { el.textContent = ""; el.classList.remove("visible"); }
+  }
+
+  function showProgress(type) {
+    const el = document.getElementById(`${type}-progress`);
+    if (el) el.classList.add("visible");
+  }
+
+  function hideProgress(type) {
+    const el = document.getElementById(`${type}-progress`);
+    if (el) el.classList.remove("visible");
+  }
+
+  function validateFile(file, allowedTypes, maxBytes, type) {
+    if (!ALLOWED_IMAGE_TYPES.concat(ALLOWED_AUDIO_TYPES).includes("")) {
+      // just proceed with checks
+    }
+    if (!allowedTypes.includes(file.type)) {
+      showMediaError(type, `Tipo de archivo no permitido: ${file.type}`);
+      return false;
+    }
+    if (file.size > maxBytes) {
+      const mb = Math.round(maxBytes / 1024 / 1024);
+      showMediaError(type, `El archivo excede el tamaño máximo de ${mb} MB.`);
+      return false;
+    }
+    return true;
+  }
+
+  // ── Función para cargar datos ─────────────────────────────────────
   async function loadInvitationData(id) {
     const { data, error } = await db
       .from("studio_invitations")
@@ -66,6 +164,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       errorAlert.style.display = "block";
       return;
     }
+
+    currentSlug = data.slug || "";
 
     // Llenar formulario
     document.getElementById("title").value = data.title || "";
@@ -88,20 +188,93 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("whatsapp_number").value = data.whatsapp_number || "";
     document.getElementById("published").checked = !!data.published;
 
+    // Preservar URLs existentes de foto y música
+    existingPhotoUrl = data.main_photo_url || null;
+    existingMusicUrl = data.music_url || null;
+
+    // Mostrar URL actual de foto
+    if (existingPhotoUrl) {
+      const photoCurrent = document.getElementById("photo-current");
+      const photoDisplay = document.getElementById("photo-url-display");
+      const photoPreview = document.getElementById("photo-preview");
+      if (photoCurrent) photoCurrent.classList.add("visible");
+      if (photoDisplay) photoDisplay.textContent = existingPhotoUrl;
+      if (photoPreview) {
+        photoPreview.src = existingPhotoUrl;
+        photoPreview.classList.add("visible");
+      }
+    }
+
+    // Mostrar URL actual de música
+    if (existingMusicUrl) {
+      const musicCurrent = document.getElementById("music-current");
+      const musicDisplay = document.getElementById("music-url-display");
+      if (musicCurrent) musicCurrent.classList.add("visible");
+      if (musicDisplay) musicDisplay.textContent = existingMusicUrl;
+    }
+
     form.style.display = "block";
   }
 
-  // Guardar datos
+  // ── Guardar datos ────────────────────────────────────────────────
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     errorAlert.style.display = "none";
     successAlert.style.display = "none";
+    clearMediaError("photo");
+    clearMediaError("music");
     saveBtn.disabled = true;
     saveBtn.textContent = "Guardando...";
 
+    const slugValue = document.getElementById("slug").value;
+    const slugToUse = slugValue || currentSlug;
+
+    // ── Subida de foto ──
+    let finalPhotoUrl = existingPhotoUrl;
+    const photoFile = document.getElementById("mainPhotoFile")?.files[0];
+    if (photoFile) {
+      if (!validateFile(photoFile, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "photo")) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar Invitación";
+        return;
+      }
+      showProgress("photo");
+      const uploadedUrl = await uploadFileToStorage(photoFile, "main-photo", slugToUse);
+      hideProgress("photo");
+      if (!uploadedUrl) {
+        showMediaError("photo", "Error al subir la foto. Intenta de nuevo.");
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar Invitación";
+        return;
+      }
+      finalPhotoUrl = uploadedUrl;
+    }
+
+    // ── Subida de música ──
+    let finalMusicUrl = existingMusicUrl;
+    const musicFile = document.getElementById("musicFile")?.files[0];
+    if (musicFile) {
+      if (!validateFile(musicFile, ALLOWED_AUDIO_TYPES, MAX_MUSIC_BYTES, "music")) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar Invitación";
+        return;
+      }
+      showProgress("music");
+      const uploadedUrl = await uploadFileToStorage(musicFile, "music", slugToUse);
+      hideProgress("music");
+      if (!uploadedUrl) {
+        showMediaError("music", "Error al subir la música. Intenta de nuevo.");
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar Invitación";
+        return;
+      }
+      finalMusicUrl = uploadedUrl;
+    }
+
+    // ── Payload ──
     const payload = {
       title: document.getElementById("title").value,
-      slug: document.getElementById("slug").value,
+      slug: slugValue,
       event_type: document.getElementById("event_type").value,
       honoree_name: document.getElementById("honoree_name").value,
       event_date: document.getElementById("event_date").value || null,
@@ -119,12 +292,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       dress_code: document.getElementById("dress_code").value,
       whatsapp_number: document.getElementById("whatsapp_number").value,
       published: document.getElementById("published").checked,
-      // Arrays por defecto según instrucciones
       gallery_urls: [],
       itinerary: [],
       template_id: null,
-      main_photo_url: null,
-      music_url: null,
+      main_photo_url: finalPhotoUrl,
+      music_url: finalMusicUrl,
     };
 
     let result;

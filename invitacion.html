@@ -38,7 +38,7 @@
   <div id="inv-content" aria-label="Invitación digital">
 
     <!-- HERO -->
-    <header class="inv-hero">
+    <header class="inv-hero" id="inv-hero">
       <div class="inv-ornament">
         <i class="fa-solid fa-sparkles"></i>
         Invitación Digital
@@ -48,6 +48,10 @@
       <p  class="inv-honoree" id="inv-honoree"></p>
       <div id="inv-welcome-block">
         <p class="inv-welcome" id="inv-welcome"></p>
+      </div>
+      <!-- Foto principal: se muestra encima del hero si existe -->
+      <div id="inv-photo-block" style="display:none">
+        <img id="inv-main-photo" class="inv-main-photo" src="" alt="Foto principal" loading="lazy">
       </div>
     </header>
 
@@ -121,6 +125,18 @@
           <i class="fa-solid fa-shirt"></i> Código de vestimenta
         </div>
         <p class="inv-dresscode-text" id="inv-dresscode"></p>
+      </section>
+
+      <!-- ── MÚSICA ── -->
+      <section class="inv-card" id="inv-music-block" aria-label="Música de fondo" style="display:none">
+        <div class="inv-card-label">
+          <i class="fa-solid fa-music"></i> Música de fondo
+        </div>
+        <button class="inv-btn inv-btn-music" id="inv-music-btn" type="button" aria-label="Reproducir música">
+          <i class="fa-solid fa-play" id="inv-music-icon"></i>
+          <span id="inv-music-label">Reproducir música</span>
+        </button>
+        <!-- El elemento audio se inyecta por JS -->
       </section>
 
       <!-- ── MESA DE REGALOS ── -->

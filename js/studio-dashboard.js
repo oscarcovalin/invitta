@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const { data: invitations, error } = await db
       .from("studio_invitations")
-      .select("id, title, slug, event_type, event_date, published")
+      .select("id, title, slug, event_type, event_date, published, main_photo_url, music_url")
       .eq("studio_id", currentStudioId)
       .order("created_at", { ascending: false });
 
@@ -84,9 +84,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const baseLink = `${window.location.origin}/invitacion.html?slug=${inv.slug}`;
       const demoLink = `${window.location.origin}/invitacion.html?slug=${inv.slug}&n=Familia+Garcia&p=4&m=5`;
 
+      const mediaBadges = [
+        inv.main_photo_url ? `<span class="badge badge-media badge-photo">📷 Foto</span>` : "",
+        inv.music_url      ? `<span class="badge badge-media badge-music">🎵 Música</span>` : "",
+      ].join(" ");
+
       item.innerHTML = `
         <div class="invitation-item-info">
-          <h3>${inv.title || 'Sin título'} ${statusBadge}</h3>
+          <h3>${inv.title || 'Sin título'} ${statusBadge} ${mediaBadges}</h3>
           <p>
             <strong>Evento:</strong> ${inv.event_type || '-'} | 
             <strong>Fecha:</strong> ${dateStr} | 

@@ -432,3 +432,58 @@ body {
   .inv-info-grid { grid-template-columns: 1fr; }
   .inv-card { padding: 22px 18px; }
 }
+
+/* ═══════════════════════════════════════════
+   FOTO PRINCIPAL (hero)
+═══════════════════════════════════════════ */
+#inv-photo-block {
+  margin-top: 28px;
+}
+
+.inv-main-photo {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+  box-shadow: 0 8px 32px rgba(43, 37, 34, 0.22);
+  border: 3px solid rgba(255,255,255,0.6);
+  transition: opacity 0.4s ease;
+}
+
+/* Hero con foto: ajuste de padding y fondo oscurecido */
+.inv-hero--has-photo {
+  padding-bottom: 36px;
+}
+
+/* ═══════════════════════════════════════════
+   BOTÓN DE MÚSICA
+═══════════════════════════════════════════ */
+.inv-btn-music {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  padding: 14px 22px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--inv-font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, var(--inv-primary) 0%, color-mix(in srgb, var(--inv-primary) 70%, #fff) 100%);
+  color: #fff;
+  box-shadow: 0 4px 18px var(--inv-primary-border);
+  transition: opacity 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.inv-btn-music:hover {
+  opacity: 0.92;
+  box-shadow: 0 6px 28px var(--inv-primary-border);
+}
+
+.inv-btn-music:active {
+  transform: scale(0.97);
+}
