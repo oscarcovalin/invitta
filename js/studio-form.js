@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // URLs actuales (preservar si no se sube archivo nuevo)
   let existingPhotoUrl = null;
   let existingMusicUrl = null;
+  let existingGalleryUrls = [];
 
   let currentStudioId = localStorage.getItem("invitta_studio_id");
   let currentSlug = "";
@@ -145,6 +146,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     return true;
   }
 
+  // ── Normalizar gallery_urls ───────────────────────────────────────
+  function normalizeGalleryUrls(value) {
+    if (!value) return [];
+    if (Array.isArray(value)) return value.filter(Boolean).slice(0, 10);
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed.filter(Boolean).slice(0, 10) : [];
+    } catch {
+      return [];
+    }
+  }
+
   // ── Función para cargar datos ─────────────────────────────────────
   async function loadInvitationData(id) {
     const { data, error } = await db
@@ -210,6 +223,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (musicDisplay) musicDisplay.textContent = existingMusicUrl;
     }
 
+    // Mostrar galería existente
+    existingGalleryUrls = normalizeGalleryUrls(data.gallery_urls);
+    if (existingGalleryUrls.length > 0) {
+      const galCurrent   = document.getElementById("gallery-current");
+      const galCount     = document.getElementById("gallery-count-label");
+      const galThumbs    = document.getElementById("gallery-thumbnails");
+      const galWarning   = document.getElementById("gallery-replace-warning");
+      if (galCurrent) galCurrent.style.display = "block";
+      if (galCount)   galCount.textContent = `Galería actual: ${existingGalleryUrls.length} foto${existingGalleryUrls.length !== 1 ? "s" : ""}`;
+      if (galWarning) galWarning.style.display = "block";
+      if (galThumbs) {
+        galThumbs.innerHTML = "";
+        existingGalleryUrls.forEach((url) => {
+          const wrap = document.createElement("div");
+          wrap.className = "gallery-thumb-wrap";
+          const img = document.createElement("img");
+          img.src = url;
+          img.alt = "Foto de galería";
+          img.loading = "lazy";
+          wrap.appendChild(img);
+          galThumbs.appendChild(wrap);
+        });
+      }
+    }
+
     form.style.display = "block";
   }
 
@@ -268,6 +306,50 @@ document.addEventListener("DOMContentLoaded", async () => {
       finalMusicUrl = uploadedUrl;
     }
 
+    // ── Subida de galería ──
+    let finalGalleryUrls = existingGalleryUrls;
+    const galleryInput   = document.getElementById("galleryFiles");
+    const galleryFiles   = galleryInput ? Array.from(galleryInput.files) : [];
+
+    if (galleryFiles.length > 0) {
+      clearMediaError("gallery");
+
+      if (galleryFiles.length > 10) {
+        showMediaError("gallery", `Solo puedes subir máximo 10 fotos. Seleccionaste ${galleryFiles.length}.`);
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar Invitación";
+        return;
+      }
+
+      // Validar cada archivo
+      for (let i = 0; i < galleryFiles.length; i++) {
+        if (!validateFile(galleryFiles[i], ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "gallery")) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Guardar Invitación";
+          return;
+        }
+      }
+
+      // Subir cada archivo secuencialmente
+      showProgress("gallery");
+      const uploadedUrls = [];
+      for (let i = 0; i < galleryFiles.length; i++) {
+        const el = document.getElementById("gallery-progress");
+        if (el) el.textContent = `⏳ Subiendo foto ${i + 1} de ${galleryFiles.length}...`;
+        const url = await uploadFileToStorage(galleryFiles[i], "gallery", slugToUse);
+        if (!url) {
+          hideProgress("gallery");
+          showMediaError("gallery", `Error al subir la foto ${i + 1}. Intenta de nuevo.`);
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Guardar Invitación";
+          return;
+        }
+        uploadedUrls.push(url);
+      }
+      hideProgress("gallery");
+      finalGalleryUrls = uploadedUrls;
+    }
+
     // ── Payload ──
     const payload = {
       title: document.getElementById("title").value,
@@ -289,7 +371,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       dress_code: document.getElementById("dress_code").value,
       whatsapp_number: document.getElementById("whatsapp_number").value,
       published: document.getElementById("published").checked,
-      gallery_urls: [],
+      gallery_urls: finalGalleryUrls,
       itinerary: [],
       template_id: null,
       main_photo_url: finalPhotoUrl,

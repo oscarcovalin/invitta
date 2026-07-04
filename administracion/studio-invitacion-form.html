@@ -69,6 +69,28 @@
       display: none;
     }
     .upload-progress.visible { display: block; }
+
+    /* ── Galería thumbnails ── */
+    .gallery-thumb-wrap {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    .gallery-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #gallery-thumbnails {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
   </style>
 </head>
 <body>
@@ -165,6 +187,29 @@
               <strong>URL actual:</strong> <span id="music-url-display"></span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- ── GALERÍA FOTOGRÁFICA ── -->
+      <h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">📸 Galería Fotográfica</h2>
+
+      <div class="form-group">
+        <div class="media-upload-box">
+          <span class="media-upload-label">Galería fotográfica</span>
+          <p class="media-hint">Máximo 10 fotografías · Formatos: JPG, PNG, WEBP · Máximo 8 MB por foto</p>
+          <input type="file" id="galleryFiles" accept="image/jpeg,image/jpg,image/png,image/webp" multiple>
+          <div class="upload-progress" id="gallery-progress">⏳ Subiendo galería...</div>
+          <div class="media-error" id="gallery-error"></div>
+          <!-- Advertencia de reemplazo (visible cuando hay galería existente) -->
+          <div class="media-current" id="gallery-replace-warning" style="background:#fff8e1;border-color:#ffe082;color:#7a5c00;display:none;">
+            ⚠️ Si subes nuevas fotos, reemplazarán la galería anterior.
+          </div>
+          <!-- Estado actual de la galería -->
+          <div class="media-current" id="gallery-current" style="display:none;">
+            <strong id="gallery-count-label">Galería actual: 0 fotos</strong>
+          </div>
+          <!-- Miniaturas de galería existente -->
+          <div id="gallery-thumbnails"></div>
         </div>
       </div>
 

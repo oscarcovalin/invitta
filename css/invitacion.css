@@ -1056,3 +1056,159 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ══════════════════════════════════════════════════
+   GALERÍA FOTOGRÁFICA PREMIUM
+   Editorial scroll, alternating layout, mobile-first
+══════════════════════════════════════════════════ */
+.inv-gallery-section {
+  /* Ocupa ancho completo (fuera del max-width de .inv-page) */
+  padding: 48px 0 16px;
+  overflow: hidden;
+}
+
+.inv-gallery-header {
+  text-align: center;
+  padding: 0 24px 36px;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.inv-gallery-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-family: var(--inv-font-sans);
+}
+
+.inv-gallery-title {
+  font-family: var(--inv-font-serif);
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+  font-weight: 600;
+  color: var(--inv-text);
+  line-height: 1.15;
+}
+
+/* ── Scroll container ── */
+.inv-gallery-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 16px 20px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── Item base ── */
+.inv-gallery-item {
+  position: relative;
+  border-radius: var(--inv-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--inv-shadow-md);
+  will-change: transform, opacity;
+
+  /* Estado inicial (invisible, desplazado) */
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.65s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease;
+}
+
+/* Alternancia: is-left desliza desde la izquierda, is-right desde la derecha */
+.inv-gallery-item.is-left  { transform: translateX(-24px) translateY(20px); }
+.inv-gallery-item.is-right { transform: translateX(24px)  translateY(20px); }
+
+/* Estado visible (activado por IntersectionObserver) */
+.inv-gallery-item.is-visible {
+  opacity: 1;
+  transform: translateX(0) translateY(0);
+}
+
+/* Delay escalonado para efecto waterfall */
+.inv-gallery-item:nth-child(1)  { transition-delay: 0.00s; }
+.inv-gallery-item:nth-child(2)  { transition-delay: 0.07s; }
+.inv-gallery-item:nth-child(3)  { transition-delay: 0.14s; }
+.inv-gallery-item:nth-child(4)  { transition-delay: 0.21s; }
+.inv-gallery-item:nth-child(5)  { transition-delay: 0.28s; }
+.inv-gallery-item:nth-child(6)  { transition-delay: 0.35s; }
+.inv-gallery-item:nth-child(7)  { transition-delay: 0.42s; }
+.inv-gallery-item:nth-child(8)  { transition-delay: 0.49s; }
+.inv-gallery-item:nth-child(9)  { transition-delay: 0.56s; }
+.inv-gallery-item:nth-child(10) { transition-delay: 0.63s; }
+
+/* ── Imagen dentro del item ── */
+.inv-gallery-item img {
+  display: block;
+  width: 100%;
+  /* Altura mayor en móvil para aspecto vertical/editorial */
+  height: clamp(260px, 70vw, 420px);
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto zoom sutil al hover (solo desktop, sin afectar móvil) */
+@media (hover: hover) and (pointer: fine) {
+  .inv-gallery-item:hover {
+    box-shadow: var(--inv-shadow-lg);
+  }
+  .inv-gallery-item:hover img {
+    transform: scale(1.025);
+  }
+}
+
+/* Overlay muy sutil (gradiente inferior para depth) */
+.inv-gallery-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(30, 18, 10, 0.18), transparent);
+  pointer-events: none;
+}
+
+/* Caption decorativa (borde dorado inferior) */
+.inv-gallery-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--inv-primary);
+  opacity: 0.55;
+}
+
+/* ── Layout editorial en pantallas medianas:
+   alternar alineación izquierda/derecha con ancho parcial ── */
+@media (min-width: 520px) {
+  .inv-gallery-scroll {
+    gap: 28px;
+  }
+
+  .inv-gallery-item.is-left {
+    margin-right: 10%;
+    border-radius: var(--inv-radius-lg) var(--inv-radius-xl) var(--inv-radius-xl) var(--inv-radius-lg);
+  }
+
+  .inv-gallery-item.is-right {
+    margin-left: 10%;
+    border-radius: var(--inv-radius-xl) var(--inv-radius-lg) var(--inv-radius-lg) var(--inv-radius-xl);
+  }
+}
+
+/* En pantalla completa: columna centrada elegante */
+@media (min-width: 700px) {
+  .inv-gallery-item img {
+    height: clamp(320px, 45vw, 480px);
+  }
+}

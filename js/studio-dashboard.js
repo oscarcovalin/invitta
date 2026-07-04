@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const { data: invitations, error } = await db
       .from("studio_invitations")
-      .select("id, title, slug, event_type, event_date, published, main_photo_url, music_url")
+      .select("id, title, slug, event_type, event_date, published, main_photo_url, music_url, gallery_urls")
       .eq("studio_id", currentStudioId)
       .order("created_at", { ascending: false });
 
@@ -84,9 +84,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       const baseLink = `${window.location.origin}/invitacion.html?slug=${inv.slug}`;
       const demoLink = `${window.location.origin}/invitacion.html?slug=${inv.slug}&n=Familia+Garcia&p=4&m=5`;
 
+      const galleryCount = (() => {
+        const v = inv.gallery_urls;
+        if (!v) return 0;
+        if (Array.isArray(v)) return v.filter(Boolean).length;
+        try { const p = JSON.parse(v); return Array.isArray(p) ? p.filter(Boolean).length : 0; } catch { return 0; }
+      })();
+
       const mediaBadges = [
-        inv.main_photo_url ? `<span class="badge badge-media badge-photo">📷 Foto</span>` : "",
-        inv.music_url      ? `<span class="badge badge-media badge-music">🎵 Música</span>` : "",
+        inv.main_photo_url  ? `<span class="badge badge-media badge-photo">📷 Foto</span>` : "",
+        inv.music_url       ? `<span class="badge badge-media badge-music">🎵 Música</span>` : "",
+        galleryCount > 0    ? `<span class="badge badge-media badge-gallery">🖼️ Galería ${galleryCount}</span>` : "",
       ].join(" ");
 
       item.innerHTML = `

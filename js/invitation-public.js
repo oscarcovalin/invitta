@@ -187,6 +187,9 @@
     /* 16. Música */
     console.log("music_url:", inv.music_url);
     setupMusicPlayer(inv.music_url, !!inv.main_photo_url);
+
+    /* 17. Galería */
+    renderGallery(normalizeGalleryUrls(inv.gallery_urls));
   }
 
   /* ─── Foto principal (hero) ──────────────────────────────────────── */
@@ -347,6 +350,74 @@
     section.style.display = "";
     updateCountdown();
     var timer = setInterval(updateCountdown, 1000);
+  }
+
+  /* ─── Galería ────────────────────────────────── */
+
+  /** Normaliza gallery_urls: array | JSON string | null → string[] */
+  function normalizeGalleryUrls(value) {
+    if (!value) return [];
+    if (Array.isArray(value)) return value.filter(Boolean).slice(0, 10);
+    try {
+      var parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed.filter(Boolean).slice(0, 10) : [];
+    } catch (e) { return []; }
+  }
+
+  /** Renderiza la galería de fotos con efecto scroll editorial */
+  function renderGallery(urls) {
+    var section   = document.getElementById("inv-gallery-section");
+    var container = document.getElementById("inv-gallery");
+    if (!section || !container) return;
+
+    if (!urls || urls.length === 0) {
+      section.style.display = "none";
+      return;
+    }
+
+    section.style.display = "";
+    container.innerHTML   = "";
+
+    urls.forEach(function (url, index) {
+      var item = document.createElement("div");
+      item.className   = "inv-gallery-item " + (index % 2 === 0 ? "is-left" : "is-right");
+      item.setAttribute("role", "listitem");
+
+      var img       = document.createElement("img");
+      img.src       = url;
+      img.alt       = "Fotografía del evento";
+      img.loading   = "lazy";
+      img.decoding  = "async";
+
+      var caption   = document.createElement("div");
+      caption.className = "inv-gallery-caption";
+      caption.setAttribute("aria-hidden", "true");
+
+      item.appendChild(img);
+      item.appendChild(caption);
+      container.appendChild(item);
+    });
+
+    // IntersectionObserver para fade-in suave al hacer scroll
+    if ("IntersectionObserver" in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      container.querySelectorAll(".inv-gallery-item").forEach(function (el) {
+        observer.observe(el);
+      });
+    } else {
+      // Fallback sin IntersectionObserver
+      container.querySelectorAll(".inv-gallery-item").forEach(function (el) {
+        el.classList.add("is-visible");
+      });
+    }
   }
 
   /* ─── Selector de pases ───────────────────────────────────────────── */
