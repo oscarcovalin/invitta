@@ -251,6 +251,7 @@
     }
 
     console.log("music_url:", inv.music_url);
+      console.log("music_url:", inv.music_url);
     setupMusicPlayer(inv);
 
     /* 17. Galería */
@@ -260,6 +261,12 @@
     if (typeof setupRevealAnimations === "function") {
       setupRevealAnimations();
     }
+
+    /* 19. Limpieza de elementos legacy de audio en el contenido */
+    document.querySelectorAll("#inv-content audio, #inv-content [id*='music'], #inv-content [class*='music']").forEach((el) => {
+      console.warn("Removing inline music element:", el);
+      el.remove();
+    });
   }
 
   /* ─── Foto principal (hero) ──────────────────────────────────────── */
