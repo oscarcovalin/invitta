@@ -329,6 +329,8 @@
 
     player.style.display = "flex";
     document.body.classList.add("has-music-player");
+    console.log("Music player computed display:", window.getComputedStyle(player).display);
+    console.log("Music player position:", window.getComputedStyle(player).position);
 
     if (title) title.textContent = invitation.music_title || "Música del evento";
     if (artist) artist.textContent = invitation.music_artist ? `~ ${invitation.music_artist} ~` : "";
