@@ -300,75 +300,64 @@
   }
 
   /* ─── Reproductor de música fijo ────────────────────────────── */
-  var invitationAudio = null;
-  var isPlaying       = false;
+  let invitationAudio = null;
+  let isMusicPlaying = false;
 
-  function setupMusicPlayer(inv) {
-    var player = document.getElementById("inv-music-player");
-    var toggleBtn = document.getElementById("inv-music-toggle");
-    var titleEl = document.getElementById("inv-music-title");
-    var artistEl = document.getElementById("inv-music-artist");
+  function setupMusicPlayer(invitation) {
+    const player = document.getElementById("inv-music-player");
+    const toggle = document.getElementById("inv-music-toggle");
+    const title = document.getElementById("inv-music-title");
+    const artist = document.getElementById("inv-music-artist");
 
-    if (!inv.music_url || !player) {
-      if (player) player.style.display = "none";
+    if (!player || !toggle) {
+      console.warn("Music player DOM missing");
       return;
     }
 
-    invitationAudio         = new Audio(inv.music_url);
-    invitationAudio.preload = "auto";
-    invitationAudio.loop    = true;
-    invitationAudio.volume  = 0.8;
-
-    if (titleEl) titleEl.textContent = inv.music_title || "Música del evento";
-    if (artistEl) artistEl.textContent = inv.music_artist || "";
+    if (!invitation.music_url) {
+      player.style.display = "none";
+      document.body.classList.remove("has-music-player");
+      return;
+    }
 
     player.style.display = "flex";
     document.body.classList.add("has-music-player");
 
-    function toggleAudio() {
+    if (title) title.textContent = invitation.music_title || "Música del evento";
+    if (artist) artist.textContent = invitation.music_artist ? `~ ${invitation.music_artist} ~` : "";
+
+    if (invitationAudio) {
+      invitationAudio.pause();
+      invitationAudio = null;
+    }
+
+    invitationAudio = new Audio(invitation.music_url);
+    invitationAudio.preload = "auto";
+    invitationAudio.loop = true;
+    invitationAudio.volume = 0.85;
+
+    isMusicPlaying = false;
+    toggle.innerHTML = '<span class="inv-play-icon">▶</span>';
+    toggle.disabled = false;
+
+    toggle.onclick = async () => {
       try {
-        if (!isPlaying) {
-          var playPromise = invitationAudio.play();
-          if (playPromise !== undefined) {
-            playPromise.then(function() {
-              isPlaying = true;
-              syncUI(true);
-            }).catch(function(err) {
-              console.log("Audio play blocked", err);
-            });
-          }
+        if (!isMusicPlaying) {
+          await invitationAudio.play();
+          isMusicPlaying = true;
+          toggle.innerHTML = '<span class="inv-play-icon">❚❚</span>';
+          toggle.setAttribute("aria-label", "Pausar música");
         } else {
           invitationAudio.pause();
-          isPlaying = false;
-          syncUI(false);
+          isMusicPlaying = false;
+          toggle.innerHTML = '<span class="inv-play-icon">▶</span>';
+          toggle.setAttribute("aria-label", "Reproducir música");
         }
       } catch (err) {
-        console.error("Error toggling audio:", err);
+        console.error("Error reproduciendo música:", err);
+        alert("No se pudo reproducir la música. Verifica que el archivo sea compatible.");
       }
-    }
-
-    function syncUI(playing) {
-      if (playing) {
-        if (toggleBtn) toggleBtn.innerHTML = '<span class="inv-play-icon">❚❚</span>';
-      } else {
-        if (toggleBtn) toggleBtn.innerHTML = '<span class="inv-play-icon">▶</span>';
-      }
-    }
-
-    if (toggleBtn) toggleBtn.addEventListener("click", toggleAudio);
-
-    invitationAudio.addEventListener("ended", function () {
-      isPlaying = false;
-      syncUI(false);
-    });
-
-    invitationAudio.addEventListener("error", function (event) {
-      console.error("Error cargando audio:", event, "URL:", inv.music_url);
-      if (toggleBtn) {
-        toggleBtn.disabled = true;
-        toggleBtn.innerHTML = '<span class="inv-play-icon">!</span>';
-      }
-    });
+    };
   }
 
   /* ─── Cuenta regresiva ────────────────────────────── */

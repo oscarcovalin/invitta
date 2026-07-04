@@ -336,24 +336,6 @@
         </div>
       </section>
 
-    <!-- ── REPRODUCTOR DE MÚSICA FIJO ── -->
-    <div id="inv-music-player" class="inv-music-player" style="display:none;">
-      <div class="inv-music-left">
-        <div class="inv-music-logo" aria-hidden="true">
-          <span>id</span>
-        </div>
-
-        <div class="inv-music-meta">
-          <p id="inv-music-title">Música del evento</p>
-          <span id="inv-music-artist"></span>
-        </div>
-      </div>
-
-      <button id="inv-music-toggle" class="inv-music-toggle" type="button" aria-label="Reproducir música">
-        <span class="inv-play-icon">▶</span>
-      </button>
-    </div>
-
       <!-- ── 13. FOOTER ── -->
       <footer class="inv-footer">
         <div class="inv-footer-divider" aria-hidden="true"></div>
@@ -362,6 +344,24 @@
 
     </main>
   </div><!-- /#inv-content -->
+
+  <!-- ── REPRODUCTOR DE MÚSICA FIJO ── -->
+  <div id="inv-music-player" class="inv-music-player" style="display:none;">
+    <div class="inv-music-left">
+      <div class="inv-music-logo" aria-hidden="true">
+        <span>id</span>
+      </div>
+
+      <div class="inv-music-meta">
+        <p id="inv-music-title">Música del evento</p>
+        <span id="inv-music-artist"></span>
+      </div>
+    </div>
+
+    <button id="inv-music-toggle" class="inv-music-toggle" type="button" aria-label="Reproducir música">
+      <span class="inv-play-icon">▶</span>
+    </button>
+  </div>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
