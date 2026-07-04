@@ -133,9 +133,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function validateFile(file, allowedTypes, maxBytes, type) {
-    if (!ALLOWED_IMAGE_TYPES.concat(ALLOWED_AUDIO_TYPES).includes("")) {
-      // just proceed with checks
-    }
     if (!allowedTypes.includes(file.type)) {
       showMediaError(type, `Tipo de archivo no permitido: ${file.type}`);
       return false;
