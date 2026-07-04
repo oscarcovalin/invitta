@@ -237,8 +237,21 @@
     setupCountdown(inv.event_date, inv.event_time);
 
     /* 16. Música */
+    // Set custom background if exists
+    if (inv.background_image_url) {
+      document.body.style.backgroundImage = `url('${inv.background_image_url}')`;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center";
+      document.body.style.backgroundAttachment = "fixed";
+      document.body.classList.add("has-custom-bg");
+    }
+
+    if (typeof setupCalendarButton === "function") {
+      setupCalendarButton(inv);
+    }
+
     console.log("music_url:", inv.music_url);
-    setupMusicPlayer(inv.music_url, !!inv.main_photo_url);
+    setupMusicPlayer(inv);
 
     /* 17. Galería */
     renderGallery(normalizeGalleryUrls(inv.gallery_urls));
@@ -257,91 +270,92 @@
     if (hero) hero.classList.add("inv-hero--has-photo");
   }
 
-  /* ─── Reproductor de música ────────────────────────────── */
+  /* ─── Calendar Button ────────────────────────────── */
+  function setupCalendarButton(inv) {
+    var calendarWrap = document.getElementById("inv-calendar-wrapper");
+    var calendarBtn = document.getElementById("inv-calendar-btn");
+    
+    if (!inv.event_date || !calendarWrap || !calendarBtn) return;
+    
+    var dateStr = inv.event_date.replace(/-/g, "");
+    var timeStr = inv.event_time ? inv.event_time.replace(/:/g, "") + "00" : "000000";
+    var startDateTime = dateStr + "T" + timeStr;
+    var endDate = new Date(inv.event_date + "T" + (inv.event_time || "00:00"));
+    endDate.setHours(endDate.getHours() + 5);
+    var endDateTime = endDate.toISOString().replace(/[-:]/g, "").split(".")[0];
+    
+    var title = encodeURIComponent(inv.title || "Evento");
+    var details = encodeURIComponent(inv.welcome_text || "");
+    var location = encodeURIComponent(inv.ceremony_address || inv.reception_address || "");
+    
+    var googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDateTime}/${endDateTime}&details=${details}&location=${location}`;
+    
+    calendarBtn.href = googleCalendarUrl;
+    calendarWrap.style.display = "block";
+  }
+
+  /* ─── Reproductor de música fijo ────────────────────────────── */
   var invitationAudio = null;
   var isPlaying       = false;
 
-  /**
-   * @param {string|null} musicUrl  - URL del audio
-   * @param {boolean}     hasPhoto  - Si hay foto en el hero (usamos botón del hero)
-   */
-  function setupMusicPlayer(musicUrl, hasPhoto) {
-    // IDs del botón en el hero
-    var heroWrap   = document.getElementById("inv-music-hero-wrap");
-    var heroBtn    = document.getElementById("inv-music-button");
-    var heroIcon   = document.getElementById("inv-music-icon");
-    var heroLabel  = document.getElementById("inv-music-label");
+  function setupMusicPlayer(inv) {
+    var player = document.getElementById("inv-music-player-fixed");
+    var btn = document.getElementById("inv-music-fixed-btn");
+    var playIcon = document.getElementById("inv-music-play-icon");
+    var pauseIcon = document.getElementById("inv-music-pause-icon");
+    var titleEl = document.getElementById("inv-music-title");
+    var artistEl = document.getElementById("inv-music-artist");
 
-    // IDs del botón en la card (fallback sin foto)
-    var cardSection = document.getElementById("inv-music-section");
-    var cardBtn     = document.getElementById("inv-music-button-card");
-    var cardIcon    = document.getElementById("inv-music-icon-card");
-    var cardLabel   = document.getElementById("inv-music-label-card");
-
-    if (!musicUrl) {
-      if (heroWrap)    heroWrap.style.display    = "none";
-      if (cardSection) cardSection.style.display = "none";
+    if (!inv.music_url || !player) {
+      if (player) player.style.display = "none";
       return;
     }
 
-    // Crear el objeto Audio
-    invitationAudio         = new Audio(musicUrl);
+    invitationAudio         = new Audio(inv.music_url);
     invitationAudio.preload = "auto";
     invitationAudio.loop    = true;
     invitationAudio.volume  = 0.8;
 
-    // Mostrar botón en hero SIEMPRE (con o sin foto)
-    if (heroWrap)  heroWrap.style.display = "";
-    if (heroLabel) heroLabel.textContent  = "Reproducir música";
-    if (heroIcon)  heroIcon.className     = "fa-solid fa-play";
+    if (titleEl) titleEl.textContent = inv.music_title || "Música del evento";
+    if (artistEl) artistEl.textContent = inv.music_artist || "";
 
-    // Si NO hay foto, también mostrar la card de música
-    if (!hasPhoto) {
-      if (cardSection) cardSection.style.display = "";
-      if (cardLabel)   cardLabel.textContent     = "Reproducir música";
-      if (cardIcon)    cardIcon.className         = "fa-solid fa-play";
-    } else {
-      if (cardSection) cardSection.style.display = "none";
-    }
+    player.style.display = "flex";
+    document.body.style.paddingBottom = "80px";
 
-    // Función compartida de toggle
-    function toggleAudio(btnEl, iconEl, labelEl) {
-      return async function () {
-        try {
-          if (!isPlaying) {
-            await invitationAudio.play();
-            isPlaying = true;
-            syncUI(true);
-          } else {
-            invitationAudio.pause();
-            isPlaying = false;
-            syncUI(false);
+    function toggleAudio() {
+      try {
+        if (!isPlaying) {
+          var playPromise = invitationAudio.play();
+          if (playPromise !== undefined) {
+            playPromise.then(function() {
+              isPlaying = true;
+              syncUI(true);
+            }).catch(function(err) {
+              console.log("Audio play blocked", err);
+            });
           }
-        } catch (err) {
-          console.error("Error reproduciendo música:", err, "URL:", musicUrl);
-          if (labelEl) labelEl.textContent = "No se pudo reproducir";
-          if (btnEl)   btnEl.disabled      = true;
+        } else {
+          invitationAudio.pause();
+          isPlaying = false;
+          syncUI(false);
         }
-      };
+      } catch (err) {
+        console.error("Error toggling audio:", err);
+      }
     }
 
-    // Sincroniza todos los botones al mismo estado
     function syncUI(playing) {
-      var icons  = [heroIcon, cardIcon];
-      var labels = [heroLabel, cardLabel];
-      icons.forEach(function (el) {
-        if (el) el.className = playing ? "fa-solid fa-pause" : "fa-solid fa-play";
-      });
-      labels.forEach(function (el) {
-        if (el) el.textContent = playing ? "Pausar música" : "Reproducir música";
-      });
+      if (playing) {
+        if (playIcon) playIcon.style.display = "none";
+        if (pauseIcon) pauseIcon.style.display = "block";
+      } else {
+        if (playIcon) playIcon.style.display = "block";
+        if (pauseIcon) pauseIcon.style.display = "none";
+      }
     }
 
-    // Bind eventos
-    if (heroBtn) heroBtn.addEventListener("click", toggleAudio(heroBtn, heroIcon, heroLabel));
-    if (cardBtn) cardBtn.addEventListener("click", toggleAudio(cardBtn, cardIcon, cardLabel));
+    if (btn) btn.addEventListener("click", toggleAudio);
 
-    // Ended & Error
     invitationAudio.addEventListener("ended", function () {
       isPlaying = false;
       syncUI(false);
