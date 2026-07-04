@@ -320,7 +320,7 @@
     invitationAudio.volume  = 0.8;
 
     if (titleEl) titleEl.textContent = inv.music_title || "Música del evento";
-    if (artistEl) artistEl.textContent = inv.music_artist ? "~ " + inv.music_artist + " ~" : "~ Invitación digital ~";
+    if (artistEl) artistEl.textContent = inv.music_artist || "";
 
     player.style.display = "flex";
     document.body.classList.add("has-music-player");
