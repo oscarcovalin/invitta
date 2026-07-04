@@ -91,6 +91,7 @@ body.font-preset-luxury {
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -101,6 +102,7 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 /* ══════════════════════════════════════════════════
@@ -165,8 +167,9 @@ body {
 }
 
 .inv-page {
-  max-width: 580px;
+  max-width: 640px;
   margin: 0 auto;
+  width: 100%;
   padding: 0 16px 80px;
 }
 
@@ -198,7 +201,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center;
   display: block;
 }
 
@@ -426,11 +429,13 @@ body {
 }
 
 .inv-countdown-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 420px;
+  margin: 0 auto;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  flex-wrap: nowrap;
 }
 
 .inv-countdown-item {
@@ -461,14 +466,7 @@ body {
 }
 
 .inv-countdown-sep {
-  font-size: 1.6rem;
-  color: var(--inv-primary);
-  opacity: 0.35;
-  font-weight: 300;
-  margin-bottom: 18px;
-  line-height: 1;
-  align-self: flex-start;
-  padding-top: 6px;
+  display: none;
 }
 
 .inv-countdown-today {
@@ -583,6 +581,8 @@ body {
   line-height: 1.15;
   position: relative;
   z-index: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .inv-ticket-divider-dashed {
@@ -770,6 +770,7 @@ body {
   justify-content: center;
   gap: 8px;
   padding: 11px 20px;
+  min-height: 44px;
   border-radius: 999px;
   font-family: var(--font-body);
   font-size: 0.82rem;
@@ -913,7 +914,7 @@ body {
   border: 1.5px solid var(--inv-border);
   border-radius: var(--inv-radius-md);
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: 16px;
   color: var(--inv-text);
   background: var(--inv-surface);
   cursor: pointer;
@@ -1042,22 +1043,35 @@ body {
   }
 }
 
-/* Pantallas muy pequeñas */
-@media (max-width: 360px) {
+/* Pantallas móviles generales */
+@media (max-width: 480px) {
+  .inv-confirm-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .inv-select {
+    max-width: 100%;
+  }
+}
+
+/* Pantallas móviles pequeñas */
+@media (max-width: 380px) {
+  .inv-countdown-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px 16px;
+  }
+
   .inv-countdown-item {
     min-width: 50px;
   }
 
   .inv-countdown-item strong {
-    font-size: 1.7rem;
-  }
-
-  .inv-countdown-sep {
-    font-size: 1.2rem;
+    font-size: 2rem;
   }
 
   .inv-ticket-grid {
     flex-wrap: wrap;
+    gap: 16px 0;
   }
 
   .inv-ticket-field {
@@ -1068,15 +1082,6 @@ body {
   .inv-ticket-field + .inv-ticket-field {
     border-left: none;
     padding-left: 0;
-  }
-
-  .inv-confirm-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .inv-select {
-    max-width: 100%;
   }
 }
 
