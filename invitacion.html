@@ -338,15 +338,19 @@
 
     <!-- ── REPRODUCTOR DE MÚSICA FIJO ── -->
     <div id="inv-music-player" class="inv-music-player" style="display:none;">
-      <div class="inv-music-brand">
-        <div class="inv-music-monogram">♪</div>
-        <div>
-          <p id="inv-music-title">Música del evento</p>
-          <span id="inv-music-artist"></span>
+      <div class="inv-music-left">
+        <div class="inv-music-logo" aria-hidden="true">
+          <span>id</span>
+        </div>
+
+        <div class="inv-music-meta">
+          <p id="inv-music-title">Título de canción</p>
+          <span id="inv-music-artist">~ Artista ~</span>
         </div>
       </div>
-      <button id="inv-music-toggle" type="button" aria-label="Reproducir música">
-        ▶
+
+      <button id="inv-music-toggle" class="inv-music-toggle" type="button" aria-label="Reproducir música">
+        <span class="inv-play-icon">▶</span>
       </button>
     </div>
 

@@ -320,7 +320,7 @@
     invitationAudio.volume  = 0.8;
 
     if (titleEl) titleEl.textContent = inv.music_title || "Música del evento";
-    if (artistEl) artistEl.textContent = inv.music_artist || "";
+    if (artistEl) artistEl.textContent = inv.music_artist ? "~ " + inv.music_artist + " ~" : "~ Invitación digital ~";
 
     player.style.display = "flex";
     document.body.classList.add("has-music-player");
@@ -349,9 +349,9 @@
 
     function syncUI(playing) {
       if (playing) {
-        if (toggleBtn) toggleBtn.textContent = "❚❚";
+        if (toggleBtn) toggleBtn.innerHTML = '<span class="inv-play-icon">❚❚</span>';
       } else {
-        if (toggleBtn) toggleBtn.textContent = "▶";
+        if (toggleBtn) toggleBtn.innerHTML = '<span class="inv-play-icon">▶</span>';
       }
     }
 
@@ -364,6 +364,10 @@
 
     invitationAudio.addEventListener("error", function (event) {
       console.error("Error cargando audio:", event, "URL:", inv.music_url);
+      if (toggleBtn) {
+        toggleBtn.disabled = true;
+        toggleBtn.innerHTML = '<span class="inv-play-icon">!</span>';
+      }
     });
   }
 

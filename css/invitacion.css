@@ -1554,55 +1554,64 @@ body.has-custom-bg::before {
   right: 0;
   bottom: 0;
   z-index: 9999;
-  min-height: 78px;
-  padding: 0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom));
-  background: rgba(15, 12, 10, 0.96);
-  color: #fff;
   display: none;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 -18px 40px rgba(0,0,0,.22);
-  backdrop-filter: blur(14px);
+  gap: 1rem;
+  min-height: 78px;
+  padding: 0.8rem 1rem calc(0.8rem + env(safe-area-inset-bottom));
+  background: rgba(7, 7, 7, 0.97);
+  color: #fff;
+  box-shadow: 0 -14px 28px rgba(0,0,0,.28);
 }
 
-.inv-music-brand {
+.inv-music-left {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: 0.85rem;
   min-width: 0;
+  flex: 1;
 }
 
-.inv-music-monogram {
-  width: 48px;
-  height: 48px;
+.inv-music-logo {
+  width: 56px;
+  height: 56px;
   border-radius: 999px;
+  border: 1px solid rgba(212, 181, 122, 0.65);
   display: grid;
   place-items: center;
-  border: 1px solid rgba(218,190,132,.55);
-  color: #dabe84;
-  font-size: 1.35rem;
+  color: #d4b57a;
   flex: 0 0 auto;
+  background: rgba(255,255,255,0.03);
 }
 
-.inv-music-copy {
+.inv-music-logo span {
+  font-family: var(--font-script, serif);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.inv-music-meta {
   min-width: 0;
 }
 
-.inv-music-copy p {
+.inv-music-meta p {
   margin: 0;
+  color: #fff;
   font-family: var(--font-body);
-  font-size: 0.95rem;
-  letter-spacing: .04em;
+  font-size: 1rem;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.inv-music-copy span {
+.inv-music-meta span {
   display: block;
-  margin-top: .12rem;
-  font-size: .78rem;
-  opacity: .72;
+  margin-top: 0.15rem;
+  color: rgba(255,255,255,0.82);
+  font-size: 0.82rem;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1612,14 +1621,18 @@ body.has-custom-bg::before {
   width: 58px;
   height: 58px;
   border: none;
-  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font-size: 2rem;
   display: grid;
   place-items: center;
-  background: #fff;
-  color: #111;
-  font-size: 1.35rem;
   cursor: pointer;
   flex: 0 0 auto;
+}
+
+.inv-music-toggle:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 body.has-music-player {
