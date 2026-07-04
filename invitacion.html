@@ -117,14 +117,48 @@
     ══════════════════════════════════════ -->
     <main class="inv-page">
 
-      <!-- ── 3. MENSAJE DE BIENVENIDA ── -->
+      <!-- ── 3. PADRES Y PADRINOS ── -->
+      <section id="inv-parents-block" class="inv-parents-section" aria-label="Padres y padrinos" style="display:none">
+        <div class="inv-parents-header">
+          <h2 class="inv-parents-title">Con la bendición de nuestros padres</h2>
+        </div>
+        <div class="inv-parents-list" id="inv-parents-list">
+          <p id="inv-father-name" style="display:none"></p>
+          <p id="inv-mother-name" style="display:none"></p>
+        </div>
+        
+        <div id="inv-godparents-wrapper" style="display:none">
+          <div class="inv-parents-header" style="margin-top: 32px;">
+            <h2 class="inv-parents-title" style="font-size: 1.1rem;">Y en compañía de nuestros padrinos</h2>
+          </div>
+          <ul class="inv-godparents-list" id="inv-godparents-list">
+          </ul>
+        </div>
+      </section>
+
+      <!-- ── 4. MENSAJE DE BIENVENIDA ── -->
       <section id="inv-welcome-block" class="inv-welcome-block" aria-label="Mensaje de bienvenida" style="display:none">
         <div class="inv-welcome-ornament" aria-hidden="true">✦</div>
         <p class="inv-welcome" id="inv-welcome"></p>
         <div class="inv-welcome-ornament" aria-hidden="true">✦</div>
       </section>
 
-      <!-- ── 4. PASE PERSONALIZADO (Boleto premium) ── -->
+      <!-- ── 5. GALERÍA FOTOGRÁFICA ── -->
+      <section id="inv-gallery-section" class="inv-gallery-section" aria-label="Galería de fotos" style="display:none">
+        <div class="inv-gallery-header">
+          <div class="inv-eyebrow inv-gallery-eyebrow">
+            <span class="inv-eyebrow-line" style="background:var(--inv-primary);opacity:0.3;"></span>
+            <span class="inv-eyebrow-text" style="color:var(--inv-primary);">Galería</span>
+            <span class="inv-eyebrow-line" style="background:var(--inv-primary);opacity:0.3;"></span>
+          </div>
+          <h2 class="inv-gallery-title">Momentos especiales</h2>
+        </div>
+        <div id="inv-gallery" class="inv-gallery-scroll" role="list" aria-label="Fotos del evento">
+          <!-- Las imágenes se inyectan por JS -->
+        </div>
+      </section>
+
+      <!-- ── 6. PASE PERSONALIZADO (Boleto premium) ── -->
       <section class="inv-ticket" aria-label="Tu pase personal">
         <!-- Borde superior perforado -->
         <div class="inv-ticket-notch-top" aria-hidden="true"></div>
@@ -159,22 +193,8 @@
         <div class="inv-ticket-notch-bottom" aria-hidden="true"></div>
       </section>
 
-      <!-- ── 5. FECHA Y HORA ── -->
-      <section class="inv-card inv-card--date" aria-label="Fecha del evento">
-        <div class="inv-card-icon-wrap" aria-hidden="true">
-          <i class="fa-regular fa-calendar-heart"></i>
-        </div>
-        <div class="inv-card-body">
-          <div class="inv-card-label">Fecha del evento</div>
-          <p class="inv-date-text" id="inv-date">—</p>
-          <p class="inv-time-text" id="inv-time-block" style="display:none">
-            <i class="fa-regular fa-clock"></i>
-            <span id="inv-time"></span>
-          </p>
-        </div>
-      </section>
-
-      <!-- ── 5b. CEREMONIA ── -->
+      <!-- ── 7. UBICACIONES ── -->
+      <!-- 7a. CEREMONIA -->
       <section class="inv-card inv-card--venue" id="inv-ceremony-block" aria-label="Ceremonia" style="display:none">
         <div class="inv-card-icon-wrap" aria-hidden="true">
           <i class="fa-solid fa-church"></i>
@@ -190,7 +210,7 @@
         </div>
       </section>
 
-      <!-- ── 5c. RECEPCIÓN ── -->
+      <!-- 7b. RECEPCIÓN -->
       <section class="inv-card inv-card--venue" id="inv-reception-block" aria-label="Recepción" style="display:none">
         <div class="inv-card-icon-wrap" aria-hidden="true">
           <i class="fa-solid fa-champagne-glasses"></i>
@@ -206,7 +226,20 @@
         </div>
       </section>
 
-      <!-- ── 7. DRESS CODE ── -->
+      <!-- ── 8. ITINERARIO ── -->
+      <section class="inv-card inv-card--detail" id="inv-itinerary-block" aria-label="Itinerario" style="display:none">
+        <div class="inv-card-icon-wrap" aria-hidden="true">
+          <i class="fa-regular fa-clock"></i>
+        </div>
+        <div class="inv-card-body">
+          <div class="inv-card-label">Itinerario del Evento</div>
+          <ul class="inv-itinerary-list" id="inv-itinerary-list">
+            <!-- Los eventos del itinerario se inyectan por JS -->
+          </ul>
+        </div>
+      </section>
+
+      <!-- ── 9. DRESS CODE ── -->
       <section class="inv-card inv-card--detail" id="inv-dresscode-block" aria-label="Código de vestimenta" style="display:none">
         <div class="inv-card-icon-wrap" aria-hidden="true">
           <i class="fa-solid fa-shirt"></i>
@@ -217,7 +250,7 @@
         </div>
       </section>
 
-      <!-- ── 7b. MESA DE REGALOS ── -->
+      <!-- ── 10. MESA DE REGALOS ── -->
       <section class="inv-card inv-card--detail" id="inv-gifts-block" aria-label="Mesa de regalos" style="display:none">
         <div class="inv-card-icon-wrap" aria-hidden="true">
           <i class="fa-solid fa-gift"></i>
@@ -232,22 +265,18 @@
         </div>
       </section>
 
-      <!-- ── GALERÍA FOTOGRÁFICA ── -->
-      <section id="inv-gallery-section" class="inv-gallery-section" aria-label="Galería de fotos" style="display:none">
-        <div class="inv-gallery-header">
-          <div class="inv-eyebrow inv-gallery-eyebrow">
-            <span class="inv-eyebrow-line" style="background:var(--inv-primary);opacity:0.3;"></span>
-            <span class="inv-eyebrow-text" style="color:var(--inv-primary);">Galería</span>
-            <span class="inv-eyebrow-line" style="background:var(--inv-primary);opacity:0.3;"></span>
-          </div>
-          <h2 class="inv-gallery-title">Momentos especiales</h2>
+      <!-- ── 11. INSTAGRAM HASHTAG ── -->
+      <section class="inv-card inv-card--detail" id="inv-hashtag-block" aria-label="Instagram Hashtag" style="display:none; text-align:center;">
+        <div class="inv-card-icon-wrap" aria-hidden="true" style="margin: 0 auto 16px;">
+          <i class="fa-brands fa-instagram"></i>
         </div>
-        <div id="inv-gallery" class="inv-gallery-scroll" role="list" aria-label="Fotos del evento">
-          <!-- Las imágenes se inyectan por JS -->
+        <div class="inv-card-body">
+          <div class="inv-card-label">Comparte tus recuerdos usando</div>
+          <p class="inv-hashtag-text" id="inv-hashtag" style="font-family: var(--inv-font-serif); font-size: 1.4rem; color: var(--inv-primary); margin-top: 8px; font-weight: 600;"></p>
         </div>
       </section>
 
-      <!-- ── 8. RSVP / CONFIRMACIÓN ── -->
+      <!-- ── 12. CONFIRMACIÓN POR WHATSAPP ── -->
       <section class="inv-rsvp" id="inv-wa-block" aria-label="Confirmar asistencia">
         <div class="inv-rsvp-header">
           <div class="inv-divider-ornament inv-divider-ornament--light" aria-hidden="true">
@@ -258,21 +287,19 @@
           <h2 class="inv-rsvp-title">Confirma tu asistencia</h2>
           <p class="inv-rsvp-sub">Esperamos contar con tu presencia en este día tan especial.</p>
         </div>
-
         <div class="inv-confirm-row">
           <label class="inv-confirm-label" for="inv-confirm-pases">Asistiré con:</label>
           <select class="inv-select" id="inv-confirm-pases" aria-label="Número de personas que asistirán">
             <option value="1">1 persona</option>
           </select>
         </div>
-
         <button class="inv-btn inv-btn-wa" id="inv-wa-btn" type="button">
           <i class="fa-brands fa-whatsapp"></i>
           Confirmar por WhatsApp
         </button>
       </section>
 
-      <!-- ── 9. MÚSICA (sección card — solo si no hay foto hero) ── -->
+      <!-- ── MÚSICA (sección card — solo si no hay foto hero) ── -->
       <section class="inv-card inv-card--music" id="inv-music-section" aria-label="Música de fondo" style="display:none">
         <div class="inv-card-icon-wrap" aria-hidden="true">
           <i class="fa-solid fa-music"></i>
@@ -286,172 +313,10 @@
         </div>
       </section>
 
-      <!-- ══ SECCIÓN: ¿QUÉ INCLUYE? ══ -->
-      <section class="inv-features" aria-label="Qué incluye esta invitación digital">
-
-        <div class="inv-features-header">
-          <div class="inv-features-eyebrow" aria-hidden="true">
-            <span class="inv-features-line"></span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
-            <span class="inv-features-line"></span>
-          </div>
-          <h2 class="inv-features-title">¿Qué incluye esta<br>invitación digital?</h2>
-          <p class="inv-features-sub">Una experiencia personalizada para compartir todos los detalles de tu evento de forma elegante y sencilla.</p>
-        </div>
-
-        <ul class="inv-features-grid" role="list">
-
-          <!-- 1 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Diseño personalizado</h3>
-            <p class="inv-feat-text">Una invitación adaptada al estilo, colores y personalidad del evento.</p>
-          </li>
-
-          <!-- 2 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Galería de fotos</h3>
-            <p class="inv-feat-text">Comparte fotografías especiales en una galería visual y elegante.</p>
-          </li>
-
-          <!-- 3 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Cuenta regresiva</h3>
-            <p class="inv-feat-text">Un contador dinámico que acompaña a tus invitados hasta el gran día.</p>
-          </li>
-
-          <!-- 4 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Invitación musicalizada</h3>
-            <p class="inv-feat-text">Música de fondo para crear una atmósfera emotiva desde el primer momento.</p>
-          </li>
-
-          <!-- 5 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Ubicaciones por Google Maps</h3>
-            <p class="inv-feat-text">Tus invitados podrán abrir la ubicación del evento con un solo clic.</p>
-          </li>
-
-          <!-- 6 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
-                <line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Pase personalizado</h3>
-            <p class="inv-feat-text">Cada invitado puede recibir su invitación con nombre, pases y mesa asignada.</p>
-          </li>
-
-          <!-- 7 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5" rx="1"/>
-                <path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/>
-                <path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Mesa de regalos</h3>
-            <p class="inv-feat-text">Incluye enlaces a mesa de regalos o información especial para tus invitados.</p>
-          </li>
-
-          <!-- 8 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H5v10a1 1 0 001 1h12a1 1 0 001-1V10h1.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Dress code</h3>
-            <p class="inv-feat-text">Indica claramente el código de vestimenta del evento.</p>
-          </li>
-
-          <!-- 9 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
-                <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
-                <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Itinerario del evento</h3>
-            <p class="inv-feat-text">Comparte los momentos principales del evento de forma clara y ordenada.</p>
-          </li>
-
-          <!-- 10 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Confirmación por WhatsApp</h3>
-            <p class="inv-feat-text">Tus invitados pueden confirmar su asistencia con un mensaje prellenado.</p>
-          </li>
-
-          <!-- 11 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Hashtag de Instagram</h3>
-            <p class="inv-feat-text">Agrega un hashtag especial para reunir los recuerdos del evento.</p>
-          </li>
-
-          <!-- 12 -->
-          <li class="inv-feat">
-            <div class="inv-feat-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
-              </svg>
-            </div>
-            <h3 class="inv-feat-title">Sección de padrinos</h3>
-            <p class="inv-feat-text">Espacio opcional para mencionar padrinos, familia o personas especiales.</p>
-          </li>
-
-        </ul>
-
-        <p class="inv-features-note" aria-hidden="true">✦ &nbsp; Todo incluido en tu invitación digital &nbsp; ✦</p>
-
-      </section>
-
-      <!-- ── FOOTER ── -->
+      <!-- ── 13. FOOTER ── -->
       <footer class="inv-footer">
         <div class="inv-footer-divider" aria-hidden="true"></div>
-        <p>Invitación creada con <a href="/" target="_blank" rel="noopener">Invitta Studio</a></p>
-        <p class="inv-footer-tagline">Momentos que merecen recordarse</p>
+        <p>Invitación creada por <a href="/" target="_blank" rel="noopener">Invitta Studio</a></p>
       </footer>
 
     </main>

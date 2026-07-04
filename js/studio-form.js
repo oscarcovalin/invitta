@@ -185,6 +185,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("event_date").value = data.event_date || "";
     document.getElementById("event_time").value = data.event_time || "";
     document.getElementById("welcome_text").value = data.welcome_text || "";
+    
+    document.getElementById("father_name").value = data.father_name || "";
+    document.getElementById("mother_name").value = data.mother_name || "";
+    document.getElementById("instagram_hashtag").value = data.instagram_hashtag || "";
+
+    let godparentsText = "";
+    if (data.godparents && Array.isArray(data.godparents)) {
+      godparentsText = data.godparents.map(gp => {
+        if (gp.role && gp.role !== "Padrinos") return `${gp.role}: ${gp.name}`;
+        return gp.name;
+      }).join("\n");
+    }
+    document.getElementById("godparents_text").value = godparentsText;
+
     document.getElementById("color_primary").value = data.color_primary || "#C9A46A";
     document.getElementById("color_secondary").value = data.color_secondary || "#F7E7D7";
     document.getElementById("ceremony_name").value = data.ceremony_name || "";
@@ -350,6 +364,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       finalGalleryUrls = uploadedUrls;
     }
 
+    // Parse godparents
+    const godparentsLines = document.getElementById("godparents_text").value.split("\n").filter(l => l.trim().length > 0);
+    const godparentsJson = godparentsLines.map(line => {
+      const idx = line.indexOf(":");
+      if (idx !== -1) {
+        return {
+          role: line.substring(0, idx).trim(),
+          name: line.substring(idx + 1).trim()
+        };
+      }
+      return {
+        role: "Padrinos",
+        name: line.trim()
+      };
+    });
+
     // ── Payload ──
     const payload = {
       title: document.getElementById("title").value,
@@ -359,6 +389,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       event_date: document.getElementById("event_date").value || null,
       event_time: document.getElementById("event_time").value || null,
       welcome_text: document.getElementById("welcome_text").value,
+      father_name: document.getElementById("father_name").value || null,
+      mother_name: document.getElementById("mother_name").value || null,
+      instagram_hashtag: document.getElementById("instagram_hashtag").value || null,
+      godparents: godparentsJson,
       color_primary: document.getElementById("color_primary").value,
       color_secondary: document.getElementById("color_secondary").value,
       ceremony_name: document.getElementById("ceremony_name").value,

@@ -134,6 +134,92 @@
     toggle("inv-welcome-block", !!inv.welcome_text);
     setText("inv-welcome", inv.welcome_text || "");
 
+    /* Padres y Padrinos */
+    var hasParents = inv.father_name || inv.mother_name;
+    var hasGodparents = inv.godparents && inv.godparents.length > 0;
+    toggle("inv-parents-block", hasParents || hasGodparents);
+    
+    if (inv.father_name) {
+      setText("inv-father-name", inv.father_name);
+      show("inv-father-name");
+    } else {
+      hide("inv-father-name");
+    }
+    if (inv.mother_name) {
+      setText("inv-mother-name", inv.mother_name);
+      show("inv-mother-name");
+    } else {
+      hide("inv-mother-name");
+    }
+
+    if (hasGodparents) {
+      show("inv-godparents-wrapper");
+      var gpList = document.getElementById("inv-godparents-list");
+      if (gpList) {
+        gpList.innerHTML = "";
+        inv.godparents.forEach(function(gp) {
+          var li = document.createElement("li");
+          var roleDiv = document.createElement("div");
+          roleDiv.className = "inv-godparent-role";
+          roleDiv.textContent = gp.role || "Padrinos";
+          var nameDiv = document.createElement("div");
+          nameDiv.className = "inv-godparent-name";
+          nameDiv.textContent = gp.name;
+          li.appendChild(roleDiv);
+          li.appendChild(nameDiv);
+          gpList.appendChild(li);
+        });
+      }
+    } else {
+      hide("inv-godparents-wrapper");
+    }
+
+    /* Itinerario */
+    var hasItinerary = inv.itinerary && inv.itinerary.length > 0;
+    toggle("inv-itinerary-block", hasItinerary);
+    if (hasItinerary) {
+      var itList = document.getElementById("inv-itinerary-list");
+      if (itList) {
+        itList.innerHTML = "";
+        inv.itinerary.forEach(function(item) {
+          var li = document.createElement("li");
+          li.className = "inv-itinerary-item";
+          
+          var timeDiv = document.createElement("div");
+          timeDiv.className = "inv-itinerary-time";
+          timeDiv.textContent = item.time || "";
+
+          var dotDiv = document.createElement("div");
+          dotDiv.className = "inv-itinerary-dot";
+
+          var contentDiv = document.createElement("div");
+          contentDiv.className = "inv-itinerary-content";
+          var titleH3 = document.createElement("h3");
+          titleH3.className = "inv-itinerary-title";
+          titleH3.textContent = item.title || "";
+          
+          contentDiv.appendChild(titleH3);
+          if (item.description) {
+            var descP = document.createElement("p");
+            descP.style.fontSize = "0.85rem";
+            descP.style.color = "var(--inv-muted)";
+            descP.style.margin = "4px 0 0 0";
+            descP.textContent = item.description;
+            contentDiv.appendChild(descP);
+          }
+
+          li.appendChild(timeDiv);
+          li.appendChild(dotDiv);
+          li.appendChild(contentDiv);
+          itList.appendChild(li);
+        });
+      }
+    }
+
+    /* Hashtag */
+    toggle("inv-hashtag-block", !!inv.instagram_hashtag);
+    setText("inv-hashtag", inv.instagram_hashtag || "");
+
     /* 8. Ceremonia */
     var hasCeremony = !!(inv.ceremony_name || inv.ceremony_address);
     toggle("inv-ceremony-block", hasCeremony);
