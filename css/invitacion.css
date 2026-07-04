@@ -27,8 +27,8 @@
   --inv-champagne: #F2E2C4;
 
   /* Tipografía */
-  --inv-font-serif:  'Cormorant Garamond', 'Playfair Display', Georgia, serif;
-  --inv-font-sans:   'Jost', 'Inter', system-ui, sans-serif;
+  var(--font-title):  'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  var(--font-body):   'Jost', 'Inter', system-ui, sans-serif;
 
   /* Sombras */
   --inv-shadow-xs: 0 1px 6px rgba(43, 34, 24, 0.06);
@@ -47,6 +47,39 @@
 }
 
 /* ══════════════════════════════════════════════════
+   PRESETS TIPOGRÁFICOS
+══════════════════════════════════════════════════ */
+body.font-preset-classic {
+  --font-title: "Cormorant Garamond", serif;
+  --font-script: "Cormorant Garamond", serif;
+  --font-body: "Montserrat", sans-serif;
+}
+
+body.font-preset-romantic {
+  --font-title: "Cormorant Garamond", serif;
+  --font-script: "Great Vibes", cursive;
+  --font-body: "Montserrat", sans-serif;
+}
+
+body.font-preset-editorial {
+  --font-title: "Playfair Display", serif;
+  --font-script: "Lora", serif;
+  --font-body: "Montserrat", sans-serif;
+}
+
+body.font-preset-minimal {
+  --font-title: "Cinzel", serif;
+  --font-script: "Cinzel", serif;
+  --font-body: "Lato", sans-serif;
+}
+
+body.font-preset-luxury {
+  --font-title: "Bodoni Moda", serif;
+  --font-script: "Cormorant Garamond", serif;
+  --font-body: "Montserrat", sans-serif;
+}
+
+/* ══════════════════════════════════════════════════
    RESET & BASE
 ══════════════════════════════════════════════════ */
 *, *::before, *::after {
@@ -61,7 +94,7 @@ html {
 }
 
 body {
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
   background: var(--inv-bg);
   color: var(--inv-text);
   min-height: 100dvh;
@@ -83,7 +116,7 @@ body {
   color: var(--inv-muted);
   font-size: 0.85rem;
   letter-spacing: 0.08em;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
 }
 
 .inv-loader-ring {
@@ -222,7 +255,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
 }
 
 /* Sin foto: texto dorado */
@@ -237,7 +270,7 @@ body {
 
 /* ── Título ── */
 .inv-title {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: clamp(2.4rem, 10vw, 4rem);
   font-weight: 600;
   line-height: 1.05;
@@ -256,7 +289,7 @@ body {
 
 /* ── Honoree ── */
 .inv-honoree {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-script);
   font-size: clamp(1.3rem, 5.5vw, 1.9rem);
   font-style: italic;
   font-weight: 300;
@@ -331,7 +364,7 @@ body {
   border-radius: 999px;
   border: none;
   cursor: pointer;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -389,7 +422,7 @@ body {
   font-weight: 600;
   color: var(--inv-primary);
   margin-bottom: 20px;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
 }
 
 .inv-countdown-grid {
@@ -408,7 +441,7 @@ body {
 }
 
 .inv-countdown-item strong {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: clamp(2rem, 8vw, 3rem);
   font-weight: 600;
   color: var(--inv-primary);
@@ -424,7 +457,7 @@ body {
   font-weight: 600;
   color: var(--inv-muted);
   margin-top: 4px;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
 }
 
 .inv-countdown-sep {
@@ -439,7 +472,7 @@ body {
 }
 
 .inv-countdown-today {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: clamp(1.1rem, 5vw, 1.5rem);
   font-style: italic;
   color: var(--inv-primary);
@@ -467,7 +500,7 @@ body {
 }
 
 .inv-welcome {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-script);
   font-size: clamp(1rem, 4vw, 1.2rem);
   font-style: italic;
   color: var(--inv-text-soft);
@@ -535,14 +568,14 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--inv-primary);
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
   display: flex;
   align-items: center;
   gap: 7px;
 }
 
 .inv-ticket-name {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-script);
   font-size: clamp(1.7rem, 7vw, 2.5rem);
   font-weight: 600;
   color: var(--inv-text);
@@ -592,11 +625,11 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.18em;
   color: var(--inv-muted);
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
 }
 
 .inv-ticket-field-value {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: 2rem;
   font-weight: 600;
   color: var(--inv-primary);
@@ -606,7 +639,7 @@ body {
 .inv-ticket-field-value--small {
   font-size: 0.9rem;
   font-style: normal;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
   font-weight: 500;
   color: var(--inv-text-soft);
   line-height: 1.4;
@@ -660,7 +693,7 @@ body {
   letter-spacing: 0.18em;
   color: var(--inv-primary);
   margin-bottom: 8px;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
 }
 
 /* Fecha card */
@@ -669,7 +702,7 @@ body {
 }
 
 .inv-date-text {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: clamp(1rem, 4.5vw, 1.3rem);
   font-weight: 600;
   color: var(--inv-text);
@@ -690,7 +723,7 @@ body {
 
 /* Venue cards */
 .inv-venue-name {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--inv-text);
@@ -707,7 +740,7 @@ body {
 
 /* Dress code */
 .inv-dresscode-text {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--inv-text);
@@ -738,7 +771,7 @@ body {
   gap: 8px;
   padding: 11px 20px;
   border-radius: 999px;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -789,7 +822,7 @@ body {
   border-radius: 999px;
   border: none;
   cursor: pointer;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -840,7 +873,7 @@ body {
 }
 
 .inv-rsvp-title {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: clamp(1.4rem, 6vw, 2rem);
   font-weight: 600;
   color: var(--inv-text);
@@ -879,7 +912,7 @@ body {
   padding: 13px 18px;
   border: 1.5px solid var(--inv-border);
   border-radius: var(--inv-radius-md);
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
   font-size: 0.9rem;
   color: var(--inv-text);
   background: var(--inv-surface);
@@ -908,7 +941,7 @@ body {
   border-radius: var(--inv-radius-md);
   border: none;
   cursor: pointer;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
   font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -965,7 +998,7 @@ body {
 }
 
 .inv-footer-tagline {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-style: italic;
   font-size: 0.78rem !important;
   color: var(--inv-muted);
@@ -1084,11 +1117,11 @@ body {
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
 }
 
 .inv-gallery-title {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: clamp(1.5rem, 6vw, 2.2rem);
   font-weight: 600;
   color: var(--inv-text);
@@ -1222,7 +1255,7 @@ body {
 }
 
 .inv-parents-title {
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: 1.3rem;
   font-weight: 500;
   color: var(--inv-primary);
@@ -1230,7 +1263,7 @@ body {
 }
 
 .inv-parents-list p {
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
   font-size: 1.1rem;
   color: var(--inv-text);
   margin: 0 0 12px;
@@ -1240,7 +1273,7 @@ body {
   list-style: none;
   padding: 0;
   margin: 0;
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
 }
 
 .inv-godparents-list li {
@@ -1293,7 +1326,7 @@ body {
 
 .inv-itinerary-time {
   width: 50px;
-  font-family: var(--inv-font-serif);
+  font-family: var(--font-title);
   font-size: 0.9rem;
   color: var(--inv-primary);
   font-weight: 600;
@@ -1319,7 +1352,7 @@ body {
 }
 
 .inv-itinerary-title {
-  font-family: var(--inv-font-sans);
+  font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 500;
   color: var(--inv-text);

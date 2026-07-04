@@ -92,8 +92,13 @@
     if (errBox)  { errBox.style.display = "none"; errBox.textContent = ""; }
     if (content) content.style.display  = "block";
 
-    /* 2. Tema de color */
+    /* 2. Tema de color y Tipografía */
     applyTheme(inv.color_primary || "#C9A46A", inv.color_secondary || "#F7E7D7");
+
+    var allowedPresets = ["classic", "romantic", "editorial", "minimal", "luxury"];
+    var preset = inv.font_preset;
+    if (!allowedPresets.includes(preset)) preset = "classic";
+    document.body.classList.add("font-preset-" + preset);
 
     /* 3. Hero: título, honoree, fecha */
     setText("inv-title",   inv.title        || "Invitación");

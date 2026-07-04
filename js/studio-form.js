@@ -199,6 +199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     document.getElementById("godparents_text").value = godparentsText;
 
+    document.getElementById("font_preset").value = data.font_preset || "classic";
     document.getElementById("color_primary").value = data.color_primary || "#C9A46A";
     document.getElementById("color_secondary").value = data.color_secondary || "#F7E7D7";
     document.getElementById("ceremony_name").value = data.ceremony_name || "";
@@ -393,6 +394,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       mother_name: document.getElementById("mother_name").value || null,
       instagram_hashtag: document.getElementById("instagram_hashtag").value || null,
       godparents: godparentsJson,
+      font_preset: document.getElementById("font_preset").value || "classic",
       color_primary: document.getElementById("color_primary").value,
       color_secondary: document.getElementById("color_secondary").value,
       ceremony_name: document.getElementById("ceremony_name").value,

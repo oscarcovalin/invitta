@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const { data: invitations, error } = await db
       .from("studio_invitations")
-      .select("id, title, slug, event_type, event_date, published, main_photo_url, music_url, gallery_urls")
+      .select("id, title, slug, event_type, event_date, published, main_photo_url, music_url, gallery_urls, font_preset")
       .eq("studio_id", currentStudioId)
       .order("created_at", { ascending: false });
 
@@ -91,10 +91,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         try { const p = JSON.parse(v); return Array.isArray(p) ? p.filter(Boolean).length : 0; } catch { return 0; }
       })();
 
+      const fontNames = {
+        classic: "Clásica Elegante",
+        romantic: "Romántica Script",
+        editorial: "Editorial Fine Art",
+        minimal: "Moderna Minimal",
+        luxury: "Luxury Dramática"
+      };
+      const fontName = fontNames[inv.font_preset] || "Clásica Elegante";
+
       const mediaBadges = [
         inv.main_photo_url  ? `<span class="badge badge-media badge-photo">📷 Foto</span>` : "",
         inv.music_url       ? `<span class="badge badge-media badge-music">🎵 Música</span>` : "",
         galleryCount > 0    ? `<span class="badge badge-media badge-gallery">🖼️ Galería ${galleryCount}</span>` : "",
+        `<span class="badge badge-media badge-font" style="background:#f3e8ff;color:#6b21a8;border-color:#d8b4fe;">✨ ${fontName}</span>`
       ].join(" ");
 
       item.innerHTML = `
