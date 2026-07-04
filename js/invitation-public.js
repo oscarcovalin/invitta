@@ -255,6 +255,11 @@
 
     /* 17. Galería */
     renderGallery(normalizeGalleryUrls(inv.gallery_urls));
+
+    /* 18. Animaciones de revelado */
+    if (typeof setupRevealAnimations === "function") {
+      setupRevealAnimations();
+    }
   }
 
   /* ─── Foto principal (hero) ──────────────────────────────────────── */
@@ -594,7 +599,8 @@
         return Array.isArray(parsed)
           ? parsed.filter(item => item && (item.title || item.time))
           : [];
-      } catch {
+      } catch (err) {
+        console.warn("No se pudo parsear itinerary:", err, value);
         return [];
       }
     }
@@ -608,6 +614,8 @@
     if (!section || !container) return;
 
     const items = normalizeItinerary(value);
+    console.log("itinerary raw:", value);
+    console.log("itinerary normalized:", items);
 
     if (!items.length) {
       section.style.display = "none";
@@ -687,3 +695,27 @@
   }
 
 })();
+
+ f u n c t i o n   s e t u p R e v e a l A n i m a t i o n s ( )   { 
+     c o n s t   e l e m e n t s   =   d o c u m e n t . q u e r y S e l e c t o r A l l ( 
+         ' . i n v - e v e n t - c a r d ,   . i n v - s e c t i o n - c a r d ,   . i n v - g a l l e r y - i t e m ,   . i n v - t i m e l i n e - i t e m ,   . i n v - p a s s - c a r d ,   . i n v - r s v p - c a r d ' 
+     ) ; 
+ 
+     e l e m e n t s . f o r E a c h ( ( e l )   = >   e l . c l a s s L i s t . a d d ( ' r e v e a l - o n - s c r o l l ' ) ) ; 
+ 
+     c o n s t   o b s e r v e r   =   n e w   I n t e r s e c t i o n O b s e r v e r ( ( e n t r i e s )   = >   { 
+         e n t r i e s . f o r E a c h ( ( e n t r y )   = >   { 
+             i f   ( e n t r y . i s I n t e r s e c t i n g )   { 
+                 e n t r y . t a r g e t . c l a s s L i s t . a d d ( ' i s - v i s i b l e ' ) ; 
+                 o b s e r v e r . u n o b s e r v e ( e n t r y . t a r g e t ) ; 
+             } 
+         } ) ; 
+     } ,   { 
+         t h r e s h o l d :   0 . 1 8 , 
+         r o o t M a r g i n :   ' 0 p x   0 p x   - 8 %   0 p x ' 
+     } ) ; 
+ 
+     e l e m e n t s . f o r E a c h ( ( e l )   = >   o b s e r v e r . o b s e r v e ( e l ) ) ; 
+ } 
+  
+ 
