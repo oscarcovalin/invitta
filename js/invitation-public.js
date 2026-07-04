@@ -732,7 +732,9 @@
       return;
     }
 
-    section.style.display = "block";
+    section.style.setProperty("display", "block", "important");
+    section.style.setProperty("visibility", "visible", "important");
+    section.style.setProperty("opacity", "1", "important");
 
     container.innerHTML = items.map((item, index) => `
       <div class="inv-timeline-item">
@@ -745,6 +747,10 @@
         </div>
       </div>
     `).join("");
+
+    console.log("Timeline section display:", window.getComputedStyle(section).display);
+    console.log("Timeline section visibility:", window.getComputedStyle(section).visibility);
+    console.log("Timeline container HTML:", container.innerHTML);
   }
 
   /* ─── Helpers texto / números ─────────────────────────────────────── */
