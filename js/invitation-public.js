@@ -163,8 +163,12 @@
     /* 13. Foto principal */
     renderMainPhoto(inv.main_photo_url);
 
-    /* 14. Música */
-    buildMusicPlayer(inv.music_url);
+    /* 14. Cuenta regresiva */
+    setupCountdown(inv.event_date, inv.event_time);
+
+    /* 15. Música */
+    console.log("music_url:", inv.music_url);
+    setupMusicPlayer(inv.music_url);
   }
 
   /* ─── Foto principal ────────────────────────────────────────────── */
@@ -179,40 +183,114 @@
     if (hero) hero.classList.add("inv-hero--has-photo");
   }
 
-  /* ─── Reproductor de música ──────────────────────────────────── */
-  function buildMusicPlayer(url) {
-    if (!url) return;
-    var block = document.getElementById("inv-music-block");
-    var btn   = document.getElementById("inv-music-btn");
-    var icon  = document.getElementById("inv-music-icon");
-    var label = document.getElementById("inv-music-label");
-    if (!block || !btn) return;
+  /* ─── Reproductor de música ────────────────────────────── */
+  var invitationAudio = null;
+  var isPlaying       = false;
 
-    // Crear el elemento <audio> (oculto)
-    var audio = document.createElement("audio");
-    audio.src = url;
-    audio.loop = true;
-    audio.preload = "none";
-    audio.style.display = "none";
-    block.appendChild(audio);
+  function setupMusicPlayer(musicUrl) {
+    var musicSection = document.getElementById("inv-music-section");
+    var musicButton  = document.getElementById("inv-music-button");
+    var musicIcon    = document.getElementById("inv-music-icon");
+    var musicLabel   = document.getElementById("inv-music-label");
 
-    // Mostrar la sección
-    block.style.display = "";
+    if (!musicUrl || !musicButton) {
+      if (musicSection) musicSection.style.display = "none";
+      return;
+    }
 
-    btn.addEventListener("click", function () {
-      if (audio.paused) {
-        audio.play().then(function () {
-          if (icon)  { icon.className  = "fa-solid fa-pause"; }
-          if (label) { label.textContent = "Pausar música"; }
-        }).catch(function (err) {
-          console.warn("No se pudo reproducir el audio:", err);
-        });
-      } else {
-        audio.pause();
-        if (icon)  { icon.className  = "fa-solid fa-play"; }
-        if (label) { label.textContent = "Reproducir música"; }
+    if (musicSection) musicSection.style.display = "";
+
+    // Crear el objeto Audio directamente (evita problemas de CORS con createElement)
+    invitationAudio        = new Audio(musicUrl);
+    invitationAudio.preload = "auto";
+    invitationAudio.loop   = true;
+    invitationAudio.volume = 0.8;
+
+    // Estado inicial
+    if (musicLabel) musicLabel.textContent = "Reproducir música";
+    if (musicIcon)  musicIcon.className    = "fa-solid fa-play";
+
+    musicButton.addEventListener("click", async function () {
+      try {
+        if (!isPlaying) {
+          await invitationAudio.play();
+          isPlaying = true;
+          if (musicLabel) musicLabel.textContent = "Pausar música";
+          if (musicIcon)  musicIcon.className    = "fa-solid fa-pause";
+        } else {
+          invitationAudio.pause();
+          isPlaying = false;
+          if (musicLabel) musicLabel.textContent = "Reproducir música";
+          if (musicIcon)  musicIcon.className    = "fa-solid fa-play";
+        }
+      } catch (err) {
+        console.error("Error reproduciendo música:", err, "URL:", musicUrl);
+        if (musicLabel) musicLabel.textContent = "No se pudo reproducir";
+        if (musicButton) musicButton.disabled  = true;
       }
     });
+
+    invitationAudio.addEventListener("ended", function () {
+      isPlaying = false;
+      if (musicLabel) musicLabel.textContent = "Reproducir música";
+      if (musicIcon)  musicIcon.className    = "fa-solid fa-play";
+    });
+
+    invitationAudio.addEventListener("error", function (event) {
+      console.error("Error cargando audio:", event, "URL:", musicUrl);
+      if (musicLabel)  musicLabel.textContent  = "Audio no disponible";
+      if (musicButton) musicButton.disabled    = true;
+    });
+  }
+
+  /* ─── Cuenta regresiva ────────────────────────────── */
+  function setupCountdown(eventDate, eventTime) {
+    var section = document.getElementById("inv-countdown-section");
+    if (!section || !eventDate) {
+      if (section) section.style.display = "none";
+      return;
+    }
+
+    var dateParts = eventDate.split("-").map(Number);
+    var timeParts = (eventTime || "00:00").split(":").map(Number);
+    var year      = dateParts[0];
+    var month     = dateParts[1];
+    var day       = dateParts[2];
+    var hours     = timeParts[0] || 0;
+    var minutes   = timeParts[1] || 0;
+
+    var targetDate = new Date(year, month - 1, day, hours, minutes, 0);
+
+    function updateCountdown() {
+      var now  = new Date();
+      var diff = targetDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        section.innerHTML = "<p class='inv-countdown-label inv-countdown-today'>✨ Hoy es el gran día ✨</p>";
+        clearInterval(timer);
+        return;
+      }
+
+      var totalSeconds = Math.floor(diff / 1000);
+      var days         = Math.floor(totalSeconds / (60 * 60 * 24));
+      var hoursLeft    = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+      var minutesLeft  = Math.floor((totalSeconds % (60 * 60)) / 60);
+      var secondsLeft  = totalSeconds % 60;
+
+      var dEl = document.getElementById("cd-days");
+      var hEl = document.getElementById("cd-hours");
+      var mEl = document.getElementById("cd-minutes");
+      var sEl = document.getElementById("cd-seconds");
+
+      if (dEl) dEl.textContent = days;
+      if (hEl) hEl.textContent = String(hoursLeft).padStart(2, "0");
+      if (mEl) mEl.textContent = String(minutesLeft).padStart(2, "0");
+      if (sEl) sEl.textContent = String(secondsLeft).padStart(2, "0");
+    }
+
+    section.style.display = "";
+    updateCountdown();
+    var timer = setInterval(updateCountdown, 1000);
   }
 
   /* ─── Selector de pases ───────────────────────────────────────────── */

@@ -487,3 +487,83 @@ body {
 .inv-btn-music:active {
   transform: scale(0.97);
 }
+
+/* ═══════════════════════════════════════════
+   CUENTA REGRESIVA
+═══════════════════════════════════════════ */
+.inv-countdown {
+  text-align: center;
+  padding: 32px 24px 28px;
+  background: linear-gradient(160deg, var(--inv-secondary) 0%, var(--inv-bg) 100%);
+  border-top: 1px solid var(--inv-primary-border);
+  border-bottom: 1px solid var(--inv-primary-border);
+}
+
+.inv-countdown-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  color: var(--inv-primary);
+  margin-bottom: 18px;
+}
+
+.inv-countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.inv-countdown-item {
+  background: var(--inv-surface);
+  border: 1px solid var(--inv-primary-border);
+  border-radius: 14px;
+  padding: 14px 8px 10px;
+  box-shadow: var(--inv-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: transform 0.15s ease;
+}
+
+.inv-countdown-item:hover {
+  transform: translateY(-2px);
+}
+
+.inv-countdown-item strong {
+  font-family: var(--inv-font-serif);
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
+  font-weight: 600;
+  color: var(--inv-primary);
+  line-height: 1;
+  display: block;
+  /* Subtle pulse on every second update */
+  transition: transform 0.2s ease;
+}
+
+.inv-countdown-item span {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  color: var(--inv-muted);
+}
+
+/* "Hoy es el gran día" message */
+.inv-countdown-today {
+  font-family: var(--inv-font-serif);
+  font-size: clamp(1.1rem, 5vw, 1.5rem);
+  font-style: italic;
+  color: var(--inv-primary);
+  letter-spacing: 0.02em;
+}
+
+/* Responsive: 2×2 on very small screens */
+@media (max-width: 340px) {
+  .inv-countdown-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

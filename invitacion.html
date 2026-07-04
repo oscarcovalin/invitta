@@ -55,6 +55,29 @@
       </div>
     </header>
 
+    <!-- ── CUENTA REGRESIVA ── -->
+    <section id="inv-countdown-section" class="inv-countdown" style="display:none" aria-label="Cuenta regresiva">
+      <p class="inv-countdown-label">Faltan</p>
+      <div class="inv-countdown-grid">
+        <div class="inv-countdown-item">
+          <strong id="cd-days">0</strong>
+          <span>Días</span>
+        </div>
+        <div class="inv-countdown-item">
+          <strong id="cd-hours">00</strong>
+          <span>Horas</span>
+        </div>
+        <div class="inv-countdown-item">
+          <strong id="cd-minutes">00</strong>
+          <span>Min</span>
+        </div>
+        <div class="inv-countdown-item">
+          <strong id="cd-seconds">00</strong>
+          <span>Seg</span>
+        </div>
+      </div>
+    </section>
+
     <main class="inv-page">
 
       <!-- ── DATOS DEL INVITADO ── -->
@@ -128,15 +151,15 @@
       </section>
 
       <!-- ── MÚSICA ── -->
-      <section class="inv-card" id="inv-music-block" aria-label="Música de fondo" style="display:none">
+      <section class="inv-card" id="inv-music-section" aria-label="Música de fondo" style="display:none">
         <div class="inv-card-label">
           <i class="fa-solid fa-music"></i> Música de fondo
         </div>
-        <button class="inv-btn inv-btn-music" id="inv-music-btn" type="button" aria-label="Reproducir música">
+        <button class="inv-btn inv-btn-music" id="inv-music-button" type="button" aria-label="Reproducir música">
           <i class="fa-solid fa-play" id="inv-music-icon"></i>
           <span id="inv-music-label">Reproducir música</span>
         </button>
-        <!-- El elemento audio se inyecta por JS -->
+        <!-- El elemento audio es gestionado por JS vía new Audio() -->
       </section>
 
       <!-- ── MESA DE REGALOS ── -->
