@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const { data: invitations, error } = await db
       .from("studio_invitations")
-      .select("id, title, slug, event_type, event_date, published, main_photo_url, music_url, gallery_urls, font_preset")
+      .select("id, title, slug, event_type, event_date, published, main_photo_url, music_url, gallery_urls, font_preset, itinerary")
       .eq("studio_id", currentStudioId)
       .order("created_at", { ascending: false });
 
@@ -100,10 +100,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
       const fontName = fontNames[inv.font_preset] || "Clásica Elegante";
 
+      const timelineCount = (() => {
+        const v = inv.itinerary;
+        if (!v) return 0;
+        if (Array.isArray(v)) return v.filter(Boolean).length;
+        try { const p = JSON.parse(v); return Array.isArray(p) ? p.filter(Boolean).length : 0; } catch { return 0; }
+      })();
+
       const mediaBadges = [
         inv.main_photo_url  ? `<span class="badge badge-media badge-photo">📷 Foto</span>` : "",
         inv.music_url       ? `<span class="badge badge-media badge-music">🎵 Música</span>` : "",
         galleryCount > 0    ? `<span class="badge badge-media badge-gallery">🖼️ Galería ${galleryCount}</span>` : "",
+        timelineCount > 0   ? `<span class="badge badge-media badge-timeline" style="background:#e0f2fe;color:#0369a1;border-color:#7dd3fc;">⏱️ Timeline ${timelineCount}</span>` : "",
         `<span class="badge badge-media badge-font" style="background:#f3e8ff;color:#6b21a8;border-color:#d8b4fe;">✨ ${fontName}</span>`
       ].join(" ");
 

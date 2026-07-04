@@ -3,6 +3,52 @@
  * Lógica para crear y editar invitaciones en Invitta Studio
  */
 
+function parseItineraryText(text) {
+  if (!text) return [];
+  return text
+    .split("\n")
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map(line => {
+      const parts = line.split("|");
+      if (parts.length >= 2) {
+        return {
+          time: parts[0].trim(),
+          title: parts.slice(1).join("|").trim()
+        };
+      }
+      return {
+        time: "",
+        title: line.trim()
+      };
+    })
+    .filter(item => item.title);
+}
+
+function itineraryToText(value) {
+  let items = [];
+
+  if (Array.isArray(value)) {
+    items = value;
+  } else if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      items = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      items = [];
+    }
+  }
+
+  return items
+    .map(item => {
+      const time = item.time || "";
+      const title = item.title || "";
+      return time ? `${time} | ${title}` : title;
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const session = await window.studioAuth.requireSession();
   if (!session) return;
@@ -212,6 +258,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("dress_code").value = data.dress_code || "";
     document.getElementById("whatsapp_number").value = data.whatsapp_number || "";
     document.getElementById("published").checked = !!data.published;
+    
+    document.getElementById("itineraryText").value = itineraryToText(data.itinerary);
 
     // Preservar URLs existentes de foto y música
     existingPhotoUrl = data.main_photo_url || null;
@@ -408,7 +456,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       whatsapp_number: document.getElementById("whatsapp_number").value,
       published: document.getElementById("published").checked,
       gallery_urls: finalGalleryUrls,
-      itinerary: [],
+      itinerary: parseItineraryText(document.getElementById("itineraryText").value),
       template_id: null,
       main_photo_url: finalPhotoUrl,
       music_url: finalMusicUrl,

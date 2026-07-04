@@ -180,46 +180,7 @@
     }
 
     /* Itinerario */
-    var hasItinerary = inv.itinerary && inv.itinerary.length > 0;
-    toggle("inv-itinerary-block", hasItinerary);
-    if (hasItinerary) {
-      var itList = document.getElementById("inv-itinerary-list");
-      if (itList) {
-        itList.innerHTML = "";
-        inv.itinerary.forEach(function(item) {
-          var li = document.createElement("li");
-          li.className = "inv-itinerary-item";
-          
-          var timeDiv = document.createElement("div");
-          timeDiv.className = "inv-itinerary-time";
-          timeDiv.textContent = item.time || "";
-
-          var dotDiv = document.createElement("div");
-          dotDiv.className = "inv-itinerary-dot";
-
-          var contentDiv = document.createElement("div");
-          contentDiv.className = "inv-itinerary-content";
-          var titleH3 = document.createElement("h3");
-          titleH3.className = "inv-itinerary-title";
-          titleH3.textContent = item.title || "";
-          
-          contentDiv.appendChild(titleH3);
-          if (item.description) {
-            var descP = document.createElement("p");
-            descP.style.fontSize = "0.85rem";
-            descP.style.color = "var(--inv-muted)";
-            descP.style.margin = "4px 0 0 0";
-            descP.textContent = item.description;
-            contentDiv.appendChild(descP);
-          }
-
-          li.appendChild(timeDiv);
-          li.appendChild(dotDiv);
-          li.appendChild(contentDiv);
-          itList.appendChild(li);
-        });
-      }
-    }
+    renderItinerary(inv.itinerary);
 
     /* Hashtag */
     toggle("inv-hashtag-block", !!inv.instagram_hashtag);
@@ -600,8 +561,65 @@
     if (e) e.style.display = "none";
   }
 
-  function toggle(id, visible) {
-    visible ? show(id) : hide(id);
+  function toggle(id, cond) {
+    var e = document.getElementById(id);
+    if (e) e.style.display = cond ? "" : "none";
+  }
+
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function normalizeItinerary(value) {
+    if (!value) return [];
+    if (Array.isArray(value)) {
+      return value.filter(item => item && (item.title || item.time));
+    }
+    if (typeof value === "string") {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed)
+          ? parsed.filter(item => item && (item.title || item.time))
+          : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  }
+
+  function renderItinerary(value) {
+    const section = document.getElementById("inv-itinerary-section");
+    const container = document.getElementById("inv-itinerary");
+
+    if (!section || !container) return;
+
+    const items = normalizeItinerary(value);
+
+    if (!items.length) {
+      section.style.display = "none";
+      container.innerHTML = "";
+      return;
+    }
+
+    section.style.display = "block";
+
+    container.innerHTML = items.map((item, index) => `
+      <div class="inv-timeline-item">
+        <div class="inv-timeline-marker">
+          <span>${String(index + 1).padStart(2, "0")}</span>
+        </div>
+        <div class="inv-timeline-content">
+          ${item.time ? `<p class="inv-timeline-time">${escapeHtml(item.time)}</p>` : ""}
+          <h3>${escapeHtml(item.title || "")}</h3>
+        </div>
+      </div>
+    `).join("");
   }
 
   /* ─── Helpers texto / números ─────────────────────────────────────── */
