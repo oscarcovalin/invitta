@@ -751,6 +751,8 @@
     console.log("Timeline section display:", window.getComputedStyle(section).display);
     console.log("Timeline section visibility:", window.getComputedStyle(section).visibility);
     console.log("Timeline container HTML:", container.innerHTML);
+    console.log("Timeline section:", document.getElementById("inv-itinerary-section"));
+    console.log("Timeline items count:", document.querySelectorAll(".inv-timeline-item").length);
   }
 
   /* ─── Helpers texto / números ─────────────────────────────────────── */
