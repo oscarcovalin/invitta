@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    invitacion.css — Invitta Studio · Invitación Pública Premium
    Pinterest-inspired: fine-art, champagne, rose gold, mobile-first
    ============================================================ */
@@ -1545,63 +1545,63 @@ body.has-custom-bg::before {
   margin: 15px 0;
 }
 
-.inv-music-fixed {
+/* ══════════════════════════════════════════════════
+   MUSIC PLAYER FIXED
+══════════════════════════════════════════════════ */
+.inv-music-player {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  background: rgba(255, 255, 255, 0.98);
-  border-top: 1px solid var(--inv-border);
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  height: calc(72px + env(safe-area-inset-bottom));
+  background: #1a1512;
+  color: #fff;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding: 12px 24px;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
+  padding: 0 24px;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+  z-index: 9999;
+  font-family: var(--font-body);
 }
 
-.inv-music-fixed-info {
+.inv-music-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
-.inv-music-fixed-icon {
-  color: var(--inv-primary);
+.inv-music-monogram {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--inv-surface);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  font-size: 1.2rem;
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
-.inv-music-fixed-text {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-
-.inv-music-title {
-  font-family: var(--inv-font-serif);
+#inv-music-title {
+  margin: 0;
+  font-size: 1rem;
   font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--inv-text);
   line-height: 1.2;
+  font-family: var(--font-title);
 }
 
-.inv-music-artist {
-  font-family: var(--inv-font-sans);
-  font-size: 0.75rem;
-  color: var(--inv-text-light);
+#inv-music-artist {
+  font-size: 0.8rem;
+  opacity: 0.7;
 }
 
-.inv-music-fixed-btn {
+#inv-music-toggle {
   background: none;
   border: none;
-  color: var(--inv-primary);
+  color: #fff;
+  font-size: 1.5rem;
   cursor: pointer;
   padding: 8px;
   display: flex;
@@ -1610,7 +1610,11 @@ body.has-custom-bg::before {
   transition: transform 0.2s ease;
 }
 
-.inv-music-fixed-btn:hover {
+#inv-music-toggle:hover {
   transform: scale(1.1);
+}
+
+body.has-music-player {
+  padding-bottom: calc(92px + env(safe-area-inset-bottom));
 }
 

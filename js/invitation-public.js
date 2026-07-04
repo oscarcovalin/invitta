@@ -299,10 +299,8 @@
   var isPlaying       = false;
 
   function setupMusicPlayer(inv) {
-    var player = document.getElementById("inv-music-player-fixed");
-    var btn = document.getElementById("inv-music-fixed-btn");
-    var playIcon = document.getElementById("inv-music-play-icon");
-    var pauseIcon = document.getElementById("inv-music-pause-icon");
+    var player = document.getElementById("inv-music-player");
+    var toggleBtn = document.getElementById("inv-music-toggle");
     var titleEl = document.getElementById("inv-music-title");
     var artistEl = document.getElementById("inv-music-artist");
 
@@ -320,7 +318,7 @@
     if (artistEl) artistEl.textContent = inv.music_artist || "";
 
     player.style.display = "flex";
-    document.body.style.paddingBottom = "80px";
+    document.body.classList.add("has-music-player");
 
     function toggleAudio() {
       try {
@@ -346,15 +344,13 @@
 
     function syncUI(playing) {
       if (playing) {
-        if (playIcon) playIcon.style.display = "none";
-        if (pauseIcon) pauseIcon.style.display = "block";
+        if (toggleBtn) toggleBtn.textContent = "❚❚";
       } else {
-        if (playIcon) playIcon.style.display = "block";
-        if (pauseIcon) pauseIcon.style.display = "none";
+        if (toggleBtn) toggleBtn.textContent = "▶";
       }
     }
 
-    if (btn) btn.addEventListener("click", toggleAudio);
+    if (toggleBtn) toggleBtn.addEventListener("click", toggleAudio);
 
     invitationAudio.addEventListener("ended", function () {
       isPlaying = false;
@@ -362,9 +358,7 @@
     });
 
     invitationAudio.addEventListener("error", function (event) {
-      console.error("Error cargando audio:", event, "URL:", musicUrl);
-      [heroLabel, cardLabel].forEach(function (el) { if (el) el.textContent = "Audio no disponible"; });
-      [heroBtn, cardBtn].forEach(function (el) { if (el) el.disabled = true; });
+      console.error("Error cargando audio:", event, "URL:", inv.music_url);
     });
   }
 
