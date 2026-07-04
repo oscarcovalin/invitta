@@ -12,7 +12,7 @@
   <!-- Fuentes premium -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
@@ -20,57 +20,91 @@
   <!-- Estilos -->
   <link rel="stylesheet" href="css/invitacion.css">
 </head>
-
 <body>
 
-  <!-- ── Estado: Cargando ── -->
+  <!-- ── Cargando ── -->
   <div id="inv-loader" role="status" aria-live="polite">
     <div class="inv-loader-ring"></div>
     <span>Cargando tu invitación…</span>
   </div>
 
-  <!-- ── Estado: Error ── -->
+  <!-- ── Error ── -->
   <div id="inv-error" role="alert" aria-live="assertive"></div>
 
-  <!-- ──────────────────────────────────────────
-       CONTENIDO PRINCIPAL (oculto hasta cargar)
-  ──────────────────────────────────────────── -->
+  <!-- ── CONTENIDO PRINCIPAL ── -->
   <div id="inv-content" aria-label="Invitación digital">
 
-    <!-- HERO -->
+    <!-- ══════════════════════════════════════
+         1. HERO PREMIUM
+    ══════════════════════════════════════ -->
     <header class="inv-hero" id="inv-hero">
-      <div class="inv-ornament">
-        <i class="fa-solid fa-sparkles"></i>
-        Invitación Digital
-        <i class="fa-solid fa-sparkles"></i>
+
+      <!-- Fondo foto (solo si existe) -->
+      <div class="inv-hero-bg" id="inv-hero-bg" style="display:none">
+        <img id="inv-hero-img" src="" alt="Foto principal" aria-hidden="true">
+        <div class="inv-hero-overlay"></div>
       </div>
-      <h1 class="inv-title" id="inv-title">Cargando…</h1>
-      <p  class="inv-honoree" id="inv-honoree"></p>
-      <div id="inv-welcome-block">
-        <p class="inv-welcome" id="inv-welcome"></p>
-      </div>
-      <!-- Foto principal: se muestra encima del hero si existe -->
-      <div id="inv-photo-block" style="display:none">
-        <img id="inv-main-photo" class="inv-main-photo" src="" alt="Foto principal" loading="lazy">
-      </div>
+
+      <!-- Contenido del hero -->
+      <div class="inv-hero-content">
+
+        <!-- Ornameto superior -->
+        <div class="inv-eyebrow" id="inv-eyebrow-top">
+          <span class="inv-eyebrow-line"></span>
+          <span class="inv-eyebrow-text">Invitación Digital</span>
+          <span class="inv-eyebrow-line"></span>
+        </div>
+
+        <!-- Título evento -->
+        <h1 class="inv-title" id="inv-title">Cargando…</h1>
+
+        <!-- Nombre festejado/a -->
+        <p class="inv-honoree" id="inv-honoree"></p>
+
+        <!-- Fecha en hero -->
+        <p class="inv-hero-date" id="inv-hero-date"></p>
+
+        <!-- Divisor ornamental -->
+        <div class="inv-divider-ornament" aria-hidden="true">
+          <span></span>
+          <i class="fa-solid fa-diamond" style="font-size:0.45rem;"></i>
+          <span></span>
+        </div>
+
+        <!-- Botón de música (en hero si hay música) -->
+        <div id="inv-music-hero-wrap" style="display:none">
+          <button class="inv-music-hero-btn" id="inv-music-button" type="button" aria-label="Reproducir música">
+            <span class="inv-music-hero-icon-wrap">
+              <i class="fa-solid fa-play" id="inv-music-icon"></i>
+            </span>
+            <span id="inv-music-label">Reproducir música</span>
+          </button>
+        </div>
+
+      </div><!-- /.inv-hero-content -->
     </header>
 
-    <!-- ── CUENTA REGRESIVA ── -->
+    <!-- ══════════════════════════════════════
+         2. CUENTA REGRESIVA
+    ══════════════════════════════════════ -->
     <section id="inv-countdown-section" class="inv-countdown" style="display:none" aria-label="Cuenta regresiva">
-      <p class="inv-countdown-label">Faltan</p>
+      <p class="inv-countdown-eyebrow">Faltan</p>
       <div class="inv-countdown-grid">
         <div class="inv-countdown-item">
           <strong id="cd-days">0</strong>
           <span>Días</span>
         </div>
+        <div class="inv-countdown-sep" aria-hidden="true">·</div>
         <div class="inv-countdown-item">
           <strong id="cd-hours">00</strong>
           <span>Horas</span>
         </div>
+        <div class="inv-countdown-sep" aria-hidden="true">·</div>
         <div class="inv-countdown-item">
           <strong id="cd-minutes">00</strong>
           <span>Min</span>
         </div>
+        <div class="inv-countdown-sep" aria-hidden="true">·</div>
         <div class="inv-countdown-item">
           <strong id="cd-seconds">00</strong>
           <span>Seg</span>
@@ -78,142 +112,178 @@
       </div>
     </section>
 
+    <!-- ══════════════════════════════════════
+         SECCIONES PRINCIPALES
+    ══════════════════════════════════════ -->
     <main class="inv-page">
 
-      <!-- ── DATOS DEL INVITADO ── -->
-      <section class="inv-card" aria-label="Datos del invitado">
-        <div class="inv-card-label">
-          <i class="fa-regular fa-id-card"></i> Tu invitación
-        </div>
-        <p class="inv-guest-name" id="inv-guest-name">Invitado</p>
-        <div class="inv-info-grid">
-          <div class="inv-info-item">
-            <div class="lbl">Pases asignados</div>
-            <div class="val" id="inv-pases">—</div>
-          </div>
-          <div class="inv-info-item" id="inv-mesa-block">
-            <div class="lbl">Mesa</div>
-            <div class="val" id="inv-mesa">—</div>
-          </div>
-        </div>
+      <!-- ── 3. MENSAJE DE BIENVENIDA ── -->
+      <section id="inv-welcome-block" class="inv-welcome-block" aria-label="Mensaje de bienvenida" style="display:none">
+        <div class="inv-welcome-ornament" aria-hidden="true">✦</div>
+        <p class="inv-welcome" id="inv-welcome"></p>
+        <div class="inv-welcome-ornament" aria-hidden="true">✦</div>
       </section>
 
-      <!-- ── FECHA Y HORA ── -->
-      <section class="inv-card" aria-label="Fecha del evento">
-        <div class="inv-card-label">
-          <i class="fa-regular fa-calendar-heart"></i> Fecha del evento
+      <!-- ── 4. PASE PERSONALIZADO (Boleto premium) ── -->
+      <section class="inv-ticket" aria-label="Tu pase personal">
+        <!-- Borde superior perforado -->
+        <div class="inv-ticket-notch-top" aria-hidden="true"></div>
+
+        <div class="inv-ticket-header">
+          <div class="inv-ticket-eyebrow">
+            <i class="fa-regular fa-id-card"></i>
+            Pase Personal
+          </div>
         </div>
-        <div class="inv-date-display">
+
+        <p class="inv-ticket-name" id="inv-guest-name">Invitado</p>
+
+        <div class="inv-ticket-divider-dashed" aria-hidden="true"></div>
+
+        <div class="inv-ticket-grid">
+          <div class="inv-ticket-field">
+            <span class="inv-ticket-field-label">Pases</span>
+            <span class="inv-ticket-field-value" id="inv-pases">—</span>
+          </div>
+          <div class="inv-ticket-field" id="inv-mesa-block">
+            <span class="inv-ticket-field-label">Mesa</span>
+            <span class="inv-ticket-field-value" id="inv-mesa">—</span>
+          </div>
+          <div class="inv-ticket-field">
+            <span class="inv-ticket-field-label">Evento</span>
+            <span class="inv-ticket-field-value inv-ticket-field-value--small" id="inv-ticket-date">—</span>
+          </div>
+        </div>
+
+        <!-- Borde inferior perforado -->
+        <div class="inv-ticket-notch-bottom" aria-hidden="true"></div>
+      </section>
+
+      <!-- ── 5. FECHA Y HORA ── -->
+      <section class="inv-card inv-card--date" aria-label="Fecha del evento">
+        <div class="inv-card-icon-wrap" aria-hidden="true">
+          <i class="fa-regular fa-calendar-heart"></i>
+        </div>
+        <div class="inv-card-body">
+          <div class="inv-card-label">Fecha del evento</div>
           <p class="inv-date-text" id="inv-date">—</p>
-          <p class="inv-time-text" id="inv-time-block">
+          <p class="inv-time-text" id="inv-time-block" style="display:none">
             <i class="fa-regular fa-clock"></i>
             <span id="inv-time"></span>
           </p>
         </div>
       </section>
 
-      <!-- ── CEREMONIA ── -->
-      <section class="inv-card" id="inv-ceremony-block" aria-label="Ceremonia" style="display:none">
-        <div class="inv-card-label">
-          <i class="fa-solid fa-church"></i> Ceremonia
+      <!-- ── 5b. CEREMONIA ── -->
+      <section class="inv-card inv-card--venue" id="inv-ceremony-block" aria-label="Ceremonia" style="display:none">
+        <div class="inv-card-icon-wrap" aria-hidden="true">
+          <i class="fa-solid fa-church"></i>
         </div>
-        <p class="inv-venue-name"    id="inv-ceremony-name"></p>
-        <p class="inv-venue-address" id="inv-ceremony-address"></p>
-        <a  class="inv-btn inv-btn-map"
-            id="inv-ceremony-map-btn"
-            href="#" target="_blank" rel="noopener noreferrer"
-            style="display:none">
-          <i class="fa-solid fa-map-location-dot"></i> Ver en mapa
-        </a>
+        <div class="inv-card-body">
+          <div class="inv-card-label">Ceremonia</div>
+          <p class="inv-venue-name" id="inv-ceremony-name"></p>
+          <p class="inv-venue-address" id="inv-ceremony-address"></p>
+          <a class="inv-btn inv-btn-map" id="inv-ceremony-map-btn"
+             href="#" target="_blank" rel="noopener noreferrer" style="display:none">
+            <i class="fa-solid fa-map-location-dot"></i> Ver en mapa
+          </a>
+        </div>
       </section>
 
-      <!-- ── RECEPCIÓN ── -->
-      <section class="inv-card" id="inv-reception-block" aria-label="Recepción" style="display:none">
-        <div class="inv-card-label">
-          <i class="fa-solid fa-champagne-glasses"></i> Recepción
+      <!-- ── 5c. RECEPCIÓN ── -->
+      <section class="inv-card inv-card--venue" id="inv-reception-block" aria-label="Recepción" style="display:none">
+        <div class="inv-card-icon-wrap" aria-hidden="true">
+          <i class="fa-solid fa-champagne-glasses"></i>
         </div>
-        <p class="inv-venue-name"    id="inv-reception-name"></p>
-        <p class="inv-venue-address" id="inv-reception-address"></p>
-        <a  class="inv-btn inv-btn-map"
-            id="inv-reception-map-btn"
-            href="#" target="_blank" rel="noopener noreferrer"
-            style="display:none">
-          <i class="fa-solid fa-map-location-dot"></i> Ver en mapa
-        </a>
+        <div class="inv-card-body">
+          <div class="inv-card-label">Recepción</div>
+          <p class="inv-venue-name" id="inv-reception-name"></p>
+          <p class="inv-venue-address" id="inv-reception-address"></p>
+          <a class="inv-btn inv-btn-map" id="inv-reception-map-btn"
+             href="#" target="_blank" rel="noopener noreferrer" style="display:none">
+            <i class="fa-solid fa-map-location-dot"></i> Ver en mapa
+          </a>
+        </div>
       </section>
 
-      <!-- ── DRESS CODE ── -->
-      <section class="inv-card" id="inv-dresscode-block" aria-label="Código de vestimenta" style="display:none">
-        <div class="inv-card-label">
-          <i class="fa-solid fa-shirt"></i> Código de vestimenta
+      <!-- ── 7. DRESS CODE ── -->
+      <section class="inv-card inv-card--detail" id="inv-dresscode-block" aria-label="Código de vestimenta" style="display:none">
+        <div class="inv-card-icon-wrap" aria-hidden="true">
+          <i class="fa-solid fa-shirt"></i>
         </div>
-        <p class="inv-dresscode-text" id="inv-dresscode"></p>
+        <div class="inv-card-body">
+          <div class="inv-card-label">Código de vestimenta</div>
+          <p class="inv-dresscode-text" id="inv-dresscode"></p>
+        </div>
       </section>
 
-      <!-- ── MÚSICA ── -->
-      <section class="inv-card" id="inv-music-section" aria-label="Música de fondo" style="display:none">
-        <div class="inv-card-label">
-          <i class="fa-solid fa-music"></i> Música de fondo
+      <!-- ── 7b. MESA DE REGALOS ── -->
+      <section class="inv-card inv-card--detail" id="inv-gifts-block" aria-label="Mesa de regalos" style="display:none">
+        <div class="inv-card-icon-wrap" aria-hidden="true">
+          <i class="fa-solid fa-gift"></i>
         </div>
-        <button class="inv-btn inv-btn-music" id="inv-music-button" type="button" aria-label="Reproducir música">
-          <i class="fa-solid fa-play" id="inv-music-icon"></i>
-          <span id="inv-music-label">Reproducir música</span>
-        </button>
-        <!-- El elemento audio es gestionado por JS vía new Audio() -->
+        <div class="inv-card-body">
+          <div class="inv-card-label">Mesa de regalos</div>
+          <p class="inv-gifts-text">Con mucho cariño, te dejamos el enlace a nuestra mesa de regalos.</p>
+          <a class="inv-btn inv-btn-outline" id="inv-gifts-link"
+             href="#" target="_blank" rel="noopener noreferrer">
+            <i class="fa-solid fa-link"></i> Ver mesa de regalos
+          </a>
+        </div>
       </section>
 
-      <!-- ── MESA DE REGALOS ── -->
-      <section class="inv-card" id="inv-gifts-block" aria-label="Mesa de regalos" style="display:none">
-        <div class="inv-card-label">
-          <i class="fa-solid fa-gift"></i> Mesa de regalos
-        </div>
-        <p class="inv-gifts-text">
-          Si deseas hacernos un regalo, aquí te dejamos el enlace a nuestra mesa.
-        </p>
-        <a class="inv-btn inv-btn-outline" id="inv-gifts-link"
-           href="#" target="_blank" rel="noopener noreferrer">
-          <i class="fa-solid fa-link"></i> Ver mesa de regalos
-        </a>
-      </section>
-
-      <!-- ── CONFIRMACIÓN + WHATSAPP ── -->
-      <section class="inv-card" id="inv-wa-block" aria-label="Confirmar asistencia">
-        <div class="inv-card-label">
-          <i class="fa-brands fa-whatsapp"></i> Confirmar asistencia
+      <!-- ── 8. RSVP / CONFIRMACIÓN ── -->
+      <section class="inv-rsvp" id="inv-wa-block" aria-label="Confirmar asistencia">
+        <div class="inv-rsvp-header">
+          <div class="inv-divider-ornament inv-divider-ornament--light" aria-hidden="true">
+            <span></span>
+            <i class="fa-solid fa-diamond" style="font-size:0.4rem;"></i>
+            <span></span>
+          </div>
+          <h2 class="inv-rsvp-title">Confirma tu asistencia</h2>
+          <p class="inv-rsvp-sub">Esperamos contar con tu presencia en este día tan especial.</p>
         </div>
 
         <div class="inv-confirm-row">
-          <label class="inv-confirm-label" for="inv-confirm-pases">
-            Asistiré con:
-          </label>
+          <label class="inv-confirm-label" for="inv-confirm-pases">Asistiré con:</label>
           <select class="inv-select" id="inv-confirm-pases" aria-label="Número de personas que asistirán">
-            <!-- Opciones generadas por JS según el máximo de pases -->
             <option value="1">1 persona</option>
           </select>
         </div>
 
-        <button class="inv-btn inv-btn-primary" id="inv-wa-btn" type="button">
+        <button class="inv-btn inv-btn-wa" id="inv-wa-btn" type="button">
           <i class="fa-brands fa-whatsapp"></i>
           Confirmar por WhatsApp
         </button>
       </section>
 
+      <!-- ── 9. MÚSICA (sección card — solo si no hay foto hero) ── -->
+      <section class="inv-card inv-card--music" id="inv-music-section" aria-label="Música de fondo" style="display:none">
+        <div class="inv-card-icon-wrap" aria-hidden="true">
+          <i class="fa-solid fa-music"></i>
+        </div>
+        <div class="inv-card-body">
+          <div class="inv-card-label">Música del evento</div>
+          <button class="inv-btn inv-btn-music" id="inv-music-button-card" type="button" aria-label="Reproducir música">
+            <i class="fa-solid fa-play" id="inv-music-icon-card"></i>
+            <span id="inv-music-label-card">Reproducir música</span>
+          </button>
+        </div>
+      </section>
+
       <!-- ── FOOTER ── -->
       <footer class="inv-footer">
-        Invitación creada con <a href="/" target="_blank">Invitta Studio</a>
+        <div class="inv-footer-divider" aria-hidden="true"></div>
+        <p>Invitación creada con <a href="/" target="_blank" rel="noopener">Invitta Studio</a></p>
+        <p class="inv-footer-tagline">Momentos que merecen recordarse</p>
       </footer>
 
     </main>
   </div><!-- /#inv-content -->
 
   <!-- Scripts -->
-  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- Variables de entorno (URL + anon key) -->
   <script src="/assets/js/env.js"></script>
-
-  <!-- Lógica de la invitación pública -->
   <script src="/js/invitation-public.js"></script>
 
 </body>

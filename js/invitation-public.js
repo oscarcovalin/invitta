@@ -16,7 +16,7 @@
   "use strict";
 
   /* ─── Supabase ────────────────────────────────────────────────────── */
-  const SUPABASE_URL = (window.INVITTIA_ENV && window.INVITTIA_ENV.SUPABASE_URL)   || "";
+  const SUPABASE_URL = (window.INVITTIA_ENV && window.INVITTIA_ENV.SUPABASE_URL)    || "";
   const SUPABASE_KEY = (window.INVITTIA_ENV && window.INVITTIA_ENV.SUPABASE_ANON_KEY) || "";
 
   let db;
@@ -29,13 +29,13 @@
   }
 
   /* ─── Parámetros de URL ───────────────────────────────────────────── */
-  var params      = new URLSearchParams(window.location.search);
-  var slug        = params.get("slug") || "";
-  var guestName   = sanitize(params.get("n") || "");
-  var maxPasses   = clampInt(params.get("p"), 1, 20);
-  var tableNum    = sanitize(params.get("m") || "");
+  var params    = new URLSearchParams(window.location.search);
+  var slug      = params.get("slug") || "";
+  var guestName = sanitize(params.get("n") || "");
+  var maxPasses = clampInt(params.get("p"), 1, 20);
+  var tableNum  = sanitize(params.get("m") || "");
 
-  /* ─── Iniciar inmediatamente (DOM ya listo al final del body) ─────── */
+  /* ─── Iniciar ────────────────────────────────────────────────────── */
   if (!slug) {
     showError("No se encontró el slug de la invitación.");
   } else {
@@ -83,7 +83,7 @@
 
   /* ─── Renderizado ─────────────────────────────────────────────────── */
   function renderInvitation(inv) {
-    /* 1. Mostrar contenido, ocultar loader y error */
+    /* 1. Mostrar contenido */
     var loader  = document.getElementById("inv-loader");
     var errBox  = document.getElementById("inv-error");
     var content = document.getElementById("inv-content");
@@ -95,28 +95,46 @@
     /* 2. Tema de color */
     applyTheme(inv.color_primary || "#C9A46A", inv.color_secondary || "#F7E7D7");
 
-    /* 3. Encabezado */
+    /* 3. Hero: título, honoree, fecha */
     setText("inv-title",   inv.title        || "Invitación");
     setText("inv-honoree", inv.honoree_name || "");
-    setText("inv-welcome", inv.welcome_text || "");
-    toggle("inv-welcome-block", !!inv.welcome_text);
 
-    /* 4. Fecha y hora */
+    // Fecha formateada en el hero
+    var heroDateStr = formatDateShort(inv.event_date);
+    var timeStr     = formatTime(inv.event_time);
+    if (heroDateStr) {
+      var heroDate = document.getElementById("inv-hero-date");
+      if (heroDate) {
+        heroDate.textContent = timeStr ? heroDateStr + "  ·  " + timeStr : heroDateStr;
+        heroDate.style.display = "";
+      }
+    }
+
+    /* 4. Fecha larga en card */
     setText("inv-date", formatDate(inv.event_date));
-    var timeStr = formatTime(inv.event_time);
-    setText("inv-time", timeStr);
     toggle("inv-time-block", !!timeStr);
+    setText("inv-time", timeStr);
 
-    /* 5. Datos del invitado */
-    setText("inv-guest-name", guestName || "Invitado");
+    /* 5. Datos del invitado (ticket) */
+    setText("inv-guest-name", guestName || "Estimado Invitado");
     setText("inv-pases",      String(maxPasses));
     setText("inv-mesa",       tableNum  || "—");
     toggle("inv-mesa-block",  !!tableNum);
 
+    // Fecha corta en ticket
+    var ticketDate = document.getElementById("inv-ticket-date");
+    if (ticketDate) {
+      ticketDate.textContent = formatDateShort(inv.event_date) || "—";
+    }
+
     /* 6. Selector de confirmación */
     buildPassSelector(maxPasses);
 
-    /* 7. Ceremonia */
+    /* 7. Mensaje de bienvenida */
+    toggle("inv-welcome-block", !!inv.welcome_text);
+    setText("inv-welcome", inv.welcome_text || "");
+
+    /* 8. Ceremonia */
     var hasCeremony = !!(inv.ceremony_name || inv.ceremony_address);
     toggle("inv-ceremony-block", hasCeremony);
     if (hasCeremony) {
@@ -130,7 +148,7 @@
       }
     }
 
-    /* 8. Recepción */
+    /* 9. Recepción */
     var hasReception = !!(inv.reception_name || inv.reception_address);
     toggle("inv-reception-block", hasReception);
     if (hasReception) {
@@ -144,42 +162,43 @@
       }
     }
 
-    /* 9. Dress code */
+    /* 10. Dress code */
     toggle("inv-dresscode-block", !!inv.dress_code);
     setText("inv-dresscode", inv.dress_code || "");
 
-    /* 10. Mesa de regalos */
+    /* 11. Mesa de regalos */
     toggle("inv-gifts-block", !!inv.gift_table_url);
     if (inv.gift_table_url) {
       setHref("inv-gifts-link", inv.gift_table_url);
     }
 
-    /* 11. WhatsApp */
+    /* 12. WhatsApp */
     buildWhatsAppButton(inv);
 
-    /* 12. Título de pestaña */
+    /* 13. Título de pestaña */
     document.title = (inv.title || "Invitación Digital") + " · Invitta";
 
-    /* 13. Foto principal */
+    /* 14. Foto principal (hero) */
     renderMainPhoto(inv.main_photo_url);
 
-    /* 14. Cuenta regresiva */
+    /* 15. Cuenta regresiva */
     setupCountdown(inv.event_date, inv.event_time);
 
-    /* 15. Música */
+    /* 16. Música */
     console.log("music_url:", inv.music_url);
-    setupMusicPlayer(inv.music_url);
+    setupMusicPlayer(inv.music_url, !!inv.main_photo_url);
   }
 
-  /* ─── Foto principal ────────────────────────────────────────────── */
+  /* ─── Foto principal (hero) ──────────────────────────────────────── */
   function renderMainPhoto(url) {
-    var block = document.getElementById("inv-photo-block");
-    var img   = document.getElementById("inv-main-photo");
-    var hero  = document.getElementById("inv-hero");
-    if (!url || !block || !img) return;
-    img.src = url;
-    block.style.display = "block";
-    // Agregar clase al hero para que tenga foto de fondo elegante
+    var heroBg   = document.getElementById("inv-hero-bg");
+    var heroImg  = document.getElementById("inv-hero-img");
+    var hero     = document.getElementById("inv-hero");
+
+    if (!url || !heroBg || !heroImg) return;
+
+    heroImg.src              = url;
+    heroBg.style.display     = "block";
     if (hero) hero.classList.add("inv-hero--has-photo");
   }
 
@@ -187,59 +206,96 @@
   var invitationAudio = null;
   var isPlaying       = false;
 
-  function setupMusicPlayer(musicUrl) {
-    var musicSection = document.getElementById("inv-music-section");
-    var musicButton  = document.getElementById("inv-music-button");
-    var musicIcon    = document.getElementById("inv-music-icon");
-    var musicLabel   = document.getElementById("inv-music-label");
+  /**
+   * @param {string|null} musicUrl  - URL del audio
+   * @param {boolean}     hasPhoto  - Si hay foto en el hero (usamos botón del hero)
+   */
+  function setupMusicPlayer(musicUrl, hasPhoto) {
+    // IDs del botón en el hero
+    var heroWrap   = document.getElementById("inv-music-hero-wrap");
+    var heroBtn    = document.getElementById("inv-music-button");
+    var heroIcon   = document.getElementById("inv-music-icon");
+    var heroLabel  = document.getElementById("inv-music-label");
 
-    if (!musicUrl || !musicButton) {
-      if (musicSection) musicSection.style.display = "none";
+    // IDs del botón en la card (fallback sin foto)
+    var cardSection = document.getElementById("inv-music-section");
+    var cardBtn     = document.getElementById("inv-music-button-card");
+    var cardIcon    = document.getElementById("inv-music-icon-card");
+    var cardLabel   = document.getElementById("inv-music-label-card");
+
+    if (!musicUrl) {
+      if (heroWrap)    heroWrap.style.display    = "none";
+      if (cardSection) cardSection.style.display = "none";
       return;
     }
 
-    if (musicSection) musicSection.style.display = "";
-
-    // Crear el objeto Audio directamente (evita problemas de CORS con createElement)
-    invitationAudio        = new Audio(musicUrl);
+    // Crear el objeto Audio
+    invitationAudio         = new Audio(musicUrl);
     invitationAudio.preload = "auto";
-    invitationAudio.loop   = true;
-    invitationAudio.volume = 0.8;
+    invitationAudio.loop    = true;
+    invitationAudio.volume  = 0.8;
 
-    // Estado inicial
-    if (musicLabel) musicLabel.textContent = "Reproducir música";
-    if (musicIcon)  musicIcon.className    = "fa-solid fa-play";
+    // Mostrar botón en hero SIEMPRE (con o sin foto)
+    if (heroWrap)  heroWrap.style.display = "";
+    if (heroLabel) heroLabel.textContent  = "Reproducir música";
+    if (heroIcon)  heroIcon.className     = "fa-solid fa-play";
 
-    musicButton.addEventListener("click", async function () {
-      try {
-        if (!isPlaying) {
-          await invitationAudio.play();
-          isPlaying = true;
-          if (musicLabel) musicLabel.textContent = "Pausar música";
-          if (musicIcon)  musicIcon.className    = "fa-solid fa-pause";
-        } else {
-          invitationAudio.pause();
-          isPlaying = false;
-          if (musicLabel) musicLabel.textContent = "Reproducir música";
-          if (musicIcon)  musicIcon.className    = "fa-solid fa-play";
+    // Si NO hay foto, también mostrar la card de música
+    if (!hasPhoto) {
+      if (cardSection) cardSection.style.display = "";
+      if (cardLabel)   cardLabel.textContent     = "Reproducir música";
+      if (cardIcon)    cardIcon.className         = "fa-solid fa-play";
+    } else {
+      if (cardSection) cardSection.style.display = "none";
+    }
+
+    // Función compartida de toggle
+    function toggleAudio(btnEl, iconEl, labelEl) {
+      return async function () {
+        try {
+          if (!isPlaying) {
+            await invitationAudio.play();
+            isPlaying = true;
+            syncUI(true);
+          } else {
+            invitationAudio.pause();
+            isPlaying = false;
+            syncUI(false);
+          }
+        } catch (err) {
+          console.error("Error reproduciendo música:", err, "URL:", musicUrl);
+          if (labelEl) labelEl.textContent = "No se pudo reproducir";
+          if (btnEl)   btnEl.disabled      = true;
         }
-      } catch (err) {
-        console.error("Error reproduciendo música:", err, "URL:", musicUrl);
-        if (musicLabel) musicLabel.textContent = "No se pudo reproducir";
-        if (musicButton) musicButton.disabled  = true;
-      }
-    });
+      };
+    }
 
+    // Sincroniza todos los botones al mismo estado
+    function syncUI(playing) {
+      var icons  = [heroIcon, cardIcon];
+      var labels = [heroLabel, cardLabel];
+      icons.forEach(function (el) {
+        if (el) el.className = playing ? "fa-solid fa-pause" : "fa-solid fa-play";
+      });
+      labels.forEach(function (el) {
+        if (el) el.textContent = playing ? "Pausar música" : "Reproducir música";
+      });
+    }
+
+    // Bind eventos
+    if (heroBtn) heroBtn.addEventListener("click", toggleAudio(heroBtn, heroIcon, heroLabel));
+    if (cardBtn) cardBtn.addEventListener("click", toggleAudio(cardBtn, cardIcon, cardLabel));
+
+    // Ended & Error
     invitationAudio.addEventListener("ended", function () {
       isPlaying = false;
-      if (musicLabel) musicLabel.textContent = "Reproducir música";
-      if (musicIcon)  musicIcon.className    = "fa-solid fa-play";
+      syncUI(false);
     });
 
     invitationAudio.addEventListener("error", function (event) {
       console.error("Error cargando audio:", event, "URL:", musicUrl);
-      if (musicLabel)  musicLabel.textContent  = "Audio no disponible";
-      if (musicButton) musicButton.disabled    = true;
+      [heroLabel, cardLabel].forEach(function (el) { if (el) el.textContent = "Audio no disponible"; });
+      [heroBtn, cardBtn].forEach(function (el) { if (el) el.disabled = true; });
     });
   }
 
@@ -266,7 +322,7 @@
       var diff = targetDate.getTime() - now.getTime();
 
       if (diff <= 0) {
-        section.innerHTML = "<p class='inv-countdown-label inv-countdown-today'>✨ Hoy es el gran día ✨</p>";
+        section.innerHTML = "<p class='inv-countdown-today'>✨ Hoy es el gran día ✨</p>";
         clearInterval(timer);
         return;
       }
@@ -341,11 +397,9 @@
   /* ─── showError ───────────────────────────────────────────────────── */
   function showError(message) {
     console.trace("showError llamado con:", message);
-
     var loader  = document.getElementById("inv-loader");
     var content = document.getElementById("inv-content");
     var errBox  = document.getElementById("inv-error");
-
     if (loader)  loader.style.display  = "none";
     if (content) content.style.display = "none";
     if (errBox) {
@@ -359,7 +413,7 @@
     var root = document.documentElement;
     root.style.setProperty("--inv-primary",        primary);
     root.style.setProperty("--inv-primary-light",  hexAlpha(primary, 0.12));
-    root.style.setProperty("--inv-primary-border", hexAlpha(primary, 0.35));
+    root.style.setProperty("--inv-primary-border", hexAlpha(primary, 0.30));
     root.style.setProperty("--inv-secondary",      secondary);
   }
 
@@ -400,16 +454,27 @@
 
   function parseLocalDate(dateString) {
     if (!dateString) return null;
-    const [year, month, day] = dateString.split("-").map(Number);
-    if (!year || !month || !day) return null;
-    return new Date(year, month - 1, day);
+    var parts = dateString.split("-").map(Number);
+    if (!parts[0] || !parts[1] || !parts[2]) return null;
+    return new Date(parts[0], parts[1] - 1, parts[2]);
   }
 
+  /** Fecha larga: "sábado, 14 de febrero de 2026" */
   function formatDate(dateStr) {
     if (!dateStr) return "";
     try {
       return parseLocalDate(dateStr).toLocaleDateString("es-MX", {
         weekday: "long", year: "numeric", month: "long", day: "numeric"
+      });
+    } catch (e) { return dateStr; }
+  }
+
+  /** Fecha corta: "14 Feb 2026" */
+  function formatDateShort(dateStr) {
+    if (!dateStr) return "";
+    try {
+      return parseLocalDate(dateStr).toLocaleDateString("es-MX", {
+        day: "numeric", month: "short", year: "numeric"
       });
     } catch (e) { return dateStr; }
   }
