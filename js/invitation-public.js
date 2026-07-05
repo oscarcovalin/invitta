@@ -271,6 +271,11 @@
         el.remove();
       }
     });
+
+    requestAnimationFrame(() => {
+      const hero = document.querySelector(".inv-hero");
+      if (hero) hero.classList.add("hero-visible");
+    });
   }
 
   /* ─── Foto principal (hero) ──────────────────────────────────────── */
@@ -867,27 +872,32 @@ function setupRevealAnimations() {
 
   if (!elements.length) return;
 
-  elements.forEach((el, index) => {
-    el.classList.add("reveal-on-scroll");
-    el.style.setProperty("--reveal-delay", `${Math.min(index * 60, 360)}ms`);
-  });
-
   if (!("IntersectionObserver" in window)) {
     elements.forEach((el) => el.classList.add("is-visible"));
     return;
   }
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      }
-    });
-  }, {
-    threshold: 0.12,
-    rootMargin: "0px 0px -5% 0px"
+  elements.forEach((el, index) => {
+    el.classList.remove("is-visible");
+    el.classList.add("reveal-on-scroll");
+    el.style.setProperty("--reveal-delay", `${Math.min(index * 80, 420)}ms`);
   });
 
-  elements.forEach((el) => observer.observe(el));
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.22,
+        rootMargin: "0px 0px -18% 0px"
+      });
+
+      elements.forEach((el) => observer.observe(el));
+    });
+  });
 }
