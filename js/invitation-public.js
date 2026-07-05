@@ -259,7 +259,9 @@
 
     /* 18. Animaciones de revelado */
     if (typeof setupRevealAnimations === "function") {
-      setupRevealAnimations();
+      requestAnimationFrame(() => {
+        setupRevealAnimations();
+      });
     }
 
     /* 19. Limpieza de elementos legacy de audio en el contenido */
@@ -848,21 +850,32 @@ function setupRevealAnimations() {
     ".inv-gallery-item",
     ".inv-timeline-item",
     ".inv-pass-card",
-    ".inv-rsvp-card"
+    ".inv-rsvp-card",
+    ".inv-countdown-section",
+    ".inv-parents-section",
+    ".inv-welcome-section"
   ];
 
-  const elements = document.querySelectorAll(selectors.join(","));
+  const elements = Array.from(document.querySelectorAll(selectors.join(",")))
+    .filter((el) => {
+      const style = window.getComputedStyle(el);
+      return style.display !== "none" && style.visibility !== "hidden";
+    });
+
+  console.log("setupRevealAnimations running");
+  console.log("Reveal elements found:", elements.length);
 
   if (!elements.length) return;
+
+  elements.forEach((el, index) => {
+    el.classList.add("reveal-on-scroll");
+    el.style.setProperty("--reveal-delay", `${Math.min(index * 60, 360)}ms`);
+  });
 
   if (!("IntersectionObserver" in window)) {
     elements.forEach((el) => el.classList.add("is-visible"));
     return;
   }
-
-  elements.forEach((el) => {
-    el.classList.add("reveal-on-scroll");
-  });
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -872,8 +885,8 @@ function setupRevealAnimations() {
       }
     });
   }, {
-    threshold: 0.16,
-    rootMargin: "0px 0px -8% 0px"
+    threshold: 0.12,
+    rootMargin: "0px 0px -5% 0px"
   });
 
   elements.forEach((el) => observer.observe(el));
