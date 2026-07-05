@@ -259,9 +259,9 @@
 
     /* 18. Animaciones de revelado */
     if (typeof setupRevealAnimations === "function") {
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         setupRevealAnimations();
-      });
+      }, 300);
     }
 
     /* 19. Limpieza de elementos legacy de audio en el contenido */
@@ -849,55 +849,61 @@
 })();
 
 function setupRevealAnimations() {
+  console.log("setupRevealAnimations running");
+
   const selectors = [
+    ".inv-section",
     ".inv-event-card",
     ".inv-section-card",
     ".inv-gallery-item",
     ".inv-timeline-item",
     ".inv-pass-card",
-    ".inv-rsvp-card",
-    ".inv-countdown-section",
-    ".inv-parents-section",
-    ".inv-welcome-section"
+    ".inv-rsvp-card"
   ];
 
   const elements = Array.from(document.querySelectorAll(selectors.join(",")))
     .filter((el) => {
       const style = window.getComputedStyle(el);
       return style.display !== "none" && style.visibility !== "hidden";
-    });
+    })
+    .filter((el) => !el.closest("#inv-music-player") && !el.classList.contains("inv-hero"));
 
-  console.log("setupRevealAnimations running");
   console.log("Reveal elements found:", elements.length);
 
-  if (!elements.length) return;
+  console.log("First reveal element:", elements[0]);
+  console.log("First reveal element classes:", elements[0]?.className);
 
-  if (!("IntersectionObserver" in window)) {
-    elements.forEach((el) => el.classList.add("is-visible"));
-    return;
-  }
+  setTimeout(() => {
+    console.log("After setup first element opacity:", window.getComputedStyle(elements[0]).opacity);
+    console.log("After setup first element transform:", window.getComputedStyle(elements[0]).transform);
+  }, 500);
+
+  if (!elements.length) return;
 
   elements.forEach((el, index) => {
     el.classList.remove("is-visible");
     el.classList.add("reveal-on-scroll");
-    el.style.setProperty("--reveal-delay", `${Math.min(index * 80, 420)}ms`);
+    el.style.setProperty("--reveal-delay", `${Math.min(index * 70, 350)}ms`);
   });
 
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      }, {
-        threshold: 0.22,
-        rootMargin: "0px 0px -18% 0px"
-      });
+  // Forzar un reflow real para que el navegador pinte el estado inicial invisible
+  document.body.offsetHeight;
 
-      elements.forEach((el) => observer.observe(el));
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      console.log("Reveal check:", entry.target.id || entry.target.className, entry.isIntersecting);
+
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      }
     });
+  }, {
+    threshold: 0.35,
+    rootMargin: "0px 0px -28% 0px"
   });
+
+  setTimeout(() => {
+    elements.forEach((el) => observer.observe(el));
+  }, 250);
 }
