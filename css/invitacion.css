@@ -1982,12 +1982,12 @@ body.has-music-player {
 ══════════════════════════════════════════════════ */
 .reveal-on-scroll {
   opacity: 0;
-  transform: translateY(28px) scale(0.985);
-  filter: blur(4px);
+  transform: translateY(32px) scale(0.985);
+  filter: blur(5px);
   transition:
-    opacity 900ms ease,
-    transform 900ms cubic-bezier(.22,1,.36,1),
-    filter 900ms ease;
+    opacity 900ms ease var(--reveal-delay, 0ms),
+    transform 900ms cubic-bezier(.22,1,.36,1) var(--reveal-delay, 0ms),
+    filter 900ms ease var(--reveal-delay, 0ms);
   will-change: opacity, transform, filter;
 }
 
@@ -1999,10 +1999,10 @@ body.has-music-player {
 
 .reveal-on-scroll .inv-card-icon {
   opacity: 0;
-  transform: translateY(16px) scale(0.86) rotate(-4deg);
+  transform: translateY(18px) scale(0.82) rotate(-4deg);
   transition:
-    opacity 900ms ease 120ms,
-    transform 900ms cubic-bezier(.22,1,.36,1) 120ms;
+    opacity 850ms ease calc(var(--reveal-delay, 0ms) + 140ms),
+    transform 850ms cubic-bezier(.22,1,.36,1) calc(var(--reveal-delay, 0ms) + 140ms);
 }
 
 .reveal-on-scroll.is-visible .inv-card-icon {
@@ -2012,10 +2012,10 @@ body.has-music-player {
 
 .reveal-on-scroll .inv-card-ornament {
   opacity: 0;
-  transform: translateX(-50%) translateY(14px) scale(0.92);
+  transform: translateX(-50%) translateY(16px) scale(0.9);
   transition:
-    opacity 900ms ease 80ms,
-    transform 900ms cubic-bezier(.22,1,.36,1) 80ms;
+    opacity 850ms ease calc(var(--reveal-delay, 0ms) + 80ms),
+    transform 850ms cubic-bezier(.22,1,.36,1) calc(var(--reveal-delay, 0ms) + 80ms);
 }
 
 .reveal-on-scroll.is-visible .inv-card-ornament {
@@ -2023,12 +2023,20 @@ body.has-music-player {
   transform: translateX(-50%) translateY(0) scale(1);
 }
 
-.inv-gallery-item.reveal-on-scroll {
-  transition-delay: 80ms;
+.inv-timeline-item.reveal-on-scroll {
+  transform: translateX(-18px);
 }
 
-.inv-timeline-item.reveal-on-scroll {
-  transition-delay: 60ms;
+.inv-timeline-item.reveal-on-scroll.is-visible {
+  transform: translateX(0);
+}
+
+.inv-gallery-item.reveal-on-scroll {
+  transform: translateY(36px) scale(0.96);
+}
+
+.inv-gallery-item.reveal-on-scroll.is-visible {
+  transform: translateY(0) scale(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
