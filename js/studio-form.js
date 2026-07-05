@@ -49,6 +49,15 @@ function itineraryToText(value) {
     .join("\n");
 }
 
+function cleanMusicFileName(filename) {
+  if (!filename) return "";
+  const decoded = decodeURIComponent(filename);
+  return decoded
+    .replace(/\.(mp3|m4a|wav|ogg)$/i, "")
+    .replace(/^\d+[-_]/, "")
+    .trim();
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const session = await window.studioAuth.requireSession();
   if (!session) return;
@@ -69,6 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // URLs actuales (preservar si no se sube archivo nuevo)
   let existingPhotoUrl = null;
   let existingMusicUrl = null;
+  let existingBackgroundUrl = null;
   let existingGalleryUrls = [];
 
   let currentStudioId = localStorage.getItem("invitta_studio_id");
@@ -113,6 +123,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (preview) {
         preview.src = URL.createObjectURL(file);
         preview.classList.add("visible");
+      }
+    });
+  }
+
+  const musicInput = document.getElementById("musicFile");
+  if (musicInput) {
+    musicInput.addEventListener("change", () => {
+      const file = musicInput.files[0];
+      clearMediaError("music");
+      if (!file) return;
+      const titleInput = document.getElementById("music_title");
+      if (titleInput) {
+        titleInput.value = cleanMusicFileName(file.name);
       }
     });
   }
@@ -260,6 +283,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("published").checked = !!data.published;
     
     document.getElementById("itineraryText").value = itineraryToText(data.itinerary);
+    
+    document.getElementById("music_title").value = data.music_title || "";
+    document.getElementById("music_artist").value = data.music_artist || "";
 
     // Preservar URLs existentes de foto y música
     existingPhotoUrl = data.main_photo_url || null;
@@ -279,6 +305,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Mostrar URL actual de música
+    // Preservar URL existente de fondo
+    existingBackgroundUrl = data.background_image_url || null;
+    if (existingBackgroundUrl) {
+      const bgCurrent = document.getElementById("background-current");
+      const bgDisplay = document.getElementById("background-url-display");
+      if (bgCurrent) bgCurrent.style.display = "block";
+      if (bgDisplay) {
+        bgDisplay.innerHTML = `<a href="${existingBackgroundUrl}" target="_blank">Ver fondo</a>`;
+      }
+    }
+
     if (existingMusicUrl) {
       const musicCurrent = document.getElementById("music-current");
       const musicDisplay = document.getElementById("music-url-display");
@@ -369,6 +406,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       finalMusicUrl = uploadedUrl;
     }
 
+    // ── Subida de fondo ──
+    let finalBackgroundUrl = existingBackgroundUrl;
+    const bgFile = document.getElementById("backgroundImageFile")?.files[0];
+    if (bgFile) {
+      if (!validateFile(bgFile, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "background")) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar Invitación";
+        return;
+      }
+      showProgress("background");
+      const uploadedUrl = await uploadFileToStorage(bgFile, "background", slugToUse);
+      hideProgress("background");
+      if (!uploadedUrl) {
+        showMediaError("background", "Error al subir el fondo. Intenta de nuevo.");
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar Invitación";
+        return;
+      }
+      finalBackgroundUrl = uploadedUrl;
+    }
+
     // ── Subida de galería ──
     let finalGalleryUrls = existingGalleryUrls;
     const galleryInput   = document.getElementById("galleryFiles");
@@ -457,6 +515,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       published: document.getElementById("published").checked,
       gallery_urls: finalGalleryUrls,
       itinerary: parseItineraryText(document.getElementById("itineraryText").value),
+      background_image_url: finalBackgroundUrl,
+      music_title: musicFile ? cleanMusicFileName(musicFile.name) : (document.getElementById("music_title").value || null),
+      music_artist: document.getElementById("music_artist").value || null,
       template_id: null,
       main_photo_url: finalPhotoUrl,
       music_url: finalMusicUrl,

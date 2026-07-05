@@ -311,6 +311,34 @@
   let invitationAudio = null;
   let isMusicPlaying = false;
 
+  function cleanMusicFileName(filename) {
+    if (!filename) return "";
+    const decoded = decodeURIComponent(filename);
+    return decoded
+      .replace(/\.(mp3|m4a|wav|ogg)$/i, "")
+      .replace(/^\d+[-_]/, "")
+      .trim();
+  }
+
+  function getMusicTitle(invitation) {
+    if (invitation.music_title && invitation.music_title.trim()) {
+      return invitation.music_title.trim();
+    }
+
+    if (invitation.music_url) {
+      try {
+        const url = new URL(invitation.music_url);
+        const filename = url.pathname.split("/").pop() || "";
+        return cleanMusicFileName(filename) || "Música del evento";
+      } catch (e) {
+        const filename = invitation.music_url.split("/").pop() || "";
+        return cleanMusicFileName(filename) || "Música del evento";
+      }
+    }
+
+    return "Música del evento";
+  }
+
   function forceMusicPlayerStyles(player) {
     if (!player) return;
   
@@ -439,7 +467,7 @@
     console.log("Music player position:", window.getComputedStyle(player).position);
     console.log("Music player bottom:", window.getComputedStyle(player).bottom);
 
-    if (title) title.textContent = invitation.music_title || "Música del evento";
+    if (title) title.textContent = getMusicTitle(invitation);
     if (artist) artist.textContent = invitation.music_artist ? `~ ${invitation.music_artist} ~` : "";
 
     if (invitationAudio) {
