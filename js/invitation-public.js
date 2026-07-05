@@ -842,11 +842,27 @@
 })();
 
 function setupRevealAnimations() {
-  const elements = document.querySelectorAll(
-    ".inv-event-card, .inv-section-card, .inv-gallery-item, .inv-timeline-item, .inv-pass-card, .inv-rsvp-card"
-  );
+  const selectors = [
+    ".inv-event-card",
+    ".inv-section-card",
+    ".inv-gallery-item",
+    ".inv-timeline-item",
+    ".inv-pass-card",
+    ".inv-rsvp-card"
+  ];
 
-  elements.forEach((el) => el.classList.add("reveal-on-scroll"));
+  const elements = document.querySelectorAll(selectors.join(","));
+
+  if (!elements.length) return;
+
+  if (!("IntersectionObserver" in window)) {
+    elements.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
+  elements.forEach((el) => {
+    el.classList.add("reveal-on-scroll");
+  });
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -856,7 +872,7 @@ function setupRevealAnimations() {
       }
     });
   }, {
-    threshold: 0.18,
+    threshold: 0.16,
     rootMargin: "0px 0px -8% 0px"
   });
 

@@ -1976,3 +1976,68 @@ body.has-music-player {
     left: 1.3rem;
   }
 }
+
+/* ══════════════════════════════════════════════════
+   REVEAL ANIMATIONS (Premium Scroll)
+══════════════════════════════════════════════════ */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(28px) scale(0.985);
+  filter: blur(4px);
+  transition:
+    opacity 900ms ease,
+    transform 900ms cubic-bezier(.22,1,.36,1),
+    filter 900ms ease;
+  will-change: opacity, transform, filter;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+.reveal-on-scroll .inv-card-icon {
+  opacity: 0;
+  transform: translateY(16px) scale(0.86) rotate(-4deg);
+  transition:
+    opacity 900ms ease 120ms,
+    transform 900ms cubic-bezier(.22,1,.36,1) 120ms;
+}
+
+.reveal-on-scroll.is-visible .inv-card-icon {
+  opacity: 1;
+  transform: translateY(0) scale(1) rotate(0deg);
+}
+
+.reveal-on-scroll .inv-card-ornament {
+  opacity: 0;
+  transform: translateX(-50%) translateY(14px) scale(0.92);
+  transition:
+    opacity 900ms ease 80ms,
+    transform 900ms cubic-bezier(.22,1,.36,1) 80ms;
+}
+
+.reveal-on-scroll.is-visible .inv-card-ornament {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.inv-gallery-item.reveal-on-scroll {
+  transition-delay: 80ms;
+}
+
+.inv-timeline-item.reveal-on-scroll {
+  transition-delay: 60ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll,
+  .reveal-on-scroll .inv-card-icon,
+  .reveal-on-scroll .inv-card-ornament {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}
