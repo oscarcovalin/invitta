@@ -769,7 +769,7 @@ body {
   width: 22px;
   height: 22px;
 }
-
+/* ══════════════════════════════════════════════════
    8. RSVP SECTION
 ══════════════════════════════════════════════════ */
 .inv-rsvp {
@@ -1648,12 +1648,6 @@ body.has-music-player {
   margin: 0 !important;
 }
 
-.reveal-on-scroll,
-.reveal-on-scroll.is-visible {
-  transition: none !important;
-  filter: none !important;
-}
-
 @media (max-width: 640px) {
   .inv-event-card,
   .inv-section-card,
@@ -1698,4 +1692,20 @@ body.has-music-player {
   body.has-music-player {
     padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important;
   }
+}
+.inv-welcome-block,
+.inv-ticket,
+.inv-event-card,
+.inv-rsvp,
+.inv-timeline-item,
+.inv-section-card,
+.inv-pass-card,
+.inv-rsvp-card {
+  animation: none !important;
+}
+
+.reveal-on-scroll,
+.reveal-on-scroll.is-visible {
+  transition: none !important;
+  filter: none !important;
 }
