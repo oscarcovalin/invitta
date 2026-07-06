@@ -1,4 +1,32 @@
 document.addEventListener("DOMContentLoaded", () => {
+  try {
+    initLinkBuilder();
+  } catch (error) {
+    console.error("Link builder init error:", error);
+    showFatalError("No se pudo cargar el generador. Revisa la configuración.");
+  }
+});
+
+function showFatalError(message) {
+  const errorBox = document.getElementById("linkBuilderError");
+  const form = document.getElementById("builderState");
+  const dynamicMessage = document.getElementById("dynamicMessage");
+
+  if (dynamicMessage) {
+    dynamicMessage.style.display = "none";
+  }
+
+  if (errorBox) {
+    errorBox.textContent = message;
+    errorBox.classList.remove("hidden");
+  }
+
+  if (form) {
+    form.classList.remove("hidden");
+  }
+}
+
+async function initLinkBuilder() {
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
 
@@ -22,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let invitationData = null;
 
   if (!slug) {
-    document.getElementById("errorMessage").style.display = "block";
+    showFatalError("No se encontró el slug de la invitación.");
     return;
   }
 
@@ -36,11 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const sb = window.supabaseClient;
 
   if (!sb) {
-    console.error("Supabase client not initialized.");
-    return;
-  }
-
-  async function init() {
+    console.error("Supabase client not initialized. Falling back to basic mode.");
+    dynamicMessage.textContent = "Crea un pase rápido para invitados de último momento.";
+    builderState.classList.remove("hidden");
+  } else {
     try {
       const { data, error } = await sb
         .from("studio_invitations")
@@ -49,8 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .single();
 
       if (error || !data) {
-        document.getElementById("errorMessage").textContent = "No se encontró la invitación.";
-        document.getElementById("errorMessage").style.display = "block";
+        showFatalError("No se encontró la invitación.");
         return;
       }
 
@@ -58,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (invitationData.link_builder_enabled === false) {
         disabledState.classList.remove("hidden");
+        dynamicMessage.style.display = "none";
         return;
       }
 
@@ -79,16 +106,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (err) {
       console.error(err);
-      document.getElementById("errorMessage").textContent = "Error de conexión.";
-      document.getElementById("errorMessage").style.display = "block";
+      showFatalError("Error de conexión. Mostrando generador básico.");
     }
   }
-  
-  init();
 
   unlockLinkBuilderButton.addEventListener("click", () => {
     const inputPin = linkBuilderPinInput.value;
-    if (inputPin === invitationData.link_builder_pin) {
+    if (invitationData && inputPin === invitationData.link_builder_pin) {
       sessionStorage.setItem(`linkBuilderUnlocked:${slug}`, "true");
       pinState.classList.add("hidden");
       builderState.classList.remove("hidden");
@@ -178,4 +202,4 @@ document.addEventListener("DOMContentLoaded", () => {
     const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(waUrl, "_blank");
   });
-});
+}

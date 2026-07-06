@@ -254,3 +254,15 @@ button.link-builder-button:hover {
     width: 100%;
   }
 }
+
+.link-builder-shell {
+  display: grid !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.link-builder-card {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}

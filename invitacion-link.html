@@ -14,33 +14,31 @@
 <body class="link-builder-page">
   <main class="link-builder-shell">
     
-    <!-- PANTALLA DE ERROR / DESACTIVADO -->
-    <div id="disabledState" class="link-builder-card hidden" style="text-align: center;">
-      <h2 class="link-builder-title" style="font-size: 2rem;">Generador no disponible</h2>
-      <p class="link-builder-subtitle" id="disabledMessageText">El generador de enlaces no está activo para esta invitación.</p>
-    </div>
-
-    <!-- PANTALLA DE PIN -->
-    <div id="pinState" class="link-builder-card hidden" style="text-align: center;">
-      <h2 class="link-builder-title" style="font-size: 2rem;">Acceso al generador</h2>
-      <p class="link-builder-subtitle" style="margin-bottom: 1.5rem;">Ingresa el PIN proporcionado por el estudio.</p>
-      <input type="password" id="linkBuilderPinInput" style="width: 100%; box-sizing: border-box; border: 1px solid rgba(74,45,32,.16); border-radius: 1rem; padding: 1rem; text-align: center; font-size: 1.2rem; letter-spacing: .16em;" placeholder="****">
-      <div id="linkBuilderPinError" style="margin-top: .8rem; color: #b42318; font-size: .9rem;" class="hidden">PIN incorrecto.</div>
-      <button type="button" id="unlockLinkBuilderButton" class="link-builder-button primary" style="width: 100%; margin-top: 1.5rem;">Entrar</button>
-    </div>
-
-    <div id="builderState" class="link-builder-card hidden">
+    <section id="linkBuilderCard" class="link-builder-card">
       <div class="link-builder-mark">Invitta Studio</div>
       <p class="link-builder-kicker">Pase personalizado</p>
       
       <h1 id="dynamicTitle" class="link-builder-title">Generador de enlace</h1>
-      <p id="dynamicMessage" class="link-builder-subtitle">Crea un pase rápido para invitados de último momento.</p>
+      <p id="dynamicMessage" class="link-builder-subtitle">Cargando configuración...</p>
 
-      <div id="errorMessage" style="display: none; color: #a13b3b; text-align: center; margin-bottom: 1.5rem; font-weight: 600;">
-        No se encontró el slug de la invitación.
+      <div id="linkBuilderError" class="link-builder-error hidden" style="margin-bottom: 1.5rem;"></div>
+
+      <!-- PANTALLA DE ERROR / DESACTIVADO -->
+      <div id="disabledState" class="hidden" style="text-align: center;">
+        <p class="link-builder-subtitle" style="color: #b42318; font-weight: 600;" id="disabledMessageText">El generador de enlaces no está activo para esta invitación.</p>
       </div>
 
-      <div id="builderForm">
+      <!-- PANTALLA DE PIN -->
+      <div id="pinState" class="hidden" style="text-align: center;">
+        <p class="link-builder-subtitle" style="margin-bottom: 1.5rem;">Ingresa el PIN proporcionado por el estudio.</p>
+        <input type="password" id="linkBuilderPinInput" style="width: 100%; box-sizing: border-box; border: 1px solid rgba(74,45,32,.16); border-radius: 1rem; padding: 1rem; text-align: center; font-size: 1.2rem; letter-spacing: .16em;" placeholder="****">
+        <div id="linkBuilderPinError" style="margin-top: .8rem; color: #b42318; font-size: .9rem;" class="hidden">PIN incorrecto.</div>
+        <button type="button" id="unlockLinkBuilderButton" class="link-builder-button primary" style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+      </div>
+
+      <!-- PANTALLA DE GENERADOR -->
+      <div id="builderState" class="hidden">
+        <div id="builderForm">
         <div class="link-builder-field">
           <label for="guestName">Nombre o familia *</label>
           <input type="text" id="guestName" placeholder="Familia García" required>
@@ -69,8 +67,9 @@
         </div>
 
         <div id="generatedLinkOutput" class="generated-link-output" style="display:none;"></div>
+        </div>
       </div>
-    </div>
+    </section>
   </main>
 
   <script src="/js/invitacion-link.js"></script>
