@@ -856,7 +856,7 @@
         const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
         const clamped = Math.max(0, Math.min(1, progress));
 
-        const translate = (clamped - 0.5) * 36;
+        const translate = (clamped - 0.5) * 28;
 
         img.style.transform = `translate3d(0, ${translate}px, 0) scale(1.06)`;
       });
