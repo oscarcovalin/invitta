@@ -58,6 +58,11 @@ function cleanMusicFileName(filename) {
     .trim();
 }
 
+function getChecked(id) {
+  const el = document.getElementById(id);
+  return Boolean(el && el.checked);
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const session = await window.studioAuth.requireSession();
   if (!session) return;
@@ -362,6 +367,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("whatsapp_number").value = data.whatsapp_number || "";
     document.getElementById("published").checked = !!data.published;
     
+    if (document.getElementById("studioName")) {
+      document.getElementById("studioName").value = data.studio_name || "Invitta Studio";
+    }
+    if (document.getElementById("studioLogoUrl")) {
+      document.getElementById("studioLogoUrl").value = data.studio_logo_url || "";
+    }
+    if (document.getElementById("musicPlayerBrandEnabled")) {
+      document.getElementById("musicPlayerBrandEnabled").checked = data.music_player_brand_enabled !== false;
+    }
+    
     document.getElementById("itineraryText").value = itineraryToText(data.itinerary);
     
     document.getElementById("music_title").value = data.music_title || "";
@@ -599,6 +614,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       dress_code: document.getElementById("dress_code").value,
       whatsapp_number: document.getElementById("whatsapp_number").value,
       published: document.getElementById("published").checked,
+      studio_name: document.getElementById("studioName") ? document.getElementById("studioName").value || "Invitta Studio" : "Invitta Studio",
+      studio_logo_url: document.getElementById("studioLogoUrl") ? document.getElementById("studioLogoUrl").value || "" : "",
+      music_player_brand_enabled: getChecked("musicPlayerBrandEnabled"),
       gallery_urls: finalGalleryUrls,
       itinerary: parseItineraryText(document.getElementById("itineraryText").value),
       background_image_url: finalBackgroundUrl,

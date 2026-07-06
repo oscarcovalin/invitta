@@ -2875,3 +2875,67 @@ main {
     height: 116%;
   }
 }
+
+/* Music player studio branding */
+
+.inv-music-brand {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 103, 0.72);
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,255,255,.12), transparent 34%),
+    rgba(12, 10, 9, 0.92);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 10px 26px rgba(0,0,0,.28);
+}
+
+.inv-music-brand-logo {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  display: block;
+}
+
+.inv-music-brand-fallback span {
+  font-family: var(--font-title, "Cormorant Garamond", serif);
+  font-size: 1.05rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,.92);
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .inv-music-brand {
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+  }
+
+  .inv-music-brand-fallback span {
+    font-size: 1rem;
+  }
+}
+
+.inv-music-player,
+.inv-audio-player,
+.inv-music-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.inv-music-title,
+.inv-audio-title,
+.inv-music-track {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}

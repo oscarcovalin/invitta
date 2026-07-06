@@ -637,6 +637,55 @@
     }
   }
 
+  function escapeHtml(unsafe) {
+    return (unsafe || "").toString()
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function getStudioInitials(name) {
+    const clean = String(name || "Invitta Studio").trim();
+    if (!clean) return "IS";
+    const parts = clean.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+    return parts.slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+  }
+
+  function renderMusicPlayerBrand(invitation) {
+    const enabled = invitation.music_player_brand_enabled !== false;
+    const studioName = invitation.studio_name || "Invitta Studio";
+    const logoUrl = invitation.studio_logo_url || "";
+
+    if (!enabled) {
+      return "";
+    }
+
+    if (logoUrl) {
+      return `
+        <div class="inv-music-brand" aria-label="${escapeHtml(studioName)}">
+          <img
+            class="inv-music-brand-logo"
+            src="${escapeHtml(logoUrl)}"
+            alt="${escapeHtml(studioName)}"
+            loading="lazy"
+            onerror="this.closest('.inv-music-brand')?.classList.add('is-logo-error'); this.remove();"
+          >
+        </div>
+      `;
+    }
+
+    return `
+      <div class="inv-music-brand inv-music-brand-fallback" aria-label="${escapeHtml(studioName)}">
+        <span>${escapeHtml(getStudioInitials(studioName))}</span>
+      </div>
+    `;
+  }
+
   function setupMusicPlayer(invitation) {
     const player = document.getElementById("inv-music-player");
     const toggle = document.getElementById("inv-music-toggle");
@@ -661,6 +710,17 @@
     player.style.setProperty("display", "flex", "important");
     forceMusicPlayerStyles(player);
     forceMusicPlayerChildStyles();
+    
+    const logoContainer = player.querySelector(".inv-music-logo, .inv-music-brand, .inv-music-brand-fallback");
+    if (logoContainer) {
+      const brandHtml = renderMusicPlayerBrand(invitation);
+      if (brandHtml) {
+        logoContainer.outerHTML = brandHtml;
+      } else {
+        logoContainer.style.display = "none";
+      }
+    }
+    
     document.body.classList.add("has-music-player");
 
     console.log("Music player computed display:", window.getComputedStyle(player).display);
