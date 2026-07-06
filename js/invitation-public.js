@@ -725,11 +725,30 @@
     return [];
   }
 
+  function getTimelineIcon(title) {
+    const value = String(title || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    if (value.includes("recepcion")) return "fa-heart";
+    if (value.includes("bienvenida")) return "fa-crown";
+    if (value.includes("presentacion")) return "fa-sparkles";
+    if (value.includes("brindis")) return "fa-champagne-glasses";
+    if (value.includes("coronacion")) return "fa-crown";
+    if (value.includes("vals")) return "fa-people-pulling";
+    if (value.includes("cena")) return "fa-utensils";
+    if (value.includes("apertura de pista")) return "fa-compact-disc";
+    if (value.includes("batucada")) return "fa-drum";
+    if (value.includes("baile")) return "fa-music";
+    if (value.includes("cierre")) return "fa-heart";
+
+    return "fa-star";
+  }
+
   function renderItinerary(value) {
     const section = document.getElementById("inv-itinerary-section");
-    const container = document.getElementById("inv-itinerary");
-
-    if (!section || !container) return;
+    if (!section) return;
 
     const items = normalizeItinerary(value);
     console.log("itinerary raw:", value);
@@ -737,33 +756,61 @@
 
     if (!items.length) {
       section.style.display = "none";
-      container.innerHTML = "";
+      section.innerHTML = "";
       return;
     }
 
+    section.classList.add("inv-timeline-premium", "reveal-on-scroll");
     section.style.setProperty("display", "block", "important");
     section.style.setProperty("visibility", "visible", "important");
-    section.style.setProperty("opacity", "1", "important");
+    // Remove the forced opacity to allow the reveal-on-scroll CSS animation to work
 
-    container.innerHTML = items.map((item, index) => `
-      <div class="inv-timeline-item">
-        <div class="inv-timeline-marker">
-          <span>${String(index + 1).padStart(2, "0")}</span>
+    const itemsHtml = items.map((item) => {
+      const eventTitle = item.title || "";
+      const icon = getTimelineIcon(eventTitle);
+
+      return `
+      <div class="inv-timeline-row reveal-on-scroll">
+        <div class="inv-timeline-icon" aria-hidden="true">
+          <i class="fa-solid ${icon}"></i>
         </div>
-        <div class="inv-timeline-content">
-          ${item.time ? `<p class="inv-timeline-time">${escapeHtml(item.time)}</p>` : ""}
-          <h3>${escapeHtml(item.title || "")}</h3>
+        <div class="inv-timeline-line" aria-hidden="true"></div>
+        <div class="inv-timeline-time">${item.time ? escapeHtml(item.time) : ""}</div>
+        <div class="inv-timeline-event">${escapeHtml(eventTitle)}</div>
+      </div>
+    `;
+    }).join("");
+
+    section.innerHTML = `
+      <div class="inv-timeline-shell">
+        <div class="inv-timeline-header">
+          <p class="inv-timeline-kicker">ITINERARIO</p>
+          <h2 class="inv-timeline-title">
+            <span class="inv-title-top">Momentos de la</span>
+            <span class="inv-title-script">Noche</span>
+          </h2>
+          <div class="inv-timeline-divider" aria-hidden="true">
+            <span></span>
+            <i class="fa-solid fa-heart"></i>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="inv-timeline-list">
+          ${itemsHtml}
+        </div>
+
+        <div class="inv-timeline-footer-quote">
+          <p>Cada estrella nos acerca a</p>
+          <span>esa noche</span>
         </div>
       </div>
-    `).join("");
+    `;
 
     console.log("Timeline section display:", window.getComputedStyle(section).display);
     console.log("Timeline section visibility:", window.getComputedStyle(section).visibility);
-    console.log("Timeline container HTML:", container.innerHTML);
-    console.log("Timeline section:", document.getElementById("inv-itinerary-section"));
-    console.log("Timeline items count:", document.querySelectorAll(".inv-timeline-item").length);
+    console.log("Timeline items count:", document.querySelectorAll(".inv-timeline-row").length);
   }
-
   /* ─── Helpers texto / números ─────────────────────────────────────── */
   function sanitize(str) {
     return String(str || "").trim().slice(0, 200);
