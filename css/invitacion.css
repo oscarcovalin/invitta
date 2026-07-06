@@ -2590,3 +2590,108 @@ body.theme-black-luxury .inv-share-hashtag {
 .inv-section-icon svg {
   transform-origin: center;
 }
+
+/* Mobile closing sections and music safe area polish */
+body {
+  padding-bottom: 112px;
+}
+
+body.has-music-player {
+  padding-bottom: calc(170px + env(safe-area-inset-bottom)) !important;
+}
+
+.invitation-page,
+.inv-public-page,
+.inv-main,
+.inv-page,
+#inv-content,
+main {
+  padding-bottom: calc(180px + env(safe-area-inset-bottom)) !important;
+}
+
+.inv-footer,
+.inv-public-footer {
+  margin-bottom: 7rem !important;
+  padding-bottom: 2rem !important;
+}
+
+.inv-thank-you-signature {
+  margin: 1rem auto 0;
+  max-width: 360px;
+  font-family: var(--font-title, "Cormorant Garamond", serif);
+  font-size: clamp(1.65rem, 7vw, 2.35rem);
+  line-height: 1.12;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--theme-muted, #7d6860);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.inv-rsvp-button,
+.inv-confirm-button,
+.whatsapp-confirm-button,
+.inv-whatsapp-button,
+#inv-whatsapp-button,
+#inv-btn-confirm {
+  background:
+    linear-gradient(135deg, #1f9f74, #0f7f68) !important;
+  box-shadow:
+    0 18px 38px rgba(15, 127, 104, 0.24),
+    inset 0 1px 0 rgba(255,255,255,0.24) !important;
+  border: 1px solid rgba(255,255,255,0.24) !important;
+}
+
+.inv-rsvp-button:hover,
+.inv-confirm-button:hover,
+.whatsapp-confirm-button:hover,
+.inv-whatsapp-button:hover,
+#inv-whatsapp-button:hover,
+#inv-btn-confirm:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  body {
+    padding-bottom: 138px;
+  }
+
+  body.has-music-player {
+    padding-bottom: calc(188px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .invitation-page,
+  .inv-public-page,
+  .inv-main,
+  .inv-page,
+  #inv-content,
+  main {
+    padding-bottom: calc(210px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .inv-footer,
+  .inv-public-footer {
+    margin-bottom: 8.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  .inv-thank-you-signature {
+    max-width: 310px;
+    font-size: clamp(1.55rem, 6.2vw, 2rem);
+    line-height: 1.15;
+  }
+
+  .inv-pass-card,
+  .inv-rsvp-card,
+  .inv-thank-you-card,
+  .inv-share-card {
+    border-radius: 2rem;
+  }
+
+  .inv-thank-you-section,
+  .inv-share-section {
+    margin-top: 2.4rem;
+    margin-bottom: 2.4rem;
+  }
+}

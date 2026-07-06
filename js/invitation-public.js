@@ -489,18 +489,24 @@
   let invitationAudio = null;
   let isMusicPlaying = false;
 
+  function cleanMusicTitle(value) {
+    return String(value || "")
+      .replace(/[-_]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   function cleanMusicFileName(filename) {
     if (!filename) return "";
     const decoded = decodeURIComponent(filename);
-    return decoded
+    return cleanMusicTitle(decoded
       .replace(/\.(mp3|m4a|wav|ogg)$/i, "")
-      .replace(/^\d+[-_]/, "")
-      .trim();
+      .replace(/^\d+[-_]/, ""));
   }
 
   function getMusicTitle(invitation) {
     if (invitation.music_title && invitation.music_title.trim()) {
-      return invitation.music_title.trim();
+      return cleanMusicTitle(invitation.music_title);
     }
 
     if (invitation.music_url) {
@@ -515,6 +521,17 @@
     }
 
     return "Música del evento";
+  }
+
+  function getMusicDisplayTitle(invitation) {
+    const musicTitle = getMusicTitle(invitation);
+    const musicArtist = cleanMusicTitle(invitation.music_artist);
+
+    if (musicArtist && musicTitle && musicTitle !== "Música del evento") {
+      return `${musicArtist} · ${musicTitle}`;
+    }
+
+    return musicArtist || musicTitle;
   }
 
   function forceMusicPlayerStyles(player) {
@@ -645,8 +662,8 @@
     console.log("Music player position:", window.getComputedStyle(player).position);
     console.log("Music player bottom:", window.getComputedStyle(player).bottom);
 
-    if (title) title.textContent = getMusicTitle(invitation);
-    if (artist) artist.textContent = invitation.music_artist ? `~ ${invitation.music_artist} ~` : "";
+    if (title) title.textContent = getMusicDisplayTitle(invitation);
+    if (artist) artist.textContent = "";
 
     if (invitationAudio) {
       invitationAudio.pause();
