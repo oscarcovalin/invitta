@@ -39,6 +39,20 @@ function hidePinGate() {
   document.getElementById("linkBuilderPinGate")?.classList.add("hidden");
 }
 
+function getSupabaseClient() {
+  if (window.supabaseClient) return window.supabaseClient;
+  if (window.supabase) {
+    const url = window.SUPABASE_URL || window.supabaseUrl || window.env?.SUPABASE_URL;
+    const key = window.SUPABASE_ANON_KEY || window.supabaseAnonKey || window.env?.SUPABASE_ANON_KEY;
+
+    if (url && key) {
+      return window.supabase.createClient(url, key);
+    }
+  }
+
+  return null;
+}
+
 async function initLinkBuilder() {
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
@@ -69,22 +83,16 @@ async function initLinkBuilder() {
   hideBuilderForm();
   hidePinGate();
 
-  // Initialize Supabase if available in global
-  if (!window.supabaseClient) {
-    if (window.env && window.env.SUPABASE_URL && window.env.SUPABASE_ANON_KEY) {
-      window.supabaseClient = supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON_KEY);
-    }
-  }
-  
-  const sb = window.supabaseClient;
+  const supabase = getSupabaseClient();
 
-  if (!sb) {
-    console.error("Supabase client not initialized. Falling back to basic mode.");
-    if (statusState) statusState.style.display = "none";
-    showBuilderForm();
-  } else {
-    try {
-      const { data, error } = await sb
+  if (!supabase) {
+    console.error("Supabase client not available for link builder.");
+    showFatalError("No se pudo cargar la configuración de acceso.");
+    return;
+  }
+
+  try {
+    const { data, error } = await supabase
         .from("studio_invitations")
         .select("slug, event_title, quinceanera_name, link_builder_enabled, link_builder_pin, link_builder_title, link_builder_message")
         .eq("slug", slug)
@@ -125,9 +133,8 @@ async function initLinkBuilder() {
 
     } catch (err) {
       console.error(err);
-      showFatalError("Error de conexión. Mostrando generador básico.");
+      showFatalError("Error de conexión al cargar la configuración.");
     }
-  }
 
   unlockLinkBuilderButton.addEventListener("click", () => {
     unlockLinkBuilder();
