@@ -16,10 +16,13 @@
     
     <section id="linkBuilderCard" class="link-builder-card">
       <div class="link-builder-mark">Invitta Studio</div>
-      <p class="link-builder-kicker">Pase personalizado</p>
       
-      <h1 id="dynamicTitle" class="link-builder-title">Generador de enlace</h1>
-      <p id="dynamicMessage" class="link-builder-subtitle">Cargando configuración...</p>
+      <!-- ESTADO DE CARGA / STATUS -->
+      <div id="statusState" style="text-align: center;">
+        <p class="link-builder-kicker">Pase personalizado</p>
+        <h1 class="link-builder-title">Cargando</h1>
+        <p class="link-builder-subtitle" id="statusMessage">Cargando configuración...</p>
+      </div>
 
       <div id="linkBuilderError" class="link-builder-error hidden" style="margin-bottom: 1.5rem;"></div>
 
@@ -28,45 +31,67 @@
         <p class="link-builder-subtitle" style="color: #b42318; font-weight: 600;" id="disabledMessageText">El generador de enlaces no está activo para esta invitación.</p>
       </div>
 
-      <!-- PANTALLA DE PIN -->
-      <div id="pinState" class="hidden" style="text-align: center;">
-        <p class="link-builder-subtitle" style="margin-bottom: 1.5rem;">Ingresa el PIN proporcionado por el estudio.</p>
-        <input type="password" id="linkBuilderPinInput" style="width: 100%; box-sizing: border-box; border: 1px solid rgba(74,45,32,.16); border-radius: 1rem; padding: 1rem; text-align: center; font-size: 1.2rem; letter-spacing: .16em;" placeholder="****">
-        <div id="linkBuilderPinError" style="margin-top: .8rem; color: #b42318; font-size: .9rem;" class="hidden">PIN incorrecto.</div>
-        <button type="button" id="unlockLinkBuilderButton" class="link-builder-button primary" style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+      <!-- PIN GATE -->
+      <div id="linkBuilderPinGate" class="link-builder-pin-gate hidden" style="text-align: center;">
+        <p class="link-builder-kicker">Acceso privado</p>
+        <h1 class="link-builder-title">Ingresa el PIN</h1>
+        <p class="link-builder-subtitle" style="margin-bottom: 1.5rem;">
+          Escribe el PIN proporcionado por el estudio para generar pases personalizados.
+        </p>
+
+        <div class="link-builder-field">
+          <label for="linkBuilderPinInput" style="text-align: left; display: block;">PIN de acceso</label>
+          <input
+            id="linkBuilderPinInput"
+            type="password"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            placeholder="••••"
+          >
+        </div>
+
+        <button id="unlockLinkBuilderButton" class="link-builder-button primary" type="button" style="width: 100%; margin-top: .5rem;">
+          Entrar
+        </button>
+
+        <p id="linkBuilderPinError" class="link-builder-error hidden"></p>
       </div>
 
-      <!-- PANTALLA DE GENERADOR -->
-      <div id="builderState" class="hidden">
+      <!-- FORMULARIO DE GENERADOR -->
+      <div id="linkBuilderForm" class="hidden">
+        <p class="link-builder-kicker">Pase personalizado</p>
+        <h1 id="dynamicTitle" class="link-builder-title">Generador de enlace</h1>
+        <p id="dynamicMessage" class="link-builder-subtitle">Crea un pase rápido para invitados de último momento.</p>
+
         <div id="builderForm">
-        <div class="link-builder-field">
-          <label for="guestName">Nombre o familia *</label>
-          <input type="text" id="guestName" placeholder="Familia García" required>
-        </div>
+          <div class="link-builder-field">
+            <label for="guestName">Nombre o familia *</label>
+            <input type="text" id="guestName" placeholder="Familia García" required>
+          </div>
 
-        <div class="link-builder-field">
-          <label for="guestPasses">Pases</label>
-          <input type="number" id="guestPasses" placeholder="4" min="1">
-        </div>
+          <div class="link-builder-field">
+            <label for="guestPasses">Pases</label>
+            <input type="number" id="guestPasses" placeholder="4" min="1">
+          </div>
 
-        <div class="link-builder-field">
-          <label for="guestTable">Mesa</label>
-          <input type="text" id="guestTable" placeholder="5">
-        </div>
+          <div class="link-builder-field">
+            <label for="guestTable">Mesa</label>
+            <input type="text" id="guestTable" placeholder="5">
+          </div>
 
-        <div class="link-builder-field">
-          <label for="guestWhatsapp">WhatsApp del invitado opcional</label>
-          <input type="tel" id="guestWhatsapp" placeholder="525512345678">
-        </div>
+          <div class="link-builder-field">
+            <label for="guestWhatsapp">WhatsApp del invitado opcional</label>
+            <input type="tel" id="guestWhatsapp" placeholder="525512345678">
+          </div>
 
-        <div class="link-builder-actions">
-          <button type="button" id="generateLinkButton" class="link-builder-button primary">Generar enlace</button>
-          <button type="button" id="copyLinkButton" class="link-builder-button" style="display:none;">Copiar enlace</button>
-          <button type="button" id="openInvitationButton" class="link-builder-button" style="display:none;">Abrir invitación</button>
-          <button type="button" id="sendWhatsappButton" class="link-builder-button" style="display:none;">Enviar por WhatsApp</button>
-        </div>
+          <div class="link-builder-actions">
+            <button type="button" id="generateLinkButton" class="link-builder-button primary">Generar enlace</button>
+            <button type="button" id="copyLinkButton" class="link-builder-button" style="display:none;">Copiar enlace</button>
+            <button type="button" id="openInvitationButton" class="link-builder-button" style="display:none;">Abrir invitación</button>
+            <button type="button" id="sendWhatsappButton" class="link-builder-button" style="display:none;">Enviar por WhatsApp</button>
+          </div>
 
-        <div id="generatedLinkOutput" class="generated-link-output" style="display:none;"></div>
+          <div id="generatedLinkOutput" class="generated-link-output" style="display:none;"></div>
         </div>
       </div>
     </section>

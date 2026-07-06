@@ -266,3 +266,24 @@ button.link-builder-button:hover {
   visibility: visible !important;
   opacity: 1 !important;
 }
+
+.link-builder-pin-gate {
+  display: block;
+}
+
+.link-builder-pin-gate.hidden {
+  display: none !important;
+}
+
+#linkBuilderPinInput {
+  text-align: center;
+  font-size: 1.2rem;
+  letter-spacing: 0.18em;
+}
+
+.link-builder-error {
+  margin-top: 0.9rem;
+  text-align: center;
+  color: #b42318;
+  font-size: 0.88rem;
+}

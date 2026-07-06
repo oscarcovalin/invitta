@@ -9,11 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function showFatalError(message) {
   const errorBox = document.getElementById("linkBuilderError");
-  const form = document.getElementById("builderState");
-  const dynamicMessage = document.getElementById("dynamicMessage");
+  const form = document.getElementById("linkBuilderForm");
+  const statusState = document.getElementById("statusState");
 
-  if (dynamicMessage) {
-    dynamicMessage.style.display = "none";
+  if (statusState) {
+    statusState.style.display = "none";
   }
 
   if (errorBox) {
@@ -37,8 +37,9 @@ async function initLinkBuilder() {
   const generatedLinkOutput = document.getElementById("generatedLinkOutput");
   
   const disabledState = document.getElementById("disabledState");
-  const pinState = document.getElementById("pinState");
-  const builderState = document.getElementById("builderState");
+  const pinState = document.getElementById("linkBuilderPinGate");
+  const builderState = document.getElementById("linkBuilderForm");
+  const statusState = document.getElementById("statusState");
   const dynamicTitle = document.getElementById("dynamicTitle");
   const dynamicMessage = document.getElementById("dynamicMessage");
   
@@ -65,7 +66,7 @@ async function initLinkBuilder() {
 
   if (!sb) {
     console.error("Supabase client not initialized. Falling back to basic mode.");
-    dynamicMessage.textContent = "Crea un pase rápido para invitados de último momento.";
+    if (statusState) statusState.style.display = "none";
     builderState.classList.remove("hidden");
   } else {
     try {
@@ -84,10 +85,12 @@ async function initLinkBuilder() {
 
       if (invitationData.link_builder_enabled === false) {
         disabledState.classList.remove("hidden");
-        dynamicMessage.style.display = "none";
+        if (statusState) statusState.style.display = "none";
         return;
       }
 
+      if (statusState) statusState.style.display = "none";
+      
       dynamicTitle.textContent = invitationData.link_builder_title || "Generador de enlace";
       dynamicMessage.textContent = invitationData.link_builder_message || "Crea un pase rápido para invitados de último momento.";
 
@@ -111,16 +114,30 @@ async function initLinkBuilder() {
   }
 
   unlockLinkBuilderButton.addEventListener("click", () => {
-    const inputPin = linkBuilderPinInput.value;
-    if (invitationData && inputPin === invitationData.link_builder_pin) {
+    unlockLinkBuilder();
+  });
+
+  linkBuilderPinInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      unlockLinkBuilder();
+    }
+  });
+
+  function unlockLinkBuilder() {
+    const inputPin = linkBuilderPinInput.value.trim();
+    const realPin = invitationData ? String(invitationData.link_builder_pin || "").trim() : "";
+    
+    if (invitationData && inputPin === realPin) {
       sessionStorage.setItem(`linkBuilderUnlocked:${slug}`, "true");
       pinState.classList.add("hidden");
       builderState.classList.remove("hidden");
       linkBuilderPinError.classList.add("hidden");
     } else {
+      linkBuilderPinError.textContent = "PIN incorrecto.";
       linkBuilderPinError.classList.remove("hidden");
     }
-  });
+  }
 
   function buildInvitationLink() {
     const baseUrl = `${window.location.origin}/invitacion.html`;
