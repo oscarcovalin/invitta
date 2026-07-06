@@ -108,7 +108,7 @@ async function initLinkBuilder() {
   const unlockLinkBuilderButton = document.getElementById("unlockLinkBuilderButton");
 
   let currentGeneratedLink = "";
-  let invitationData = null;
+  let invitationConfig = null;
 
   if (!slug) {
     showFatalError("No se encontró el slug de la invitación.");
@@ -126,80 +126,12 @@ async function initLinkBuilder() {
     return;
   }
 
-  try {
-    const { data, error } = await supabase
-      .from("studio_invitations")
-      .select(`
-        slug,
-        link_builder_enabled,
-        link_builder_pin,
-        link_builder_title,
-        link_builder_message
-      `)
-      .eq("slug", slug)
-      .maybeSingle();
-
-    console.log("Link builder config result:", { data, error });
-
-    if (error) {
-      console.error("Link builder config query error:", error);
-      throw error;
-    }
-
-    if (!data) {
-      throw new Error("Invitation config not found");
-    }
-
-    invitationData = data;
-    console.log("Loaded invitationConfig:", invitationData);
-
-    if (invitationData.link_builder_enabled === false) {
-      disabledState.classList.remove("hidden");
-      if (statusState) statusState.style.display = "none";
-      return;
-    }
-
-    if (statusState) statusState.style.display = "none";
-    
-    dynamicTitle.textContent = invitationData.link_builder_title || "Generador de enlace";
-    dynamicMessage.textContent = invitationData.link_builder_message || "Crea un pase rápido para invitados de último momento.";
-
-    const pin = String(invitationData.link_builder_pin || "").trim();
-    
-    if (sessionStorage.getItem(`linkBuilderUnlocked:${slug}`) === "true") {
-      showBuilderForm();
-      return;
-    }
-
-    if (pin) {
-      showPinGate();
-      return;
-    }
-
-    showBuilderForm();
-
-    } catch (err) {
-      console.error("Error al cargar la configuración:", err);
-      showFatalError("Error de conexión al cargar la configuración.");
-    }
-
-  unlockLinkBuilderButton.addEventListener("click", () => {
-    unlockLinkBuilder();
-  });
-
-  linkBuilderPinInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      unlockLinkBuilder();
-    }
-  });
-
   function unlockLinkBuilder() {
     const input = document.getElementById("linkBuilderPinInput");
     const errorBox = document.getElementById("linkBuilderPinError");
 
     const typedPin = normalizePin(input?.value);
-    const realPin = normalizePin(invitationData?.link_builder_pin);
+    const realPin = normalizePin(invitationConfig?.link_builder_pin);
 
     console.log("PIN validation debug:", {
       typedPin,
@@ -207,7 +139,7 @@ async function initLinkBuilder() {
       typedLength: typedPin.length,
       realLength: realPin.length,
       isMatch: typedPin === realPin,
-      invitationConfig: invitationData
+      invitationConfig
     });
 
     if (!realPin) {
@@ -246,6 +178,76 @@ async function initLinkBuilder() {
 
     showBuilderForm();
   }
+
+  unlockLinkBuilderButton?.addEventListener("click", (event) => {
+    event.preventDefault();
+    unlockLinkBuilder();
+  });
+
+  linkBuilderPinInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      unlockLinkBuilder();
+    }
+  });
+
+  try {
+    const { data, error } = await supabase
+      .from("studio_invitations")
+      .select(`
+        slug,
+        link_builder_enabled,
+        link_builder_pin,
+        link_builder_title,
+        link_builder_message
+      `)
+      .eq("slug", slug)
+      .maybeSingle();
+
+    console.log("Link builder config result:", { data, error });
+
+    if (error) {
+      console.error("Link builder config query error:", error);
+      throw error;
+    }
+
+    if (!data) {
+      throw new Error("Invitation config not found");
+    }
+
+    invitationConfig = data;
+    console.log("Loaded invitationConfig:", invitationConfig);
+    console.log("Real PIN loaded:", invitationConfig.link_builder_pin);
+
+    if (invitationConfig.link_builder_enabled === false) {
+      disabledState.classList.remove("hidden");
+      if (statusState) statusState.style.display = "none";
+      return;
+    }
+
+    if (statusState) statusState.style.display = "none";
+    
+    dynamicTitle.textContent = invitationConfig.link_builder_title || "Generador de enlace";
+    dynamicMessage.textContent = invitationConfig.link_builder_message || "Crea un pase rápido para invitados de último momento.";
+
+    const pin = String(invitationConfig.link_builder_pin || "").trim();
+    
+    if (sessionStorage.getItem(`linkBuilderUnlocked:${slug}`) === "true") {
+      showBuilderForm();
+      return;
+    }
+
+    if (pin) {
+      showPinGate();
+      return;
+    }
+
+    showBuilderForm();
+
+    } catch (err) {
+      console.error("Error al cargar la configuración:", err);
+      showFatalError("Error de conexión al cargar la configuración.");
+    }
 
   function buildInvitationLink() {
     const baseUrl = `${window.location.origin}/invitacion.html`;
