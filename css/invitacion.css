@@ -2593,11 +2593,11 @@ body.theme-black-luxury .inv-share-hashtag {
 
 /* Mobile closing sections and music safe area polish */
 body {
-  padding-bottom: 112px;
+  padding-bottom: 84px;
 }
 
 body.has-music-player {
-  padding-bottom: calc(170px + env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
 }
 
 .invitation-page,
@@ -2606,13 +2606,13 @@ body.has-music-player {
 .inv-page,
 #inv-content,
 main {
-  padding-bottom: calc(180px + env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important;
 }
 
 .inv-footer,
 .inv-public-footer {
-  margin-bottom: 7rem !important;
-  padding-bottom: 2rem !important;
+  margin-bottom: 2.5rem !important;
+  padding-bottom: 1.25rem !important;
 }
 
 .inv-thank-you-signature {
@@ -2654,11 +2654,11 @@ main {
 
 @media (max-width: 640px) {
   body {
-    padding-bottom: 138px;
+    padding-bottom: 132px;
   }
 
   body.has-music-player {
-    padding-bottom: calc(188px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
   }
 
   .invitation-page,
@@ -2667,13 +2667,13 @@ main {
   .inv-page,
   #inv-content,
   main {
-    padding-bottom: calc(210px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(132px + env(safe-area-inset-bottom)) !important;
   }
 
   .inv-footer,
   .inv-public-footer {
-    margin-bottom: 8.5rem !important;
-    padding-bottom: 2.5rem !important;
+    margin-bottom: 7.5rem !important;
+    padding-bottom: 2.25rem !important;
   }
 
   .inv-thank-you-signature {
@@ -2938,4 +2938,14 @@ main {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
+}
+
+.inv-share-section {
+  margin-bottom: 2.5rem;
+}
+
+@media (max-width: 640px) {
+  .inv-share-section {
+    margin-bottom: 2.75rem;
+  }
 }
