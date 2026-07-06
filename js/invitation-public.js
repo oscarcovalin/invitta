@@ -1,21 +1,21 @@
-/**
+﻿/**
  * invitation-public.js
- * Invitta Studio — Página pública de invitación
+ * Invitta Studio â€” PÃ¡gina pÃºblica de invitaciÃ³n
  *
  * URL: /invitacion.html?slug=paola-xv&n=Familia+Garcia&p=4&m=5
  * Tabla: studio_invitations (SELECT anon, published = true)
  *
- * Solo lectura. No modifica tablas. No requiere autenticación.
+ * Solo lectura. No modifica tablas. No requiere autenticaciÃ³n.
  *
  * NOTA: Este script se carga al final del <body>, por lo que el DOM ya
- * está listo. No se usa DOMContentLoaded para evitar que el evento
+ * estÃ¡ listo. No se usa DOMContentLoaded para evitar que el evento
  * ya haya disparado antes de que se registre el listener.
  */
 
 (function () {
   "use strict";
 
-  /* ─── Supabase ────────────────────────────────────────────────────── */
+  /* â”€â”€â”€ Supabase â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   const SUPABASE_URL = (window.INVITTIA_ENV && window.INVITTIA_ENV.SUPABASE_URL)    || "";
   const SUPABASE_KEY = (window.INVITTIA_ENV && window.INVITTIA_ENV.SUPABASE_ANON_KEY) || "";
 
@@ -24,25 +24,25 @@
     db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   } catch (e) {
     console.error("Error al inicializar Supabase:", e);
-    showError("No se pudo inicializar la conexión. Recarga la página.");
+    showError("No se pudo inicializar la conexiÃ³n. Recarga la pÃ¡gina.");
     return;
   }
 
-  /* ─── Parámetros de URL ───────────────────────────────────────────── */
+  /* â”€â”€â”€ ParÃ¡metros de URL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   var params    = new URLSearchParams(window.location.search);
   var slug      = params.get("slug") || "";
   var guestName = sanitize(params.get("n") || "");
   var maxPasses = clampInt(params.get("p"), 1, 20);
   var tableNum  = sanitize(params.get("m") || "");
 
-  /* ─── Iniciar ────────────────────────────────────────────────────── */
+  /* â”€â”€â”€ Iniciar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   if (!slug) {
-    showError("No se encontró el slug de la invitación.");
+    showError("No se encontrÃ³ el slug de la invitaciÃ³n.");
   } else {
     loadInvitation();
   }
 
-  /* ─── Carga ───────────────────────────────────────────────────────── */
+  /* â”€â”€â”€ Carga â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   async function loadInvitation() {
     try {
       console.log("slug recibido:", slug);
@@ -57,27 +57,27 @@
       var data  = result.data;
       var error = result.error;
 
-      console.log("data invitación:", data);
+      console.log("data invitaciÃ³n:", data);
       console.log("error Supabase:", error);
 
       if (error) {
         console.error("Error real de Supabase:", error);
-        showError("Error al consultar la invitación.");
+        showError("Error al consultar la invitaciÃ³n.");
         return;
       }
 
       if (!data) {
-        showError("Invitación no encontrada o no publicada.");
+        showError("InvitaciÃ³n no encontrada o no publicada.");
         return;
       }
 
       console.log("Antes de renderInvitation");
       renderInvitation(data);
-      console.log("Después de renderInvitation");
+      console.log("DespuÃ©s de renderInvitation");
 
     } catch (err) {
       console.error("Error real en loadInvitation:", err);
-      showError("Ocurrió un error al cargar la invitación. Revisa la consola.");
+      showError("OcurriÃ³ un error al cargar la invitaciÃ³n. Revisa la consola.");
     }
   }
 
@@ -250,7 +250,7 @@
       }
     }
   }
-  /* ─── Renderizado ─────────────────────────────────────────────────── */
+  /* â”€â”€â”€ Renderizado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function renderInvitation(inv) {
     applyVisualTheme(inv);
     injectPremiumIcons();
@@ -264,7 +264,7 @@
     if (errBox)  { errBox.style.display = "none"; errBox.textContent = ""; }
     if (content) content.style.display  = "block";
 
-    /* 2. Tema de color y Tipografía */
+    /* 2. Tema de color y TipografÃ­a */
     applyTheme(inv.color_primary || "#C9A46A", inv.color_secondary || "#F7E7D7");
 
     var allowedPresets = ["classic", "romantic", "editorial", "minimal", "luxury"];
@@ -274,8 +274,8 @@
 
 
 
-    /* 3. Hero: título, honoree, fecha */
-    setText("inv-title",   inv.title        || "Invitación");
+    /* 3. Hero: tÃ­tulo, honoree, fecha */
+    setText("inv-title",   inv.title        || "InvitaciÃ³n");
     setText("inv-honoree", inv.honoree_name || "");
 
     // Fecha formateada en el hero
@@ -284,7 +284,7 @@
     if (heroDateStr) {
       var heroDate = document.getElementById("inv-hero-date");
       if (heroDate) {
-        heroDate.textContent = timeStr ? heroDateStr + "  ·  " + timeStr : heroDateStr;
+        heroDate.textContent = timeStr ? heroDateStr + "  Â·  " + timeStr : heroDateStr;
         heroDate.style.display = "";
       }
     }
@@ -297,16 +297,16 @@
     /* 5. Datos del invitado (ticket) */
     setText("inv-guest-name", guestName || "Estimado Invitado");
     setText("inv-pases",      String(maxPasses));
-    setText("inv-mesa",       tableNum  || "—");
+    setText("inv-mesa",       tableNum  || "â€”");
     toggle("inv-mesa-block",  !!tableNum);
 
     // Fecha corta en ticket
     var ticketDate = document.getElementById("inv-ticket-date");
     if (ticketDate) {
-      ticketDate.textContent = formatDateShort(inv.event_date) || "—";
+      ticketDate.textContent = formatDateShort(inv.event_date) || "â€”";
     }
 
-    /* 6. Selector de confirmación */
+    /* 6. Selector de confirmaciÃ³n */
     buildPassSelector(maxPasses);
 
     /* 7. Mensaje de bienvenida */
@@ -374,11 +374,11 @@
       }
     }
 
-    /* 9. Recepción */
+    /* 9. RecepciÃ³n */
     var hasReception = !!(inv.reception_name || inv.reception_address);
     toggle("inv-reception-block", hasReception);
     if (hasReception) {
-      setText("inv-reception-name",    inv.reception_name    || "Recepción");
+      setText("inv-reception-name",    inv.reception_name    || "RecepciÃ³n");
       setText("inv-reception-address", inv.reception_address || "");
       if (inv.reception_map_url) {
         setHref("inv-reception-map-btn", inv.reception_map_url);
@@ -401,8 +401,8 @@
     /* 12. WhatsApp */
     buildWhatsAppButton(inv);
 
-    /* 13. Título de pestaña */
-    document.title = (inv.title || "Invitación Digital") + " · Invitta";
+    /* 13. TÃ­tulo de pestaÃ±a */
+    document.title = (inv.title || "InvitaciÃ³n Digital") + " Â· Invitta";
 
     /* 14. Foto principal (hero) */
     renderMainPhoto(inv.main_photo_url);
@@ -410,7 +410,7 @@
     /* 15. Cuenta regresiva */
     setupCountdown(inv.event_date, inv.event_time);
 
-    /* 16. Música */
+    /* 16. MÃºsica */
     // Set custom background if exists
     if (inv.background_image_url) {
       document.body.style.backgroundImage = `url('${inv.background_image_url}')`;
@@ -428,7 +428,7 @@
       console.log("music_url:", inv.music_url);
     setupMusicPlayer(inv);
 
-    /* 17. Galería */
+    /* 17. GalerÃ­a */
     renderGallery(normalizeGalleryUrls(inv.gallery_urls));
 
     /* 18. Footer CTA */
@@ -463,7 +463,7 @@
     }, 400);
   }
 
-  /* ─── Foto principal (hero) ──────────────────────────────────────── */
+  /* â”€â”€â”€ Foto principal (hero) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function renderMainPhoto(url) {
     var heroBg   = document.getElementById("inv-hero-bg");
     var heroImg  = document.getElementById("inv-hero-img");
@@ -476,7 +476,7 @@
     if (hero) hero.classList.add("inv-hero--has-photo");
   }
 
-  /* ─── Calendar Button ────────────────────────────── */
+  /* â”€â”€â”€ Calendar Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function setupCalendarButton(inv) {
     var calendarWrap = document.getElementById("inv-calendar-wrapper");
     var calendarBtn = document.getElementById("inv-calendar-btn");
@@ -499,7 +499,7 @@
     calendarWrap.style.display = "block";
   }
 
-  /* ─── Reproductor de música fijo ────────────────────────────── */
+  /* â”€â”€â”€ Reproductor de mÃºsica fijo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   let invitationAudio = null;
   let isMusicPlaying = false;
 
@@ -527,22 +527,22 @@
       try {
         const url = new URL(invitation.music_url);
         const filename = url.pathname.split("/").pop() || "";
-        return cleanMusicFileName(filename) || "Música del evento";
+        return cleanMusicFileName(filename) || "MÃºsica del evento";
       } catch (e) {
         const filename = invitation.music_url.split("/").pop() || "";
-        return cleanMusicFileName(filename) || "Música del evento";
+        return cleanMusicFileName(filename) || "MÃºsica del evento";
       }
     }
 
-    return "Música del evento";
+    return "MÃºsica del evento";
   }
 
   function getMusicDisplayTitle(invitation) {
     const musicTitle = getMusicTitle(invitation);
     const musicArtist = cleanMusicTitle(invitation.music_artist);
 
-    if (musicArtist && musicTitle && musicTitle !== "Música del evento") {
-      return `${musicArtist} · ${musicTitle}`;
+    if (musicArtist && musicTitle && musicTitle !== "MÃºsica del evento") {
+      return `${musicArtist} Â· ${musicTitle}`;
     }
 
     return musicArtist || musicTitle;
@@ -704,7 +704,7 @@
     const phone = normalizePhoneNumber(invitation.studio_whatsapp);
     if (!phone) return "";
     const message = invitation.studio_cta_message
-      || "Hola, vi esta invitación digital y me interesa contratar una para mi evento.";
+      || "Hola, vi esta invitaciÃ³n digital y me interesa contratar una para mi evento.";
     return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   }
 
@@ -714,7 +714,7 @@
 
     if (!enabled || !url) return "";
 
-    const text = invitation.studio_cta_text || "Quiero una invitación así";
+    const text = invitation.studio_cta_text || "Quiero una invitaciÃ³n asÃ­";
 
     return `
       <a
@@ -784,7 +784,7 @@
     invitationAudio.volume = 0.85;
 
     isMusicPlaying = false;
-    toggle.innerHTML = '<span class="inv-play-icon">▶</span>';
+    toggle.innerHTML = '<span class="inv-play-icon">â–¶</span>';
     toggle.disabled = false;
 
     toggle.onclick = async () => {
@@ -792,22 +792,22 @@
         if (!isMusicPlaying) {
           await invitationAudio.play();
           isMusicPlaying = true;
-          toggle.innerHTML = '<span class="inv-play-icon">❚❚</span>';
-          toggle.setAttribute("aria-label", "Pausar música");
+          toggle.innerHTML = '<span class="inv-play-icon">âšâš</span>';
+          toggle.setAttribute("aria-label", "Pausar mÃºsica");
         } else {
           invitationAudio.pause();
           isMusicPlaying = false;
-          toggle.innerHTML = '<span class="inv-play-icon">▶</span>';
-          toggle.setAttribute("aria-label", "Reproducir música");
+          toggle.innerHTML = '<span class="inv-play-icon">â–¶</span>';
+          toggle.setAttribute("aria-label", "Reproducir mÃºsica");
         }
       } catch (err) {
-        console.error("Error reproduciendo música:", err);
-        alert("No se pudo reproducir la música. Verifica que el archivo sea compatible.");
+        console.error("Error reproduciendo mÃºsica:", err);
+        alert("No se pudo reproducir la mÃºsica. Verifica que el archivo sea compatible.");
       }
     };
   }
 
-  /* ─── Cuenta regresiva ────────────────────────────── */
+  /* â”€â”€â”€ Cuenta regresiva â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function setupCountdown(eventDate, eventTime) {
     var section = document.getElementById("inv-countdown-section");
     if (!section || !eventDate) {
@@ -830,7 +830,7 @@
       var diff = targetDate.getTime() - now.getTime();
 
       if (diff <= 0) {
-        section.innerHTML = "<p class='inv-countdown-today'>✨ Hoy es el gran día ✨</p>";
+        section.innerHTML = "<p class='inv-countdown-today'>âœ¨ Hoy es el gran dÃ­a âœ¨</p>";
         clearInterval(timer);
         return;
       }
@@ -857,9 +857,9 @@
     var timer = setInterval(updateCountdown, 1000);
   }
 
-  /* ─── Galería ────────────────────────────────── */
+  /* â”€â”€â”€ GalerÃ­a â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-  /** Normaliza gallery_urls: array | JSON string | null → string[] */
+  /** Normaliza gallery_urls: array | JSON string | null â†’ string[] */
   function normalizeGalleryUrls(value) {
     if (!value) return [];
     if (Array.isArray(value)) return value.filter(Boolean).slice(0, 10);
@@ -869,7 +869,7 @@
     } catch (e) { return []; }
   }
 
-  /** Renderiza la galería como momentos fullscreen cinematográficos. */
+  /** Renderiza la galerÃ­a como momentos fullscreen cinematogrÃ¡ficos. */
   function renderGallery(urls) {
     var section = document.getElementById("inv-gallery-section");
     var container = document.getElementById("inv-gallery");
@@ -979,7 +979,7 @@
     window.addEventListener("resize", requestTick);
   }
 
-  /* ─── Selector de pases ───────────────────────────────────────────── */
+  /* â”€â”€â”€ Selector de pases â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function buildPassSelector(max) {
     var sel = document.getElementById("inv-confirm-pases");
     if (!sel) return;
@@ -992,7 +992,7 @@
     }
   }
 
-  /* ─── WhatsApp ────────────────────────────────────────────────────── */
+  /* â”€â”€â”€ WhatsApp â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function buildWhatsAppButton(inv) {
     var phone = (inv.whatsapp_number || "").replace(/\D/g, "");
     if (!phone) {
@@ -1024,7 +1024,7 @@
     });
   }
 
-  /* ─── showError ───────────────────────────────────────────────────── */
+  /* â”€â”€â”€ showError â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function showError(message) {
     console.trace("showError llamado con:", message);
     var loader  = document.getElementById("inv-loader");
@@ -1038,7 +1038,7 @@
     }
   }
 
-  /* ─── Tema de colores ─────────────────────────────────────────────── */
+  /* â”€â”€â”€ Tema de colores â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function applyTheme(primary, secondary) {
     var root = document.documentElement;
     root.style.setProperty("--inv-primary",        primary);
@@ -1047,7 +1047,7 @@
     root.style.setProperty("--inv-secondary",      secondary);
   }
 
-  /* ─── Helpers DOM ─────────────────────────────────────────────────── */
+  /* â”€â”€â”€ Helpers DOM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function setText(id, val) {
     var e = document.getElementById(id);
     if (e) e.textContent = String(val);
@@ -1090,8 +1090,8 @@
     const section = document.getElementById("inv-thank-you-section");
     if (!section) return;
 
-    setText("inv-thank-you-title", textWithFallback(inv.thank_you_title, "Con cariño"));
-    setText("inv-thank-you-message", textWithFallback(inv.thank_you_message, "Gracias por ser parte de mis XV años"));
+    setText("inv-thank-you-title", textWithFallback(inv.thank_you_title, "Con cariÃ±o"));
+    setText("inv-thank-you-message", textWithFallback(inv.thank_you_message, "Gracias por ser parte de mis XV aÃ±os"));
 
     const signature = String(inv.thank_you_signature || "").trim();
     const signatureEl = document.getElementById("inv-thank-you-signature");
@@ -1112,7 +1112,7 @@
 
     setText("inv-share-title", textWithFallback(inv.hashtag_section_title, "Comparte el momento"));
     setText("inv-hashtag", hashtag);
-    setText("inv-share-message", textWithFallback(inv.hashtag_section_message, "Usa el hashtag en tus fotos y videos para que no se pierda ningún recuerdo."));
+    setText("inv-share-message", textWithFallback(inv.hashtag_section_message, "Usa el hashtag en tus fotos y videos para que no se pierda ningÃºn recuerdo."));
     show("inv-hashtag-block");
   }
 
@@ -1139,22 +1139,22 @@
     const text = String(label || "").toLowerCase();
 
     if (text.includes("ceremonia") || text.includes("iglesia")) {
-      return getPremiumSectionIcon ? getPremiumSectionIcon("ceremony") : "✦";
+      return getPremiumSectionIcon ? getPremiumSectionIcon("ceremony") : "âœ¦";
     }
 
-    if (text.includes("recepción") || text.includes("recepcion")) {
-      return getPremiumSectionIcon ? getPremiumSectionIcon("reception") : "✦";
+    if (text.includes("recepciÃ³n") || text.includes("recepcion")) {
+      return getPremiumSectionIcon ? getPremiumSectionIcon("reception") : "âœ¦";
     }
 
     if (text.includes("cena") || text.includes("banquete")) {
-      return getPremiumSectionIcon ? getPremiumSectionIcon("gifts") : "✦";
+      return getPremiumSectionIcon ? getPremiumSectionIcon("gifts") : "âœ¦";
     }
 
     if (text.includes("vals") || text.includes("baile") || text.includes("fiesta") || text.includes("musica")) {
-      return getPremiumSectionIcon ? getPremiumSectionIcon("music") : "✦";
+      return getPremiumSectionIcon ? getPremiumSectionIcon("music") : "âœ¦";
     }
 
-    return getPremiumSectionIcon ? getPremiumSectionIcon("itinerary") : "✦";
+    return getPremiumSectionIcon ? getPremiumSectionIcon("itinerary") : "âœ¦";
   }
 
   function renderItinerary(value) {
@@ -1226,7 +1226,7 @@
       </div>
     `;
   }
-  /* ─── Helpers texto / números ─────────────────────────────────────── */
+  /* â”€â”€â”€ Helpers texto / nÃºmeros â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function sanitize(str) {
     return String(str || "").trim().slice(0, 200);
   }
@@ -1243,7 +1243,7 @@
     return new Date(parts[0], parts[1] - 1, parts[2]);
   }
 
-  /** Fecha larga: "sábado, 14 de febrero de 2026" */
+  /** Fecha larga: "sÃ¡bado, 14 de febrero de 2026" */
   function formatDate(dateStr) {
     if (!dateStr) return "";
     try {
@@ -1273,7 +1273,7 @@
     } catch (e) { return timeStr; }
   }
 
-  /* ─── Color helper ────────────────────────────────────────────────── */
+  /* â”€â”€â”€ Color helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   function hexAlpha(hex, a) {
     var h = hex || "#C9A46A";
     var r = parseInt(h.slice(1, 3), 16) || 0;
@@ -1327,105 +1327,32 @@ function setupSectionIconReveal() {
 function setupRevealAnimations() {
   console.log("setupRevealAnimations classic rose subtle mode");
 
-  const selectors = [
-    ".inv-hero-content",
-    ".inv-countdown-section",
-    "#inv-countdown-section",
-    "#inv-parents-block",
-    "#inv-welcome-block",
-    ".inv-gallery-item",
-    ".inv-moments-header",
-    ".inv-moment-frame",
-    "#inv-ceremony-block",
-    "#inv-reception-block",
-    "#inv-itinerary-section",
-    "#inv-dresscode-block",
-    "#inv-gifts-block",
-    "#inv-pass-section",
-    "#inv-rsvp-section",
-    "#inv-wa-block",
-    "#inv-thank-you-section",
-    "#inv-hashtag-block"
-  ];
+  setupRevealOnScroll();
+}
 
-  const elements = Array.from(document.querySelectorAll(selectors.join(",")))
-    .filter((el) => {
-      const style = window.getComputedStyle(el);
-      return (
-        style.display !== "none" &&
-        style.visibility !== "hidden" &&
-        !el.closest("#inv-music-player")
-      );
-    });
-
+function setupRevealOnScroll() {
+  const elements = document.querySelectorAll(".reveal-on-scroll");
   if (!elements.length) return;
 
-  elements.forEach((el, index) => {
-    el.dataset.revealed = "false";
-    el.style.opacity = "0";
-    el.style.transform = "translateY(8px)";
-    el.style.willChange = "opacity, transform";
-    el.dataset.revealDelay = String(Math.min(index * 60, 240));
-  });
+  if (!("IntersectionObserver" in window)) {
+    elements.forEach((element) => element.classList.add("is-visible"));
+    return;
+  }
 
-  function animateElement(el) {
-    if (!el || el.dataset.revealed === "true") return;
-
-    el.dataset.revealed = "true";
-
-    const delay = Number(el.dataset.revealDelay || 0);
-
-    el.animate(
-      [
-        { opacity: 0, transform: "translateY(8px)" },
-        { opacity: 1, transform: "translateY(0)" }
-      ],
-      {
-        duration: 760,
-        delay,
-        easing: "ease-out",
-        fill: "forwards"
-      }
-    );
-
-    const icon = el.querySelector(".inv-card-icon");
-    if (icon) {
-      icon.animate(
-        [
-          { opacity: 0, transform: "translateY(6px)" },
-          { opacity: 1, transform: "translateY(0)" }
-        ],
-        {
-          duration: 700,
-          delay: delay + 90,
-          easing: "ease-out",
-          fill: "forwards"
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
         }
-      );
+      });
+    },
+    {
+      threshold: 0.16,
+      rootMargin: "0px 0px -8% 0px"
     }
+  );
 
-    setTimeout(() => {
-      el.style.opacity = "1";
-      el.style.transform = "translateY(0)";
-      el.style.willChange = "auto";
-    }, 820 + delay);
-  }
-
-  function checkReveal() {
-    const triggerPoint = window.innerHeight * 0.92;
-
-    elements.forEach((el) => {
-      if (el.dataset.revealed === "true") return;
-
-      const rect = el.getBoundingClientRect();
-
-      if (rect.top < triggerPoint && rect.bottom > 0) {
-        animateElement(el);
-      }
-    });
-  }
-
-  setTimeout(checkReveal, 200);
-  window.addEventListener("scroll", checkReveal, { passive: true });
-  window.addEventListener("resize", checkReveal);
+  elements.forEach((element) => observer.observe(element));
 }
