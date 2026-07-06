@@ -82,6 +82,10 @@ async function initLinkBuilder() {
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
 
+  if (params.get("resetPin") === "1") {
+    sessionStorage.removeItem(`linkBuilderUnlocked:${slug}`);
+  }
+
   const generateLinkButton = document.getElementById("generateLinkButton");
   const copyLinkButton = document.getElementById("copyLinkButton");
   const openInvitationButton = document.getElementById("openInvitationButton");
@@ -184,24 +188,53 @@ async function initLinkBuilder() {
   });
 
   function unlockLinkBuilder() {
-    const typedPin = document.getElementById("linkBuilderPinInput")?.value.trim();
-    const realPin = String(invitationData?.link_builder_pin || "").trim();
+    const input = document.getElementById("linkBuilderPinInput");
     const errorBox = document.getElementById("linkBuilderPinError");
-    
-    if (typedPin === realPin) {
-      sessionStorage.setItem(`linkBuilderUnlocked:${slug}`, "true");
+
+    const typedPin = String(input?.value || "").trim();
+    const realPin = String(invitationData?.link_builder_pin || "").trim();
+
+    console.log("PIN validation:", {
+      typedPin,
+      realPin,
+      isMatch: typedPin === realPin
+    });
+
+    if (!realPin) {
       if (errorBox) {
-        errorBox.classList.add("hidden");
-        errorBox.textContent = "";
+        errorBox.textContent = "No hay PIN configurado.";
+        errorBox.classList.remove("hidden");
       }
-      showBuilderForm();
       return;
     }
 
-    if (errorBox) {
-      errorBox.textContent = "PIN incorrecto.";
-      errorBox.classList.remove("hidden");
+    if (!typedPin) {
+      if (errorBox) {
+        errorBox.textContent = "Ingresa el PIN.";
+        errorBox.classList.remove("hidden");
+      }
+      return;
     }
+
+    if (typedPin !== realPin) {
+      if (errorBox) {
+        errorBox.textContent = "PIN incorrecto.";
+        errorBox.classList.remove("hidden");
+      }
+
+      input?.focus();
+      input?.select();
+      return;
+    }
+
+    sessionStorage.setItem(`linkBuilderUnlocked:${slug}`, "true");
+
+    if (errorBox) {
+      errorBox.textContent = "";
+      errorBox.classList.add("hidden");
+    }
+
+    showBuilderForm();
   }
 
   function buildInvitationLink() {
