@@ -202,6 +202,14 @@
             <div class="media-current" id="music-current">
               <strong>URL actual:</strong> <span id="music-url-display"></span>
             </div>
+            
+            <div style="margin-top: 15px;">
+              <label for="music_title" style="font-size: 0.8rem;">Título de la Canción</label>
+              <input type="text" id="music_title" class="form-control" placeholder="Ej. A Thousand Years" style="margin-bottom: 8px;">
+              
+              <label for="music_artist" style="font-size: 0.8rem;">Artista</label>
+              <input type="text" id="music_artist" class="form-control" placeholder="Ej. Christina Perri">
+            </div>
           </div>
         </div>
       </div>
@@ -230,6 +238,21 @@
       </div>
 
       <h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Diseño y Tema</h2>
+      
+      <div class="form-row">
+        <div class="form-group" style="flex: 1;">
+          <div class="media-upload-box">
+            <span class="media-upload-label">Fondo de Invitación Personalizado</span>
+            <p class="media-hint">Sustituye el color liso por una imagen o textura de fondo.<br>Formatos: JPG, PNG, WEBP · Máximo: 8 MB</p>
+            <input type="file" id="backgroundImageFile" accept="image/jpeg,image/jpg,image/png,image/webp">
+            <div class="upload-progress" id="background-progress">⏳ Subiendo fondo...</div>
+            <div class="media-error" id="background-error"></div>
+            <div class="media-current" id="background-current" style="display:none;">
+              <strong>URL actual:</strong> <span id="background-url-display"></span>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div class="form-row">
         <div class="form-group" style="flex: 1;">
