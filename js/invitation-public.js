@@ -441,7 +441,10 @@
     });
 
     setTimeout(() => {
-      setupRevealAnimations?.();
+      if (typeof setupRevealAnimations === "function") {
+        setupRevealAnimations();
+      }
+
       setupSectionIconReveal();
     }, 400);
   }
@@ -1120,7 +1123,7 @@ function setupSectionIconReveal() {
   setTimeout(() => {
     document.querySelectorAll(".inv-section-icon").forEach((icon) => {
       const rect = icon.getBoundingClientRect();
-      if (rect.top < window.innerHeight) {
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
         icon.classList.add("icon-visible");
       }
     });
