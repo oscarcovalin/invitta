@@ -128,16 +128,7 @@
     if (!allowedPresets.includes(preset)) preset = "classic";
     document.body.classList.add("font-preset-" + preset);
 
-    /* 2.5 Tema Visual */
-    var visualTheme = inv.visual_theme || "rose-floral";
-    document.body.classList.remove(
-      "theme-rose-floral",
-      "theme-gold-marble",
-      "theme-elegant-lavender",
-      "theme-black-luxury",
-      "theme-classic-champagne"
-    );
-    document.body.classList.add(`theme-${visualTheme}`);
+
 
     /* 3. Hero: título, honoree, fecha */
     setText("inv-title",   inv.title        || "Invitación");
