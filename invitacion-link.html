@@ -4,31 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generador de Pase - Invitta Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/invitacion-link.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/assets/js/env.js"></script>
 </head>
-<body>
+<body class="link-builder-page">
   <main class="link-builder-shell">
     
     <!-- PANTALLA DE ERROR / DESACTIVADO -->
-    <div id="disabledState" class="link-builder-lock hidden">
-      <h2 class="link-builder-lock-title">Generador no disponible</h2>
-      <p class="link-builder-lock-text" id="disabledMessageText">El generador de enlaces no está activo para esta invitación.</p>
+    <div id="disabledState" class="link-builder-card hidden" style="text-align: center;">
+      <h2 class="link-builder-title" style="font-size: 2rem;">Generador no disponible</h2>
+      <p class="link-builder-subtitle" id="disabledMessageText">El generador de enlaces no está activo para esta invitación.</p>
     </div>
 
     <!-- PANTALLA DE PIN -->
-    <div id="pinState" class="link-builder-lock hidden">
-      <h2 class="link-builder-lock-title">Acceso al generador</h2>
-      <p class="link-builder-lock-text">Ingresa el PIN proporcionado por el estudio.</p>
-      <input type="password" id="linkBuilderPinInput" class="link-builder-pin-input" placeholder="****">
-      <div id="linkBuilderPinError" class="link-builder-error hidden">PIN incorrecto.</div>
+    <div id="pinState" class="link-builder-card hidden" style="text-align: center;">
+      <h2 class="link-builder-title" style="font-size: 2rem;">Acceso al generador</h2>
+      <p class="link-builder-subtitle" style="margin-bottom: 1.5rem;">Ingresa el PIN proporcionado por el estudio.</p>
+      <input type="password" id="linkBuilderPinInput" style="width: 100%; box-sizing: border-box; border: 1px solid rgba(74,45,32,.16); border-radius: 1rem; padding: 1rem; text-align: center; font-size: 1.2rem; letter-spacing: .16em;" placeholder="****">
+      <div id="linkBuilderPinError" style="margin-top: .8rem; color: #b42318; font-size: .9rem;" class="hidden">PIN incorrecto.</div>
       <button type="button" id="unlockLinkBuilderButton" class="link-builder-button primary" style="width: 100%; margin-top: 1.5rem;">Entrar</button>
     </div>
 
     <div id="builderState" class="link-builder-card hidden">
-      <h1 id="dynamicTitle" class="link-builder-title">Generador de pase personalizado</h1>
-      <p id="dynamicMessage" class="link-builder-subtitle">Crea un enlace rápido para invitados de último momento.</p>
+      <div class="link-builder-mark">Invitta Studio</div>
+      <p class="link-builder-kicker">Pase personalizado</p>
+      
+      <h1 id="dynamicTitle" class="link-builder-title">Generador de enlace</h1>
+      <p id="dynamicMessage" class="link-builder-subtitle">Crea un pase rápido para invitados de último momento.</p>
 
       <div id="errorMessage" style="display: none; color: #a13b3b; text-align: center; margin-bottom: 1.5rem; font-weight: 600;">
         No se encontró el slug de la invitación.

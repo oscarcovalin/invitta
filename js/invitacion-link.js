@@ -61,8 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      dynamicTitle.textContent = invitationData.link_builder_title || "Generador de pase personalizado";
-      dynamicMessage.textContent = invitationData.link_builder_message || "Crea un enlace rápido para invitados de último momento.";
+      dynamicTitle.textContent = invitationData.link_builder_title || "Generador de enlace";
+      dynamicMessage.textContent = invitationData.link_builder_message || "Crea un pase rápido para invitados de último momento.";
 
       const requiredPin = invitationData.link_builder_pin;
       
