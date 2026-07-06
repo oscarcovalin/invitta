@@ -1954,3 +1954,339 @@ body.has-music-player {
 .reveal-on-scroll.is-visible {
   transition: none !important;
 }
+/* Mobile invitation polish - July 2026 */
+html,
+body {
+  overflow-x: hidden;
+}
+
+body.has-music-player {
+  padding-bottom: calc(110px + env(safe-area-inset-bottom)) !important;
+}
+
+.inv-page {
+  padding-bottom: calc(132px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 640px) {
+  .inv-page {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: calc(150px + env(safe-area-inset-bottom));
+  }
+
+  .inv-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-top: 2.4rem;
+    margin-bottom: 2.4rem;
+  }
+
+  .inv-countdown {
+    padding: 2rem 1rem 1.8rem;
+  }
+
+  .inv-countdown-grid {
+    gap: 0.65rem;
+    max-width: 360px;
+  }
+
+  .inv-countdown-item strong {
+    font-size: clamp(1.7rem, 9vw, 2.45rem);
+  }
+
+  .inv-hero {
+    min-height: 88dvh;
+    align-items: flex-end;
+  }
+
+  .inv-hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(18, 11, 7, 0.16) 0%,
+      rgba(18, 11, 7, 0.34) 46%,
+      rgba(18, 11, 7, 0.82) 100%
+    );
+  }
+
+  .inv-hero-content {
+    padding: 5.4rem 1.35rem 3.7rem;
+  }
+
+  .inv-hero:not(.inv-hero--has-photo) .inv-hero-content {
+    padding-top: 6.4rem;
+  }
+
+  .inv-title {
+    font-size: clamp(2.35rem, 13vw, 3.55rem);
+    line-height: 1.02;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+
+  .inv-hero--has-photo .inv-title {
+    text-shadow: 0 3px 26px rgba(0, 0, 0, 0.46);
+  }
+
+  .inv-honoree {
+    font-size: clamp(1.25rem, 6.5vw, 1.85rem);
+    line-height: 1.18;
+    text-wrap: balance;
+  }
+
+  .inv-hero-date,
+  .inv-hero--has-photo .inv-hero-date {
+    color: rgba(255, 246, 232, 0.9);
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+  }
+
+  .inv-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+  }
+
+  .inv-eyebrow-text {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+  }
+
+  .inv-event-card,
+  .inv-section-card,
+  .inv-pass-card,
+  .inv-rsvp-card {
+    width: min(100%, 92vw);
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 1.6rem;
+  }
+
+  .inv-event-card {
+    margin-top: 2.35rem;
+    margin-bottom: 2.35rem;
+    padding: 3.35rem 1.25rem 1.75rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 250, 243, 0.86));
+    box-shadow: 0 16px 42px rgba(76, 45, 28, 0.10), inset 0 0 0 1px rgba(184, 138, 61, 0.18);
+  }
+
+  .inv-card-ornament {
+    width: 168px;
+    height: 58px;
+    top: -1.7rem;
+    opacity: 0.68;
+  }
+
+  .inv-card-icon {
+    width: 50px;
+    height: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0.9rem;
+  }
+
+  .inv-card-title,
+  .inv-section h2 {
+    font-size: clamp(1.8rem, 8vw, 2.45rem) !important;
+    line-height: 1.08;
+    margin-bottom: 1.1rem;
+    text-wrap: balance;
+  }
+
+  .inv-card-details {
+    font-size: 0.98rem;
+    line-height: 1.58;
+  }
+
+  .inv-premium-button {
+    min-height: 52px;
+    padding: 0 1.35rem;
+    border-radius: 0.9rem;
+  }
+
+  .inv-gallery-section {
+    padding: 2.15rem 0 0.8rem;
+  }
+
+  .inv-gallery-header {
+    padding: 0 1rem 1.35rem;
+  }
+
+  .inv-gallery,
+  .inv-gallery-scroll {
+    gap: 1rem;
+  }
+
+  .inv-gallery-scroll {
+    padding: 0 1rem 0.5rem;
+  }
+
+  .inv-gallery-item {
+    border-radius: 1.4rem;
+    box-shadow: 0 14px 36px rgba(43, 34, 24, 0.12);
+  }
+
+  .inv-gallery-item.is-left,
+  .inv-gallery-item.is-right {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .inv-gallery-item img {
+    height: clamp(245px, 66vw, 360px);
+    border-radius: 1.4rem;
+  }
+
+  .inv-timeline {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 1.8rem;
+  }
+
+  .inv-timeline::before {
+    left: 1.28rem;
+    opacity: 0.48;
+  }
+
+  .inv-timeline-item {
+    grid-template-columns: 2.65rem minmax(0, 1fr);
+    gap: 0.85rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .inv-timeline-marker {
+    width: 2.55rem;
+    height: 2.55rem;
+    box-shadow: 0 8px 22px rgba(75, 52, 32, 0.07);
+  }
+
+  .inv-timeline-marker span {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+
+  .inv-timeline-content {
+    padding: 0.9rem 1rem;
+    border-radius: 1.05rem;
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 12px 28px rgba(60, 40, 25, 0.06);
+  }
+
+  .inv-timeline-content h3 {
+    font-size: clamp(1.22rem, 5.6vw, 1.62rem);
+    line-height: 1.1;
+  }
+
+  [aria-label="Tu pase personal"] {
+    margin-top: 2.75rem;
+    margin-bottom: 3rem;
+    border-color: rgba(201, 164, 106, 0.36);
+    box-shadow: 0 18px 46px rgba(76, 45, 28, 0.13), inset 0 0 0 1px rgba(201, 164, 106, 0.20);
+  }
+
+  #inv-guest-name {
+    display: block;
+    font-size: clamp(1.85rem, 10vw, 2.45rem) !important;
+    line-height: 1.05 !important;
+    margin: 0.85rem 0 1.25rem !important;
+    overflow-wrap: anywhere;
+  }
+
+  .inv-ticket-grid {
+    width: 100%;
+    gap: 0.85rem !important;
+    margin-top: 1.15rem !important;
+  }
+
+  .inv-ticket-field {
+    min-width: 0;
+    padding: 0.85rem 0.75rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(201, 164, 106, 0.18);
+  }
+
+  .inv-ticket-field + .inv-ticket-field {
+    border-left: 1px solid rgba(201, 164, 106, 0.18);
+  }
+
+  .inv-ticket-field-label {
+    font-size: 0.68rem !important;
+    letter-spacing: 0.14em !important;
+  }
+
+  .inv-ticket-field-value {
+    font-size: 1.55rem !important;
+    line-height: 1.15;
+  }
+
+  #inv-wa-block {
+    margin-top: 2.6rem;
+    margin-bottom: 2.1rem;
+  }
+
+  #inv-wa-block .inv-rsvp-sub {
+    margin-bottom: 1.35rem !important;
+  }
+
+  .inv-confirm-row {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .inv-confirm-label {
+    margin-bottom: 0 !important;
+    text-align: center;
+  }
+
+  .inv-select {
+    width: min(100%, 220px) !important;
+    min-height: 48px;
+    border-radius: 0.9rem !important;
+    text-align: center;
+  }
+
+  #inv-btn-confirm {
+    width: min(100%, 292px) !important;
+    min-height: 54px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 999px;
+    box-shadow: 0 13px 28px rgba(37, 211, 102, 0.18) !important;
+  }
+
+  .inv-footer {
+    padding: 1.3rem 1rem calc(5.4rem + env(safe-area-inset-bottom));
+    margin-top: 0.7rem;
+  }
+
+  .inv-footer p {
+    font-size: 0.76rem;
+  }
+
+  #inv-music-player {
+    min-height: 74px !important;
+    padding: 0.65rem 0.85rem calc(0.65rem + env(safe-area-inset-bottom)) !important;
+  }
+
+  #inv-music-player .inv-music-logo {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  #inv-music-player .inv-music-meta p {
+    font-size: 0.92rem !important;
+  }
+
+  #inv-music-player .inv-music-meta span {
+    font-size: 0.76rem !important;
+  }
+
+  #inv-music-player #inv-music-toggle {
+    width: 52px !important;
+    height: 52px !important;
+  }
+}
