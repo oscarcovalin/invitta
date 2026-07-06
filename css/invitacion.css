@@ -2560,3 +2560,26 @@ body.theme-black-luxury #inv-music-player {
   transform: translateY(0) scale(1);
   filter: blur(0);
 }
+\n
+/* --- Premium Section Icons --- */
+.inv-card-icon,
+.inv-section-icon {
+  color: var(--theme-gold, var(--gold, #b88a3d));
+}
+
+.inv-card-icon svg,
+.inv-section-icon svg {
+  width: 34px;
+  height: 34px;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 1.35;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.theme-black-luxury .inv-card-icon,
+body.theme-black-luxury .inv-section-icon {
+  color: var(--theme-gold, #d4af67);
+}

@@ -156,9 +156,103 @@
     });
   }
 
+  
+  function getPremiumSectionIcon(type) {
+    const icons = {
+      parents: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M12 13c2.5-1.8 3.6-3.8 2.8-5.2C14 6.4 12.6 6.5 12 8c-.6-1.5-2-1.6-2.8-.2C8.4 9.2 9.5 11.2 12 13Z"/>
+  <path d="M12 13c-2.8.5-5 .1-5.7-1.4-.7-1.5.2-2.7 1.8-2.6"/>
+  <path d="M12 13c2.8.5 5 .1 5.7-1.4.7-1.5-.2-2.7-1.8-2.6"/>
+  <path d="M12 13v7"/>
+  <path d="M12 17c-2.2 0-3.8 1-5 3"/>
+  <path d="M12 17c2.2 0 3.8 1 5 3"/>
+</svg>`,
+      ceremony: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M12 3v4"/>
+  <path d="M10.5 5h3"/>
+  <path d="M5.5 21V10.5L12 6l6.5 4.5V21"/>
+  <path d="M9 21v-5a3 3 0 0 1 6 0v5"/>
+  <path d="M5.5 13.5h13"/>
+</svg>`,
+      reception: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M8 3h4v5a4 4 0 0 1-8 0V3h4"/>
+  <path d="M8 12v7"/>
+  <path d="M5.5 19h5"/>
+  <path d="M16 3h4v5a4 4 0 0 1-8 0V3h4"/>
+  <path d="M16 12v7"/>
+  <path d="M13.5 19h5"/>
+</svg>`,
+      itinerary: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M16.5 14.5A6.5 6.5 0 0 1 9.5 5a7.5 7.5 0 1 0 7 9.5Z"/>
+  <path d="M18.5 4.5l.5 1.4 1.5.5-1.5.5-.5 1.4-.5-1.4-1.5-.5 1.5-.5.5-1.4Z"/>
+</svg>`,
+      dresscode: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M9 3h6"/>
+  <path d="M10 3c0 2-1 3.5-3 5l2 4-2 9h10l-2-9 2-4c-2-1.5-3-3-3-5"/>
+  <path d="M9 12h6"/>
+</svg>`,
+      gifts: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M4 10h16v10H4z"/>
+  <path d="M3 7h18v3H3z"/>
+  <path d="M12 7v13"/>
+  <path d="M12 7s-4.5.2-4.5-2.2C7.5 3.6 8.4 3 9.4 3 11.2 3 12 7 12 7Z"/>
+  <path d="M12 7s4.5.2 4.5-2.2C16.5 3.6 15.6 3 14.6 3 12.8 3 12 7 12 7Z"/>
+</svg>`,
+      hashtag: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M9 4 7 20"/>
+  <path d="M17 4l-2 16"/>
+  <path d="M4 9h16"/>
+  <path d="M3 15h16"/>
+  <path d="M19 5l.5 1.4 1.5.5-1.5.5L19 9l-.5-1.6-1.5-.5 1.5-.5L19 5Z"/>
+</svg>`,
+      pass: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v2a2.5 2.5 0 0 0 0 5v2A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-2a2.5 2.5 0 0 0 0-5v-2Z"/>
+  <path d="M10 8.5h4"/>
+  <path d="M9 12h6"/>
+  <path d="M10 15.5h4"/>
+</svg>`,
+      rsvp: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M12 20s-7-4.2-8.8-8.2C1.8 8.7 3.6 6 6.6 6c1.7 0 3 1 3.9 2.2C11.4 7 12.7 6 14.4 6c3 0 4.8 2.7 3.4 5.8C16 15.8 12 20 12 20Z"/>
+  <path d="m9.5 12.2 1.6 1.6 3.4-3.6"/>
+</svg>`,
+      music: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M12 3l1.4 5.1L18.5 10l-5.1 1.9L12 17l-1.4-5.1L5.5 10l5.1-1.9L12 3Z"/>
+  <path d="M19 16l.6 2.1L22 19l-2.4.9L19 22l-.6-2.1L16 19l2.4-.9L19 16Z"/>
+</svg>`, // music icon requested not explicitly, using default or something similar if needed
+      default: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M12 3l1.4 5.1L18.5 10l-5.1 1.9L12 17l-1.4-5.1L5.5 10l5.1-1.9L12 3Z"/>
+  <path d="M19 16l.6 2.1L22 19l-2.4.9L19 22l-.6-2.1L16 19l2.4-.9L19 16Z"/>
+</svg>`
+    };
+    return icons[type] || icons.default;
+  }
+
+  function injectPremiumIcons() {
+    const map = {
+      'inv-parents-block': getPremiumSectionIcon('parents'),
+      'inv-ceremony-block': getPremiumSectionIcon('ceremony'),
+      'inv-reception-block': getPremiumSectionIcon('reception'),
+      'inv-dresscode-block': getPremiumSectionIcon('dresscode'),
+      'inv-gifts-block': getPremiumSectionIcon('gifts'),
+      'inv-hashtag-block': getPremiumSectionIcon('hashtag'),
+      'inv-pass-section': getPremiumSectionIcon('pass'),
+      'inv-wa-block': getPremiumSectionIcon('rsvp')
+    };
+
+    for (const id in map) {
+      const el = document.getElementById(id);
+      if (el) {
+        const iconContainer = el.querySelector('.inv-card-icon, .inv-section-icon');
+        if (iconContainer) {
+          iconContainer.innerHTML = map[id];
+        }
+      }
+    }
+  }
   /* ─── Renderizado ─────────────────────────────────────────────────── */
   function renderInvitation(inv) {
     applyVisualTheme(inv);
+    injectPremiumIcons();
 
     /* 1. Mostrar contenido */
     var loader  = document.getElementById("inv-loader");
