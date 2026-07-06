@@ -108,19 +108,20 @@ async function initLinkBuilder() {
       dynamicTitle.textContent = invitationData.link_builder_title || "Generador de enlace";
       dynamicMessage.textContent = invitationData.link_builder_message || "Crea un pase rápido para invitados de último momento.";
 
-      const requiredPin = invitationData.link_builder_pin;
+      const pin = String(invitationData.link_builder_pin || "").trim();
       console.log("Link builder config:", invitationData);
       
-      if (requiredPin) {
-        const isUnlocked = sessionStorage.getItem(`linkBuilderUnlocked:${slug}`);
-        if (isUnlocked === "true") {
-          showBuilderForm();
-        } else {
-          showPinGate();
-        }
-      } else {
+      if (sessionStorage.getItem(`linkBuilderUnlocked:${slug}`) === "true") {
         showBuilderForm();
+        return;
       }
+
+      if (pin) {
+        showPinGate();
+        return;
+      }
+
+      showBuilderForm();
 
     } catch (err) {
       console.error(err);
@@ -140,16 +141,23 @@ async function initLinkBuilder() {
   });
 
   function unlockLinkBuilder() {
-    const inputPin = linkBuilderPinInput.value.trim();
-    const realPin = invitationData ? String(invitationData.link_builder_pin || "").trim() : "";
+    const typedPin = document.getElementById("linkBuilderPinInput")?.value.trim();
+    const realPin = String(invitationData?.link_builder_pin || "").trim();
+    const errorBox = document.getElementById("linkBuilderPinError");
     
-    if (invitationData && inputPin === realPin) {
+    if (typedPin === realPin) {
       sessionStorage.setItem(`linkBuilderUnlocked:${slug}`, "true");
-      linkBuilderPinError.classList.add("hidden");
+      if (errorBox) {
+        errorBox.classList.add("hidden");
+        errorBox.textContent = "";
+      }
       showBuilderForm();
-    } else {
-      linkBuilderPinError.textContent = "PIN incorrecto.";
-      linkBuilderPinError.classList.remove("hidden");
+      return;
+    }
+
+    if (errorBox) {
+      errorBox.textContent = "PIN incorrecto.";
+      errorBox.classList.remove("hidden");
     }
   }
 
