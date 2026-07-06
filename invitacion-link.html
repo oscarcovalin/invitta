@@ -86,10 +86,33 @@
             <button type="button" id="generateLinkButton" class="link-builder-button primary">Generar enlace</button>
             <button type="button" id="copyLinkButton" class="link-builder-button" style="display:none;">Copiar enlace</button>
             <button type="button" id="openInvitationButton" class="link-builder-button" style="display:none;">Abrir invitación</button>
+            <button id="downloadPassButton" class="link-builder-button" type="button" style="display:none;">Descargar pase</button>
             <button type="button" id="sendWhatsappButton" class="link-builder-button" style="display:none;">Enviar por WhatsApp</button>
           </div>
 
           <div id="generatedLinkOutput" class="generated-link-output" style="display:none;"></div>
+
+          <div id="generatedPassCard" class="generated-pass-card hidden">
+            <p class="generated-pass-kicker">Pase personalizado</p>
+            <h2 id="generatedPassName" class="generated-pass-name">Familia García</h2>
+
+            <div class="generated-pass-details">
+              <div>
+                <span>Pases</span>
+                <strong id="generatedPassCount">4</strong>
+              </div>
+              <div>
+                <span>Mesa</span>
+                <strong id="generatedPassTable">5</strong>
+              </div>
+            </div>
+
+            <div id="generatedPassQr" class="generated-pass-qr"></div>
+
+            <p class="generated-pass-note">
+              Presenta este pase al ingresar al evento.
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -97,6 +120,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/assets/js/env.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="/js/invitacion-link.js"></script>
 </body>
 </html>

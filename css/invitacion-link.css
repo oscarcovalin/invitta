@@ -287,3 +287,92 @@ button.link-builder-button:hover {
   color: #b42318;
   font-size: 0.88rem;
 }
+
+.generated-pass-card {
+  margin: 1.6rem auto 0;
+  padding: 2rem 1.3rem;
+  border-radius: 1.8rem;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,238,0.9));
+  border: 1px solid rgba(184,138,61,0.28);
+  box-shadow: 0 22px 60px rgba(74,45,32,0.14);
+  text-align: center;
+}
+
+.generated-pass-kicker {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--link-gold);
+}
+
+.generated-pass-name {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 8vw, 3.1rem);
+  line-height: 1;
+  font-weight: 500;
+  color: var(--link-text);
+}
+
+.generated-pass-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin: 1.4rem auto;
+}
+
+.generated-pass-details div {
+  padding: 1rem;
+  border-radius: 1.1rem;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(184,138,61,0.18);
+}
+
+.generated-pass-details span {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--link-muted);
+}
+
+.generated-pass-details strong {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--link-gold-dark);
+}
+
+.generated-pass-qr {
+  width: 176px;
+  height: 176px;
+  margin: 1.2rem auto 0;
+  padding: 10px;
+  border-radius: 1rem;
+  background: #fff;
+  border: 1px solid rgba(184,138,61,0.22);
+  display: grid;
+  place-items: center;
+}
+
+.generated-pass-note {
+  margin: 1rem auto 0;
+  max-width: 320px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--link-muted);
+}
+
+@media (max-width: 640px) {
+  .generated-pass-card {
+    padding: 1.6rem 1rem;
+  }
+
+  .generated-pass-details {
+    gap: 0.65rem;
+  }
+}

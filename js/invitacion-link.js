@@ -270,8 +270,75 @@ async function initLinkBuilder() {
     return String(value || "").replace(/[^\d]/g, "");
   }
 
+  function renderGeneratedQr(link) {
+    const qrContainer = document.getElementById("generatedPassQr");
+    if (!qrContainer) return;
+
+    qrContainer.innerHTML = "";
+
+    if (typeof QRCode === "undefined") {
+      qrContainer.textContent = "No se pudo generar el QR.";
+      return;
+    }
+
+    new QRCode(qrContainer, {
+      text: link,
+      width: 156,
+      height: 156,
+      colorDark: "#2f2520",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  function renderGeneratedPass({ name, passes, table, link }) {
+    const card = document.getElementById("generatedPassCard");
+    const nameEl = document.getElementById("generatedPassName");
+    const passesEl = document.getElementById("generatedPassCount");
+    const tableEl = document.getElementById("generatedPassTable");
+
+    if (nameEl) nameEl.textContent = name || "Invitado";
+    if (passesEl) passesEl.textContent = passes || "-";
+    if (tableEl) tableEl.textContent = table || "-";
+
+    renderGeneratedQr(link);
+
+    card?.classList.remove("hidden");
+  }
+
+  async function downloadGeneratedPass() {
+    const card = document.getElementById("generatedPassCard");
+
+    if (!card || card.classList.contains("hidden")) {
+      alert("Primero genera un pase.");
+      return;
+    }
+
+    if (!window.html2canvas) {
+      alert("No se pudo cargar la herramienta de descarga.");
+      return;
+    }
+
+    const canvas = await html2canvas(card, {
+      scale: 2,
+      backgroundColor: null,
+      useCORS: true
+    });
+
+    const link = document.createElement("a");
+    link.download = "pase-personalizado.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
+
+  document.getElementById("downloadPassButton")
+    ?.addEventListener("click", downloadGeneratedPass);
+
   generateLinkButton.addEventListener("click", () => {
     const name = document.getElementById("guestName").value.trim();
+    const passes = document.getElementById("guestPasses")?.value.trim();
+    const table = document.getElementById("guestTable")?.value.trim();
+
     if (!name) {
       alert("Por favor, ingresa el nombre o familia.");
       return;
@@ -282,8 +349,18 @@ async function initLinkBuilder() {
     generatedLinkOutput.textContent = currentGeneratedLink;
     generatedLinkOutput.style.display = "block";
 
+    renderGeneratedPass({
+      name,
+      passes,
+      table,
+      link: currentGeneratedLink
+    });
+
     copyLinkButton.style.display = "inline-block";
     openInvitationButton.style.display = "inline-block";
+    
+    const downloadBtn = document.getElementById("downloadPassButton");
+    if (downloadBtn) downloadBtn.style.display = "inline-block";
     
     const whatsapp = document.getElementById("guestWhatsapp").value.trim();
     if (normalizePhone(whatsapp)) {
@@ -325,7 +402,7 @@ async function initLinkBuilder() {
       return;
     }
 
-    const message = `Hola, te compartimos tu pase personalizado para el evento:\n${currentGeneratedLink}`;
+    const message = `Hola, te compartimos tu pase personalizado para el evento:\n\nNombre: ${document.getElementById("guestName").value.trim()}\nPases: ${document.getElementById("guestPasses")?.value.trim() || "-"}\nMesa: ${document.getElementById("guestTable")?.value.trim() || "-"}\n\n${currentGeneratedLink}`;
     const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(waUrl, "_blank");
   });
