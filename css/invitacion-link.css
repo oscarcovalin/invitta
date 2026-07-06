@@ -105,3 +105,46 @@ body {
     width: 100%;
   }
 }
+.link-builder-lock {
+  width: min(92vw, 460px);
+  margin: 0 auto;
+  padding: 2rem;
+  border-radius: 2rem;
+  background: rgba(255,255,255,.9);
+  border: 1px solid rgba(184,138,61,.24);
+  box-shadow: 0 24px 70px rgba(74,45,32,.14);
+  text-align: center;
+}
+
+.link-builder-lock-title {
+  font-family: Georgia, serif;
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  margin: 0 0 .75rem;
+  color: #2f2520;
+}
+
+.link-builder-lock-text {
+  color: #7d6860;
+  margin: 0 0 1.5rem;
+}
+
+.link-builder-pin-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(74,45,32,.16);
+  border-radius: 1rem;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.2rem;
+  letter-spacing: .16em;
+}
+
+.link-builder-error {
+  margin-top: .8rem;
+  color: #b42318;
+  font-size: .9rem;
+}
+
+.hidden {
+  display: none !important;
+}

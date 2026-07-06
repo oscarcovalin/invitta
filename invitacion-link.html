@@ -5,12 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generador de Pase - Invitta Studio</title>
   <link rel="stylesheet" href="/css/invitacion-link.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/env.js"></script>
 </head>
 <body>
   <main class="link-builder-shell">
-    <div class="link-builder-card">
-      <h1 class="link-builder-title">Generador de pase personalizado</h1>
-      <p class="link-builder-subtitle">Crea un enlace rápido para invitados de último momento.</p>
+    
+    <!-- PANTALLA DE ERROR / DESACTIVADO -->
+    <div id="disabledState" class="link-builder-lock hidden">
+      <h2 class="link-builder-lock-title">Generador no disponible</h2>
+      <p class="link-builder-lock-text" id="disabledMessageText">El generador de enlaces no está activo para esta invitación.</p>
+    </div>
+
+    <!-- PANTALLA DE PIN -->
+    <div id="pinState" class="link-builder-lock hidden">
+      <h2 class="link-builder-lock-title">Acceso al generador</h2>
+      <p class="link-builder-lock-text">Ingresa el PIN proporcionado por el estudio.</p>
+      <input type="password" id="linkBuilderPinInput" class="link-builder-pin-input" placeholder="****">
+      <div id="linkBuilderPinError" class="link-builder-error hidden">PIN incorrecto.</div>
+      <button type="button" id="unlockLinkBuilderButton" class="link-builder-button primary" style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+    </div>
+
+    <div id="builderState" class="link-builder-card hidden">
+      <h1 id="dynamicTitle" class="link-builder-title">Generador de pase personalizado</h1>
+      <p id="dynamicMessage" class="link-builder-subtitle">Crea un enlace rápido para invitados de último momento.</p>
 
       <div id="errorMessage" style="display: none; color: #a13b3b; text-align: center; margin-bottom: 1.5rem; font-weight: 600;">
         No se encontró el slug de la invitación.

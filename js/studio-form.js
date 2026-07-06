@@ -155,9 +155,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       await copyTextToClipboard(getPublicInvitationUrl(slug));
       showSuccessMessage("Enlace copiado.");
     } catch (err) {
-      console.error("Error al copiar enlace:", err);
-      alert("No se pudo copiar el enlace. Intenta de nuevo.");
+      console.error(err);
+      alert("Error al copiar el enlace.");
     }
+  });
+
+  const openLinkBuilderBtn = document.getElementById("openLinkBuilderBtn");
+  openLinkBuilderBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const slug = requireSlugForAction();
+    if (!slug) return;
+    window.open(`/invitacion-link.html?slug=${slug}`, "_blank", "noopener");
   });
 
   // Si no tenemos el studio_id, lo buscamos
@@ -387,6 +395,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (document.getElementById("studioCtaMessage")) {
       document.getElementById("studioCtaMessage").value = data.studio_cta_message || "Hola, vi esta invitación digital y me interesa contratar una para mi evento.";
+    }
+    
+    if (document.getElementById("linkBuilderEnabled")) {
+      document.getElementById("linkBuilderEnabled").checked = data.link_builder_enabled !== false;
+    }
+    if (document.getElementById("linkBuilderPin")) {
+      document.getElementById("linkBuilderPin").value = data.link_builder_pin || "";
+    }
+    if (document.getElementById("linkBuilderTitle")) {
+      document.getElementById("linkBuilderTitle").value = data.link_builder_title || "Generador de pase personalizado";
+    }
+    if (document.getElementById("linkBuilderMessage")) {
+      document.getElementById("linkBuilderMessage").value = data.link_builder_message || "Crea un enlace rápido para invitados de último momento.";
     }
     
     document.getElementById("itineraryText").value = itineraryToText(data.itinerary);
@@ -633,6 +654,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       studio_cta_enabled: getChecked("studioCtaEnabled"),
       studio_cta_text: document.getElementById("studioCtaText") ? document.getElementById("studioCtaText").value || "Quiero una invitación así" : "Quiero una invitación así",
       studio_cta_message: document.getElementById("studioCtaMessage") ? document.getElementById("studioCtaMessage").value || "Hola, vi esta invitación digital y me interesa contratar una para mi evento." : "Hola, vi esta invitación digital y me interesa contratar una para mi evento.",
+      link_builder_enabled: getChecked("linkBuilderEnabled"),
+      link_builder_pin: document.getElementById("linkBuilderPin") ? document.getElementById("linkBuilderPin").value || "" : "",
+      link_builder_title: document.getElementById("linkBuilderTitle") ? document.getElementById("linkBuilderTitle").value || "Generador de pase personalizado" : "Generador de pase personalizado",
+      link_builder_message: document.getElementById("linkBuilderMessage") ? document.getElementById("linkBuilderMessage").value || "Crea un enlace rápido para invitados de último momento." : "Crea un enlace rápido para invitados de último momento.",
       gallery_urls: finalGalleryUrls,
       itinerary: parseItineraryText(document.getElementById("itineraryText").value),
       background_image_url: finalBackgroundUrl,

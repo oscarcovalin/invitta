@@ -8,13 +8,95 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendWhatsappButton = document.getElementById("sendWhatsappButton");
   const generatedLinkOutput = document.getElementById("generatedLinkOutput");
   
+  const disabledState = document.getElementById("disabledState");
+  const pinState = document.getElementById("pinState");
+  const builderState = document.getElementById("builderState");
+  const dynamicTitle = document.getElementById("dynamicTitle");
+  const dynamicMessage = document.getElementById("dynamicMessage");
+  
+  const linkBuilderPinInput = document.getElementById("linkBuilderPinInput");
+  const linkBuilderPinError = document.getElementById("linkBuilderPinError");
+  const unlockLinkBuilderButton = document.getElementById("unlockLinkBuilderButton");
+
   let currentGeneratedLink = "";
+  let invitationData = null;
 
   if (!slug) {
     document.getElementById("errorMessage").style.display = "block";
-    document.getElementById("builderForm").style.display = "none";
     return;
   }
+
+  // Initialize Supabase if available in global
+  if (!window.supabaseClient) {
+    if (window.env && window.env.SUPABASE_URL && window.env.SUPABASE_ANON_KEY) {
+      window.supabaseClient = supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON_KEY);
+    }
+  }
+  
+  const sb = window.supabaseClient;
+
+  if (!sb) {
+    console.error("Supabase client not initialized.");
+    return;
+  }
+
+  async function init() {
+    try {
+      const { data, error } = await sb
+        .from("studio_invitations")
+        .select("slug, event_title, quinceanera_name, link_builder_enabled, link_builder_pin, link_builder_title, link_builder_message")
+        .eq("slug", slug)
+        .single();
+
+      if (error || !data) {
+        document.getElementById("errorMessage").textContent = "No se encontró la invitación.";
+        document.getElementById("errorMessage").style.display = "block";
+        return;
+      }
+
+      invitationData = data;
+
+      if (invitationData.link_builder_enabled === false) {
+        disabledState.classList.remove("hidden");
+        return;
+      }
+
+      dynamicTitle.textContent = invitationData.link_builder_title || "Generador de pase personalizado";
+      dynamicMessage.textContent = invitationData.link_builder_message || "Crea un enlace rápido para invitados de último momento.";
+
+      const requiredPin = invitationData.link_builder_pin;
+      
+      if (requiredPin) {
+        const isUnlocked = sessionStorage.getItem(`linkBuilderUnlocked:${slug}`);
+        if (isUnlocked === "true") {
+          builderState.classList.remove("hidden");
+        } else {
+          pinState.classList.remove("hidden");
+        }
+      } else {
+        builderState.classList.remove("hidden");
+      }
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById("errorMessage").textContent = "Error de conexión.";
+      document.getElementById("errorMessage").style.display = "block";
+    }
+  }
+  
+  init();
+
+  unlockLinkBuilderButton.addEventListener("click", () => {
+    const inputPin = linkBuilderPinInput.value;
+    if (inputPin === invitationData.link_builder_pin) {
+      sessionStorage.setItem(`linkBuilderUnlocked:${slug}`, "true");
+      pinState.classList.add("hidden");
+      builderState.classList.remove("hidden");
+      linkBuilderPinError.classList.add("hidden");
+    } else {
+      linkBuilderPinError.classList.remove("hidden");
+    }
+  });
 
   function buildInvitationLink() {
     const baseUrl = `${window.location.origin}/invitacion.html`;
