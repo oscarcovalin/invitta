@@ -3266,113 +3266,27 @@ body.theme-black-luxury .inv-timeline-alt-line {
 
 
 
-/* Final clean scroll reveal - card only */
+/* Safe final scroll fade */
 
-.js-scroll-reveal {
-  opacity: 0 !important;
-  transform: translate3d(0, 50px, 0) scale(0.92) !important;
-  filter: blur(5px) !important;
-  transition:
-    opacity 1600ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1600ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 1600ms cubic-bezier(0.22, 1, 0.36, 1) !important;
-  will-change: opacity, transform, filter;
-}
-
-.js-scroll-reveal.is-visible {
-  opacity: 1 !important;
-  transform: translate3d(0, 0, 0) scale(1) !important;
-  filter: blur(0) !important;
-}
-
-/* Important: children must not remain blurred or hidden */
-.js-scroll-reveal.is-visible * {
-  filter: none !important;
-}
-
-.js-scroll-reveal * {
-  opacity: inherit;
-}
-
-/* But do not force opacity on structural elements that may need normal visibility */
-.js-scroll-reveal.is-visible * {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .js-scroll-reveal,
-  .js-scroll-reveal *,
-  .js-scroll-reveal.is-visible {
-    opacity: 1 !important;
-    transform: none !important;
-    filter: none !important;
-    transition: none !important;
-    animation: none !important;
-  }
-}
-
-
-/* Neutralize old reveal-on-scroll classes */
-.reveal-on-scroll,
-.reveal-on-scroll * {
-  filter: none !important;
-}
-
-/* Final forced fade zoom on scroll */
 .inv-scroll-fade {
-  opacity: 0 !important;
-  transform: translate3d(0, 42px, 0) scale(0.92) !important;
-  filter: blur(6px) !important;
+  opacity: 0;
+  transform: translate3d(0, 36px, 0) scale(0.94);
+  filter: blur(5px);
+  transition:
+    opacity 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1100ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform, filter;
 }
 
 .inv-scroll-fade.inv-scroll-visible {
-  animation: invFadeZoomIn 1250ms cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0);
 }
 
-@keyframes invFadeZoomIn {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 42px, 0) scale(0.92);
-    filter: blur(6px);
-  }
-
-  55% {
-    opacity: 1;
-    filter: blur(1px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
-  }
-}
-
-/* Important: children must remain clean */
 .inv-scroll-fade.inv-scroll-visible * {
   filter: none !important;
-}
-
-/* Prevent old reveal classes from interfering */
-.reveal-on-scroll,
-.reveal-on-scroll.is-visible,
-.js-scroll-reveal,
-.js-scroll-reveal.is-visible {
-  opacity: inherit;
-  transform: none;
-  filter: none;
-  transition: none;
-}
-
-.reveal-on-scroll *,
-.js-scroll-reveal *,
-.reveal-on-scroll.is-visible *,
-.js-scroll-reveal.is-visible * {
-  opacity: inherit;
-  transform: none;
-  filter: none !important;
-  transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3382,7 +3296,37 @@ body.theme-black-luxury .inv-timeline-alt-line {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
-    animation: none !important;
     transition: none !important;
+    animation: none !important;
   }
+}
+
+.inv-music-player,
+.inv-music-player * {
+  box-sizing: border-box;
+}
+
+.inv-music-play-button,
+.inv-audio-play-button,
+.inv-music-control,
+#inv-music-toggle {
+  color: #ffffff !important;
+}
+
+.inv-music-play-button svg,
+.inv-audio-play-button svg,
+.inv-music-control svg,
+#inv-music-toggle svg,
+.inv-music-control-icon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: none !important;
+}
+
+.inv-music-control-icon path {
+  fill: #ffffff !important;
+}
+
+.inv-music-control-icon [stroke] {
+  stroke: #ffffff !important;
 }
