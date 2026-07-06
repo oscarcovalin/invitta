@@ -903,21 +903,32 @@
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-    if (value.includes("recepcion")) return "fa-heart";
-    if (value.includes("bienvenida")) return "fa-crown";
-    if (value.includes("presentacion")) return "fa-sparkles";
-    if (value.includes("brindis")) return "fa-champagne-glasses";
-    if (value.includes("coronacion")) return "fa-crown";
-    if (value.includes("vals")) return "fa-people-pulling";
-    if (value.includes("cena")) return "fa-utensils";
-    if (value.includes("apertura de pista")) return "fa-compact-disc";
-    if (value.includes("batucada")) return "fa-drum";
-    if (value.includes("baile")) return "fa-music";
-    if (value.includes("cierre")) return "fa-heart";
+    const icons = {
+      heart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 5.6c-1.7-1.8-4.4-1.8-6.1 0L12 8.3 9.3 5.6c-1.7-1.8-4.4-1.8-6.1 0-1.6 1.7-1.6 4.3 0 6l8.8 8.8 8.8-8.8c1.6-1.7 1.6-4.3 0-6Z"/></svg>',
+      crown: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18"/><path d="M5 15 7.5 7l4.5 4 4.5-4L19 15H5Z"/><path d="M8 21h8"/></svg>',
+      star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.9 6.3.7-4.7 4.3 1.3 6.1-5.6-3.1L6.4 20l1.3-6.1L3 9.6l6.3-.7L12 3Z"/></svg>',
+      glass: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v4a5 5 0 0 1-10 0V3Z"/><path d="M12 12v7"/><path d="M8 21h8"/></svg>',
+      dance: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="5" r="2"/><circle cx="16" cy="5" r="2"/><path d="M8 8l-2 5 3 2-1 6"/><path d="M16 8l2 5-3 2 1 6"/><path d="M10 10h4"/></svg>',
+      utensils: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v18"/><path d="M4 3v6a3 3 0 0 0 6 0V3"/><path d="M16 21V3c2.5 1.3 4 3.6 4 6.2V12h-4"/></svg>',
+      disc: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.3"/><path d="M15 6.7a6 6 0 0 1 2.3 2.4"/></svg>',
+      drum: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14v9H5z"/><path d="M5 8c0 1.2 3.1 2 7 2s7-.8 7-2"/><path d="M8 8 5 3"/><path d="M16 8l3-5"/></svg>',
+      music: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg>'
+    };
 
-    return "fa-star";
+    if (value.includes("recepcion")) return icons.heart;
+    if (value.includes("bienvenida")) return icons.crown;
+    if (value.includes("presentacion")) return icons.star;
+    if (value.includes("brindis")) return icons.glass;
+    if (value.includes("coronacion")) return icons.crown;
+    if (value.includes("vals")) return icons.dance;
+    if (value.includes("cena")) return icons.utensils;
+    if (value.includes("apertura de pista")) return icons.disc;
+    if (value.includes("batucada")) return icons.drum;
+    if (value.includes("baile")) return icons.music;
+    if (value.includes("cierre")) return icons.heart;
+
+    return icons.star;
   }
-
   function renderItinerary(value) {
     const section = document.getElementById("inv-itinerary-section");
     if (!section) return;
@@ -943,7 +954,7 @@
       return `
         <div class="inv-timeline-row reveal-on-scroll">
           <div class="inv-timeline-icon" aria-hidden="true">
-            <i class="fa-solid ${icon}"></i>
+            ${icon}
           </div>
           <div class="inv-timeline-line" aria-hidden="true"></div>
           <div class="inv-timeline-time">${item.time ? escapeHtml(item.time) : ""}</div>
