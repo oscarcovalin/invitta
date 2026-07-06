@@ -41,13 +41,26 @@ function hidePinGate() {
 
 function getSupabaseClient() {
   if (window.supabaseClient) return window.supabaseClient;
-  if (window.supabase) {
-    const url = window.SUPABASE_URL || window.supabaseUrl || window.env?.SUPABASE_URL;
-    const key = window.SUPABASE_ANON_KEY || window.supabaseAnonKey || window.env?.SUPABASE_ANON_KEY;
+  if (window.invittaSupabase) return window.invittaSupabase;
+  if (window.sbClient) return window.sbClient;
 
-    if (url && key) {
-      return window.supabase.createClient(url, key);
-    }
+  const url =
+    window.SUPABASE_URL ||
+    window.supabaseUrl ||
+    window.INVITTA_SUPABASE_URL ||
+    window.env?.SUPABASE_URL ||
+    window.INVITTIA_ENV?.SUPABASE_URL;
+
+  const key =
+    window.SUPABASE_ANON_KEY ||
+    window.supabaseAnonKey ||
+    window.INVITTA_SUPABASE_ANON_KEY ||
+    window.env?.SUPABASE_ANON_KEY ||
+    window.INVITTIA_ENV?.SUPABASE_ANON_KEY;
+
+  if (window.supabase && url && key) {
+    window.supabaseClient = window.supabase.createClient(url, key);
+    return window.supabaseClient;
   }
 
   return null;
@@ -85,51 +98,60 @@ async function initLinkBuilder() {
 
   const supabase = getSupabaseClient();
 
+  console.log("Supabase CDN:", Boolean(window.supabase));
+  console.log("Supabase client:", Boolean(supabase));
+  console.log("SUPABASE URL exists:", Boolean(window.SUPABASE_URL || window.supabaseUrl || window.INVITTA_SUPABASE_URL || window.INVITTIA_ENV?.SUPABASE_URL || window.env?.SUPABASE_URL));
+  console.log("SUPABASE KEY exists:", Boolean(window.SUPABASE_ANON_KEY || window.supabaseAnonKey || window.INVITTA_SUPABASE_ANON_KEY || window.INVITTIA_ENV?.SUPABASE_ANON_KEY || window.env?.SUPABASE_ANON_KEY));
+
   if (!supabase) {
-    console.error("Supabase client not available for link builder.");
+    console.error("No Supabase client available in invitacion-link.js");
     showFatalError("No se pudo cargar la configuración de acceso.");
     return;
   }
 
   try {
     const { data, error } = await supabase
-        .from("studio_invitations")
-        .select("slug, event_title, quinceanera_name, link_builder_enabled, link_builder_pin, link_builder_title, link_builder_message")
-        .eq("slug", slug)
-        .single();
+      .from("studio_invitations")
+      .select("slug, event_title, quinceanera_name, link_builder_enabled, link_builder_pin, link_builder_title, link_builder_message")
+      .eq("slug", slug)
+      .single();
 
-      if (error || !data) {
-        showFatalError("No se encontró la invitación.");
-        return;
-      }
+    console.log("Link builder config result:", { data, error });
 
-      invitationData = data;
+    if (error) {
+      throw error;
+    }
 
-      if (invitationData.link_builder_enabled === false) {
-        disabledState.classList.remove("hidden");
-        if (statusState) statusState.style.display = "none";
-        return;
-      }
+    if (!data) {
+      throw new Error("Invitation config not found");
+    }
 
+    invitationData = data;
+
+    if (invitationData.link_builder_enabled === false) {
+      disabledState.classList.remove("hidden");
       if (statusState) statusState.style.display = "none";
-      
-      dynamicTitle.textContent = invitationData.link_builder_title || "Generador de enlace";
-      dynamicMessage.textContent = invitationData.link_builder_message || "Crea un pase rápido para invitados de último momento.";
+      return;
+    }
 
-      const pin = String(invitationData.link_builder_pin || "").trim();
-      console.log("Link builder config:", invitationData);
-      
-      if (sessionStorage.getItem(`linkBuilderUnlocked:${slug}`) === "true") {
-        showBuilderForm();
-        return;
-      }
+    if (statusState) statusState.style.display = "none";
+    
+    dynamicTitle.textContent = invitationData.link_builder_title || "Generador de enlace";
+    dynamicMessage.textContent = invitationData.link_builder_message || "Crea un pase rápido para invitados de último momento.";
 
-      if (pin) {
-        showPinGate();
-        return;
-      }
-
+    const pin = String(invitationData.link_builder_pin || "").trim();
+    
+    if (sessionStorage.getItem(`linkBuilderUnlocked:${slug}`) === "true") {
       showBuilderForm();
+      return;
+    }
+
+    if (pin) {
+      showPinGate();
+      return;
+    }
+
+    showBuilderForm();
 
     } catch (err) {
       console.error(err);
