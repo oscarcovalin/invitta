@@ -257,12 +257,6 @@
     /* 17. Galería */
     renderGallery(normalizeGalleryUrls(inv.gallery_urls));
 
-    /* 18. Animaciones de revelado */
-    if (typeof setupRevealAnimations === "function") {
-      setTimeout(() => {
-        setupRevealAnimations();
-      }, 800);
-    }
 
     /* 19. Limpieza de elementos legacy de audio en el contenido */
     document.querySelectorAll("#inv-content audio, #inv-content [id*='music'], #inv-content [class*='music']").forEach((el) => {
@@ -274,7 +268,8 @@
 
     setTimeout(() => {
       animateHeroIntro();
-    }, 300);
+      setupRevealAnimations();
+    }, 600);
   }
 
   /* ─── Foto principal (hero) ──────────────────────────────────────── */
@@ -606,26 +601,7 @@
       container.appendChild(item);
     });
 
-    // IntersectionObserver para fade-in suave al hacer scroll
-    if ("IntersectionObserver" in window) {
-      var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.12 });
 
-      container.querySelectorAll(".inv-gallery-item").forEach(function (el) {
-        observer.observe(el);
-      });
-    } else {
-      // Fallback sin IntersectionObserver
-      container.querySelectorAll(".inv-gallery-item").forEach(function (el) {
-        el.classList.add("is-visible");
-      });
-    }
   }
 
   /* ─── Selector de pases ───────────────────────────────────────────── */
@@ -858,19 +834,17 @@ function animateHeroIntro() {
   hero.animate(
     [
       {
-        opacity: 0,
-        transform: "scale(1.06)",
-        filter: "blur(10px)"
+        opacity: 0.92,
+        transform: "scale(1.015)"
       },
       {
         opacity: 1,
-        transform: "scale(1)",
-        filter: "blur(0)"
+        transform: "scale(1)"
       }
     ],
     {
-      duration: 1500,
-      easing: "cubic-bezier(.16, 1, .3, 1)",
+      duration: 1200,
+      easing: "cubic-bezier(.22, 1, .36, 1)",
       fill: "forwards"
     }
   );
@@ -880,7 +854,7 @@ function animateHeroIntro() {
       [
         {
           opacity: 0,
-          transform: "translateY(45px)"
+          transform: "translateY(18px)"
         },
         {
           opacity: 1,
@@ -888,9 +862,9 @@ function animateHeroIntro() {
         }
       ],
       {
-        duration: 1300,
-        delay: 350,
-        easing: "cubic-bezier(.16, 1, .3, 1)",
+        duration: 950,
+        delay: 180,
+        easing: "cubic-bezier(.22, 1, .36, 1)",
         fill: "forwards"
       }
     );
@@ -898,16 +872,20 @@ function animateHeroIntro() {
 }
 
 function setupRevealAnimations() {
-  console.log("setupRevealAnimations running JS animation mode");
+  console.log("setupRevealAnimations running smooth mode");
 
   const selectors = [
-    ".inv-section",
-    ".inv-event-card",
-    ".inv-section-card",
-    ".inv-gallery-item",
-    ".inv-timeline-item",
-    ".inv-pass-card",
-    ".inv-rsvp-card"
+    "#inv-parents-block",
+    "#inv-welcome-block",
+    "#inv-ceremony-block",
+    "#inv-reception-block",
+    "#inv-itinerary-section",
+    "#inv-dresscode-block",
+    "#inv-gifts-block",
+    "#inv-hashtag-block",
+    "#inv-pass-section",
+    "#inv-rsvp-section",
+    ".inv-gallery-item"
   ];
 
   const elements = Array.from(document.querySelectorAll(selectors.join(",")))
@@ -918,24 +896,21 @@ function setupRevealAnimations() {
         style.display !== "none" &&
         style.visibility !== "hidden" &&
         !el.closest("#inv-music-player") &&
-        !el.classList.contains("inv-hero") &&
-        !el.dataset.revealReady
+        !el.classList.contains("inv-hero")
       );
     });
 
-  console.log("Reveal elements found:", elements.length);
+  console.log("Smooth reveal elements found:", elements.length);
 
   if (!elements.length) return;
 
   elements.forEach((el, index) => {
-    el.dataset.revealReady = "true";
     el.dataset.revealed = "false";
     el.style.opacity = "0";
-    el.style.transform = "translateY(90px) scale(0.94)";
-    el.style.filter = "blur(10px)";
-    el.style.willChange = "opacity, transform, filter";
-    el.style.transition = "none";
-    el.dataset.revealDelay = String(Math.min(index * 60, 300));
+    el.style.transform = "translateY(26px)";
+    el.style.filter = "none";
+    el.style.willChange = "opacity, transform";
+    el.dataset.revealDelay = String(Math.min(index * 45, 180));
   });
 
   function animateElement(el) {
@@ -945,75 +920,75 @@ function setupRevealAnimations() {
 
     const delay = Number(el.dataset.revealDelay || 0);
 
-    console.log("Animating reveal:", el.id || el.className);
+    console.log("Smooth animating reveal:", el.id || el.className);
 
     el.animate(
       [
         {
           opacity: 0,
-          transform: "translateY(90px) scale(0.94)",
-          filter: "blur(10px)"
+          transform: "translateY(26px)"
         },
         {
           opacity: 1,
-          transform: "translateY(0) scale(1)",
-          filter: "blur(0)"
+          transform: "translateY(0)"
         }
       ],
       {
-        duration: 1100,
+        duration: 850,
         delay,
-        easing: "cubic-bezier(.16, 1, .3, 1)",
+        easing: "cubic-bezier(.22, 1, .36, 1)",
         fill: "forwards"
       }
     );
 
     setTimeout(() => {
       el.style.opacity = "1";
-      el.style.transform = "translateY(0) scale(1)";
-      el.style.filter = "blur(0)";
+      el.style.transform = "translateY(0)";
+      el.style.filter = "none";
       el.style.willChange = "auto";
-    }, 1200 + delay);
+    }, 900 + delay);
 
-    const icon = el.querySelector(".inv-card-icon, svg");
+    const icon = el.querySelector(".inv-card-icon");
+
     if (icon) {
       icon.animate(
         [
           {
             opacity: 0,
-            transform: "translateY(34px) scale(0.62) rotate(-10deg)"
+            transform: "translateY(12px)"
           },
           {
             opacity: 1,
-            transform: "translateY(0) scale(1) rotate(0deg)"
+            transform: "translateY(0)"
           }
         ],
         {
-          duration: 950,
-          delay: delay + 220,
-          easing: "cubic-bezier(.16, 1, .3, 1)",
+          duration: 700,
+          delay: delay + 120,
+          easing: "cubic-bezier(.22, 1, .36, 1)",
           fill: "forwards"
         }
       );
     }
 
     const ornament = el.querySelector(".inv-card-ornament");
+
     if (ornament) {
       ornament.animate(
         [
           {
             opacity: 0,
-            transform: "translateX(-50%) translateY(30px) scale(0.72)"
+            transform: "translateX(-50%) translateY(10px)"
           },
           {
             opacity: 1,
-            transform: "translateX(-50%) translateY(0) scale(1)"
+            transform: "translateX(-50%) translateY(0)"
           }
         ],
         {
-          duration: 950,
-          delay: delay + 160,
-          easing: "cubic-bezier(.16, 1, .3, 1)",
+          duration: 700,
+          delay: delay + 90,
+          easing: "cubic-bezier(.22, 1, .36, 1)",
           fill: "forwards"
         }
       );
@@ -1021,7 +996,7 @@ function setupRevealAnimations() {
   }
 
   function checkReveal() {
-    const triggerPoint = window.innerHeight * 0.86;
+    const triggerPoint = window.innerHeight * 0.88;
 
     elements.forEach((el) => {
       if (el.dataset.revealed === "true") return;
@@ -1034,22 +1009,7 @@ function setupRevealAnimations() {
     });
   }
 
-  // Revisar varias veces al inicio por si la pagina termina de cargar imagenes tarde
   setTimeout(checkReveal, 300);
-  setTimeout(checkReveal, 700);
-  setTimeout(checkReveal, 1200);
-  setTimeout(checkReveal, 1800);
-
   window.addEventListener("scroll", checkReveal, { passive: true });
   window.addEventListener("resize", checkReveal);
-
-  document.addEventListener("scroll", checkReveal, { passive: true });
-
-  const possibleScrollContainers = document.querySelectorAll(
-    "main, body, html, .inv-page, .inv-wrapper, #inv-content"
-  );
-
-  possibleScrollContainers.forEach((container) => {
-    container.addEventListener("scroll", checkReveal, { passive: true });
-  });
 }

@@ -1952,5 +1952,5 @@ body.has-music-player {
 /* Reveal animation fallback: JavaScript controls opacity and transform. */
 .reveal-on-scroll,
 .reveal-on-scroll.is-visible {
-  transition: none;
+  transition: none !important;
 }
