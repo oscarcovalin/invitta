@@ -168,16 +168,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.open(`/invitacion-link.html?slug=${slug}`, "_blank", "noopener");
   });
 
-  const openQuickLinkBuilderButton = document.getElementById("openQuickLinkBuilderButton");
-  openQuickLinkBuilderButton?.addEventListener("click", (e) => {
+  const openEmergencyPassBuilderButton = document.getElementById("openEmergencyPassBuilderButton");
+  openEmergencyPassBuilderButton?.addEventListener("click", (e) => {
     e.preventDefault();
     const slug = requireSlugForAction();
     if (!slug) return;
     window.open(`/invitacion-link.html?slug=${encodeURIComponent(slug)}`, "_blank", "noopener,noreferrer");
   });
 
-  const copyQuickLinkBuilderButton = document.getElementById("copyQuickLinkBuilderButton");
-  copyQuickLinkBuilderButton?.addEventListener("click", async (e) => {
+  const copyEmergencyPassBuilderLinkButton = document.getElementById("copyEmergencyPassBuilderLinkButton");
+  copyEmergencyPassBuilderLinkButton?.addEventListener("click", async (e) => {
     e.preventDefault();
     const slug = requireSlugForAction();
     if (!slug) return;
