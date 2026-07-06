@@ -2406,3 +2406,115 @@ body.theme-black-luxury .inv-card-icon,
 body.theme-black-luxury .inv-section-icon {
   color: var(--theme-gold, #d4af67);
 }
+/* Thank you and share closing sections */
+.inv-thank-you-section,
+.inv-share-section {
+  width: min(92vw, 520px);
+  margin: 3rem auto;
+}
+
+.inv-thank-you-card,
+.inv-share-card {
+  position: relative;
+  overflow: hidden;
+  padding: 3rem 1.4rem;
+  border-radius: 2rem;
+  background:
+    linear-gradient(180deg, var(--theme-card-strong, rgba(255,255,255,.92)), var(--theme-card, rgba(255,250,244,.86)));
+  border: 1px solid var(--theme-gold-soft, rgba(184,138,61,.28));
+  box-shadow: var(--theme-shadow, 0 24px 70px rgba(74,45,32,.12));
+  text-align: center;
+}
+
+.inv-thank-you-card::before,
+.inv-share-card::before {
+  content: "✦";
+  position: absolute;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--theme-gold, #b88a3d);
+  opacity: .45;
+  font-size: .85rem;
+}
+
+.inv-thank-you-kicker,
+.inv-share-kicker {
+  margin: 0 0 .9rem;
+  font-family: var(--font-body, sans-serif);
+  font-size: .72rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--theme-gold, #b88a3d);
+}
+
+.inv-thank-you-title {
+  margin: 0;
+  font-family: var(--font-script, "Great Vibes", cursive);
+  font-size: clamp(2.8rem, 12vw, 4.7rem);
+  line-height: .95;
+  font-weight: 400;
+  color: var(--theme-accent, #b0707c);
+}
+
+.inv-thank-you-signature {
+  margin: .5rem 0 0;
+  font-family: var(--font-script, "Great Vibes", cursive);
+  font-size: clamp(2rem, 8vw, 3.3rem);
+  line-height: 1;
+  color: var(--theme-accent, #b0707c);
+}
+
+.inv-thank-you-message {
+  margin: 1.4rem auto 0;
+  max-width: 420px;
+  font-family: var(--font-body, sans-serif);
+  font-size: .95rem;
+  letter-spacing: .04em;
+  color: var(--theme-muted, #7d6860);
+}
+
+.inv-share-title {
+  margin: 0 0 .8rem;
+  font-family: var(--font-title, serif);
+  font-size: clamp(2.1rem, 8vw, 3rem);
+  line-height: 1;
+  color: var(--theme-text, #2f2520);
+}
+
+.inv-share-hashtag {
+  margin: 0;
+  font-family: var(--font-title, serif);
+  font-size: clamp(1.7rem, 7vw, 2.5rem);
+  color: var(--theme-accent, #b0707c);
+  word-break: break-word;
+}
+
+.inv-share-message {
+  margin: 1rem auto 0;
+  max-width: 430px;
+  font-family: var(--font-body, sans-serif);
+  font-size: .95rem;
+  line-height: 1.7;
+  color: var(--theme-muted, #7d6860);
+}
+
+body.theme-black-luxury .inv-thank-you-card,
+body.theme-black-luxury .inv-share-card {
+  background:
+    linear-gradient(180deg, rgba(35,29,25,.96), rgba(20,17,15,.9));
+}
+
+body.theme-black-luxury .inv-thank-you-title,
+body.theme-black-luxury .inv-thank-you-signature,
+body.theme-black-luxury .inv-share-hashtag {
+  color: var(--theme-gold, #d4af67);
+}
+
+@media (max-width: 640px) {
+  .inv-thank-you-card,
+  .inv-share-card {
+    padding: 2.7rem 1.15rem;
+    border-radius: 1.75rem;
+  }
+}

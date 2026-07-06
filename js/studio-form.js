@@ -258,6 +258,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("father_name").value = data.father_name || "";
     document.getElementById("mother_name").value = data.mother_name || "";
     document.getElementById("instagram_hashtag").value = data.instagram_hashtag || "";
+    document.getElementById("thankYouTitle").value = data.thank_you_title || "";
+    document.getElementById("thankYouMessage").value = data.thank_you_message || "";
+    document.getElementById("thankYouSignature").value = data.thank_you_signature || "";
+    document.getElementById("hashtagSectionTitle").value = data.hashtag_section_title || "";
+    document.getElementById("hashtagSectionMessage").value = data.hashtag_section_message || "";
 
     let godparentsText = "";
     if (data.godparents && Array.isArray(data.godparents)) {
@@ -503,6 +508,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       father_name: document.getElementById("father_name").value || null,
       mother_name: document.getElementById("mother_name").value || null,
       instagram_hashtag: document.getElementById("instagram_hashtag").value || null,
+      thank_you_title: document.getElementById("thankYouTitle").value || "Con cariño",
+      thank_you_message: document.getElementById("thankYouMessage").value || "Gracias por ser parte de mis XV años",
+      thank_you_signature: document.getElementById("thankYouSignature").value || null,
+      hashtag_section_title: document.getElementById("hashtagSectionTitle").value || "Comparte el momento",
+      hashtag_section_message: document.getElementById("hashtagSectionMessage").value || "Usa el hashtag en tus fotos y videos para que no se pierda ningún recuerdo.",
       godparents: godparentsJson,
       font_preset: document.getElementById("font_preset").value || "classic",
       visual_theme: document.getElementById("visual_theme") ? document.getElementById("visual_theme").value : "rose-floral",

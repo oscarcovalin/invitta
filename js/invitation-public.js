@@ -355,9 +355,9 @@
     /* Itinerario */
     renderItinerary(inv.itinerary);
 
-    /* Hashtag */
-    toggle("inv-hashtag-block", !!inv.instagram_hashtag);
-    setText("inv-hashtag", inv.instagram_hashtag || "");
+    /* Cierre y agradecimiento */
+    renderThankYouClosing(inv);
+    renderShareSection(inv);
 
     /* 8. Ceremonia */
     var hasCeremony = !!(inv.ceremony_name || inv.ceremony_address);
@@ -878,6 +878,41 @@
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
+  function textWithFallback(value, fallback) {
+    const clean = String(value || "").trim();
+    return clean || fallback;
+  }
+
+  function renderThankYouClosing(inv) {
+    const section = document.getElementById("inv-thank-you-section");
+    if (!section) return;
+
+    setText("inv-thank-you-title", textWithFallback(inv.thank_you_title, "Con cariño"));
+    setText("inv-thank-you-message", textWithFallback(inv.thank_you_message, "Gracias por ser parte de mis XV años"));
+
+    const signature = String(inv.thank_you_signature || "").trim();
+    const signatureEl = document.getElementById("inv-thank-you-signature");
+    if (signatureEl) {
+      signatureEl.textContent = signature;
+      signatureEl.style.display = signature ? "" : "none";
+    }
+
+    show("inv-thank-you-section");
+  }
+
+  function renderShareSection(inv) {
+    const hashtag = String(inv.instagram_hashtag || "").trim();
+    if (!hashtag) {
+      hide("inv-hashtag-block");
+      return;
+    }
+
+    setText("inv-share-title", textWithFallback(inv.hashtag_section_title, "Comparte el momento"));
+    setText("inv-hashtag", hashtag);
+    setText("inv-share-message", textWithFallback(inv.hashtag_section_message, "Usa el hashtag en tus fotos y videos para que no se pierda ningún recuerdo."));
+    show("inv-hashtag-block");
+  }
+
 
   function normalizeItinerary(value) {
     if (!value) return [];
@@ -1061,10 +1096,11 @@ function setupRevealAnimations() {
     "#inv-itinerary-section",
     "#inv-dresscode-block",
     "#inv-gifts-block",
-    "#inv-hashtag-block",
     "#inv-pass-section",
     "#inv-rsvp-section",
-    "#inv-wa-block"
+    "#inv-wa-block",
+    "#inv-thank-you-section",
+    "#inv-hashtag-block"
   ];
 
   const elements = Array.from(document.querySelectorAll(selectors.join(",")))
