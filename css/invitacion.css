@@ -3362,3 +3362,48 @@ body.theme-black-luxury .inv-timeline-alt-line {
     animation: none !important;
   }
 }
+
+/* Premium SVG Music Controls */
+.inv-music-play-button,
+.inv-audio-play-button,
+.inv-music-control {
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  border: 0;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0;
+}
+
+.inv-music-control-icon {
+  width: 34px;
+  height: 34px;
+  display: block;
+  fill: currentColor;
+}
+
+.inv-music-play-button:hover,
+.inv-audio-play-button:hover,
+.inv-music-control:hover {
+  opacity: 0.86;
+}
+
+@media (max-width: 640px) {
+  .inv-music-play-button,
+  .inv-audio-play-button,
+  .inv-music-control {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+  }
+
+  .inv-music-control-icon {
+    width: 32px;
+    height: 32px;
+  }
+}

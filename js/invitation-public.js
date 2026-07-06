@@ -1,4 +1,4 @@
-﻿/**
+/**
  * invitation-public.js
  * Invitta Studio â€” PÃ¡gina pÃºblica de invitaciÃ³n
  *
@@ -695,6 +695,23 @@
     `;
   }
 
+  function getPlayIconSvg() {
+    return `
+      <svg class="inv-music-control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8 5.5v13l10-6.5-10-6.5z"></path>
+      </svg>
+    `;
+  }
+
+  function getPauseIconSvg() {
+    return `
+      <svg class="inv-music-control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8 5h2.8v14H8z"></path>
+        <path d="M13.2 5H16v14h-2.8z"></path>
+      </svg>
+    `;
+  }
+
   function normalizePhoneNumber(value) {
     return String(value || "")
       .replace(/[^\d]/g, "");
@@ -704,7 +721,7 @@
     const phone = normalizePhoneNumber(invitation.studio_whatsapp);
     if (!phone) return "";
     const message = invitation.studio_cta_message
-      || "Hola, vi esta invitaciÃ³n digital y me interesa contratar una para mi evento.";
+      || "Hola, vi esta invitación digital y me interesa contratar una para mi evento.";
     return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   }
 
@@ -714,7 +731,7 @@
 
     if (!enabled || !url) return "";
 
-    const text = invitation.studio_cta_text || "Quiero una invitaciÃ³n asÃ­";
+    const text = invitation.studio_cta_text || "Quiero una invitación así";
 
     return `
       <a
@@ -784,7 +801,7 @@
     invitationAudio.volume = 0.85;
 
     isMusicPlaying = false;
-    toggle.innerHTML = '<span class="inv-play-icon">â–¶</span>';
+    toggle.innerHTML = getPlayIconSvg();
     toggle.disabled = false;
 
     toggle.onclick = async () => {
@@ -792,17 +809,17 @@
         if (!isMusicPlaying) {
           await invitationAudio.play();
           isMusicPlaying = true;
-          toggle.innerHTML = '<span class="inv-play-icon">âšâš</span>';
-          toggle.setAttribute("aria-label", "Pausar mÃºsica");
+          toggle.innerHTML = getPauseIconSvg();
+          toggle.setAttribute("aria-label", "Pausar música");
         } else {
           invitationAudio.pause();
           isMusicPlaying = false;
-          toggle.innerHTML = '<span class="inv-play-icon">â–¶</span>';
-          toggle.setAttribute("aria-label", "Reproducir mÃºsica");
+          toggle.innerHTML = getPlayIconSvg();
+          toggle.setAttribute("aria-label", "Reproducir música");
         }
       } catch (err) {
-        console.error("Error reproduciendo mÃºsica:", err);
-        alert("No se pudo reproducir la mÃºsica. Verifica que el archivo sea compatible.");
+        console.error("Error reproduciendo música:", err);
+        alert("No se pudo reproducir la música. Verifica que el archivo sea compatible.");
       }
     };
   }
