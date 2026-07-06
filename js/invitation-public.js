@@ -970,11 +970,6 @@
         <div id="inv-itinerary" class="inv-timeline-list">
           ${itemsHtml}
         </div>
-
-        <div class="inv-timeline-footer-quote">
-          <p>Cada estrella nos acerca a</p>
-          <span>esa noche</span>
-        </div>
       </div>
     `;
 

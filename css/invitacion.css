@@ -2029,38 +2029,6 @@ body.has-music-player {
   color: var(--timeline-text);
 }
 
-.inv-timeline-footer-quote {
-  position: relative;
-  z-index: 1;
-  margin: 2.1rem auto 0;
-  display: grid;
-  justify-items: center;
-  gap: 0.2rem;
-  color: rgba(79, 59, 54, 0.75);
-}
-
-.inv-timeline-footer-quote::before {
-  content: "";
-  width: 48px;
-  height: 1px;
-  margin-bottom: 0.5rem;
-  background: color-mix(in srgb, var(--timeline-gold) 34%, transparent);
-}
-
-.inv-timeline-footer-quote p {
-  margin: 0;
-  font-family: var(--font-body, sans-serif);
-  font-size: 0.78rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.inv-timeline-footer-quote span {
-  font-family: var(--font-script, "Great Vibes", cursive);
-  font-size: clamp(1.85rem, 8vw, 2.6rem);
-  line-height: 1;
-  color: var(--timeline-accent);
-}
 
 @keyframes invTimelineFadeIn {
   from {
@@ -2296,9 +2264,7 @@ body[class*="theme-"] .inv-gifts-text {
 }
 
 body[class*="theme-"] .inv-title-script,
-body[class*="theme-"] .inv-timeline-time,
-body[class*="theme-"] .inv-timeline-footer-quote p,
-body[class*="theme-"] .inv-timeline-footer-quote span {
+body[class*="theme-"] .inv-timeline-time {
   color: var(--theme-accent);
 }
 
