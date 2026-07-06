@@ -224,3 +224,44 @@ body {
     gap: 0;
   }
 }
+
+/* Studio form action buttons */
+.studio-form-actions {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.studio-action-button {
+  min-height: 42px;
+  border-radius: 999px;
+  padding: 11px 18px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 24px rgba(43, 34, 24, 0.06);
+}
+
+.studio-preview-button {
+  border-color: rgba(201, 164, 106, 0.45);
+  color: var(--accent-color);
+  background: #fffaf4;
+}
+
+.studio-preview-button:hover,
+.studio-copy-button:hover {
+  background: #f8f2ea;
+  border-color: var(--accent-color);
+}
+
+@media (max-width: 640px) {
+  .studio-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .studio-action-button {
+    width: 100%;
+  }
+}

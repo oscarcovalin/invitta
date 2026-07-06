@@ -384,10 +384,11 @@
           <span style="font-weight: 500;">Publicar Invitación (Visible al público)</span>
         </label>
       </div>
-
-      <div style="margin-top: 30px; display: flex; gap: 15px;">
-        <button type="submit" id="save-btn" class="btn btn-primary">Guardar Invitación</button>
-        <a href="/administracion/studio-dashboard.html" class="btn btn-secondary">Cancelar</a>
+      <div class="studio-form-actions">
+        <button type="submit" id="save-btn" class="btn btn-primary studio-action-button">Guardar cambios</button>
+        <button type="button" id="preview-invitation-btn" class="btn btn-secondary studio-action-button studio-preview-button">Ver invitación</button>
+        <button type="button" id="copy-invitation-link-btn" class="btn btn-secondary studio-action-button studio-copy-button">Copiar enlace</button>
+        <a href="/administracion/studio-dashboard.html" class="btn btn-secondary studio-action-button">Volver al panel</a>
       </div>
       
     </form>

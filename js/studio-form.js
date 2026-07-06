@@ -64,8 +64,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const db = window.studioAuth.db;
   const urlParams = new URLSearchParams(window.location.search);
-  const inviteId = urlParams.get("id");
-  const isEditMode = !!inviteId;
+  let inviteId = urlParams.get("id");
+  let isEditMode = !!inviteId;
   
   // Elementos del DOM
   const form = document.getElementById("invitation-form");
@@ -74,6 +74,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const successAlert = document.getElementById("form-success");
   const pageTitle = document.getElementById("page-title");
   const saveBtn = document.getElementById("save-btn");
+  const previewBtn = document.getElementById("preview-invitation-btn");
+  const copyLinkBtn = document.getElementById("copy-invitation-link-btn");
 
   // URLs actuales (preservar si no se sube archivo nuevo)
   let existingPhotoUrl = null;
@@ -83,6 +85,75 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let currentStudioId = localStorage.getItem("invitta_studio_id");
   let currentSlug = "";
+
+  function getCurrentSlugValue() {
+    return (document.getElementById("slug")?.value || currentSlug || "").trim();
+  }
+
+  function getPublicInvitationUrl(slug) {
+    return `https://invitta.vercel.app/invitacion.html?slug=${encodeURIComponent(slug)}`;
+  }
+
+  function getPreviewInvitationUrl(slug) {
+    const params = new URLSearchParams({
+      slug,
+      n: "Familia Garcia",
+      p: "4",
+      m: "5",
+      v: `preview-${Date.now()}`
+    });
+    return `https://invitta.vercel.app/invitacion.html?${params.toString()}`;
+  }
+
+  function requireSlugForAction() {
+    const slug = getCurrentSlugValue();
+    if (!slug) {
+      alert("Primero guarda o escribe el slug de la invitación.");
+      return "";
+    }
+    return slug;
+  }
+
+  async function copyTextToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  }
+
+  function showSuccessMessage(message) {
+    successAlert.textContent = message;
+    successAlert.style.display = "block";
+  }
+
+  previewBtn?.addEventListener("click", () => {
+    const slug = requireSlugForAction();
+    if (!slug) return;
+    window.open(getPreviewInvitationUrl(slug), "_blank", "noopener");
+  });
+
+  copyLinkBtn?.addEventListener("click", async () => {
+    const slug = requireSlugForAction();
+    if (!slug) return;
+
+    try {
+      await copyTextToClipboard(getPublicInvitationUrl(slug));
+      showSuccessMessage("Enlace copiado.");
+    } catch (err) {
+      console.error("Error al copiar enlace:", err);
+      alert("No se pudo copiar el enlace. Intenta de nuevo.");
+    }
+  });
 
   // Si no tenemos el studio_id, lo buscamos
   if (!currentStudioId) {
@@ -370,7 +441,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     saveBtn.disabled = true;
     saveBtn.textContent = "Guardando...";
 
-    const slugValue = document.getElementById("slug").value;
+    const slugValue = document.getElementById("slug").value.trim();
     const slugToUse = slugValue || currentSlug;
 
     // ── Subida de foto ──
@@ -379,7 +450,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (photoFile) {
       if (!validateFile(photoFile, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "photo")) {
         saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar Invitación";
+        saveBtn.textContent = "Guardar cambios";
         return;
       }
       showProgress("photo");
@@ -388,7 +459,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!uploadedUrl) {
         showMediaError("photo", "Error al subir la foto. Intenta de nuevo.");
         saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar Invitación";
+        saveBtn.textContent = "Guardar cambios";
         return;
       }
       finalPhotoUrl = uploadedUrl;
@@ -400,7 +471,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (musicFile) {
       if (!validateFile(musicFile, ALLOWED_AUDIO_TYPES, MAX_MUSIC_BYTES, "music")) {
         saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar Invitación";
+        saveBtn.textContent = "Guardar cambios";
         return;
       }
       showProgress("music");
@@ -409,7 +480,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!uploadedUrl) {
         showMediaError("music", "Error al subir la música. Intenta de nuevo.");
         saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar Invitación";
+        saveBtn.textContent = "Guardar cambios";
         return;
       }
       finalMusicUrl = uploadedUrl;
@@ -421,7 +492,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (bgFile) {
       if (!validateFile(bgFile, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "background")) {
         saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar Invitación";
+        saveBtn.textContent = "Guardar cambios";
         return;
       }
       showProgress("background");
@@ -430,7 +501,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!uploadedUrl) {
         showMediaError("background", "Error al subir el fondo. Intenta de nuevo.");
         saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar Invitación";
+        saveBtn.textContent = "Guardar cambios";
         return;
       }
       finalBackgroundUrl = uploadedUrl;
@@ -447,7 +518,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (galleryFiles.length > 10) {
         showMediaError("gallery", `Solo puedes subir máximo 10 fotos. Seleccionaste ${galleryFiles.length}.`);
         saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar Invitación";
+        saveBtn.textContent = "Guardar cambios";
         return;
       }
 
@@ -455,7 +526,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       for (let i = 0; i < galleryFiles.length; i++) {
         if (!validateFile(galleryFiles[i], ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "gallery")) {
           saveBtn.disabled = false;
-          saveBtn.textContent = "Guardar Invitación";
+          saveBtn.textContent = "Guardar cambios";
           return;
         }
       }
@@ -471,7 +542,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           hideProgress("gallery");
           showMediaError("gallery", `Error al subir la foto ${i + 1}. Intenta de nuevo.`);
           saveBtn.disabled = false;
-          saveBtn.textContent = "Guardar Invitación";
+          saveBtn.textContent = "Guardar cambios";
           return;
         }
         uploadedUrls.push(url);
@@ -499,7 +570,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ── Payload ──
     const payload = {
       title: document.getElementById("title").value,
-      slug: slugValue,
+      slug: slugToUse,
       event_type: document.getElementById("event_type").value,
       honoree_name: document.getElementById("honoree_name").value,
       event_date: document.getElementById("event_date").value || null,
@@ -551,7 +622,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       payload.studio_id = currentStudioId;
       result = await db
         .from("studio_invitations")
-        .insert([payload]);
+        .insert([payload])
+        .select("id, slug")
+        .single();
     }
 
     if (result.error) {
@@ -559,13 +632,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       errorAlert.textContent = "Error al guardar. Puede que el slug ya esté en uso u otro error de validación.";
       errorAlert.style.display = "block";
       saveBtn.disabled = false;
-      saveBtn.textContent = "Guardar Invitación";
+      saveBtn.textContent = "Guardar cambios";
     } else {
-      successAlert.textContent = "Invitación guardada exitosamente. Redirigiendo...";
-      successAlert.style.display = "block";
-      setTimeout(() => {
-        window.location.href = "/administracion/studio-dashboard.html";
-      }, 1500);
+      currentSlug = slugToUse;
+      if (!isEditMode && result.data?.id) {
+        inviteId = result.data.id;
+        isEditMode = true;
+        window.history.replaceState({}, "", `/administracion/studio-invitacion-form.html?id=${encodeURIComponent(inviteId)}`);
+      }
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Guardar cambios";
+      showSuccessMessage("Invitación guardada correctamente.");
     }
   });
 
