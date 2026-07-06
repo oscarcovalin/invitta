@@ -1,3 +1,54 @@
+/* ─── THEME VARIABLES ─── */
+body.theme-rose-floral {
+  --theme-bg-1: #fffaf4;
+  --theme-bg-2: #fbf3ee;
+  --theme-accent: #b0707c;
+  --theme-gold: #b88a3d;
+  --theme-card: rgba(255, 250, 244, 0.88);
+  --theme-text: #2f2520;
+  --theme-muted: #7d6860;
+}
+
+body.theme-gold-marble {
+  --theme-bg-1: #fbfaf7;
+  --theme-bg-2: #eee7dc;
+  --theme-accent: #b88a3d;
+  --theme-gold: #c7a45b;
+  --theme-card: rgba(255, 255, 255, 0.9);
+  --theme-text: #2e2923;
+  --theme-muted: #776c60;
+}
+
+body.theme-elegant-lavender {
+  --theme-bg-1: #fbf7ff;
+  --theme-bg-2: #eee4f7;
+  --theme-accent: #8d6aa6;
+  --theme-gold: #b99a63;
+  --theme-card: rgba(255, 250, 255, 0.88);
+  --theme-text: #2c2431;
+  --theme-muted: #76687d;
+}
+
+body.theme-black-luxury {
+  --theme-bg-1: #11100f;
+  --theme-bg-2: #1c1714;
+  --theme-accent: #d4af67;
+  --theme-gold: #d4af67;
+  --theme-card: rgba(28, 23, 20, 0.88);
+  --theme-text: #f8efe2;
+  --theme-muted: #c7b8a3;
+}
+
+body.theme-classic-champagne {
+  --theme-bg-1: #fffaf0;
+  --theme-bg-2: #f1e3cc;
+  --theme-accent: #a98245;
+  --theme-gold: #b88a3d;
+  --theme-card: rgba(255, 250, 240, 0.9);
+  --theme-text: #30271e;
+  --theme-muted: #7a6856;
+}
+
 /* ============================================================
    invitacion.css — Invitta Studio · Invitación Pública Premium
    Pinterest-inspired: fine-art, champagne, rose gold, mobile-first
@@ -99,9 +150,9 @@ body {
   background:
     radial-gradient(circle at 20% 12%, rgba(232,200,191,.45), transparent 34%),
     radial-gradient(circle at 80% 35%, rgba(239,225,194,.55), transparent 36%),
-    linear-gradient(180deg, #fffaf4, #f7eee7);
+    linear-gradient(180deg, var(--theme-bg-1), #f7eee7);
   background-attachment: fixed;
-  color: var(--inv-text);
+  color: var(--theme-text);
   min-height: 100dvh;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
@@ -129,7 +180,7 @@ body {
   width: 48px;
   height: 48px;
   border: 2px solid var(--inv-champagne);
-  border-top-color: var(--inv-primary);
+  border-top-color: var(--theme-accent);
   border-radius: 50%;
   animation: inv-spin 1s linear infinite;
 }
@@ -145,8 +196,8 @@ body {
   margin: 80px auto;
   text-align: center;
   padding: 48px 32px;
-  background: var(--inv-surface);
-  border: 1px solid var(--inv-border);
+  background: var(--theme-card);
+  border: 1px solid color-mix(in srgb, var(--theme-gold) 20%, transparent);
   border-radius: var(--inv-radius-lg);
   box-shadow: var(--inv-shadow-sm);
   color: var(--inv-muted);
@@ -158,7 +209,7 @@ body {
   content: "✦";
   display: block;
   font-size: 1.8rem;
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   margin-bottom: 18px;
 }
 
@@ -191,7 +242,7 @@ body {
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-  background: linear-gradient(175deg, var(--inv-secondary) 0%, var(--inv-bg-warm) 55%, var(--inv-bg) 100%);
+  background: linear-gradient(175deg, var(--theme-gold) 0%, var(--inv-bg-warm) 55%, var(--theme-bg-1) 100%);
 }
 
 /* Background foto */
@@ -267,7 +318,7 @@ body {
 
 /* Sin foto: texto dorado */
 .inv-hero:not(.inv-hero--has-photo) .inv-eyebrow {
-  color: var(--inv-primary);
+  color: var(--theme-accent);
 }
 
 /* Con foto: texto blanco perlado */
@@ -286,7 +337,7 @@ body {
 }
 
 .inv-hero:not(.inv-hero--has-photo) .inv-title {
-  color: var(--inv-text);
+  color: var(--theme-text);
 }
 
 .inv-hero--has-photo .inv-title {
@@ -304,7 +355,7 @@ body {
 }
 
 .inv-hero:not(.inv-hero--has-photo) .inv-honoree {
-  color: var(--inv-primary);
+  color: var(--theme-accent);
 }
 
 .inv-hero--has-photo .inv-honoree {
@@ -351,7 +402,7 @@ body {
 }
 
 .inv-hero:not(.inv-hero--has-photo) .inv-divider-ornament {
-  color: var(--inv-primary);
+  color: var(--theme-accent);
 }
 
 .inv-hero--has-photo .inv-divider-ornament {
@@ -382,7 +433,7 @@ body {
 }
 
 .inv-hero:not(.inv-hero--has-photo) .inv-music-hero-btn {
-  background: var(--inv-primary);
+  background: var(--theme-accent);
   color: #fff;
   box-shadow: 0 4px 20px rgba(201, 164, 106, 0.35);
 }
@@ -416,8 +467,8 @@ body {
    2. CUENTA REGRESIVA
 ══════════════════════════════════════════════════ */
 .inv-countdown {
-  background: var(--inv-surface);
-  border-bottom: 1px solid var(--inv-border);
+  background: var(--theme-card);
+  border-bottom: 1px solid color-mix(in srgb, var(--theme-gold) 20%, transparent);
   padding: 36px 20px 32px;
   text-align: center;
 }
@@ -427,7 +478,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.25em;
   font-weight: 600;
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   margin-bottom: 20px;
   font-family: var(--font-body);
 }
@@ -453,7 +504,7 @@ body {
   font-family: var(--font-title);
   font-size: clamp(2rem, 8vw, 3rem);
   font-weight: 600;
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   line-height: 1;
   display: block;
   letter-spacing: -0.02em;
@@ -477,7 +528,7 @@ body {
   font-family: var(--font-title);
   font-size: clamp(1.1rem, 5vw, 1.5rem);
   font-style: italic;
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   letter-spacing: 0.02em;
 }
 
@@ -494,7 +545,7 @@ body {
 
 .inv-welcome-ornament {
   font-size: 0.9rem;
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   opacity: 0.55;
   margin: 12px 0;
   display: block;
@@ -515,8 +566,8 @@ body {
    4. PASE PERSONAL (Boleto premium)
 ══════════════════════════════════════════════════ */
 .inv-ticket {
-  background: var(--inv-surface);
-  border: 1px solid var(--inv-border);
+  background: var(--theme-card);
+  border: 1px solid color-mix(in srgb, var(--theme-gold) 20%, transparent);
   border-radius: var(--inv-radius-lg);
   margin: 28px 0;
   position: relative;
@@ -525,7 +576,7 @@ body {
   animation: inv-fadein 0.6s ease 0.1s both;
 
   /* Borde dorado sutil en la izquierda */
-  border-left: 3px solid var(--inv-primary);
+  border-left: 3px solid var(--theme-accent);
 }
 
 /* Efecto de textura en el ticket */
@@ -534,7 +585,7 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 120% 60% at 80% -10%, var(--inv-primary-light), transparent),
+    radial-gradient(ellipse 120% 60% at 80% -10%, color-mix(in srgb, var(--theme-accent) 15%, transparent), transparent),
     linear-gradient(135deg, var(--inv-champagne) 0%, transparent 60%);
   pointer-events: none;
   opacity: 0.4;
@@ -545,8 +596,8 @@ body {
   height: 1px;
   background: repeating-linear-gradient(
     to right,
-    var(--inv-border) 0,
-    var(--inv-border) 6px,
+    color-mix(in srgb, var(--theme-gold) 20%, transparent) 0,
+    color-mix(in srgb, var(--theme-gold) 20%, transparent) 6px,
     transparent 6px,
     transparent 12px
   );
@@ -569,7 +620,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   font-family: var(--font-body);
   display: flex;
   align-items: center;
@@ -580,7 +631,7 @@ body {
   font-family: var(--font-script);
   font-size: clamp(1.7rem, 7vw, 2.5rem);
   font-weight: 600;
-  color: var(--inv-text);
+  color: var(--theme-text);
   padding: 14px 28px 0;
   line-height: 1.15;
   position: relative;
@@ -594,8 +645,8 @@ body {
   margin: 18px 28px;
   background: repeating-linear-gradient(
     to right,
-    var(--inv-border) 0,
-    var(--inv-border) 4px,
+    color-mix(in srgb, var(--theme-gold) 20%, transparent) 0,
+    color-mix(in srgb, var(--theme-gold) 20%, transparent) 4px,
     transparent 4px,
     transparent 10px
   );
@@ -619,7 +670,7 @@ body {
 }
 
 .inv-ticket-field + .inv-ticket-field {
-  border-left: 1px solid var(--inv-border);
+  border-left: 1px solid color-mix(in srgb, var(--theme-gold) 20%, transparent);
   padding-left: 16px;
 }
 
@@ -636,7 +687,7 @@ body {
   font-family: var(--font-title);
   font-size: 2rem;
   font-weight: 600;
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   line-height: 1.1;
 }
 
@@ -676,7 +727,7 @@ body {
   width: 210px;
   height: 72px;
   pointer-events: none;
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   opacity: 0.8;
 }
 
@@ -684,7 +735,7 @@ body {
   width: 58px;
   height: 58px;
   margin: 0 auto 1rem;
-  color: var(--inv-primary);
+  color: var(--theme-accent);
 }
 
 .inv-card-title {
@@ -693,7 +744,7 @@ body {
   line-height: .92;
   text-transform: uppercase;
   letter-spacing: .03em;
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   margin: 0 0 1.5rem;
 }
 
@@ -701,7 +752,7 @@ body {
   font-family: var(--font-body);
   font-size: 1.02rem;
   line-height: 1.65;
-  color: var(--inv-text);
+  color: var(--theme-text);
   max-width: 420px;
   margin: 0 auto;
 }
@@ -710,14 +761,14 @@ body {
   font-family: var(--font-title);
   font-size: 1.4rem;
   font-weight: 500;
-  color: var(--inv-text);
+  color: var(--theme-text);
   margin-bottom: 6px;
   line-height: 1.2;
 }
 
 .inv-venue-address {
   font-size: 0.95rem;
-  color: var(--inv-text);
+  color: var(--theme-text);
   line-height: 1.55;
   margin-bottom: 0;
   opacity: 0.85;
@@ -727,7 +778,7 @@ body {
 .inv-gifts-text,
 .inv-hashtag-text {
   font-size: 1.1rem;
-  color: var(--inv-text);
+  color: var(--theme-text);
   line-height: 1.5;
 }
 
@@ -773,8 +824,8 @@ body {
    8. RSVP SECTION
 ══════════════════════════════════════════════════ */
 .inv-rsvp {
-  background: linear-gradient(160deg, var(--inv-bg-warm) 0%, var(--inv-secondary) 100%);
-  border: 1px solid var(--inv-border);
+  background: linear-gradient(160deg, var(--inv-bg-warm) 0%, var(--theme-gold) 100%);
+  border: 1px solid color-mix(in srgb, var(--theme-gold) 20%, transparent);
   border-radius: var(--inv-radius-lg);
   padding: 40px 28px 36px;
   margin-top: 32px;
@@ -788,7 +839,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 80% 50% at 50% -10%, var(--inv-primary-light), transparent);
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--theme-accent) 15%, transparent), transparent);
   pointer-events: none;
 }
 
@@ -797,7 +848,7 @@ body {
 }
 
 .inv-divider-ornament--light {
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   margin-bottom: 16px;
 }
 
@@ -805,7 +856,7 @@ body {
   font-family: var(--font-title);
   font-size: clamp(1.4rem, 6vw, 2rem);
   font-weight: 600;
-  color: var(--inv-text);
+  color: var(--theme-text);
   margin-bottom: 8px;
 }
 
@@ -839,12 +890,12 @@ body {
   min-width: 150px;
   max-width: 220px;
   padding: 13px 18px;
-  border: 1.5px solid var(--inv-border);
+  border: 1.5px solid color-mix(in srgb, var(--theme-gold) 20%, transparent);
   border-radius: var(--inv-radius-md);
   font-family: var(--font-body);
   font-size: 16px;
-  color: var(--inv-text);
-  background: var(--inv-surface);
+  color: var(--theme-text);
+  background: var(--theme-card);
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A8C82' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -856,7 +907,7 @@ body {
 
 .inv-select:focus {
   outline: none;
-  border-color: var(--inv-primary);
+  border-color: var(--theme-accent);
 }
 
 /* Botón WhatsApp */
@@ -906,7 +957,7 @@ body {
 .inv-footer-divider {
   width: 40px;
   height: 1px;
-  background: var(--inv-border);
+  background: color-mix(in srgb, var(--theme-gold) 20%, transparent);
   margin: 0 auto 20px;
 }
 
@@ -917,7 +968,7 @@ body {
 }
 
 .inv-footer a {
-  color: var(--inv-primary);
+  color: var(--theme-accent);
   text-decoration: none;
   font-weight: 600;
 }
@@ -1025,14 +1076,14 @@ body {
 
 /* Template classic-rose-xv */
 :root {
-  --rose-bg: #fbf3ee;
+  --rose-bg: var(--theme-bg-2);
   --rose-soft: #f5ddd6;
   --rose-muted: #c98f86;
-  --cream: #fffaf4;
+  --cream: var(--theme-bg-1);
   --paper: rgba(255, 250, 244, 0.84);
-  --gold: #b88a3d;
-  --gold-soft: rgba(184, 138, 61, 0.28);
-  --ink: #2f2520;
+  --gold: var(--theme-gold);
+  --gold-soft: color-mix(in srgb, var(--theme-gold) calc(0.28 * 100%), transparent);
+  --ink: var(--theme-text);
   --muted: #7d6860;
   --shadow-soft: 0 24px 70px rgba(74, 45, 32, 0.12);
 }
@@ -1047,8 +1098,8 @@ body,
   background:
     radial-gradient(circle at 15% 8%, rgba(232, 175, 169, 0.34), transparent 28%),
     radial-gradient(circle at 88% 22%, rgba(245, 217, 198, 0.42), transparent 30%),
-    radial-gradient(circle at 50% 92%, rgba(184, 138, 61, 0.12), transparent 34%),
-    linear-gradient(180deg, #fffaf4 0%, #fbf3ee 42%, #fff7ef 100%);
+    radial-gradient(circle at 50% 92%, color-mix(in srgb, var(--theme-gold) calc(0.12 * 100%), transparent), transparent 34%),
+    linear-gradient(180deg, var(--theme-bg-1) 0%, var(--theme-bg-2) 42%, #fff7ef 100%);
   color: var(--ink);
 }
 
@@ -1258,7 +1309,7 @@ body.has-music-player {
   place-items: center;
   color: var(--gold);
   background: radial-gradient(circle, rgba(255,255,255,0.92), rgba(255,242,232,0.68));
-  border: 1px solid rgba(184,138,61,0.28);
+  border: 1px solid color-mix(in srgb, var(--theme-gold) calc(0.28 * 100%), transparent);
   box-shadow: 0 14px 36px rgba(93, 54, 38, 0.09);
 }
 
@@ -1429,7 +1480,7 @@ body.has-music-player {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: var(--gold, #b88a3d);
+  color: var(--gold, var(--theme-gold));
 }
 
 .inv-timeline-content h3 {
@@ -1450,7 +1501,7 @@ body.has-music-player {
   padding: 1.35rem 1rem;
   border-radius: 1.8rem;
   background: rgba(255,250,244,0.88);
-  border: 1px solid rgba(184,138,61,0.24);
+  border: 1px solid color-mix(in srgb, var(--theme-gold) calc(0.24 * 100%), transparent);
   box-shadow: 0 22px 58px rgba(74,45,32,0.13);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -1531,7 +1582,7 @@ body.has-music-player {
 
 #inv-pass-section {
   border-style: double;
-  border-color: rgba(184,138,61,0.36);
+  border-color: color-mix(in srgb, var(--theme-gold) calc(0.36 * 100%), transparent);
 }
 
 #inv-guest-name,
@@ -1775,7 +1826,7 @@ body.has-music-player {
   position: relative;
   overflow: hidden;
   padding: clamp(2.15rem, 7vw, 3.2rem) clamp(1.1rem, 5vw, 2.4rem) clamp(2rem, 6vw, 2.8rem);
-  border: 1px solid rgba(184, 138, 61, 0.18);
+  border: 1px solid color-mix(in srgb, var(--theme-gold) calc(0.18 * 100%), transparent);
   border-radius: 2.1rem;
   background:
     radial-gradient(circle at 16% 8%, rgba(255, 255, 255, 0.9) 0 12%, transparent 28%),
@@ -1797,9 +1848,9 @@ body.has-music-player {
   height: 9rem;
   right: -3.6rem;
   top: -3.8rem;
-  border: 1px solid rgba(184, 138, 61, 0.2);
+  border: 1px solid color-mix(in srgb, var(--theme-gold) calc(0.2 * 100%), transparent);
   border-radius: 50%;
-  box-shadow: -5.2rem 8.4rem 0 -4.7rem rgba(184, 138, 61, 0.5);
+  box-shadow: -5.2rem 8.4rem 0 -4.7rem color-mix(in srgb, var(--theme-gold) calc(0.5 * 100%), transparent);
 }
 
 .inv-timeline-shell::after {
@@ -1809,7 +1860,7 @@ body.has-music-player {
   height: 7rem;
   background:
     radial-gradient(ellipse at 22% 56%, rgba(214, 151, 150, 0.2) 0 32%, transparent 34%),
-    radial-gradient(ellipse at 58% 68%, rgba(184, 138, 61, 0.13) 0 28%, transparent 30%);
+    radial-gradient(ellipse at 58% 68%, color-mix(in srgb, var(--theme-gold) calc(0.13 * 100%), transparent) 0 28%, transparent 30%);
   filter: blur(0.2px);
 }
 
@@ -1824,7 +1875,7 @@ body.has-music-player {
 .inv-timeline-header::before,
 .inv-timeline-header::after {
   position: absolute;
-  color: rgba(184, 138, 61, 0.45);
+  color: color-mix(in srgb, var(--theme-gold) calc(0.45 * 100%), transparent);
   font-family: var(--font-title, Georgia, serif);
   font-size: 1.2rem;
   line-height: 1;
@@ -1885,13 +1936,13 @@ body.has-music-player {
   width: min(62%, 220px);
   gap: 0.8rem;
   margin-top: -0.2rem;
-  color: rgba(184, 138, 61, 0.66);
+  color: color-mix(in srgb, var(--theme-gold) calc(0.66 * 100%), transparent);
 }
 
 .inv-timeline-divider span {
   display: block;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(184, 138, 61, 0.45), transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--theme-gold) calc(0.45 * 100%), transparent), transparent);
 }
 
 .inv-timeline-divider i {
@@ -1931,9 +1982,9 @@ body.has-music-player {
   display: grid;
   place-items: center;
   border-radius: 999px;
-  color: #b88a3d;
+  color: var(--theme-gold);
   background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(184, 138, 61, 0.22);
+  border: 1px solid color-mix(in srgb, var(--theme-gold) calc(0.22 * 100%), transparent);
   box-shadow: 0 10px 24px rgba(92, 66, 58, 0.08);
 }
 
@@ -1945,12 +1996,12 @@ body.has-music-player {
   width: 1px;
   min-height: 3.9rem;
   height: calc(100% + 1.45rem);
-  background: linear-gradient(to bottom, rgba(184, 138, 61, 0.12), rgba(184, 138, 61, 0.48), rgba(184, 138, 61, 0.12));
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--theme-gold) calc(0.12 * 100%), transparent), color-mix(in srgb, var(--theme-gold) calc(0.48 * 100%), transparent), color-mix(in srgb, var(--theme-gold) calc(0.12 * 100%), transparent));
 }
 
 .inv-timeline-row:last-child .inv-timeline-line {
   height: 3.2rem;
-  background: linear-gradient(to bottom, rgba(184, 138, 61, 0.42), transparent);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--theme-gold) calc(0.42 * 100%), transparent), transparent);
 }
 
 .inv-timeline-time {
@@ -1989,7 +2040,7 @@ body.has-music-player {
   width: 48px;
   height: 1px;
   margin-bottom: 0.5rem;
-  background: rgba(184, 138, 61, 0.34);
+  background: color-mix(in srgb, var(--theme-gold) calc(0.34 * 100%), transparent);
 }
 
 .inv-timeline-footer-quote p {
@@ -2086,10 +2137,10 @@ body.has-music-player {
   padding: 3rem 1.35rem 2.8rem;
   border-radius: 2.2rem;
   background:
-    radial-gradient(circle at 12% 8%, rgba(214, 151, 160, 0.24), transparent 28%),
-    radial-gradient(circle at 88% 88%, rgba(214, 151, 160, 0.20), transparent 30%),
-    linear-gradient(180deg, rgba(255, 250, 246, 0.94), rgba(252, 238, 234, 0.78));
-  border: 1px solid rgba(184, 138, 61, 0.22);
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--theme-accent) calc(0.24 * 100%), transparent), transparent 28%),
+    radial-gradient(circle at 88% 88%, color-mix(in srgb, var(--theme-accent) calc(0.20 * 100%), transparent), transparent 30%),
+    linear-gradient(180deg, var(--theme-bg-1), var(--theme-bg-2));
+  border: 1px solid color-mix(in srgb, var(--theme-gold) calc(0.22 * 100%), transparent);
   box-shadow: 0 26px 70px rgba(74, 45, 32, 0.13);
   text-align: center;
 }
@@ -2101,7 +2152,7 @@ body.has-music-player {
   right: 1.2rem;
   font-size: 1.1rem;
   letter-spacing: .4rem;
-  color: rgba(184, 138, 61, 0.38);
+  color: color-mix(in srgb, var(--theme-gold) calc(0.38 * 100%), transparent);
 }
 
 .inv-night-shell::after {
@@ -2146,7 +2197,7 @@ body.has-music-player {
   font-family: var(--font-title, serif);
   font-size: clamp(2.2rem, 10vw, 3.4rem);
   font-weight: 400;
-  color: var(--ink, #2f2520);
+  color: var(--theme-text);
 }
 
 .inv-night-title-script {
@@ -2155,7 +2206,7 @@ body.has-music-player {
   font-family: var(--font-script, "Great Vibes", cursive);
   font-size: clamp(4.3rem, 20vw, 7rem);
   font-weight: 400;
-  color: #b0707c;
+  color: var(--theme-accent);
   letter-spacing: .01em;
 }
 
@@ -2177,7 +2228,7 @@ body.has-music-player {
 
 .inv-night-divider i {
   font-size: .75rem;
-  color: #b0707c;
+  color: var(--theme-accent);
 }
 
 .inv-night-list {
@@ -2204,7 +2255,7 @@ body.has-music-player {
   width: 34px;
   height: 34px;
   margin: 0 auto;
-  color: #b0707c;
+  color: var(--theme-accent);
   font-size: 1.1rem;
 }
 
@@ -2218,7 +2269,7 @@ body.has-music-player {
 .inv-night-time {
   font-family: var(--font-title, serif);
   font-size: clamp(1.1rem, 4.7vw, 1.55rem);
-  color: #a96975;
+  color: var(--theme-accent);
   white-space: nowrap;
   letter-spacing: .02em;
 }
@@ -2227,7 +2278,7 @@ body.has-music-player {
   font-family: var(--font-title, serif);
   font-size: clamp(1.1rem, 4.7vw, 1.55rem);
   line-height: 1.15;
-  color: var(--ink, #2f2520);
+  color: var(--theme-text);
 }
 
 .inv-night-footer {
@@ -2241,7 +2292,7 @@ body.has-music-player {
   margin: 0;
   font-family: var(--font-title, serif);
   font-size: clamp(1.4rem, 6vw, 2rem);
-  color: #b0707c;
+  color: var(--theme-accent);
 }
 
 .inv-night-footer span {
@@ -2249,7 +2300,7 @@ body.has-music-player {
   margin-top: .15rem;
   font-family: var(--font-script, "Great Vibes", cursive);
   font-size: clamp(2.4rem, 11vw, 3.8rem);
-  color: #b0707c;
+  color: var(--theme-accent);
   line-height: .9;
 }
 
