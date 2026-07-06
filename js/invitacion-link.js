@@ -52,6 +52,14 @@ function normalizePin(value) {
     .trim();
 }
 
+function toTitleCase(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/\b\p{L}/gu, (char) => char.toUpperCase());
+}
+
 function getSupabaseClient() {
   if (window.supabaseClient) return window.supabaseClient;
   if (window.invittaSupabase) return window.invittaSupabase;
@@ -342,7 +350,7 @@ function renderGeneratedPass({ name, passes, table, link }) {
     return;
   }
 
-  if (nameEl) nameEl.textContent = name || "Invitado";
+  if (nameEl) nameEl.textContent = toTitleCase(name) || "Invitado";
   if (passesEl) passesEl.textContent = passes || "-";
   if (tableEl) tableEl.textContent = table || "-";
 
