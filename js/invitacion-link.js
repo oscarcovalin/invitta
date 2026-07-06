@@ -119,9 +119,15 @@ async function initLinkBuilder() {
   try {
     const { data, error } = await supabase
       .from("studio_invitations")
-      .select("slug, event_title, quinceanera_name, link_builder_enabled, link_builder_pin, link_builder_title, link_builder_message")
+      .select(`
+        slug,
+        link_builder_enabled,
+        link_builder_pin,
+        link_builder_title,
+        link_builder_message
+      `)
       .eq("slug", slug)
-      .single();
+      .maybeSingle();
 
     console.log("Link builder config result:", { data, error });
 
