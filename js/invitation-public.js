@@ -1,4 +1,4 @@
-﻿/**
+/**
  * invitation-public.js
  * Invitta Studio ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â PÃƒÆ’Ã‚Â¡gina pÃƒÆ’Ã‚Âºblica de invitaciÃƒÆ’Ã‚Â³n
  *
@@ -671,7 +671,7 @@
       return "";
     }
 
-    if (logoUrl) {
+    if (logoUrl && !logoUrl.includes("URL_DEL_LOGO_AQUI")) {
       return `
         <div class="inv-music-brand" aria-label="${escapeHtml(studioName)}">
           <img
@@ -1370,6 +1370,7 @@ function markInvitationSectionsForReveal() {
   console.log("Scroll reveal elements:", elements.length);
 }
 
+
 function setupRevealOnScroll() {
   const elements = document.querySelectorAll(".js-scroll-reveal");
 
@@ -1388,14 +1389,16 @@ function setupRevealOnScroll() {
         if (entry.isIntersecting) {
           requestAnimationFrame(() => {
             entry.target.classList.add("is-visible");
+            console.log("Reveal visible:", entry.target.className);
           });
+
           observer.unobserve(entry.target);
         }
       });
     },
     {
-      threshold: 0.18,
-      rootMargin: "0px 0px -12% 0px"
+      threshold: 0.32,
+      rootMargin: "0px 0px -22% 0px"
     }
   );
 
