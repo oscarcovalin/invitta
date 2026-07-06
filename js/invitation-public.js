@@ -897,27 +897,25 @@
     }
     return [];
   }
-
-    function getTimelineIcon(title) {
+  function getTimelineIcon(title) {
     const value = String(title || "")
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-    if (value.includes("recepcion")) return '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
-    if (value.includes("bienvenida")) return '<svg viewBox="0 0 24 24"><path d="M2 20h20"/><path d="M2 16l3-8 5 4 2-6 2 6 5-4 3 8z"/></svg>';
-    if (value.includes("presentacion")) return '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
-    if (value.includes("brindis")) return '<svg viewBox="0 0 24 24"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M5 8c0 3.866 3.134 7 7 7s7-3.134 7-7"/><path d="M5 8V4h14v4"/></svg>';
-    if (value.includes("coronacion")) return '<svg viewBox="0 0 24 24"><path d="M2 20h20"/><path d="M2 16l3-8 5 4 2-6 2 6 5-4 3 8z"/></svg>';
-    if (value.includes("vals")) return '<svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><path d="M9.5 8h5l2.5 7h-9L9.5 8z"/><path d="M9 15l-3 7"/><path d="M15 15l3 7"/></svg>';
-    if (value.includes("cena")) return '<svg viewBox="0 0 24 24"><path d="M8 2v20"/><path d="M4 2v8h8V2H4z"/><path d="M16 22V2c3 0 5 2 5 5v5h-5"/></svg>';
-    if (value.includes("apertura")) return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
-    if (value.includes("pista")) return '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
-    if (value.includes("batucada")) return '<svg viewBox="0 0 24 24"><path d="M4 7h16v10H4z"/><path d="M12 7v10"/><path d="M4 12h16"/><path d="M8 7l4-5"/><path d="M16 7l-4-5"/></svg>';
-    if (value.includes("baile")) return '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
-    if (value.includes("cierre")) return '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+    if (value.includes("recepcion")) return "fa-heart";
+    if (value.includes("bienvenida")) return "fa-crown";
+    if (value.includes("presentacion")) return "fa-sparkles";
+    if (value.includes("brindis")) return "fa-champagne-glasses";
+    if (value.includes("coronacion")) return "fa-crown";
+    if (value.includes("vals")) return "fa-people-pulling";
+    if (value.includes("cena")) return "fa-utensils";
+    if (value.includes("apertura de pista")) return "fa-compact-disc";
+    if (value.includes("batucada")) return "fa-drum";
+    if (value.includes("baile")) return "fa-music";
+    if (value.includes("cierre")) return "fa-heart";
 
-    return '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+    return "fa-star";
   }
 
   function renderItinerary(value) {
@@ -934,7 +932,7 @@
       return;
     }
 
-    section.className = "inv-section inv-night-timeline reveal-on-scroll";
+    section.className = "inv-section inv-timeline-premium reveal-on-scroll";
     section.style.setProperty("display", "block", "important");
     section.style.setProperty("visibility", "visible", "important");
 
@@ -943,35 +941,37 @@
       const icon = getTimelineIcon(eventTitle);
 
       return `
-      <div class="inv-night-row">
-        <div class="inv-night-icon">\n          ${icon}\n        </div>
-        <div class="inv-night-separator"></div>
-        <div class="inv-night-time">${item.time ? escapeHtml(item.time) : ""}</div>
-        <div class="inv-night-event">${escapeHtml(eventTitle)}</div>
-      </div>
-    `;
+        <div class="inv-timeline-row reveal-on-scroll">
+          <div class="inv-timeline-icon" aria-hidden="true">
+            <i class="fa-solid ${icon}"></i>
+          </div>
+          <div class="inv-timeline-line" aria-hidden="true"></div>
+          <div class="inv-timeline-time">${item.time ? escapeHtml(item.time) : ""}</div>
+          <div class="inv-timeline-event">${escapeHtml(eventTitle)}</div>
+        </div>
+      `;
     }).join("");
 
     section.innerHTML = `
-      <div class="inv-night-shell">
-        <div class="inv-night-header">
-          <p class="inv-night-kicker">ITINERARIO</p>
-          <h2 class="inv-night-title">
-            <span class="inv-night-title-small">Momentos de la</span>
-            <span class="inv-night-title-script">Noche</span>
+      <div class="inv-timeline-shell">
+        <div class="inv-timeline-header">
+          <p class="inv-timeline-kicker">ITINERARIO</p>
+          <h2 class="inv-timeline-title">
+            <span class="inv-title-top">Momentos de la</span>
+            <span class="inv-title-script">Noche</span>
           </h2>
-          <div class="inv-night-divider">
+          <div class="inv-timeline-divider" aria-hidden="true">
             <span></span>
             <i class="fa-solid fa-heart"></i>
             <span></span>
           </div>
         </div>
 
-        <div class="inv-night-list">
+        <div id="inv-itinerary" class="inv-timeline-list">
           ${itemsHtml}
         </div>
 
-        <div class="inv-night-footer">
+        <div class="inv-timeline-footer-quote">
           <p>Cada estrella nos acerca a</p>
           <span>esa noche</span>
         </div>
@@ -980,7 +980,7 @@
 
     console.log("Timeline section display:", window.getComputedStyle(section).display);
     console.log("Timeline section visibility:", window.getComputedStyle(section).visibility);
-    console.log("Timeline items count:", document.querySelectorAll(".inv-night-row").length);
+    console.log("Timeline items count:", document.querySelectorAll(".inv-timeline-row").length);
   }
   /* ─── Helpers texto / números ─────────────────────────────────────── */
   function sanitize(str) {
