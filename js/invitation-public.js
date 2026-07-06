@@ -269,7 +269,7 @@
     setTimeout(() => {
       animateHeroIntro();
       setupRevealAnimations();
-    }, 600);
+    }, 400);
   }
 
   /* ─── Foto principal (hero) ──────────────────────────────────────── */
@@ -824,59 +824,42 @@
 })();
 
 function animateHeroIntro() {
-  const hero = document.querySelector(".inv-hero");
-  const content = document.querySelector(".inv-hero-content");
+  const heroContent = document.querySelector(".inv-hero-content");
 
-  if (!hero || hero.dataset.heroAnimated === "true") return;
+  if (!heroContent || heroContent.dataset.heroAnimated === "true") return;
 
-  hero.dataset.heroAnimated = "true";
+  heroContent.dataset.heroAnimated = "true";
+  heroContent.style.opacity = "0";
+  heroContent.style.transform = "translateY(10px)";
 
-  hero.animate(
+  heroContent.animate(
     [
-      {
-        opacity: 0.92,
-        transform: "scale(1.015)"
-      },
-      {
-        opacity: 1,
-        transform: "scale(1)"
-      }
+      { opacity: 0, transform: "translateY(10px)" },
+      { opacity: 1, transform: "translateY(0)" }
     ],
     {
-      duration: 1200,
-      easing: "cubic-bezier(.22, 1, .36, 1)",
+      duration: 900,
+      easing: "ease-out",
       fill: "forwards"
     }
   );
 
-  if (content) {
-    content.animate(
-      [
-        {
-          opacity: 0,
-          transform: "translateY(18px)"
-        },
-        {
-          opacity: 1,
-          transform: "translateY(0)"
-        }
-      ],
-      {
-        duration: 950,
-        delay: 180,
-        easing: "cubic-bezier(.22, 1, .36, 1)",
-        fill: "forwards"
-      }
-    );
-  }
+  setTimeout(() => {
+    heroContent.style.opacity = "1";
+    heroContent.style.transform = "translateY(0)";
+  }, 950);
 }
 
 function setupRevealAnimations() {
-  console.log("setupRevealAnimations running smooth mode");
+  console.log("setupRevealAnimations running subtle fade mode");
 
   const selectors = [
+    ".inv-hero-content",
+    ".inv-countdown-section",
+    "#inv-countdown-section",
     "#inv-parents-block",
     "#inv-welcome-block",
+    ".inv-gallery-item",
     "#inv-ceremony-block",
     "#inv-reception-block",
     "#inv-itinerary-section",
@@ -884,33 +867,32 @@ function setupRevealAnimations() {
     "#inv-gifts-block",
     "#inv-hashtag-block",
     "#inv-pass-section",
+    "[aria-label='Tu pase personal']",
     "#inv-rsvp-section",
-    ".inv-gallery-item"
+    "#inv-wa-block"
   ];
 
   const elements = Array.from(document.querySelectorAll(selectors.join(",")))
     .filter((el) => {
       const style = window.getComputedStyle(el);
-
-      return (
-        style.display !== "none" &&
-        style.visibility !== "hidden" &&
-        !el.closest("#inv-music-player") &&
-        !el.classList.contains("inv-hero")
-      );
+      return style.display !== "none" && style.visibility !== "hidden";
     });
 
-  console.log("Smooth reveal elements found:", elements.length);
+  console.log("Subtle fade elements found:", elements.length);
 
   if (!elements.length) return;
 
   elements.forEach((el, index) => {
+    if (el.dataset.heroAnimated === "true") {
+      el.dataset.revealed = "true";
+      return;
+    }
+
     el.dataset.revealed = "false";
     el.style.opacity = "0";
-    el.style.transform = "translateY(26px)";
-    el.style.filter = "none";
+    el.style.transform = "translateY(8px)";
     el.style.willChange = "opacity, transform";
-    el.dataset.revealDelay = String(Math.min(index * 45, 180));
+    el.dataset.revealDelay = String(Math.min(index * 70, 280));
   });
 
   function animateElement(el) {
@@ -920,13 +902,11 @@ function setupRevealAnimations() {
 
     const delay = Number(el.dataset.revealDelay || 0);
 
-    console.log("Smooth animating reveal:", el.id || el.className);
-
     el.animate(
       [
         {
           opacity: 0,
-          transform: "translateY(26px)"
+          transform: "translateY(8px)"
         },
         {
           opacity: 1,
@@ -934,9 +914,9 @@ function setupRevealAnimations() {
         }
       ],
       {
-        duration: 850,
+        duration: 700,
         delay,
-        easing: "cubic-bezier(.22, 1, .36, 1)",
+        easing: "ease-out",
         fill: "forwards"
       }
     );
@@ -944,59 +924,12 @@ function setupRevealAnimations() {
     setTimeout(() => {
       el.style.opacity = "1";
       el.style.transform = "translateY(0)";
-      el.style.filter = "none";
       el.style.willChange = "auto";
-    }, 900 + delay);
-
-    const icon = el.querySelector(".inv-card-icon");
-
-    if (icon) {
-      icon.animate(
-        [
-          {
-            opacity: 0,
-            transform: "translateY(12px)"
-          },
-          {
-            opacity: 1,
-            transform: "translateY(0)"
-          }
-        ],
-        {
-          duration: 700,
-          delay: delay + 120,
-          easing: "cubic-bezier(.22, 1, .36, 1)",
-          fill: "forwards"
-        }
-      );
-    }
-
-    const ornament = el.querySelector(".inv-card-ornament");
-
-    if (ornament) {
-      ornament.animate(
-        [
-          {
-            opacity: 0,
-            transform: "translateX(-50%) translateY(10px)"
-          },
-          {
-            opacity: 1,
-            transform: "translateX(-50%) translateY(0)"
-          }
-        ],
-        {
-          duration: 700,
-          delay: delay + 90,
-          easing: "cubic-bezier(.22, 1, .36, 1)",
-          fill: "forwards"
-        }
-      );
-    }
+    }, 760 + delay);
   }
 
   function checkReveal() {
-    const triggerPoint = window.innerHeight * 0.88;
+    const triggerPoint = window.innerHeight * 0.92;
 
     elements.forEach((el) => {
       if (el.dataset.revealed === "true") return;
@@ -1009,7 +942,7 @@ function setupRevealAnimations() {
     });
   }
 
-  setTimeout(checkReveal, 300);
+  setTimeout(checkReveal, 200);
   window.addEventListener("scroll", checkReveal, { passive: true });
   window.addEventListener("resize", checkReveal);
 }
