@@ -1116,7 +1116,6 @@
     show("inv-hashtag-block");
   }
 
-
   function normalizeItinerary(value) {
     if (!value) return [];
     if (Array.isArray(value)) {
@@ -1135,45 +1134,34 @@
     }
     return [];
   }
-  function getTimelineIcon(title) {
-    const value = String(title || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
 
-    const icons = {
-      heart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 5.6c-1.7-1.8-4.4-1.8-6.1 0L12 8.3 9.3 5.6c-1.7-1.8-4.4-1.8-6.1 0-1.6 1.7-1.6 4.3 0 6l8.8 8.8 8.8-8.8c1.6-1.7 1.6-4.3 0-6Z"/></svg>',
-      crown: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18"/><path d="M5 15 7.5 7l4.5 4 4.5-4L19 15H5Z"/><path d="M8 21h8"/></svg>',
-      star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.9 6.3.7-4.7 4.3 1.3 6.1-5.6-3.1L6.4 20l1.3-6.1L3 9.6l6.3-.7L12 3Z"/></svg>',
-      glass: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v4a5 5 0 0 1-10 0V3Z"/><path d="M12 12v7"/><path d="M8 21h8"/></svg>',
-      dance: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="5" r="2"/><circle cx="16" cy="5" r="2"/><path d="M8 8l-2 5 3 2-1 6"/><path d="M16 8l2 5-3 2 1 6"/><path d="M10 10h4"/></svg>',
-      utensils: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v18"/><path d="M4 3v6a3 3 0 0 0 6 0V3"/><path d="M16 21V3c2.5 1.3 4 3.6 4 6.2V12h-4"/></svg>',
-      disc: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.3"/><path d="M15 6.7a6 6 0 0 1 2.3 2.4"/></svg>',
-      drum: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14v9H5z"/><path d="M5 8c0 1.2 3.1 2 7 2s7-.8 7-2"/><path d="M8 8 5 3"/><path d="M16 8l3-5"/></svg>',
-      music: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg>'
-    };
+  function getTimelineAltIcon(label = "") {
+    const text = String(label || "").toLowerCase();
 
-    if (value.includes("recepcion")) return icons.heart;
-    if (value.includes("bienvenida")) return icons.crown;
-    if (value.includes("presentacion")) return icons.star;
-    if (value.includes("brindis")) return icons.glass;
-    if (value.includes("coronacion")) return icons.crown;
-    if (value.includes("vals")) return icons.dance;
-    if (value.includes("cena")) return icons.utensils;
-    if (value.includes("apertura de pista")) return icons.disc;
-    if (value.includes("batucada")) return icons.drum;
-    if (value.includes("baile")) return icons.music;
-    if (value.includes("cierre")) return icons.heart;
+    if (text.includes("ceremonia") || text.includes("iglesia")) {
+      return getPremiumSectionIcon ? getPremiumSectionIcon("ceremony") : "✦";
+    }
 
-    return icons.star;
+    if (text.includes("recepción") || text.includes("recepcion")) {
+      return getPremiumSectionIcon ? getPremiumSectionIcon("reception") : "✦";
+    }
+
+    if (text.includes("cena") || text.includes("banquete")) {
+      return getPremiumSectionIcon ? getPremiumSectionIcon("gifts") : "✦";
+    }
+
+    if (text.includes("vals") || text.includes("baile") || text.includes("fiesta") || text.includes("musica")) {
+      return getPremiumSectionIcon ? getPremiumSectionIcon("music") : "✦";
+    }
+
+    return getPremiumSectionIcon ? getPremiumSectionIcon("itinerary") : "✦";
   }
+
   function renderItinerary(value) {
     const section = document.getElementById("inv-itinerary-section");
     if (!section) return;
 
     const items = normalizeItinerary(value);
-    console.log("itinerary raw:", value);
-    console.log("itinerary normalized:", items);
 
     if (!items.length) {
       section.style.display = "none";
@@ -1181,53 +1169,62 @@
       return;
     }
 
-    section.className = "inv-section inv-timeline-premium reveal-on-scroll";
+    section.className = "inv-section inv-night-timeline inv-timeline-alt-section reveal-on-scroll";
     section.style.setProperty("display", "block", "important");
     section.style.setProperty("visibility", "visible", "important");
 
-    const itemsHtml = items.map((item) => {
+    const itemsHtml = items.map((item, index) => {
       const eventTitle = item.title || "";
-      const icon = getTimelineIcon(eventTitle);
+      const icon = getTimelineAltIcon(eventTitle);
+      const isLeft = index % 2 === 0;
+      const rowClass = isLeft ? "is-left" : "is-right";
+      const timeHtml = item.time ? `<p class="inv-timeline-alt-time">${escapeHtml(item.time)}</p>` : "";
 
-      return `
-        <div class="inv-timeline-row reveal-on-scroll">
-          <div class="inv-timeline-icon" aria-hidden="true">
-            ${icon}
-          </div>
-          <div class="inv-timeline-line" aria-hidden="true"></div>
-          <div class="inv-timeline-time">${item.time ? escapeHtml(item.time) : ""}</div>
-          <div class="inv-timeline-event">${escapeHtml(eventTitle)}</div>
-        </div>
-      `;
+      if (isLeft) {
+        return `
+          <article class="inv-timeline-alt-row ${rowClass}">
+            <div class="inv-timeline-alt-side inv-timeline-alt-content">
+              ${timeHtml}
+              <p class="inv-timeline-alt-event">${escapeHtml(eventTitle)}</p>
+            </div>
+            <div class="inv-timeline-alt-dot-wrap">
+              <span class="inv-timeline-alt-dot"></span>
+            </div>
+            <div class="inv-timeline-alt-side inv-timeline-alt-icon">
+              ${icon}
+            </div>
+          </article>
+        `;
+      } else {
+        return `
+          <article class="inv-timeline-alt-row ${rowClass}">
+            <div class="inv-timeline-alt-side inv-timeline-alt-icon">
+              ${icon}
+            </div>
+            <div class="inv-timeline-alt-dot-wrap">
+              <span class="inv-timeline-alt-dot"></span>
+            </div>
+            <div class="inv-timeline-alt-side inv-timeline-alt-content">
+              ${timeHtml}
+              <p class="inv-timeline-alt-event">${escapeHtml(eventTitle)}</p>
+            </div>
+          </article>
+        `;
+      }
     }).join("");
 
     section.innerHTML = `
-      <div class="inv-timeline-shell">
-        <div class="inv-timeline-header">
-          <div class="inv-card-icon inv-section-icon" aria-hidden="true">
-            ${getPremiumSectionIcon("itinerary")}
-          </div>
-          <p class="inv-timeline-kicker">ITINERARIO</p>
-          <h2 class="inv-timeline-title">
-            <span class="inv-title-top">Momentos de la</span>
-            <span class="inv-title-script">Noche</span>
-          </h2>
-          <div class="inv-timeline-divider" aria-hidden="true">
-            <span></span>
-            <i class="fa-solid fa-heart"></i>
-            <span></span>
-          </div>
+      <div class="inv-timeline-alt-card">
+        <div class="inv-timeline-alt-header">
+          <p class="inv-timeline-alt-kicker">Itinerario</p>
+          <h2 class="inv-timeline-alt-title">Momentos de la Noche</h2>
         </div>
-
-        <div id="inv-itinerary" class="inv-timeline-list">
+        <div class="inv-timeline-alt-list">
+          <div class="inv-timeline-alt-line"></div>
           ${itemsHtml}
         </div>
       </div>
     `;
-
-    console.log("Timeline section display:", window.getComputedStyle(section).display);
-    console.log("Timeline section visibility:", window.getComputedStyle(section).visibility);
-    console.log("Timeline items count:", document.querySelectorAll(".inv-timeline-row").length);
   }
   /* ─── Helpers texto / números ─────────────────────────────────────── */
   function sanitize(str) {
