@@ -168,6 +168,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.open(`/invitacion-link.html?slug=${slug}`, "_blank", "noopener");
   });
 
+  const openQuickLinkBuilderButton = document.getElementById("openQuickLinkBuilderButton");
+  openQuickLinkBuilderButton?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const slug = requireSlugForAction();
+    if (!slug) return;
+    window.open(`/invitacion-link.html?slug=${encodeURIComponent(slug)}`, "_blank", "noopener,noreferrer");
+  });
+
+  const copyQuickLinkBuilderButton = document.getElementById("copyQuickLinkBuilderButton");
+  copyQuickLinkBuilderButton?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const slug = requireSlugForAction();
+    if (!slug) return;
+    const url = `${window.location.origin}/invitacion-link.html?slug=${encodeURIComponent(slug)}`;
+    try {
+      await copyTextToClipboard(url);
+      showSuccessMessage("Link del generador copiado.");
+    } catch (err) {
+      console.error(err);
+      alert("Error al copiar el enlace del generador.");
+    }
+  });
+
   // Si no tenemos el studio_id, lo buscamos
   if (!currentStudioId) {
     const { data: studio } = await db

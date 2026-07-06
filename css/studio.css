@@ -265,3 +265,36 @@ body {
     width: 100%;
   }
 }
+
+.studio-secondary-button,
+#openQuickLinkBuilderButton,
+#copyQuickLinkBuilderButton {
+  border: 1px solid rgba(184, 138, 61, 0.32);
+  background: rgba(255,255,255,0.72);
+  color: #7b5a2e;
+  border-radius: 999px;
+  padding: 0.72rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.studio-secondary-button:hover,
+#openQuickLinkBuilderButton:hover,
+#copyQuickLinkBuilderButton:hover {
+  transform: translateY(-1px);
+  border-color: rgba(184, 138, 61, 0.58);
+  box-shadow: 0 12px 26px rgba(74,45,32,0.10);
+}
+
+.quick-link-builder-note {
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  color: #7d6860;
+}
