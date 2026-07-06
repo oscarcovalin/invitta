@@ -1,3 +1,7 @@
+let generatedInvitationLink = "";
+let lastGeneratedPassData = null;
+let slug = "";
+
 document.addEventListener("DOMContentLoaded", () => {
   try {
     initLinkBuilder();
@@ -29,6 +33,9 @@ function showPinGate() {
 function showBuilderForm() {
   document.getElementById("linkBuilderPinGate")?.classList.add("hidden");
   document.getElementById("linkBuilderForm")?.classList.remove("hidden");
+
+  setupGeneratorEvents();
+  setupGeneratedActionEvents();
 }
 
 function hideBuilderForm() {
@@ -68,13 +75,6 @@ function getSupabaseClient() {
     env.supabaseAnonKey ||
     env.supabase_anon_key;
 
-  console.log("Link builder Supabase debug:", {
-    hasSupabaseCdn: Boolean(window.supabase),
-    hasUrl: Boolean(url),
-    hasKey: Boolean(key),
-    env
-  });
-
   if (!window.supabase || !url || !key) {
     return null;
   }
@@ -86,18 +86,12 @@ function getSupabaseClient() {
 
 async function initLinkBuilder() {
   const params = new URLSearchParams(window.location.search);
-  const slug = params.get("slug");
+  slug = params.get("slug") || "";
 
   if (params.get("resetPin") === "1") {
     sessionStorage.removeItem(`linkBuilderUnlocked:${slug}`);
   }
 
-  const generateLinkButton = document.getElementById("generateLinkButton");
-  const copyLinkButton = document.getElementById("copyLinkButton");
-  const openInvitationButton = document.getElementById("openInvitationButton");
-  const sendWhatsappButton = document.getElementById("sendWhatsappButton");
-  const generatedLinkOutput = document.getElementById("generatedLinkOutput");
-  
   const disabledState = document.getElementById("disabledState");
   const statusState = document.getElementById("statusState");
   const dynamicTitle = document.getElementById("dynamicTitle");
@@ -107,8 +101,6 @@ async function initLinkBuilder() {
   const linkBuilderPinError = document.getElementById("linkBuilderPinError");
   const unlockLinkBuilderButton = document.getElementById("unlockLinkBuilderButton");
 
-  let generatedInvitationLink = "";
-  let lastGeneratedPassData = null;
   let invitationConfig = null;
 
   if (!slug) {
@@ -139,8 +131,7 @@ async function initLinkBuilder() {
       realPin,
       typedLength: typedPin.length,
       realLength: realPin.length,
-      isMatch: typedPin === realPin,
-      invitationConfig
+      isMatch: typedPin === realPin
     });
 
     if (!realPin) {
@@ -205,8 +196,6 @@ async function initLinkBuilder() {
       .eq("slug", slug)
       .maybeSingle();
 
-    console.log("Link builder config result:", { data, error });
-
     if (error) {
       console.error("Link builder config query error:", error);
       throw error;
@@ -217,8 +206,6 @@ async function initLinkBuilder() {
     }
 
     invitationConfig = data;
-    console.log("Loaded invitationConfig:", invitationConfig);
-    console.log("Real PIN loaded:", invitationConfig.link_builder_pin);
 
     if (invitationConfig.link_builder_enabled === false) {
       disabledState.classList.remove("hidden");
@@ -228,8 +215,8 @@ async function initLinkBuilder() {
 
     if (statusState) statusState.style.display = "none";
     
-    dynamicTitle.textContent = invitationConfig.link_builder_title || "Generador de pase";
-    dynamicMessage.textContent = invitationConfig.link_builder_message || "Crea un pase rápido para invitados de último momento.";
+    if (dynamicTitle) dynamicTitle.textContent = invitationConfig.link_builder_title || "Generador de pase";
+    if (dynamicMessage) dynamicMessage.textContent = invitationConfig.link_builder_message || "Crea un pase rápido para invitados de último momento.";
 
     const pin = String(invitationConfig.link_builder_pin || "").trim();
     
@@ -245,236 +232,252 @@ async function initLinkBuilder() {
 
     showBuilderForm();
 
-    } catch (err) {
-      console.error("Error al cargar la configuración:", err);
-      showFatalError("Error de conexión al cargar la configuración.");
-    }
+  } catch (err) {
+    console.error("Error al cargar la configuración:", err);
+    showFatalError("Error de conexión al cargar la configuración.");
+  }
+}
 
-  function buildInvitationLink() {
-    const name = document.getElementById("guestName")?.value.trim();
-    const passes = document.getElementById("guestPasses")?.value.trim();
-    const table = document.getElementById("guestTable")?.value.trim();
+function setupGeneratorEvents() {
+  const generateButton = document.getElementById("generateLinkButton");
 
-    const params = new URLSearchParams();
-    params.set("slug", slug);
-
-    if (name) params.set("n", name);
-    if (passes) params.set("p", passes);
-    if (table) params.set("m", table);
-
-    return `${window.location.origin}/invitacion.html?${params.toString()}`;
+  if (!generateButton) {
+    console.error("generateLinkButton not found");
+    return;
   }
 
-  function normalizePhone(value) {
-    return String(value || "").replace(/[^\d]/g, "");
+  if (generateButton.dataset.bound === "true") {
+    return;
   }
 
-  function renderGeneratedQr(link) {
-    const qrContainer = document.getElementById("generatedPassQr");
+  generateButton.dataset.bound = "true";
 
-    if (!qrContainer) return;
+  generateButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    console.log("Generate pass button clicked");
+    generateEmergencyPass();
+  });
+}
 
-    qrContainer.innerHTML = "";
+function setupGeneratedActionEvents() {
+  const buttons = [
+    ["copyLinkButton", copyGeneratedLink],
+    ["openInvitationButton", openGeneratedInvitation],
+    ["downloadPassButton", downloadGeneratedPass],
+    ["sendWhatsappButton", sendGeneratedPassWhatsapp]
+  ];
 
-    if (!window.QRCode) {
-      qrContainer.textContent = "No se pudo generar el QR.";
-      console.error("QRCode library not loaded.");
+  buttons.forEach(([id, handler]) => {
+    const button = document.getElementById(id);
+
+    if (!button) return;
+
+    if (button.dataset.bound === "true") {
       return;
     }
 
-    new QRCode(qrContainer, {
-      text: link,
-      width: 156,
-      height: 156,
-      colorDark: "#2f2520",
-      colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.H
-    });
-  }
-
-  function renderGeneratedPass({ name, passes, table, link }) {
-    const card = document.getElementById("generatedPassCard");
-    const nameEl = document.getElementById("generatedPassName");
-    const passesEl = document.getElementById("generatedPassCount");
-    const tableEl = document.getElementById("generatedPassTable");
-
-    if (nameEl) nameEl.textContent = name || "Invitado";
-    if (passesEl) passesEl.textContent = passes || "-";
-    if (tableEl) tableEl.textContent = table || "-";
-
-    renderGeneratedQr(link);
-
-    card?.classList.remove("hidden");
-  }
-
-  function showGeneratedActions() {
-    document.getElementById("generatedPassActions")?.classList.remove("hidden");
-
-    ["copyLinkButton", "openInvitationButton", "downloadPassButton", "sendWhatsappButton"]
-      .forEach((id) => {
-        const button = document.getElementById(id);
-        button?.removeAttribute("disabled");
-        if (id === "sendWhatsappButton") {
-           const whatsapp = document.getElementById("guestWhatsapp")?.value.trim();
-           if (normalizePhone(whatsapp)) {
-             button?.classList.remove("hidden");
-             button.style.display = "inline-block";
-           } else {
-             button?.classList.add("hidden");
-             button.style.display = "none";
-           }
-        } else {
-          button?.classList.remove("hidden");
-          if (button) button.style.display = "inline-block";
-        }
-      });
-  }
-
-  function generateEmergencyPass(event) {
-    if (event) {
+    button.dataset.bound = "true";
+    button.addEventListener("click", (event) => {
       event.preventDefault();
-    }
-
-    console.log("Generating emergency pass...");
-
-    const nameInput = document.getElementById("guestName");
-    const passesInput = document.getElementById("guestPasses");
-    const tableInput = document.getElementById("guestTable");
-    const output = document.getElementById("generatedLinkOutput");
-
-    const name = nameInput?.value.trim();
-    const passes = passesInput?.value.trim();
-    const table = tableInput?.value.trim();
-
-    if (!name) {
-      alert("Ingresa el nombre o familia del invitado.");
-      nameInput?.focus();
-      return;
-    }
-
-    generatedInvitationLink = buildInvitationLink();
-
-    lastGeneratedPassData = {
-      name,
-      passes,
-      table,
-      link: generatedInvitationLink
-    };
-
-    if (output) {
-      output.textContent = generatedInvitationLink;
-      output.style.display = "block";
-      output.classList.remove("hidden");
-    }
-
-    renderGeneratedPass(lastGeneratedPassData);
-    showGeneratedActions();
-
-    console.log("Emergency pass generated:", lastGeneratedPassData);
-  }
-
-  async function downloadGeneratedPass() {
-    const card = document.getElementById("generatedPassCard");
-
-    if (!card || card.classList.contains("hidden")) {
-      alert("Primero genera un pase.");
-      return;
-    }
-
-    if (!window.html2canvas) {
-      alert("No se pudo cargar la herramienta de descarga.");
-      return;
-    }
-
-    const canvas = await html2canvas(card, {
-      scale: 2,
-      backgroundColor: null,
-      useCORS: true
+      handler();
     });
+  });
+}
 
-    const safeName = String(lastGeneratedPassData?.name || "pase-emergencia")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-zA-Z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .toLowerCase();
+function generateEmergencyPass() {
+  console.log("Generating emergency pass...");
 
-    const downloadLink = document.createElement("a");
-    downloadLink.download = `${safeName || "pase-emergencia"}.png`;
-    downloadLink.href = canvas.toDataURL("image/png");
-    downloadLink.click();
+  const nameInput = document.getElementById("guestName");
+  const passesInput = document.getElementById("guestPasses");
+  const tableInput = document.getElementById("guestTable");
+  const output = document.getElementById("generatedLinkOutput");
+
+  const name = String(nameInput?.value || "").trim();
+  const passes = String(passesInput?.value || "").trim();
+  const table = String(tableInput?.value || "").trim();
+
+  if (!name) {
+    alert("Ingresa el nombre o familia del invitado.");
+    nameInput?.focus();
+    return;
   }
 
-  async function copyGeneratedLink() {
-    if (!generatedInvitationLink) {
-      alert("Primero genera un pase.");
-      return;
-    }
+  const params = new URLSearchParams();
+  params.set("slug", slug);
 
-    try {
-      await navigator.clipboard.writeText(generatedInvitationLink);
-      alert("Enlace copiado.");
-    } catch (error) {
-      const textarea = document.createElement("textarea");
-      textarea.value = generatedInvitationLink;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      textarea.remove();
-      alert("Enlace copiado.");
-    }
+  if (name) params.set("n", name);
+  if (passes) params.set("p", passes);
+  if (table) params.set("m", table);
+
+  generatedInvitationLink = `${window.location.origin}/invitacion.html?${params.toString()}`;
+
+  lastGeneratedPassData = {
+    name,
+    passes,
+    table,
+    link: generatedInvitationLink
+  };
+
+  if (output) {
+    output.textContent = generatedInvitationLink;
+    output.classList.remove("hidden");
+  } else {
+    console.error("generatedLinkOutput not found");
   }
 
-  function openGeneratedInvitation() {
-    if (!generatedInvitationLink) {
-      alert("Primero genera un pase.");
-      return;
-    }
+  renderGeneratedPass(lastGeneratedPassData);
+  showGeneratedActions();
 
-    const separator = generatedInvitationLink.includes("?") ? "&" : "?";
-    window.open(`${generatedInvitationLink}${separator}v=preview-${Date.now()}`, "_blank", "noopener,noreferrer");
+  console.log("Emergency pass generated:", lastGeneratedPassData);
+}
+
+function renderGeneratedPass({ name, passes, table, link }) {
+  const card = document.getElementById("generatedPassCard");
+  const nameEl = document.getElementById("generatedPassName");
+  const passesEl = document.getElementById("generatedPassCount");
+  const tableEl = document.getElementById("generatedPassTable");
+
+  if (!card) {
+    console.error("generatedPassCard not found");
+    return;
   }
 
-  function sendGeneratedPassWhatsapp() {
-    if (!generatedInvitationLink || !lastGeneratedPassData) {
-      alert("Primero genera un pase.");
-      return;
-    }
+  if (nameEl) nameEl.textContent = name || "Invitado";
+  if (passesEl) passesEl.textContent = passes || "-";
+  if (tableEl) tableEl.textContent = table || "-";
 
-    const phone = normalizePhone(document.getElementById("guestWhatsapp")?.value);
+  renderGeneratedQr(link);
 
-    if (!phone) {
-      alert("Agrega un WhatsApp para enviar el pase.");
-      return;
-    }
+  card.classList.remove("hidden");
+}
 
-    const { name, passes, table } = lastGeneratedPassData;
+function renderGeneratedQr(link) {
+  const qrContainer = document.getElementById("generatedPassQr");
 
-    const message = [
-      "Hola, te compartimos tu pase personalizado para el evento:",
-      "",
-      `Nombre: ${name || "-"}`,
-      `Pases: ${passes || "-"}`,
-      `Mesa: ${table || "-"}`,
-      "",
-      generatedInvitationLink
-    ].join("\n");
-
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+  if (!qrContainer) {
+    console.error("generatedPassQr not found");
+    return;
   }
 
-  document.getElementById("generateLinkButton")
-    ?.addEventListener("click", generateEmergencyPass);
+  qrContainer.innerHTML = "";
 
-  document.getElementById("copyLinkButton")
-    ?.addEventListener("click", copyGeneratedLink);
+  if (!window.QRCode) {
+    qrContainer.textContent = "No se pudo generar el QR.";
+    console.error("QRCode library not loaded");
+    return;
+  }
 
-  document.getElementById("openInvitationButton")
-    ?.addEventListener("click", openGeneratedInvitation);
+  new QRCode(qrContainer, {
+    text: link,
+    width: 156,
+    height: 156,
+    colorDark: "#2f2520",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+}
 
-  document.getElementById("downloadPassButton")
-    ?.addEventListener("click", downloadGeneratedPass);
+function showGeneratedActions() {
+  document.getElementById("generatedPassActions")?.classList.remove("hidden");
 
-  document.getElementById("sendWhatsappButton")
-    ?.addEventListener("click", sendGeneratedPassWhatsapp);
+  ["copyLinkButton", "openInvitationButton", "downloadPassButton", "sendWhatsappButton"]
+    .forEach((id) => {
+      const button = document.getElementById(id);
+      button?.removeAttribute("disabled");
+      button?.classList.remove("hidden");
+    });
+}
+
+async function copyGeneratedLink() {
+  if (!generatedInvitationLink) {
+    alert("Primero genera un pase.");
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(generatedInvitationLink);
+    alert("Enlace copiado.");
+  } catch (err) {
+    const textarea = document.createElement("textarea");
+    textarea.value = generatedInvitationLink;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+    alert("Enlace copiado.");
+  }
+}
+
+function openGeneratedInvitation() {
+  if (!generatedInvitationLink) {
+    alert("Primero genera un pase.");
+    return;
+  }
+
+  const separator = generatedInvitationLink.includes("?") ? "&" : "?";
+  window.open(`${generatedInvitationLink}${separator}v=preview-${Date.now()}`, "_blank", "noopener,noreferrer");
+}
+
+async function downloadGeneratedPass() {
+  const card = document.getElementById("generatedPassCard");
+
+  if (!card || card.classList.contains("hidden")) {
+    alert("Primero genera un pase.");
+    return;
+  }
+
+  if (!window.html2canvas) {
+    alert("No se pudo cargar la herramienta de descarga.");
+    return;
+  }
+
+  const canvas = await html2canvas(card, {
+    scale: 2,
+    backgroundColor: null,
+    useCORS: true
+  });
+
+  const safeName = String(lastGeneratedPassData?.name || "pase-emergencia")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
+
+  const link = document.createElement("a");
+  link.download = `${safeName || "pase-emergencia"}.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
+function normalizePhone(value) {
+  return String(value || "").replace(/[^\d]/g, "");
+}
+
+function sendGeneratedPassWhatsapp() {
+  if (!generatedInvitationLink || !lastGeneratedPassData) {
+    alert("Primero genera un pase.");
+    return;
+  }
+
+  const phone = normalizePhone(document.getElementById("guestWhatsapp")?.value);
+
+  if (!phone) {
+    alert("Agrega un WhatsApp para enviar el pase.");
+    return;
+  }
+
+  const { name, passes, table } = lastGeneratedPassData;
+
+  const message = [
+    "Hola, te compartimos tu pase personalizado para el evento:",
+    "",
+    `Nombre: ${name || "-"}`,
+    `Pases: ${passes || "-"}`,
+    `Mesa: ${table || "-"}`,
+    "",
+    generatedInvitationLink
+  ].join("\n");
+
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
 }
