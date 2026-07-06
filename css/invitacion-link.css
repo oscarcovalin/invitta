@@ -1,0 +1,107 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,.85), transparent 36%),
+    linear-gradient(180deg, #f5ead8, #ead8bd);
+  font-family: system-ui, sans-serif;
+  color: #2f2520;
+}
+
+.link-builder-shell {
+  width: min(92vw, 560px);
+  margin: 0 auto;
+  padding: 3rem 0;
+}
+
+.link-builder-card {
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(184,138,61,.24);
+  border-radius: 2rem;
+  box-shadow: 0 24px 70px rgba(74,45,32,.14);
+  padding: 2rem;
+}
+
+.link-builder-title {
+  font-family: Georgia, serif;
+  font-size: clamp(2rem, 8vw, 3rem);
+  text-align: center;
+  margin: 0 0 .75rem;
+}
+
+.link-builder-subtitle {
+  text-align: center;
+  color: #7d6860;
+  margin: 0 0 2rem;
+}
+
+.link-builder-field {
+  display: grid;
+  gap: .4rem;
+  margin-bottom: 1rem;
+}
+
+.link-builder-field label {
+  font-size: .78rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #9a7a42;
+}
+
+.link-builder-field input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(74,45,32,.16);
+  border-radius: 1rem;
+  padding: .95rem 1rem;
+  font-size: 1rem;
+  background: rgba(255,255,255,.86);
+}
+
+.link-builder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-top: 1.25rem;
+}
+
+.link-builder-button {
+  border: 1px solid rgba(184,138,61,.32);
+  background: linear-gradient(135deg, #fff, #fff5e8);
+  color: #7b5a2e;
+  border-radius: 999px;
+  padding: .85rem 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.link-builder-button.primary {
+  background: linear-gradient(135deg, #b88a3d, #8f6429);
+  color: #fff;
+}
+
+.generated-link-output {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(255,248,238,.8);
+  border: 1px solid rgba(184,138,61,.18);
+  font-size: .9rem;
+  word-break: break-word;
+  color: #5f5047;
+}
+
+@media (max-width: 640px) {
+  .link-builder-card {
+    padding: 1.5rem;
+    border-radius: 1.6rem;
+  }
+
+  .link-builder-actions {
+    display: grid;
+  }
+
+  .link-builder-button {
+    width: 100%;
+  }
+}

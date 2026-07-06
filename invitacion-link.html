@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Pase - Invitta Studio</title>
+  <link rel="stylesheet" href="/css/invitacion-link.css">
+</head>
+<body>
+  <main class="link-builder-shell">
+    <div class="link-builder-card">
+      <h1 class="link-builder-title">Generador de pase personalizado</h1>
+      <p class="link-builder-subtitle">Crea un enlace rápido para invitados de último momento.</p>
+
+      <div id="errorMessage" style="display: none; color: #a13b3b; text-align: center; margin-bottom: 1.5rem; font-weight: 600;">
+        No se encontró el slug de la invitación.
+      </div>
+
+      <div id="builderForm">
+        <div class="link-builder-field">
+          <label for="guestName">Nombre o familia *</label>
+          <input type="text" id="guestName" placeholder="Familia García" required>
+        </div>
+
+        <div class="link-builder-field">
+          <label for="guestPasses">Pases</label>
+          <input type="number" id="guestPasses" placeholder="4" min="1">
+        </div>
+
+        <div class="link-builder-field">
+          <label for="guestTable">Mesa</label>
+          <input type="text" id="guestTable" placeholder="5">
+        </div>
+
+        <div class="link-builder-field">
+          <label for="guestWhatsapp">WhatsApp del invitado opcional</label>
+          <input type="tel" id="guestWhatsapp" placeholder="525512345678">
+        </div>
+
+        <div class="link-builder-actions">
+          <button type="button" id="generateLinkButton" class="link-builder-button primary">Generar enlace</button>
+          <button type="button" id="copyLinkButton" class="link-builder-button" style="display:none;">Copiar enlace</button>
+          <button type="button" id="openInvitationButton" class="link-builder-button" style="display:none;">Abrir invitación</button>
+          <button type="button" id="sendWhatsappButton" class="link-builder-button" style="display:none;">Enviar por WhatsApp</button>
+        </div>
+
+        <div id="generatedLinkOutput" class="generated-link-output" style="display:none;"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/invitacion-link.js"></script>
+</body>
+</html>
