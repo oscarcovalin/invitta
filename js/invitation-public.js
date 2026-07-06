@@ -705,7 +705,7 @@ function renderInvitation(inv) {
   function getPlayIconSvg() {
     return `
       <svg class="inv-music-control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M8 5.5v13l10-6.5-10-6.5z"></path>
+        <path d="M8 5.5v13l10-6.5-10-6.5z" fill="currentColor"></path>
       </svg>
     `;
   }
@@ -713,8 +713,8 @@ function renderInvitation(inv) {
   function getPauseIconSvg() {
     return `
       <svg class="inv-music-control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M8 5h2.8v14H8z"></path>
-        <path d="M13.2 5H16v14h-2.8z"></path>
+        <path d="M8 5h2.8v14H8z" fill="currentColor"></path>
+        <path d="M13.2 5H16v14h-2.8z" fill="currentColor"></path>
       </svg>
     `;
   }
@@ -1419,6 +1419,8 @@ function setupRevealOnScroll() {
 
   elements.forEach((element) => observer.observe(element));
 }
+
+
 
 
 
