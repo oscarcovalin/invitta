@@ -1709,3 +1709,44 @@ body.has-music-player {
   transition: none !important;
   filter: none !important;
 }
+/* Final music player spacing guard */
+body.has-music-player {
+  padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
+}
+
+.inv-page {
+  padding-bottom: calc(180px + env(safe-area-inset-bottom)) !important;
+}
+
+#inv-content {
+  padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
+}
+
+.inv-footer,
+#inv-rsvp-section,
+#inv-pass-section,
+#inv-itinerary-section {
+  margin-bottom: 3rem;
+}
+
+#inv-music-player {
+  min-height: 74px !important;
+}
+
+@media (max-width: 640px) {
+  body.has-music-player {
+    padding-bottom: calc(160px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .inv-page {
+    padding-bottom: calc(190px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #inv-content {
+    padding-bottom: calc(160px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #inv-music-player {
+    min-height: 72px !important;
+  }
+}
