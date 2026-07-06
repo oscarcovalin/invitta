@@ -84,13 +84,16 @@
 
           <div class="link-builder-actions">
             <button type="button" id="generateLinkButton" class="link-builder-button primary">Generar pase</button>
-            <button type="button" id="copyLinkButton" class="link-builder-button" style="display:none;">Copiar enlace</button>
-            <button type="button" id="openInvitationButton" class="link-builder-button" style="display:none;">Abrir invitación</button>
-            <button id="downloadPassButton" class="link-builder-button" type="button" style="display:none;">Descargar pase</button>
-            <button type="button" id="sendWhatsappButton" class="link-builder-button" style="display:none;">Enviar por WhatsApp</button>
           </div>
 
-          <div id="generatedLinkOutput" class="generated-link-output" style="display:none;"></div>
+          <div id="generatedLinkOutput" class="generated-link-output hidden"></div>
+
+          <div id="generatedPassActions" class="link-builder-actions hidden">
+            <button id="copyLinkButton" class="link-builder-button" type="button">Copiar enlace</button>
+            <button id="openInvitationButton" class="link-builder-button" type="button">Abrir invitación</button>
+            <button id="downloadPassButton" class="link-builder-button" type="button">Descargar pase</button>
+            <button id="sendWhatsappButton" class="link-builder-button" type="button">Enviar por WhatsApp</button>
+          </div>
 
           <div id="generatedPassCard" class="generated-pass-card hidden">
             <p class="generated-pass-kicker">PASE DE EMERGENCIA</p>

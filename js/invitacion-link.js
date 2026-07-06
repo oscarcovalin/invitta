@@ -307,7 +307,9 @@ async function initLinkBuilder() {
     card?.classList.remove("hidden");
   }
 
-  function enableGeneratedPassActions() {
+  function showGeneratedActions() {
+    document.getElementById("generatedPassActions")?.classList.remove("hidden");
+
     ["copyLinkButton", "openInvitationButton", "downloadPassButton", "sendWhatsappButton"]
       .forEach((id) => {
         const button = document.getElementById(id);
@@ -332,6 +334,8 @@ async function initLinkBuilder() {
     if (event) {
       event.preventDefault();
     }
+
+    console.log("Generating emergency pass...");
 
     const nameInput = document.getElementById("guestName");
     const passesInput = document.getElementById("guestPasses");
@@ -364,7 +368,7 @@ async function initLinkBuilder() {
     }
 
     renderGeneratedPass(lastGeneratedPassData);
-    enableGeneratedPassActions();
+    showGeneratedActions();
 
     console.log("Emergency pass generated:", lastGeneratedPassData);
   }
