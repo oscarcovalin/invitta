@@ -731,19 +731,20 @@
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-    if (value.includes("recepcion")) return "fa-heart";
-    if (value.includes("bienvenida")) return "fa-crown";
-    if (value.includes("presentacion")) return "fa-sparkles";
-    if (value.includes("brindis")) return "fa-champagne-glasses";
-    if (value.includes("coronacion")) return "fa-crown";
-    if (value.includes("vals")) return "fa-people-pulling";
-    if (value.includes("cena")) return "fa-utensils";
-    if (value.includes("apertura de pista")) return "fa-compact-disc";
-    if (value.includes("batucada")) return "fa-drum";
-    if (value.includes("baile")) return "fa-music";
-    if (value.includes("cierre")) return "fa-heart";
+    if (value.includes("recepcion")) return "fa-regular fa-heart";
+    if (value.includes("bienvenida")) return "fa-solid fa-crown";
+    if (value.includes("presentacion")) return "fa-solid fa-star";
+    if (value.includes("brindis")) return "fa-solid fa-champagne-glasses";
+    if (value.includes("coronacion")) return "fa-solid fa-crown";
+    if (value.includes("vals")) return "fa-solid fa-person-dress";
+    if (value.includes("cena")) return "fa-solid fa-utensils";
+    if (value.includes("apertura")) return "fa-solid fa-compact-disc";
+    if (value.includes("pista")) return "fa-solid fa-music";
+    if (value.includes("batucada")) return "fa-solid fa-drum";
+    if (value.includes("baile")) return "fa-solid fa-music";
+    if (value.includes("cierre")) return "fa-regular fa-heart";
 
-    return "fa-star";
+    return "fa-regular fa-star";
   }
 
   function renderItinerary(value) {
@@ -760,47 +761,46 @@
       return;
     }
 
-    section.classList.add("inv-timeline-premium", "reveal-on-scroll");
+    section.className = "inv-section inv-night-timeline reveal-on-scroll";
     section.style.setProperty("display", "block", "important");
     section.style.setProperty("visibility", "visible", "important");
-    // Remove the forced opacity to allow the reveal-on-scroll CSS animation to work
 
     const itemsHtml = items.map((item) => {
       const eventTitle = item.title || "";
       const icon = getTimelineIcon(eventTitle);
 
       return `
-      <div class="inv-timeline-row reveal-on-scroll">
-        <div class="inv-timeline-icon" aria-hidden="true">
-          <i class="fa-solid ${icon}"></i>
+      <div class="inv-night-row">
+        <div class="inv-night-icon">
+          <i class="${icon}"></i>
         </div>
-        <div class="inv-timeline-line" aria-hidden="true"></div>
-        <div class="inv-timeline-time">${item.time ? escapeHtml(item.time) : ""}</div>
-        <div class="inv-timeline-event">${escapeHtml(eventTitle)}</div>
+        <div class="inv-night-separator"></div>
+        <div class="inv-night-time">${item.time ? escapeHtml(item.time) : ""}</div>
+        <div class="inv-night-event">${escapeHtml(eventTitle)}</div>
       </div>
     `;
     }).join("");
 
     section.innerHTML = `
-      <div class="inv-timeline-shell">
-        <div class="inv-timeline-header">
-          <p class="inv-timeline-kicker">ITINERARIO</p>
-          <h2 class="inv-timeline-title">
-            <span class="inv-title-top">Momentos de la</span>
-            <span class="inv-title-script">Noche</span>
+      <div class="inv-night-shell">
+        <div class="inv-night-header">
+          <p class="inv-night-kicker">ITINERARIO</p>
+          <h2 class="inv-night-title">
+            <span class="inv-night-title-small">Momentos de la</span>
+            <span class="inv-night-title-script">Noche</span>
           </h2>
-          <div class="inv-timeline-divider" aria-hidden="true">
+          <div class="inv-night-divider">
             <span></span>
             <i class="fa-solid fa-heart"></i>
             <span></span>
           </div>
         </div>
 
-        <div class="inv-timeline-list">
+        <div class="inv-night-list">
           ${itemsHtml}
         </div>
 
-        <div class="inv-timeline-footer-quote">
+        <div class="inv-night-footer">
           <p>Cada estrella nos acerca a</p>
           <span>esa noche</span>
         </div>
@@ -809,7 +809,7 @@
 
     console.log("Timeline section display:", window.getComputedStyle(section).display);
     console.log("Timeline section visibility:", window.getComputedStyle(section).visibility);
-    console.log("Timeline items count:", document.querySelectorAll(".inv-timeline-row").length);
+    console.log("Timeline items count:", document.querySelectorAll(".inv-night-row").length);
   }
   /* ─── Helpers texto / números ─────────────────────────────────────── */
   function sanitize(str) {
