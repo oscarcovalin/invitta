@@ -267,7 +267,6 @@
     });
 
     setTimeout(() => {
-      animateHeroIntro();
       setupRevealAnimations();
     }, 400);
   }
@@ -823,35 +822,8 @@
 
 })();
 
-function animateHeroIntro() {
-  const heroContent = document.querySelector(".inv-hero-content");
-
-  if (!heroContent || heroContent.dataset.heroAnimated === "true") return;
-
-  heroContent.dataset.heroAnimated = "true";
-  heroContent.style.opacity = "0";
-  heroContent.style.transform = "translateY(10px)";
-
-  heroContent.animate(
-    [
-      { opacity: 0, transform: "translateY(10px)" },
-      { opacity: 1, transform: "translateY(0)" }
-    ],
-    {
-      duration: 900,
-      easing: "ease-out",
-      fill: "forwards"
-    }
-  );
-
-  setTimeout(() => {
-    heroContent.style.opacity = "1";
-    heroContent.style.transform = "translateY(0)";
-  }, 950);
-}
-
 function setupRevealAnimations() {
-  console.log("setupRevealAnimations running subtle fade mode");
+  console.log("setupRevealAnimations classic rose subtle mode");
 
   const selectors = [
     ".inv-hero-content",
@@ -867,7 +839,6 @@ function setupRevealAnimations() {
     "#inv-gifts-block",
     "#inv-hashtag-block",
     "#inv-pass-section",
-    "[aria-label='Tu pase personal']",
     "#inv-rsvp-section",
     "#inv-wa-block"
   ];
@@ -875,24 +846,21 @@ function setupRevealAnimations() {
   const elements = Array.from(document.querySelectorAll(selectors.join(",")))
     .filter((el) => {
       const style = window.getComputedStyle(el);
-      return style.display !== "none" && style.visibility !== "hidden";
+      return (
+        style.display !== "none" &&
+        style.visibility !== "hidden" &&
+        !el.closest("#inv-music-player")
+      );
     });
-
-  console.log("Subtle fade elements found:", elements.length);
 
   if (!elements.length) return;
 
   elements.forEach((el, index) => {
-    if (el.dataset.heroAnimated === "true") {
-      el.dataset.revealed = "true";
-      return;
-    }
-
     el.dataset.revealed = "false";
     el.style.opacity = "0";
     el.style.transform = "translateY(8px)";
     el.style.willChange = "opacity, transform";
-    el.dataset.revealDelay = String(Math.min(index * 70, 280));
+    el.dataset.revealDelay = String(Math.min(index * 60, 240));
   });
 
   function animateElement(el) {
@@ -904,28 +872,38 @@ function setupRevealAnimations() {
 
     el.animate(
       [
-        {
-          opacity: 0,
-          transform: "translateY(8px)"
-        },
-        {
-          opacity: 1,
-          transform: "translateY(0)"
-        }
+        { opacity: 0, transform: "translateY(8px)" },
+        { opacity: 1, transform: "translateY(0)" }
       ],
       {
-        duration: 700,
+        duration: 760,
         delay,
         easing: "ease-out",
         fill: "forwards"
       }
     );
 
+    const icon = el.querySelector(".inv-card-icon");
+    if (icon) {
+      icon.animate(
+        [
+          { opacity: 0, transform: "translateY(6px)" },
+          { opacity: 1, transform: "translateY(0)" }
+        ],
+        {
+          duration: 700,
+          delay: delay + 90,
+          easing: "ease-out",
+          fill: "forwards"
+        }
+      );
+    }
+
     setTimeout(() => {
       el.style.opacity = "1";
       el.style.transform = "translateY(0)";
       el.style.willChange = "auto";
-    }, 760 + delay);
+    }, 820 + delay);
   }
 
   function checkReveal() {
