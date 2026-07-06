@@ -431,6 +431,15 @@
     /* 17. Galería */
     renderGallery(normalizeGalleryUrls(inv.gallery_urls));
 
+    /* 18. Footer CTA */
+    const footer = document.querySelector('.inv-footer');
+    if (footer) {
+      const ctaHtml = renderStudioFooterCta(inv);
+      if (ctaHtml) {
+        footer.insertAdjacentHTML('beforeend', ctaHtml);
+      }
+    }
+
     setTimeout(() => {
       setupMomentImageOrientation();
       setupMomentsParallax();
@@ -683,6 +692,40 @@
       <div class="inv-music-brand inv-music-brand-fallback" aria-label="${escapeHtml(studioName)}">
         <span>${escapeHtml(getStudioInitials(studioName))}</span>
       </div>
+    `;
+  }
+
+  function normalizePhoneNumber(value) {
+    return String(value || "")
+      .replace(/[^\d]/g, "");
+  }
+
+  function buildStudioWhatsappUrl(invitation) {
+    const phone = normalizePhoneNumber(invitation.studio_whatsapp);
+    if (!phone) return "";
+    const message = invitation.studio_cta_message
+      || "Hola, vi esta invitación digital y me interesa contratar una para mi evento.";
+    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  }
+
+  function renderStudioFooterCta(invitation) {
+    const enabled = invitation.studio_cta_enabled !== false;
+    const url = buildStudioWhatsappUrl(invitation);
+
+    if (!enabled || !url) return "";
+
+    const text = invitation.studio_cta_text || "Quiero una invitación así";
+
+    return `
+      <a
+        class="inv-footer-cta"
+        href="${escapeHtml(url)}"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="${escapeHtml(text)}"
+      >
+        ${escapeHtml(text)}
+      </a>
     `;
   }
 

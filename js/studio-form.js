@@ -376,6 +376,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (document.getElementById("musicPlayerBrandEnabled")) {
       document.getElementById("musicPlayerBrandEnabled").checked = data.music_player_brand_enabled !== false;
     }
+    if (document.getElementById("studioWhatsapp")) {
+      document.getElementById("studioWhatsapp").value = data.studio_whatsapp || "";
+    }
+    if (document.getElementById("studioCtaEnabled")) {
+      document.getElementById("studioCtaEnabled").checked = data.studio_cta_enabled !== false;
+    }
+    if (document.getElementById("studioCtaText")) {
+      document.getElementById("studioCtaText").value = data.studio_cta_text || "Quiero una invitación así";
+    }
+    if (document.getElementById("studioCtaMessage")) {
+      document.getElementById("studioCtaMessage").value = data.studio_cta_message || "Hola, vi esta invitación digital y me interesa contratar una para mi evento.";
+    }
     
     document.getElementById("itineraryText").value = itineraryToText(data.itinerary);
     
@@ -617,6 +629,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       studio_name: document.getElementById("studioName") ? document.getElementById("studioName").value || "Invitta Studio" : "Invitta Studio",
       studio_logo_url: document.getElementById("studioLogoUrl") ? document.getElementById("studioLogoUrl").value || "" : "",
       music_player_brand_enabled: getChecked("musicPlayerBrandEnabled"),
+      studio_whatsapp: document.getElementById("studioWhatsapp") ? document.getElementById("studioWhatsapp").value || "" : "",
+      studio_cta_enabled: getChecked("studioCtaEnabled"),
+      studio_cta_text: document.getElementById("studioCtaText") ? document.getElementById("studioCtaText").value || "Quiero una invitación así" : "Quiero una invitación así",
+      studio_cta_message: document.getElementById("studioCtaMessage") ? document.getElementById("studioCtaMessage").value || "Hola, vi esta invitación digital y me interesa contratar una para mi evento." : "Hola, vi esta invitación digital y me interesa contratar una para mi evento.",
       gallery_urls: finalGalleryUrls,
       itinerary: parseItineraryText(document.getElementById("itineraryText").value),
       background_image_url: finalBackgroundUrl,
