@@ -2518,3 +2518,45 @@ body.theme-black-luxury .inv-share-hashtag {
     border-radius: 1.75rem;
   }
 }
+/* Thank you typography refinement */
+.inv-thank-you-title {
+  margin: 0;
+  font-family: var(--font-script, "Great Vibes", cursive);
+  font-size: clamp(2.6rem, 10vw, 4.1rem);
+  line-height: 0.95;
+  font-weight: 400;
+  color: var(--theme-accent, #b0707c);
+}
+
+.inv-thank-you-signature {
+  margin: 1rem auto 0;
+  max-width: 420px;
+  font-family: var(--font-title, "Cormorant Garamond", serif);
+  font-size: clamp(1.55rem, 6vw, 2.35rem);
+  line-height: 1.15;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--theme-text, #2f2520);
+  text-wrap: balance;
+}
+
+.inv-thank-you-message {
+  margin: 1.4rem auto 0;
+  max-width: 420px;
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+  color: var(--theme-muted, #7d6860);
+}
+
+@media (max-width: 640px) {
+  .inv-thank-you-title {
+    font-size: clamp(2.4rem, 11vw, 3.6rem);
+  }
+
+  .inv-thank-you-signature {
+    font-size: clamp(1.45rem, 7vw, 2rem);
+    max-width: 320px;
+  }
+}
