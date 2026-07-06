@@ -227,7 +227,7 @@ async function initLinkBuilder() {
 
     if (statusState) statusState.style.display = "none";
     
-    dynamicTitle.textContent = invitationConfig.link_builder_title || "Generador de enlace";
+    dynamicTitle.textContent = invitationConfig.link_builder_title || "Generador de pase";
     dynamicMessage.textContent = invitationConfig.link_builder_message || "Crea un pase rápido para invitados de último momento.";
 
     const pin = String(invitationConfig.link_builder_pin || "").trim();
@@ -326,7 +326,9 @@ async function initLinkBuilder() {
     });
 
     const link = document.createElement("a");
-    link.download = "pase-personalizado.png";
+    const name = document.getElementById("guestName")?.value.trim();
+    const safeName = name ? name.toLowerCase().replace(/[^a-z0-9]/g, "-") : "";
+    link.download = safeName ? `pase-emergencia-${safeName}.png` : "pase-emergencia.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
   }
