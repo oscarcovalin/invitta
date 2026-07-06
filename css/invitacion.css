@@ -2560,3 +2560,33 @@ body.theme-black-luxury .inv-share-hashtag {
     max-width: 320px;
   }
 }
+
+/* Premium section icon reveal animation */
+.inv-section-icon {
+  opacity: 0;
+  transform: translateY(10px) scale(0.96);
+  filter: blur(1px);
+  transition:
+    opacity 850ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 850ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 850ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 140ms;
+  will-change: opacity, transform, filter;
+}
+
+.inv-section-icon.icon-visible,
+.reveal-on-scroll.is-visible .inv-section-icon,
+.inv-event-card.is-visible .inv-section-icon,
+.inv-section-card.is-visible .inv-section-icon,
+.inv-pass-card.is-visible .inv-section-icon,
+.inv-rsvp-card.is-visible .inv-section-icon,
+.inv-thank-you-card.is-visible .inv-section-icon,
+.inv-share-card.is-visible .inv-section-icon {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+.inv-section-icon svg {
+  transform-origin: center;
+}

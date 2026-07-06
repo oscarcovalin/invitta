@@ -232,6 +232,7 @@
       'inv-parents-block': getPremiumSectionIcon('parents'),
       'inv-ceremony-block': getPremiumSectionIcon('ceremony'),
       'inv-reception-block': getPremiumSectionIcon('reception'),
+      'inv-itinerary-section': getPremiumSectionIcon('itinerary'),
       'inv-dresscode-block': getPremiumSectionIcon('dresscode'),
       'inv-gifts-block': getPremiumSectionIcon('gifts'),
       'inv-hashtag-block': getPremiumSectionIcon('hashtag'),
@@ -440,7 +441,8 @@
     });
 
     setTimeout(() => {
-      setupRevealAnimations();
+      setupRevealAnimations?.();
+      setupSectionIconReveal();
     }, 400);
   }
 
@@ -1001,6 +1003,9 @@
     section.innerHTML = `
       <div class="inv-timeline-shell">
         <div class="inv-timeline-header">
+          <div class="inv-card-icon inv-section-icon" aria-hidden="true">
+            ${getPremiumSectionIcon("itinerary")}
+          </div>
           <p class="inv-timeline-kicker">ITINERARIO</p>
           <h2 class="inv-timeline-title">
             <span class="inv-title-top">Momentos de la</span>
@@ -1081,6 +1086,46 @@
 
 })();
 
+function setupSectionIconReveal() {
+  const icons = Array.from(document.querySelectorAll(".inv-section-icon"))
+    .filter((icon) => {
+      const style = window.getComputedStyle(icon);
+      return style.display !== "none" && style.visibility !== "hidden";
+    });
+
+  if (!icons.length) return;
+
+  icons.forEach((icon) => {
+    icon.classList.remove("icon-visible");
+  });
+
+  function revealIcons() {
+    const triggerPoint = window.innerHeight * 0.9;
+
+    icons.forEach((icon) => {
+      if (icon.classList.contains("icon-visible")) return;
+
+      const rect = icon.getBoundingClientRect();
+
+      if (rect.top < triggerPoint && rect.bottom > 0) {
+        icon.classList.add("icon-visible");
+      }
+    });
+  }
+
+  setTimeout(revealIcons, 300);
+  window.addEventListener("scroll", revealIcons, { passive: true });
+  window.addEventListener("resize", revealIcons);
+
+  setTimeout(() => {
+    document.querySelectorAll(".inv-section-icon").forEach((icon) => {
+      const rect = icon.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        icon.classList.add("icon-visible");
+      }
+    });
+  }, 1200);
+}
 function setupRevealAnimations() {
   console.log("setupRevealAnimations classic rose subtle mode");
 
