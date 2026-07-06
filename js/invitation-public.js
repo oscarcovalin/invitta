@@ -107,6 +107,55 @@
     document.body.classList.add(`theme-${visualTheme}`);
   }
 
+  
+  function getSectionIcon(type) {
+    const icons = {
+      parents: '<svg viewBox="0 0 24 24"><path d="M12 22c4-4 8-8 8-13A6 6 0 0 0 4 9c0 5 4 9 8 13z"/><path d="M12 22V12"/><path d="M12 12c-2-2-4-3-4-3s2 1 4 3z"/><path d="M12 12c2-2 4-3 4-3s-2 1-4 3z"/></svg>',
+      ceremony: '<svg viewBox="0 0 24 24"><path d="M12 3L4 9v12h16V9l-8-6z"/><path d="M12 11v10"/><path d="M9 16h6"/></svg>',
+      reception: '<svg viewBox="0 0 24 24"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M5 8c0 3.866 3.134 7 7 7s7-3.134 7-7"/><path d="M5 8V4h14v4"/></svg>',
+      itinerary: '<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+      dresscode: '<svg viewBox="0 0 24 24"><path d="M12 2C8 2 6 5 6 5l-2 4h16l-2-4s-2-3-6-3z"/><path d="M7 9l1 13h8l1-13"/></svg>',
+      gifts: '<svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M4 12h16v-4H4v4z"/><path d="M12 8V4M8 4h8M12 12v10"/></svg>',
+      hashtag: '<svg viewBox="0 0 24 24"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3L8 21"/><path d="M16 3l-2 18"/></svg>',
+      pass: '<svg viewBox="0 0 24 24"><path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8"/><path d="M22 7l-10 7L2 7"/><path d="M19 16v6"/><path d="M16 19h6"/></svg>',
+      rsvp: '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/><path d="M9 12l2 2 4-4"/></svg>',
+      music: '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'
+    };
+    return icons[type] || icons.parents;
+  }
+
+  function replaceSectionIcons() {
+    const map = {
+      'inv-parents-block': getSectionIcon('parents'),
+      'inv-ceremony-section': getSectionIcon('ceremony'),
+      'inv-reception-section': getSectionIcon('reception'),
+      'inv-itinerary-section': getSectionIcon('itinerary'),
+      'inv-dresscode-block': getSectionIcon('dresscode'),
+      'inv-gifts-block': getSectionIcon('gifts'),
+      'inv-hashtag-block': getSectionIcon('hashtag'),
+      'inv-pass-block': getSectionIcon('pass'),
+      'inv-rsvp-block': getSectionIcon('rsvp'),
+      'inv-music-player': getSectionIcon('music')
+    };
+
+    for (const id in map) {
+      const el = document.getElementById(id);
+      if (el) {
+        const iconContainer = el.querySelector('.inv-card-icon, .inv-section-icon, .music-icon');
+        if (iconContainer) {
+          iconContainer.innerHTML = map[id];
+        }
+      }
+    }
+    
+    // Fallback for general cards that don't have these specific IDs but have the classes
+    document.querySelectorAll('.inv-card-icon, .inv-section-icon').forEach(container => {
+        if(!container.innerHTML.includes('<svg')) {
+           container.innerHTML = getSectionIcon('parents');
+        }
+    });
+  }
+
   /* ─── Renderizado ─────────────────────────────────────────────────── */
   function renderInvitation(inv) {
     applyVisualTheme(inv);
@@ -755,26 +804,26 @@
     return [];
   }
 
-  function getTimelineIcon(title) {
+    function getTimelineIcon(title) {
     const value = String(title || "")
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-    if (value.includes("recepcion")) return "fa-regular fa-heart";
-    if (value.includes("bienvenida")) return "fa-solid fa-crown";
-    if (value.includes("presentacion")) return "fa-solid fa-star";
-    if (value.includes("brindis")) return "fa-solid fa-champagne-glasses";
-    if (value.includes("coronacion")) return "fa-solid fa-crown";
-    if (value.includes("vals")) return "fa-solid fa-person-dress";
-    if (value.includes("cena")) return "fa-solid fa-utensils";
-    if (value.includes("apertura")) return "fa-solid fa-compact-disc";
-    if (value.includes("pista")) return "fa-solid fa-music";
-    if (value.includes("batucada")) return "fa-solid fa-drum";
-    if (value.includes("baile")) return "fa-solid fa-music";
-    if (value.includes("cierre")) return "fa-regular fa-heart";
+    if (value.includes("recepcion")) return '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+    if (value.includes("bienvenida")) return '<svg viewBox="0 0 24 24"><path d="M2 20h20"/><path d="M2 16l3-8 5 4 2-6 2 6 5-4 3 8z"/></svg>';
+    if (value.includes("presentacion")) return '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+    if (value.includes("brindis")) return '<svg viewBox="0 0 24 24"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M5 8c0 3.866 3.134 7 7 7s7-3.134 7-7"/><path d="M5 8V4h14v4"/></svg>';
+    if (value.includes("coronacion")) return '<svg viewBox="0 0 24 24"><path d="M2 20h20"/><path d="M2 16l3-8 5 4 2-6 2 6 5-4 3 8z"/></svg>';
+    if (value.includes("vals")) return '<svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><path d="M9.5 8h5l2.5 7h-9L9.5 8z"/><path d="M9 15l-3 7"/><path d="M15 15l3 7"/></svg>';
+    if (value.includes("cena")) return '<svg viewBox="0 0 24 24"><path d="M8 2v20"/><path d="M4 2v8h8V2H4z"/><path d="M16 22V2c3 0 5 2 5 5v5h-5"/></svg>';
+    if (value.includes("apertura")) return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
+    if (value.includes("pista")) return '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+    if (value.includes("batucada")) return '<svg viewBox="0 0 24 24"><path d="M4 7h16v10H4z"/><path d="M12 7v10"/><path d="M4 12h16"/><path d="M8 7l4-5"/><path d="M16 7l-4-5"/></svg>';
+    if (value.includes("baile")) return '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+    if (value.includes("cierre")) return '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
 
-    return "fa-regular fa-star";
+    return '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
   }
 
   function renderItinerary(value) {
@@ -801,9 +850,7 @@
 
       return `
       <div class="inv-night-row">
-        <div class="inv-night-icon">
-          <i class="${icon}"></i>
-        </div>
+        <div class="inv-night-icon">\n          ${icon}\n        </div>
         <div class="inv-night-separator"></div>
         <div class="inv-night-time">${item.time ? escapeHtml(item.time) : ""}</div>
         <div class="inv-night-event">${escapeHtml(eventTitle)}</div>
