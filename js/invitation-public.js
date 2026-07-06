@@ -525,7 +525,6 @@ function renderInvitation(inv) {
     });
 
     requestAnimationFrame(() => {
-      markInvitationSectionsForReveal();
       setupRevealOnScroll();
     });
   }
@@ -1421,13 +1420,10 @@ function setupSectionIconReveal() {
   }, 1200);
 }
 function setupRevealAnimations() {
-  console.log("setupRevealAnimations classic rose subtle mode");
-
   setupRevealOnScroll();
 }
 
-
-function markInvitationSectionsForReveal() {
+function getInvitationRevealSections() {
   const selectors = [
     ".inv-parents-card",
     ".inv-welcome-block",
@@ -1436,37 +1432,49 @@ function markInvitationSectionsForReveal() {
     ".inv-pass-card",
     ".inv-rsvp-card",
     ".inv-thanks-card",
+    ".inv-thank-you-section",
+    ".inv-thank-you-card",
     ".inv-share-card",
     ".inv-share-section",
-    ".inv-timeline-alt-section"
+    ".inv-timeline-alt-section",
+    ".inv-dresscode-section",
+    ".inv-gifts-section"
   ];
 
-  const elements = Array.from(document.querySelectorAll(selectors.join(",")))
+  return Array.from(document.querySelectorAll(selectors.join(",")))
     .filter((element) => {
+      if (!element) return false;
       if (element.closest(".inv-hero")) return false;
       if (element.closest(".inv-music-player")) return false;
       if (element.classList.contains("inv-music-player")) return false;
+      if (element.classList.contains("inv-moment-frame")) return false;
       return true;
     });
+}
 
-  elements.forEach((element) => {
-    element.classList.add("js-scroll-reveal");
-    element.classList.remove("is-visible");
-    element.style.transitionDelay = "0ms";
+function prepareScrollFadeSections() {
+  const sections = getInvitationRevealSections();
+
+  sections.forEach((section) => {
+    section.classList.remove("inv-scroll-visible", "js-scroll-reveal", "is-visible");
+    section.classList.add("inv-scroll-fade");
+    section.style.transitionDelay = "";
   });
 
-  console.log("Scroll reveal clean elements:", elements.length);
+  console.log("Prepared scroll fade sections:", sections.length);
+
+  return sections;
 }
 
 function setupRevealOnScroll() {
-  const elements = document.querySelectorAll(".js-scroll-reveal");
+  const sections = prepareScrollFadeSections();
 
-  console.log("Setting clean scroll reveal:", elements.length);
-
-  if (!elements.length) return;
+  if (!sections.length) return;
 
   if (!("IntersectionObserver" in window)) {
-    elements.forEach((element) => element.classList.add("is-visible"));
+    sections.forEach((section) => {
+      section.classList.add("inv-scroll-visible");
+    });
     return;
   }
 
@@ -1475,26 +1483,23 @@ function setupRevealOnScroll() {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
 
+        const section = entry.target;
+
         requestAnimationFrame(() => {
-          entry.target.classList.add("is-visible");
-          console.log("Reveal visible:", entry.target.className);
+          section.classList.add("inv-scroll-visible");
+          console.log("Scroll fade visible:", section.className);
         });
 
-        observer.unobserve(entry.target);
+        observer.unobserve(section);
       });
     },
     {
-      threshold: 0.22,
-      rootMargin: "0px 0px -16% 0px"
+      threshold: 0.28,
+      rootMargin: "0px 0px -18% 0px"
     }
   );
 
-  elements.forEach((element) => observer.observe(element));
+  sections.forEach((section) => observer.observe(section));
+
+  console.log("Scroll fade observer ready:", sections.length);
 }
-
-
-
-
-
-
-
