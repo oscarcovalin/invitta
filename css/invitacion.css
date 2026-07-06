@@ -3330,3 +3330,22 @@ body.theme-black-luxury .inv-timeline-alt-line {
 .inv-music-control-icon [stroke] {
   stroke: #ffffff !important;
 }
+
+/* TEMP recovery: disable broken reveal */
+.inv-scroll-fade,
+.js-scroll-reveal,
+.reveal-on-scroll {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+.inv-scroll-fade *,
+.js-scroll-reveal *,
+.reveal-on-scroll * {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
