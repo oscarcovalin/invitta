@@ -9,21 +9,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function showFatalError(message) {
   const errorBox = document.getElementById("linkBuilderError");
-  const form = document.getElementById("linkBuilderForm");
   const statusState = document.getElementById("statusState");
 
-  if (statusState) {
-    statusState.style.display = "none";
-  }
+  if (statusState) statusState.style.display = "none";
+  hideBuilderForm();
+  hidePinGate();
 
   if (errorBox) {
     errorBox.textContent = message;
     errorBox.classList.remove("hidden");
   }
+}
 
-  if (form) {
-    form.classList.remove("hidden");
-  }
+function showPinGate() {
+  document.getElementById("linkBuilderPinGate")?.classList.remove("hidden");
+  document.getElementById("linkBuilderForm")?.classList.add("hidden");
+}
+
+function showBuilderForm() {
+  document.getElementById("linkBuilderPinGate")?.classList.add("hidden");
+  document.getElementById("linkBuilderForm")?.classList.remove("hidden");
+}
+
+function hideBuilderForm() {
+  document.getElementById("linkBuilderForm")?.classList.add("hidden");
+}
+
+function hidePinGate() {
+  document.getElementById("linkBuilderPinGate")?.classList.add("hidden");
 }
 
 async function initLinkBuilder() {
@@ -37,8 +50,6 @@ async function initLinkBuilder() {
   const generatedLinkOutput = document.getElementById("generatedLinkOutput");
   
   const disabledState = document.getElementById("disabledState");
-  const pinState = document.getElementById("linkBuilderPinGate");
-  const builderState = document.getElementById("linkBuilderForm");
   const statusState = document.getElementById("statusState");
   const dynamicTitle = document.getElementById("dynamicTitle");
   const dynamicMessage = document.getElementById("dynamicMessage");
@@ -55,6 +66,9 @@ async function initLinkBuilder() {
     return;
   }
 
+  hideBuilderForm();
+  hidePinGate();
+
   // Initialize Supabase if available in global
   if (!window.supabaseClient) {
     if (window.env && window.env.SUPABASE_URL && window.env.SUPABASE_ANON_KEY) {
@@ -67,7 +81,7 @@ async function initLinkBuilder() {
   if (!sb) {
     console.error("Supabase client not initialized. Falling back to basic mode.");
     if (statusState) statusState.style.display = "none";
-    builderState.classList.remove("hidden");
+    showBuilderForm();
   } else {
     try {
       const { data, error } = await sb
@@ -95,16 +109,17 @@ async function initLinkBuilder() {
       dynamicMessage.textContent = invitationData.link_builder_message || "Crea un pase rápido para invitados de último momento.";
 
       const requiredPin = invitationData.link_builder_pin;
+      console.log("Link builder config:", invitationData);
       
       if (requiredPin) {
         const isUnlocked = sessionStorage.getItem(`linkBuilderUnlocked:${slug}`);
         if (isUnlocked === "true") {
-          builderState.classList.remove("hidden");
+          showBuilderForm();
         } else {
-          pinState.classList.remove("hidden");
+          showPinGate();
         }
       } else {
-        builderState.classList.remove("hidden");
+        showBuilderForm();
       }
 
     } catch (err) {
@@ -130,9 +145,8 @@ async function initLinkBuilder() {
     
     if (invitationData && inputPin === realPin) {
       sessionStorage.setItem(`linkBuilderUnlocked:${slug}`, "true");
-      pinState.classList.add("hidden");
-      builderState.classList.remove("hidden");
       linkBuilderPinError.classList.add("hidden");
+      showBuilderForm();
     } else {
       linkBuilderPinError.textContent = "PIN incorrecto.";
       linkBuilderPinError.classList.remove("hidden");
