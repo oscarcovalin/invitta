@@ -1639,63 +1639,6 @@ body.has-music-player {
   padding-bottom: calc(96px + env(safe-area-inset-bottom));
 }
 
-/* ══════════════════════════════════════════════════
-   ANIMACIONES (reveal-on-scroll)
-══════════════════════════════════════════════════ */
-.reveal-on-scroll {
-  opacity: 0;
-  transform: translateY(24px) scale(0.98);
-  filter: blur(4px);
-  transition:
-    opacity 900ms ease,
-    transform 900ms cubic-bezier(.22,1,.36,1),
-    filter 900ms ease;
-}
-
-.reveal-on-scroll.is-visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
-}
-
-.inv-card-icon,
-.inv-card-ornament {
-  transition:
-    opacity 900ms ease,
-    transform 900ms cubic-bezier(.22,1,.36,1);
-}
-
-.reveal-on-scroll .inv-card-icon {
-  opacity: 0;
-  transform: translateY(14px) scale(0.86) rotate(-3deg);
-}
-
-.reveal-on-scroll.is-visible .inv-card-icon {
-  opacity: 1;
-  transform: translateY(0) scale(1) rotate(0deg);
-}
-
-.reveal-on-scroll .inv-card-ornament {
-  opacity: 0;
-  transform: translateX(-50%) translateY(12px) scale(0.92);
-}
-
-.reveal-on-scroll.is-visible .inv-card-ornament {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0) scale(1);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal-on-scroll,
-  .reveal-on-scroll .inv-card-icon,
-  .reveal-on-scroll .inv-card-ornament {
-    opacity: 1;
-    transform: none;
-    filter: none;
-    transition: none;
-  }
-}
-
 #inv-music-player {
   position: fixed !important;
   left: 0 !important;
@@ -2006,50 +1949,8 @@ body.has-music-player {
   transform: translateY(0);
 }
 
-/* ══════════════════════════════════════════════════
-   REVEAL ANIMATIONS (Premium Scroll)
-══════════════════════════════════════════════════ */
-.reveal-on-scroll {
-  opacity: 0 !important;
-  transform: translateY(90px) scale(0.92) !important;
-  filter: blur(12px) !important;
-  transition:
-    opacity 1200ms ease var(--reveal-delay, 0ms),
-    transform 1200ms cubic-bezier(.16, 1, .3, 1) var(--reveal-delay, 0ms),
-    filter 1200ms ease var(--reveal-delay, 0ms) !important;
-  will-change: opacity, transform, filter;
-}
-
+/* Reveal animation fallback: JavaScript controls opacity and transform. */
+.reveal-on-scroll,
 .reveal-on-scroll.is-visible {
-  opacity: 1 !important;
-  transform: translateY(0) scale(1) !important;
-  filter: blur(0) !important;
-}
-
-.reveal-on-scroll .inv-card-icon,
-.reveal-on-scroll svg {
-  opacity: 0 !important;
-  transform: translateY(36px) scale(0.55) rotate(-12deg) !important;
-  transition:
-    opacity 1000ms ease 250ms,
-    transform 1000ms cubic-bezier(.16, 1, .3, 1) 250ms !important;
-}
-
-.reveal-on-scroll.is-visible .inv-card-icon,
-.reveal-on-scroll.is-visible svg {
-  opacity: 1 !important;
-  transform: translateY(0) scale(1) rotate(0deg) !important;
-}
-
-.reveal-on-scroll .inv-card-ornament {
-  opacity: 0 !important;
-  transform: translateX(-50%) translateY(32px) scale(0.7) !important;
-  transition:
-    opacity 1000ms ease 180ms,
-    transform 1000ms cubic-bezier(.16, 1, .3, 1) 180ms !important;
-}
-
-.reveal-on-scroll.is-visible .inv-card-ornament {
-  opacity: 1 !important;
-  transform: translateX(-50%) translateY(0) scale(1) !important;
+  transition: none;
 }

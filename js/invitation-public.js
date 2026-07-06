@@ -261,7 +261,7 @@
     if (typeof setupRevealAnimations === "function") {
       setTimeout(() => {
         setupRevealAnimations();
-      }, 300);
+      }, 800);
     }
 
     /* 19. Limpieza de elementos legacy de audio en el contenido */
@@ -272,10 +272,9 @@
       }
     });
 
-    requestAnimationFrame(() => {
-      const hero = document.querySelector(".inv-hero");
-      if (hero) hero.classList.add("hero-visible");
-    });
+    setTimeout(() => {
+      animateHeroIntro();
+    }, 300);
   }
 
   /* ─── Foto principal (hero) ──────────────────────────────────────── */
@@ -848,8 +847,58 @@
 
 })();
 
+function animateHeroIntro() {
+  const hero = document.querySelector(".inv-hero");
+  const content = document.querySelector(".inv-hero-content");
+
+  if (!hero || hero.dataset.heroAnimated === "true") return;
+
+  hero.dataset.heroAnimated = "true";
+
+  hero.animate(
+    [
+      {
+        opacity: 0,
+        transform: "scale(1.06)",
+        filter: "blur(10px)"
+      },
+      {
+        opacity: 1,
+        transform: "scale(1)",
+        filter: "blur(0)"
+      }
+    ],
+    {
+      duration: 1500,
+      easing: "cubic-bezier(.16, 1, .3, 1)",
+      fill: "forwards"
+    }
+  );
+
+  if (content) {
+    content.animate(
+      [
+        {
+          opacity: 0,
+          transform: "translateY(45px)"
+        },
+        {
+          opacity: 1,
+          transform: "translateY(0)"
+        }
+      ],
+      {
+        duration: 1300,
+        delay: 350,
+        easing: "cubic-bezier(.16, 1, .3, 1)",
+        fill: "forwards"
+      }
+    );
+  }
+}
+
 function setupRevealAnimations() {
-  console.log("setupRevealAnimations running");
+  console.log("setupRevealAnimations running JS animation mode");
 
   const selectors = [
     ".inv-section",
@@ -864,46 +913,143 @@ function setupRevealAnimations() {
   const elements = Array.from(document.querySelectorAll(selectors.join(",")))
     .filter((el) => {
       const style = window.getComputedStyle(el);
-      return style.display !== "none" && style.visibility !== "hidden";
-    })
-    .filter((el) => !el.closest("#inv-music-player") && !el.classList.contains("inv-hero"));
+
+      return (
+        style.display !== "none" &&
+        style.visibility !== "hidden" &&
+        !el.closest("#inv-music-player") &&
+        !el.classList.contains("inv-hero") &&
+        !el.dataset.revealReady
+      );
+    });
 
   console.log("Reveal elements found:", elements.length);
-
-  console.log("First reveal element:", elements[0]);
-  console.log("First reveal element classes:", elements[0]?.className);
-
-  setTimeout(() => {
-    console.log("After setup first element opacity:", window.getComputedStyle(elements[0]).opacity);
-    console.log("After setup first element transform:", window.getComputedStyle(elements[0]).transform);
-  }, 500);
 
   if (!elements.length) return;
 
   elements.forEach((el, index) => {
-    el.classList.remove("is-visible");
-    el.classList.add("reveal-on-scroll");
-    el.style.setProperty("--reveal-delay", `${Math.min(index * 70, 350)}ms`);
+    el.dataset.revealReady = "true";
+    el.dataset.revealed = "false";
+    el.style.opacity = "0";
+    el.style.transform = "translateY(90px) scale(0.94)";
+    el.style.filter = "blur(10px)";
+    el.style.willChange = "opacity, transform, filter";
+    el.style.transition = "none";
+    el.dataset.revealDelay = String(Math.min(index * 60, 300));
   });
 
-  // Forzar un reflow real para que el navegador pinte el estado inicial invisible
-  document.body.offsetHeight;
+  function animateElement(el) {
+    if (!el || el.dataset.revealed === "true") return;
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      console.log("Reveal check:", entry.target.id || entry.target.className, entry.isIntersecting);
+    el.dataset.revealed = "true";
 
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
+    const delay = Number(el.dataset.revealDelay || 0);
+
+    console.log("Animating reveal:", el.id || el.className);
+
+    el.animate(
+      [
+        {
+          opacity: 0,
+          transform: "translateY(90px) scale(0.94)",
+          filter: "blur(10px)"
+        },
+        {
+          opacity: 1,
+          transform: "translateY(0) scale(1)",
+          filter: "blur(0)"
+        }
+      ],
+      {
+        duration: 1100,
+        delay,
+        easing: "cubic-bezier(.16, 1, .3, 1)",
+        fill: "forwards"
+      }
+    );
+
+    setTimeout(() => {
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0) scale(1)";
+      el.style.filter = "blur(0)";
+      el.style.willChange = "auto";
+    }, 1200 + delay);
+
+    const icon = el.querySelector(".inv-card-icon, svg");
+    if (icon) {
+      icon.animate(
+        [
+          {
+            opacity: 0,
+            transform: "translateY(34px) scale(0.62) rotate(-10deg)"
+          },
+          {
+            opacity: 1,
+            transform: "translateY(0) scale(1) rotate(0deg)"
+          }
+        ],
+        {
+          duration: 950,
+          delay: delay + 220,
+          easing: "cubic-bezier(.16, 1, .3, 1)",
+          fill: "forwards"
+        }
+      );
+    }
+
+    const ornament = el.querySelector(".inv-card-ornament");
+    if (ornament) {
+      ornament.animate(
+        [
+          {
+            opacity: 0,
+            transform: "translateX(-50%) translateY(30px) scale(0.72)"
+          },
+          {
+            opacity: 1,
+            transform: "translateX(-50%) translateY(0) scale(1)"
+          }
+        ],
+        {
+          duration: 950,
+          delay: delay + 160,
+          easing: "cubic-bezier(.16, 1, .3, 1)",
+          fill: "forwards"
+        }
+      );
+    }
+  }
+
+  function checkReveal() {
+    const triggerPoint = window.innerHeight * 0.86;
+
+    elements.forEach((el) => {
+      if (el.dataset.revealed === "true") return;
+
+      const rect = el.getBoundingClientRect();
+
+      if (rect.top < triggerPoint && rect.bottom > 0) {
+        animateElement(el);
       }
     });
-  }, {
-    threshold: 0.35,
-    rootMargin: "0px 0px -28% 0px"
-  });
+  }
 
-  setTimeout(() => {
-    elements.forEach((el) => observer.observe(el));
-  }, 250);
+  // Revisar varias veces al inicio por si la pagina termina de cargar imagenes tarde
+  setTimeout(checkReveal, 300);
+  setTimeout(checkReveal, 700);
+  setTimeout(checkReveal, 1200);
+  setTimeout(checkReveal, 1800);
+
+  window.addEventListener("scroll", checkReveal, { passive: true });
+  window.addEventListener("resize", checkReveal);
+
+  document.addEventListener("scroll", checkReveal, { passive: true });
+
+  const possibleScrollContainers = document.querySelectorAll(
+    "main, body, html, .inv-page, .inv-wrapper, #inv-content"
+  );
+
+  possibleScrollContainers.forEach((container) => {
+    container.addEventListener("scroll", checkReveal, { passive: true });
+  });
 }
