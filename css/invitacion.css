@@ -2295,3 +2295,176 @@ body.has-music-player {
   transform: translateY(0) scale(1);
   filter: blur(0);
 }
+
+/* Visual theme system */
+
+body.theme-rose-floral {
+  --theme-bg-1: #fffaf4;
+  --theme-bg-2: #fbf3ee;
+  --theme-bg-3: #fff7ef;
+  --theme-accent: #b0707c;
+  --theme-accent-soft: rgba(176, 112, 124, 0.22);
+  --theme-gold: #b88a3d;
+  --theme-gold-soft: rgba(184, 138, 61, 0.28);
+  --theme-card: rgba(255, 250, 244, 0.88);
+  --theme-card-strong: rgba(255, 255, 255, 0.92);
+  --theme-text: #2f2520;
+  --theme-muted: #7d6860;
+  --theme-shadow: 0 24px 70px rgba(74, 45, 32, 0.12);
+}
+
+body.theme-gold-marble {
+  --theme-bg-1: #fbfaf7;
+  --theme-bg-2: #eee7dc;
+  --theme-bg-3: #fffdf8;
+  --theme-accent: #a98245;
+  --theme-accent-soft: rgba(169, 130, 69, 0.18);
+  --theme-gold: #c7a45b;
+  --theme-gold-soft: rgba(199, 164, 91, 0.3);
+  --theme-card: rgba(255, 255, 255, 0.9);
+  --theme-card-strong: rgba(255, 255, 255, 0.96);
+  --theme-text: #2e2923;
+  --theme-muted: #776c60;
+  --theme-shadow: 0 24px 70px rgba(60, 48, 36, 0.13);
+}
+
+body.theme-elegant-lavender {
+  --theme-bg-1: #fbf7ff;
+  --theme-bg-2: #eee4f7;
+  --theme-bg-3: #fffaff;
+  --theme-accent: #8d6aa6;
+  --theme-accent-soft: rgba(141, 106, 166, 0.2);
+  --theme-gold: #b99a63;
+  --theme-gold-soft: rgba(185, 154, 99, 0.28);
+  --theme-card: rgba(255, 250, 255, 0.88);
+  --theme-card-strong: rgba(255, 255, 255, 0.94);
+  --theme-text: #2c2431;
+  --theme-muted: #76687d;
+  --theme-shadow: 0 24px 70px rgba(61, 42, 75, 0.12);
+}
+
+body.theme-black-luxury {
+  --theme-bg-1: #11100f;
+  --theme-bg-2: #1c1714;
+  --theme-bg-3: #0d0c0b;
+  --theme-accent: #d4af67;
+  --theme-accent-soft: rgba(212, 175, 103, 0.18);
+  --theme-gold: #d4af67;
+  --theme-gold-soft: rgba(212, 175, 103, 0.34);
+  --theme-card: rgba(28, 23, 20, 0.88);
+  --theme-card-strong: rgba(35, 29, 25, 0.94);
+  --theme-text: #f8efe2;
+  --theme-muted: #c7b8a3;
+  --theme-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+}
+
+body.theme-classic-champagne {
+  --theme-bg-1: #fffaf0;
+  --theme-bg-2: #f1e3cc;
+  --theme-bg-3: #fff6e8;
+  --theme-accent: #a98245;
+  --theme-accent-soft: rgba(169, 130, 69, 0.18);
+  --theme-gold: #b88a3d;
+  --theme-gold-soft: rgba(184, 138, 61, 0.30);
+  --theme-card: rgba(255, 250, 240, 0.9);
+  --theme-card-strong: rgba(255, 255, 255, 0.94);
+  --theme-text: #30271e;
+  --theme-muted: #7a6856;
+  --theme-shadow: 0 24px 70px rgba(74, 45, 32, 0.12);
+}
+
+body[class*="theme-"],
+body[class*="theme-"] .inv-page {
+  background:
+    radial-gradient(circle at 15% 8%, var(--theme-accent-soft), transparent 28%),
+    radial-gradient(circle at 88% 22%, var(--theme-gold-soft), transparent 30%),
+    radial-gradient(circle at 50% 92%, var(--theme-accent-soft), transparent 34%),
+    linear-gradient(180deg, var(--theme-bg-1) 0%, var(--theme-bg-2) 42%, var(--theme-bg-3) 100%);
+  color: var(--theme-text);
+}
+
+body[class*="theme-"] .inv-event-card,
+body[class*="theme-"] .inv-section-card,
+body[class*="theme-"] .inv-pass-card,
+body[class*="theme-"] .inv-rsvp-card,
+body[class*="theme-"] #inv-itinerary-section,
+body[class*="theme-"] .inv-night-shell {
+  background:
+    linear-gradient(180deg, var(--theme-card-strong), var(--theme-card));
+  border-color: var(--theme-gold-soft);
+  box-shadow: var(--theme-shadow);
+  color: var(--theme-text);
+}
+
+body[class*="theme-"] .inv-card-icon,
+body[class*="theme-"] .inv-night-icon {
+  color: var(--theme-gold);
+  border-color: var(--theme-gold-soft);
+}
+
+body[class*="theme-"] .inv-card-title,
+body[class*="theme-"] .inv-section h2,
+body[class*="theme-"] .inv-night-title-small,
+body[class*="theme-"] .inv-night-event,
+body[class*="theme-"] #inv-guest-name,
+body[class*="theme-"] .inv-pass-name {
+  color: var(--theme-text);
+}
+
+body[class*="theme-"] .inv-eyebrow,
+body[class*="theme-"] .inv-night-kicker,
+body[class*="theme-"] .inv-countdown-label,
+body[class*="theme-"] .inv-countdown-eyebrow {
+  color: var(--theme-gold);
+}
+
+body[class*="theme-"] .inv-section p,
+body[class*="theme-"] .inv-card-text,
+body[class*="theme-"] .inv-card-details,
+body[class*="theme-"] .inv-venue-address,
+body[class*="theme-"] .inv-dresscode-text,
+body[class*="theme-"] .inv-gifts-text {
+  color: var(--theme-muted);
+}
+
+body[class*="theme-"] .inv-night-title-script,
+body[class*="theme-"] .inv-night-time,
+body[class*="theme-"] .inv-night-footer p,
+body[class*="theme-"] .inv-night-footer span {
+  color: var(--theme-accent);
+}
+
+body[class*="theme-"] .inv-premium-button,
+body[class*="theme-"] .inv-location-button,
+body[class*="theme-"] .inv-calendar-button {
+  background:
+    linear-gradient(135deg, var(--theme-gold), var(--theme-accent));
+  color: #fff;
+  border-color: var(--theme-gold-soft);
+}
+
+body.theme-black-luxury .inv-event-card,
+body.theme-black-luxury .inv-section-card,
+body.theme-black-luxury .inv-pass-card,
+body.theme-black-luxury .inv-rsvp-card,
+body.theme-black-luxury #inv-itinerary-section,
+body.theme-black-luxury .inv-night-shell {
+  border-color: rgba(212, 175, 103, 0.36);
+}
+
+body.theme-black-luxury .inv-card-icon {
+  background: rgba(255,255,255,0.04);
+  color: var(--theme-gold);
+}
+
+body.theme-black-luxury .inv-countdown-item,
+body.theme-black-luxury .inv-ticket-field,
+body.theme-black-luxury .inv-timeline-content {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(212, 175, 103, 0.22);
+}
+
+body.theme-black-luxury .inv-music-player,
+body.theme-black-luxury #inv-music-player {
+  background: rgba(0, 0, 0, 0.98) !important;
+}

@@ -81,8 +81,36 @@
     }
   }
 
+  function normalizeVisualTheme(value) {
+    const allowedThemes = [
+      "rose-floral",
+      "gold-marble",
+      "elegant-lavender",
+      "black-luxury",
+      "classic-champagne"
+    ];
+    if (!value || !allowedThemes.includes(value)) {
+      return "rose-floral";
+    }
+    return value;
+  }
+
+  function applyVisualTheme(invitation) {
+    const visualTheme = normalizeVisualTheme(invitation.visual_theme);
+    document.body.classList.remove(
+      "theme-rose-floral",
+      "theme-gold-marble",
+      "theme-elegant-lavender",
+      "theme-black-luxury",
+      "theme-classic-champagne"
+    );
+    document.body.classList.add(`theme-${visualTheme}`);
+  }
+
   /* ─── Renderizado ─────────────────────────────────────────────────── */
   function renderInvitation(inv) {
+    applyVisualTheme(inv);
+
     /* 1. Mostrar contenido */
     var loader  = document.getElementById("inv-loader");
     var errBox  = document.getElementById("inv-error");
