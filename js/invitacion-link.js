@@ -39,6 +39,12 @@ function hidePinGate() {
   document.getElementById("linkBuilderPinGate")?.classList.add("hidden");
 }
 
+function normalizePin(value) {
+  return String(value ?? "")
+    .replace(/\s+/g, "")
+    .trim();
+}
+
 function getSupabaseClient() {
   if (window.supabaseClient) return window.supabaseClient;
   if (window.invittaSupabase) return window.invittaSupabase;
@@ -145,6 +151,7 @@ async function initLinkBuilder() {
     }
 
     invitationData = data;
+    console.log("Loaded invitationConfig:", invitationData);
 
     if (invitationData.link_builder_enabled === false) {
       disabledState.classList.remove("hidden");
@@ -191,18 +198,21 @@ async function initLinkBuilder() {
     const input = document.getElementById("linkBuilderPinInput");
     const errorBox = document.getElementById("linkBuilderPinError");
 
-    const typedPin = String(input?.value || "").trim();
-    const realPin = String(invitationData?.link_builder_pin || "").trim();
+    const typedPin = normalizePin(input?.value);
+    const realPin = normalizePin(invitationData?.link_builder_pin);
 
-    console.log("PIN validation:", {
+    console.log("PIN validation debug:", {
       typedPin,
       realPin,
-      isMatch: typedPin === realPin
+      typedLength: typedPin.length,
+      realLength: realPin.length,
+      isMatch: typedPin === realPin,
+      invitationConfig: invitationData
     });
 
     if (!realPin) {
       if (errorBox) {
-        errorBox.textContent = "No hay PIN configurado.";
+        errorBox.textContent = "No hay PIN configurado para esta invitación.";
         errorBox.classList.remove("hidden");
       }
       return;
@@ -213,6 +223,7 @@ async function initLinkBuilder() {
         errorBox.textContent = "Ingresa el PIN.";
         errorBox.classList.remove("hidden");
       }
+      input?.focus();
       return;
     }
 
@@ -221,7 +232,6 @@ async function initLinkBuilder() {
         errorBox.textContent = "PIN incorrecto.";
         errorBox.classList.remove("hidden");
       }
-
       input?.focus();
       input?.select();
       return;
