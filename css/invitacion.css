@@ -2695,3 +2695,87 @@ main {
     margin-bottom: 2.4rem;
   }
 }
+
+/* Fullscreen cinematic special moments */
+.inv-moments-section {
+  width: 100%;
+  margin: 4rem auto;
+  padding: 0;
+}
+
+.inv-moments-header {
+  width: min(92vw, 520px);
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+
+.inv-moments-stack {
+  width: 100%;
+  display: grid;
+  gap: 2.4rem;
+}
+
+.inv-moment-frame {
+  position: relative;
+  width: 100%;
+  height: min(92vh, 820px);
+  margin: 0;
+  overflow: hidden;
+  border-radius: 0;
+  background: #f7efe5;
+  box-shadow: 0 28px 80px rgba(74, 45, 32, 0.18);
+}
+
+.inv-moment-image {
+  width: 100%;
+  height: 115%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  transform: translate3d(0, -4%, 0) scale(1.04);
+  will-change: transform;
+}
+
+.inv-moment-image.is-landscape {
+  object-fit: cover;
+  object-position: center center;
+}
+
+.inv-moment-image.is-portrait {
+  object-fit: cover;
+  object-position: center center;
+}
+
+@media (min-width: 768px) {
+  .inv-moment-frame {
+    width: min(92vw, 860px);
+    height: min(88vh, 760px);
+    margin: 0 auto;
+    border-radius: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .inv-moments-section {
+    margin: 3rem auto;
+  }
+
+  .inv-moments-stack {
+    gap: 2rem;
+  }
+
+  .inv-moment-frame {
+    height: 92vh;
+    min-height: 620px;
+  }
+
+  .inv-moment-image {
+    height: 116%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-moment-image {
+    transform: none !important;
+  }
+}

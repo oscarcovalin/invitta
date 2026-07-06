@@ -431,6 +431,11 @@
     /* 17. Galería */
     renderGallery(normalizeGalleryUrls(inv.gallery_urls));
 
+    setTimeout(() => {
+      setupMomentImageOrientation();
+      setupMomentsParallax();
+    }, 500);
+
 
     /* 19. Limpieza de elementos legacy de audio en el contenido */
     document.querySelectorAll("#inv-content audio, #inv-content [id*='music'], #inv-content [class*='music']").forEach((el) => {
@@ -761,9 +766,9 @@
     } catch (e) { return []; }
   }
 
-  /** Renderiza la galería de fotos con efecto scroll editorial */
+  /** Renderiza la galería como momentos fullscreen cinematográficos. */
   function renderGallery(urls) {
-    var section   = document.getElementById("inv-gallery-section");
+    var section = document.getElementById("inv-gallery-section");
     var container = document.getElementById("inv-gallery");
     if (!section || !container) return;
 
@@ -772,30 +777,103 @@
       return;
     }
 
+    section.className = "inv-section inv-moments-section";
     section.style.display = "";
-    container.innerHTML   = "";
 
-    urls.forEach(function (url, index) {
-      var item = document.createElement("div");
-      item.className   = "inv-gallery-item " + (index % 2 === 0 ? "is-left" : "is-right");
-      item.setAttribute("role", "listitem");
+    var header = section.querySelector(".inv-gallery-header, .inv-moments-header");
+    if (header) {
+      header.className = "inv-moments-header reveal-on-scroll";
+    }
 
-      var img       = document.createElement("img");
-      img.src       = url;
-      img.alt       = "Fotografía del evento";
-      img.loading   = "lazy";
-      img.decoding  = "async";
+    var kicker = section.querySelector(".inv-eyebrow-text");
+    if (kicker) {
+      kicker.textContent = "Recuerdos";
+      kicker.classList.add("inv-section-kicker");
+    }
 
-      var caption   = document.createElement("div");
-      caption.className = "inv-gallery-caption";
-      caption.setAttribute("aria-hidden", "true");
+    var title = section.querySelector(".inv-gallery-title");
+    if (title) {
+      title.classList.add("inv-section-title");
+    }
 
-      item.appendChild(img);
-      item.appendChild(caption);
-      container.appendChild(item);
+    container.className = "inv-moments-stack";
+    container.innerHTML = "";
+
+    urls.forEach(function (url) {
+      var frame = document.createElement("figure");
+      frame.className = "inv-moment-frame reveal-on-scroll";
+      frame.setAttribute("role", "listitem");
+
+      var img = document.createElement("img");
+      img.className = "inv-moment-image";
+      img.src = url;
+      img.alt = "Momento especial";
+      img.loading = "lazy";
+      img.decoding = "async";
+
+      frame.appendChild(img);
+      container.appendChild(frame);
     });
+  }
 
+  function setupMomentImageOrientation() {
+    document.querySelectorAll(".inv-moment-image").forEach((img) => {
+      function setOrientation() {
+        img.classList.toggle("is-landscape", img.naturalWidth >= img.naturalHeight);
+        img.classList.toggle("is-portrait", img.naturalHeight > img.naturalWidth);
+      }
 
+      if (img.complete) {
+        setOrientation();
+      } else {
+        img.addEventListener("load", setOrientation, { once: true });
+      }
+    });
+  }
+
+  function setupMomentsParallax() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    const images = Array.from(document.querySelectorAll(".inv-moment-image"));
+
+    if (!images.length) return;
+
+    let ticking = false;
+
+    function updateParallax() {
+      const viewportHeight = window.innerHeight;
+
+      images.forEach((img) => {
+        const frame = img.closest(".inv-moment-frame");
+        if (!frame) return;
+
+        const rect = frame.getBoundingClientRect();
+
+        if (rect.bottom < 0 || rect.top > viewportHeight) return;
+
+        const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
+        const clamped = Math.max(0, Math.min(1, progress));
+
+        const translate = (clamped - 0.5) * 36;
+
+        img.style.transform = `translate3d(0, ${translate}px, 0) scale(1.06)`;
+      });
+
+      ticking = false;
+    }
+
+    function requestTick() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    }
+
+    updateParallax();
+    window.addEventListener("scroll", requestTick, { passive: true });
+    window.addEventListener("resize", requestTick);
   }
 
   /* ─── Selector de pases ───────────────────────────────────────────── */
@@ -1156,6 +1234,8 @@ function setupRevealAnimations() {
     "#inv-parents-block",
     "#inv-welcome-block",
     ".inv-gallery-item",
+    ".inv-moments-header",
+    ".inv-moment-frame",
     "#inv-ceremony-block",
     "#inv-reception-block",
     "#inv-itinerary-section",
