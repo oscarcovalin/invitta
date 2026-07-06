@@ -44,26 +44,38 @@ function getSupabaseClient() {
   if (window.invittaSupabase) return window.invittaSupabase;
   if (window.sbClient) return window.sbClient;
 
+  const env = window.INVITTIA_ENV || window.ENV || window.APP_CONFIG || window.__ENV__ || window.env || {};
+
   const url =
     window.SUPABASE_URL ||
     window.supabaseUrl ||
     window.INVITTA_SUPABASE_URL ||
-    window.env?.SUPABASE_URL ||
-    window.INVITTIA_ENV?.SUPABASE_URL;
+    env.SUPABASE_URL ||
+    env.supabaseUrl ||
+    env.supabase_url;
 
   const key =
     window.SUPABASE_ANON_KEY ||
     window.supabaseAnonKey ||
     window.INVITTA_SUPABASE_ANON_KEY ||
-    window.env?.SUPABASE_ANON_KEY ||
-    window.INVITTIA_ENV?.SUPABASE_ANON_KEY;
+    env.SUPABASE_ANON_KEY ||
+    env.supabaseAnonKey ||
+    env.supabase_anon_key;
 
-  if (window.supabase && url && key) {
-    window.supabaseClient = window.supabase.createClient(url, key);
-    return window.supabaseClient;
+  console.log("Link builder Supabase debug:", {
+    hasSupabaseCdn: Boolean(window.supabase),
+    hasUrl: Boolean(url),
+    hasKey: Boolean(key),
+    env
+  });
+
+  if (!window.supabase || !url || !key) {
+    return null;
   }
 
-  return null;
+  const client = window.supabase.createClient(url, key);
+  window.linkBuilderSupabaseClient = client;
+  return client;
 }
 
 async function initLinkBuilder() {
@@ -98,13 +110,8 @@ async function initLinkBuilder() {
 
   const supabase = getSupabaseClient();
 
-  console.log("Supabase CDN:", Boolean(window.supabase));
-  console.log("Supabase client:", Boolean(supabase));
-  console.log("SUPABASE URL exists:", Boolean(window.SUPABASE_URL || window.supabaseUrl || window.INVITTA_SUPABASE_URL || window.INVITTIA_ENV?.SUPABASE_URL || window.env?.SUPABASE_URL));
-  console.log("SUPABASE KEY exists:", Boolean(window.SUPABASE_ANON_KEY || window.supabaseAnonKey || window.INVITTA_SUPABASE_ANON_KEY || window.INVITTIA_ENV?.SUPABASE_ANON_KEY || window.env?.SUPABASE_ANON_KEY));
-
   if (!supabase) {
-    console.error("No Supabase client available in invitacion-link.js");
+    console.error("Link builder: Supabase client unavailable.");
     showFatalError("No se pudo cargar la configuración de acceso.");
     return;
   }
@@ -119,6 +126,7 @@ async function initLinkBuilder() {
     console.log("Link builder config result:", { data, error });
 
     if (error) {
+      console.error("Link builder config query error:", error);
       throw error;
     }
 
@@ -154,7 +162,7 @@ async function initLinkBuilder() {
     showBuilderForm();
 
     } catch (err) {
-      console.error(err);
+      console.error("Error al cargar la configuración:", err);
       showFatalError("Error de conexión al cargar la configuración.");
     }
 
