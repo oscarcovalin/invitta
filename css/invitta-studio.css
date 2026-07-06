@@ -1,0 +1,210 @@
+:root {
+  --studio-bg: #efe0c8;
+  --studio-bg-soft: #f8efe2;
+  --studio-card: rgba(255, 253, 248, 0.9);
+  --studio-text: #2f2520;
+  --studio-muted: #7d6860;
+  --studio-gold: #b88a3d;
+  --studio-gold-dark: #8f6429;
+  --studio-border: rgba(184, 138, 61, 0.24);
+  --studio-shadow: 0 28px 90px rgba(74, 45, 32, 0.14);
+  --font-title: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Montserrat", system-ui, sans-serif;
+  --font-script: "Great Vibes", cursive;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.94), transparent 34%),
+    linear-gradient(180deg, #f7ecd9 0%, #ead7ba 100%);
+  color: var(--studio-text);
+  font-family: var(--font-body);
+}
+
+.studio-commercial-shell {
+  width: min(92vw, 1120px);
+  margin: 0 auto;
+}
+
+.studio-commercial-section {
+  padding: clamp(3rem, 8vw, 6rem) 0;
+}
+
+.studio-hero {
+  min-height: 88vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.studio-kicker {
+  margin: 0 0 1rem;
+  font-size: .76rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--studio-gold);
+}
+
+.studio-title {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(3.4rem, 12vw, 7rem);
+  line-height: .9;
+  font-weight: 500;
+}
+
+.studio-subtitle {
+  max-width: 720px;
+  margin: 1.2rem auto 0;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.8;
+  color: var(--studio-muted);
+}
+
+.studio-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .85rem;
+  margin-top: 2rem;
+}
+
+.studio-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .95rem 1.35rem;
+  border-radius: 999px;
+  border: 1px solid var(--studio-border);
+  text-decoration: none;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--studio-gold-dark);
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 14px 34px rgba(74,45,32,.10);
+}
+
+.studio-button.primary {
+  color: #fff;
+  background: linear-gradient(135deg, #c49a54, #8f6429);
+}
+
+.studio-section-title {
+  margin: 0 0 1rem;
+  text-align: center;
+  font-family: var(--font-title);
+  font-size: clamp(2.5rem, 7vw, 4.6rem);
+  line-height: .95;
+  font-weight: 500;
+}
+
+.studio-section-text {
+  max-width: 720px;
+  margin: 0 auto 2.2rem;
+  text-align: center;
+  color: var(--studio-muted);
+  line-height: 1.8;
+}
+
+.studio-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.studio-card {
+  padding: 1.4rem;
+  border-radius: 1.5rem;
+  background: var(--studio-card);
+  border: 1px solid var(--studio-border);
+  box-shadow: 0 18px 48px rgba(74,45,32,.08);
+}
+
+.studio-card h3 {
+  margin: 0 0 .6rem;
+  font-family: var(--font-title);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.studio-card p {
+  margin: 0;
+  color: var(--studio-muted);
+  font-size: .9rem;
+  line-height: 1.7;
+}
+
+.studio-steps {
+  display: grid;
+  gap: 1rem;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.studio-step {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 1.2rem;
+  border-radius: 1.3rem;
+  background: var(--studio-card);
+  border: 1px solid var(--studio-border);
+}
+
+.studio-step-number {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(184,138,61,.12);
+  color: var(--studio-gold-dark);
+  font-weight: 700;
+}
+
+.studio-offer {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 3rem);
+  border-radius: 2rem;
+  background: var(--studio-card);
+  border: 1px solid var(--studio-border);
+  box-shadow: var(--studio-shadow);
+  text-align: center;
+}
+
+.studio-price {
+  margin: 1.4rem 0;
+  font-family: var(--font-title);
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  color: var(--studio-gold-dark);
+}
+
+@media (max-width: 900px) {
+  .studio-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .studio-hero {
+    min-height: auto;
+    padding: 4rem 0;
+  }
+
+  .studio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .studio-actions {
+    display: grid;
+  }
+
+  .studio-button {
+    width: 100%;
+  }
+}
