@@ -3378,14 +3378,14 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible) {
   transform: none !important;
   filter: none !important;
   transition:
-    opacity 760ms ease,
-    transform 760ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+    opacity 1450ms ease,
+    transform 1450ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   will-change: opacity, transform;
 }
 
 body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible) {
   opacity: 0 !important;
-  transform: translateY(26px) scale(0.985) !important;
+  transform: translateY(46px) scale(0.975) !important;
   filter: none !important;
 }
 
@@ -3407,6 +3407,12 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible) {
 .inv-section-icon,
 .inv-card-icon {
   transform: none !important;
+}
+
+body.inv-reveal-ready .inv-moment-frame.inv-scroll-fade:not(.inv-scroll-visible),
+body.inv-reveal-ready .inv-gallery-item.inv-scroll-fade:not(.inv-scroll-visible) {
+  opacity: 0 !important;
+  transform: translateY(58px) scale(0.965) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
