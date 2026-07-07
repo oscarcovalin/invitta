@@ -352,6 +352,7 @@ function renderInvitation(inv) {
     /* 3. Hero: tÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­tulo, honoree, fecha */
     setText("inv-title",   inv.title        || "InvitaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n");
     setText("inv-honoree", inv.honoree_name || "");
+    fitHeroTitleSingleLine();
 
     // Fecha formateada en el hero (Limpia)
     var heroDateTime = buildCleanHeroDateTime(inv);
@@ -1543,5 +1544,43 @@ function setupRevealOnScroll() {
         observer.observe(section);
       });
     });
+  });
+}
+
+function fitHeroTitleSingleLine() {
+  const title = document.getElementById("inv-title");
+  const content = title ? title.closest(".inv-hero-content") : null;
+  if (!title || !content) return;
+
+  title.style.whiteSpace = "nowrap";
+  title.style.maxWidth = "100%";
+  title.style.fontSize = "";
+
+  const maxSize = parseFloat(window.getComputedStyle(title).fontSize) || 96;
+  const minSize = 18;
+  let low = minSize;
+  let high = maxSize;
+
+  for (let i = 0; i < 12; i += 1) {
+    const mid = (low + high) / 2;
+    title.style.fontSize = mid + "px";
+
+    if (title.scrollWidth <= content.clientWidth) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+
+  title.style.fontSize = low + "px";
+}
+
+window.addEventListener("resize", () => {
+  window.requestAnimationFrame(fitHeroTitleSingleLine);
+});
+
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => {
+    window.requestAnimationFrame(fitHeroTitleSingleLine);
   });
 }
