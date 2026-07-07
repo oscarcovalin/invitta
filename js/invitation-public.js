@@ -528,9 +528,8 @@ function renderInvitation(inv) {
         el.remove();
       }
     });
-
     requestAnimationFrame(() => {
-      setupSafeSectionReveal();
+      setupRevealOnScroll();
     });
   }
 
@@ -1431,64 +1430,8 @@ function setupSectionIconReveal() {
     });
   }, 1200);
 }
-function getSafeRevealSections() {
-  const selectors = [
-    ".inv-parents-card",
-    ".inv-welcome-block",
-    ".inv-event-card",
-    ".inv-section-card",
-    ".inv-pass-card",
-    ".inv-rsvp-card",
-    ".inv-thanks-card",
-    ".inv-share-card",
-    ".inv-share-section",
-    ".inv-timeline-alt-section"
-  ];
-
-  return Array.from(document.querySelectorAll(selectors.join(","))).filter((element) => {
-    if (!element) return false;
-    if (element.closest(".inv-hero")) return false;
-    if (element.closest(".inv-music-player")) return false;
-    if (element.classList.contains("inv-music-player")) return false;
-    return true;
-  });
-}
-
-function setupSafeSectionReveal() {
-  const sections = getSafeRevealSections();
-
-  if (!sections.length) return;
-
-  sections.forEach((section) => {
-    section.classList.remove("inv-safe-visible");
-    section.classList.add("inv-safe-reveal");
-  });
-
-  if (!("IntersectionObserver" in window)) {
-    sections.forEach((section) => section.classList.add("inv-safe-visible"));
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-
-        entry.target.classList.add("inv-safe-visible");
-        observer.unobserve(entry.target);
-      });
-    },
-    {
-      threshold: 0.18,
-      rootMargin: "0px 0px -10% 0px"
-    }
-  );
-
-  sections.forEach((section) => observer.observe(section));
-}
 function setupRevealAnimations() {
-  // TEMP recovery: disabled to keep the public invitation render stable.
-  return;
+  setupRevealOnScroll();
 }
 
 function getInvitationRevealSections() {
@@ -1516,21 +1459,20 @@ function getInvitationRevealSections() {
 }
 
 function setupRevealOnScroll() {
-  // TEMP recovery: disabled to keep reveal classes from affecting render.
-  return;
-
   const sections = getInvitationRevealSections();
 
   console.log("Scroll fade sections:", sections.length);
 
   if (!sections.length) return;
 
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   sections.forEach((section) => {
-    section.classList.remove("inv-scroll-visible");
     section.classList.add("inv-scroll-fade");
+    section.classList.remove("inv-scroll-visible");
   });
 
-  if (!("IntersectionObserver" in window)) {
+  if (reduceMotion || !("IntersectionObserver" in window)) {
     sections.forEach((section) => section.classList.add("inv-scroll-visible"));
     return;
   }
@@ -1550,5 +1492,9 @@ function setupRevealOnScroll() {
     }
   );
 
-  sections.forEach((section) => observer.observe(section));
+  sections.forEach((section) => {
+    observer.observe(section);
+  });
+
+  document.body.classList.add("inv-reveal-ready");
 }
