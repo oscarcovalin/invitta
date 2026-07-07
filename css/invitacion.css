@@ -3425,3 +3425,31 @@ body.inv-reveal-ready .inv-gallery-item.inv-scroll-fade:not(.inv-scroll-visible)
     filter: none !important;
   }
 }
+
+/* Stronger reveal for regular sections only. Gallery and itinerary keep their tuned motion. */
+.inv-scroll-fade:not(.inv-moment-frame):not(.inv-gallery-item):not(.inv-moments-header):not(.inv-timeline-alt-section) {
+  transition:
+    opacity 1850ms ease,
+    transform 1850ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-frame):not(.inv-gallery-item):not(.inv-moments-header):not(.inv-timeline-alt-section) {
+  opacity: 0 !important;
+  transform: translateY(88px) scale(0.94) !important;
+}
+
+.inv-scroll-fade.inv-scroll-visible:not(.inv-moment-frame):not(.inv-gallery-item):not(.inv-moments-header):not(.inv-timeline-alt-section) {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-scroll-fade,
+  body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible),
+  .inv-scroll-fade.inv-scroll-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    filter: none !important;
+  }
+}
