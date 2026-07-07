@@ -3420,19 +3420,19 @@ body.inv-reveal-ready .inv-gallery-item.inv-scroll-fade:not(.inv-scroll-visible)
   }
 }
 
-/* Stronger reveal for regular sections only. Gallery and itinerary keep their tuned motion. */
-.inv-scroll-fade:not(.inv-moment-frame):not(.inv-gallery-item):not(.inv-moments-header):not(.inv-timeline-alt-section) {
+/* Slower reveal for regular sections only. Gallery, itinerary and share keep their tuned motion. */
+.inv-scroll-fade:not(.inv-moment-frame):not(.inv-gallery-item):not(.inv-moments-header):not(.inv-timeline-alt-section):not(.inv-share-section):not(.inv-share-card) {
   transition:
-    opacity 1850ms ease,
-    transform 1850ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    opacity 3200ms cubic-bezier(0.22, 0, 0.16, 1),
+    transform 2600ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-frame):not(.inv-gallery-item):not(.inv-moments-header):not(.inv-timeline-alt-section) {
+body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-frame):not(.inv-gallery-item):not(.inv-moments-header):not(.inv-timeline-alt-section):not(.inv-share-section):not(.inv-share-card) {
   opacity: 0 !important;
-  transform: translateY(88px) scale(0.94) !important;
+  transform: translateY(76px) scale(0.955) !important;
 }
 
-.inv-scroll-fade.inv-scroll-visible:not(.inv-moment-frame):not(.inv-gallery-item):not(.inv-moments-header):not(.inv-timeline-alt-section) {
+.inv-scroll-fade.inv-scroll-visible:not(.inv-moment-frame):not(.inv-gallery-item):not(.inv-moments-header):not(.inv-timeline-alt-section):not(.inv-share-section):not(.inv-share-card) {
   opacity: 1 !important;
   transform: translateY(0) scale(1) !important;
 }
