@@ -1446,7 +1446,10 @@ function getInvitationRevealSections() {
     ".inv-thanks-card",
     ".inv-share-card",
     ".inv-share-section",
-    ".inv-timeline-alt-section"
+    ".inv-timeline-alt-section",
+    ".inv-moments-header",
+    ".inv-moment-frame",
+    ".inv-gallery-item"
   ];
 
   return Array.from(document.querySelectorAll(selectors.join(",")))
@@ -1478,6 +1481,8 @@ function setupRevealOnScroll() {
     return;
   }
 
+  document.body.classList.add("inv-reveal-ready");
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -1493,9 +1498,11 @@ function setupRevealOnScroll() {
     }
   );
 
-  sections.forEach((section) => {
-    observer.observe(section);
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      sections.forEach((section) => {
+        observer.observe(section);
+      });
+    });
   });
-
-  document.body.classList.add("inv-reveal-ready");
 }
