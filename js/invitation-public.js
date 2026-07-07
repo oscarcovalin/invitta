@@ -1437,6 +1437,17 @@ function setupRevealAnimations() {
 
 function getInvitationRevealSections() {
   const selectors = [
+    "#inv-countdown-section",
+    "#inv-parents-block",
+    "#inv-welcome-block",
+    "#inv-ceremony-block",
+    "#inv-reception-block",
+    "#inv-dresscode-block",
+    "#inv-gifts-block",
+    "#inv-pass-section",
+    "#inv-wa-block",
+    "#inv-thank-you-section",
+    "#inv-hashtag-block",
     ".inv-parents-card",
     ".inv-welcome-block",
     ".inv-event-card",
@@ -1444,6 +1455,7 @@ function getInvitationRevealSections() {
     ".inv-pass-card",
     ".inv-rsvp-card",
     ".inv-thanks-card",
+    ".inv-thank-you-card",
     ".inv-share-card",
     ".inv-share-section",
     ".inv-timeline-alt-section",
@@ -1462,6 +1474,28 @@ function getInvitationRevealSections() {
     });
 }
 
+function isTunedRevealElement(element) {
+  return element.matches(
+    ".inv-moment-frame, .inv-gallery-item, .inv-moments-header, .inv-timeline-alt-section, .inv-share-section, .inv-share-card, #inv-hashtag-block"
+  );
+}
+
+function prepareRegularRevealElement(element) {
+  if (isTunedRevealElement(element)) return;
+
+  element.style.opacity = "0";
+  element.style.transform = "translate3d(0, 76px, 0) scale(0.955)";
+  element.style.transition = "opacity 3200ms cubic-bezier(0.22, 0, 0.16, 1), transform 2600ms cubic-bezier(0.16, 1, 0.3, 1)";
+  element.style.willChange = "opacity, transform";
+}
+
+function showRegularRevealElement(element) {
+  if (isTunedRevealElement(element)) return;
+
+  element.style.opacity = "1";
+  element.style.transform = "translate3d(0, 0, 0) scale(1)";
+}
+
 function setupRevealOnScroll() {
   const sections = getInvitationRevealSections();
 
@@ -1474,10 +1508,14 @@ function setupRevealOnScroll() {
   sections.forEach((section) => {
     section.classList.add("inv-scroll-fade");
     section.classList.remove("inv-scroll-visible");
+    prepareRegularRevealElement(section);
   });
 
   if (reduceMotion || !("IntersectionObserver" in window)) {
-    sections.forEach((section) => section.classList.add("inv-scroll-visible"));
+    sections.forEach((section) => {
+      section.classList.add("inv-scroll-visible");
+      showRegularRevealElement(section);
+    });
     return;
   }
 
@@ -1489,6 +1527,7 @@ function setupRevealOnScroll() {
         if (!entry.isIntersecting) return;
 
         entry.target.classList.add("inv-scroll-visible");
+        showRegularRevealElement(entry.target);
         observer.unobserve(entry.target);
       });
     },
