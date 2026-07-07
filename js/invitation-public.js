@@ -530,6 +530,7 @@ function renderInvitation(inv) {
     });
     requestAnimationFrame(() => {
       setupRevealOnScroll();
+      setupSectionIconReveal();
     });
   }
 
