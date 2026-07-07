@@ -532,6 +532,7 @@ function renderInvitation(inv) {
     requestAnimationFrame(() => {
       setupRevealOnScroll();
       setupSectionIconReveal();
+      setupSlowRevealForProblemSections();
     });
   }
 
@@ -1495,6 +1496,92 @@ function showRegularRevealElement(element) {
 
   element.style.opacity = "1";
   element.style.transform = "translate3d(0, 0, 0) scale(1)";
+}
+
+function getSlowRevealProblemSections() {
+  const selectors = [
+    "#inv-parents-block",
+    "#inv-welcome-block",
+    "#inv-ceremony-block",
+    "#inv-reception-block",
+    "#inv-dresscode-block",
+    "#inv-gifts-block",
+    "#inv-pass-section",
+    "#inv-pass-block",
+    "#inv-wa-block",
+    "#inv-rsvp-block"
+  ];
+
+  return Array.from(new Set(document.querySelectorAll(selectors.join(","))))
+    .filter((element) => {
+      if (!element) return false;
+      if (element.closest(".inv-hero")) return false;
+      if (element.closest(".inv-music-player")) return false;
+      if (element.classList.contains("inv-music-player")) return false;
+      return true;
+    });
+}
+
+function setupSlowRevealForProblemSections() {
+  const sections = getSlowRevealProblemSections();
+
+  if (!sections.length) return;
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    sections.forEach((section) => {
+      section.style.setProperty("opacity", "1", "important");
+      section.style.setProperty("transform", "none", "important");
+      section.style.setProperty("transition", "none", "important");
+    });
+    return;
+  }
+
+  sections.forEach((section) => {
+    section.style.setProperty("opacity", "0", "important");
+    section.style.setProperty("transform", "translate3d(0, 92px, 0) scale(0.94)", "important");
+    section.style.setProperty("transition", "opacity 220ms linear, transform 220ms linear", "important");
+    section.style.setProperty("will-change", "opacity, transform");
+  });
+
+  let ticking = false;
+
+  function updateSlowReveal() {
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+    const start = viewportHeight * 1.08;
+    const end = viewportHeight * 0.58;
+
+    sections.forEach((section) => {
+      const style = window.getComputedStyle(section);
+      if (style.display === "none" || style.visibility === "hidden") return;
+
+      const rect = section.getBoundingClientRect();
+      let progress = (start - rect.top) / (start - end);
+
+      if (rect.bottom < 0) progress = 1;
+      progress = Math.max(0, Math.min(1, progress));
+
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const translate = (1 - eased) * 92;
+      const scale = 0.94 + eased * 0.06;
+
+      section.style.setProperty("opacity", eased.toFixed(3), "important");
+      section.style.setProperty("transform", `translate3d(0, ${translate.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`, "important");
+    });
+
+    ticking = false;
+  }
+
+  function requestSlowRevealUpdate() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(updateSlowReveal);
+  }
+
+  updateSlowReveal();
+  setTimeout(updateSlowReveal, 350);
+  setTimeout(updateSlowReveal, 1000);
+  window.addEventListener("scroll", requestSlowRevealUpdate, { passive: true });
+  window.addEventListener("resize", requestSlowRevealUpdate);
 }
 
 function setupRevealOnScroll() {
