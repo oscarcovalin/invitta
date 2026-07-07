@@ -350,9 +350,11 @@ function renderInvitation(inv) {
 
 
     /* 3. Hero: tÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­tulo, honoree, fecha */
-    setText("inv-title",   inv.title        || "InvitaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n");
-    setText("inv-honoree", inv.honoree_name || "");
+    var heroHonoree = String(inv.honoree_name || "").trim();
+    setText("inv-title", buildHeroEventTitle(inv.title, heroHonoree));
+    setText("inv-honoree", heroHonoree);
     fitHeroTitleSingleLine();
+    fitHeroHonoreeSingleLine();
 
     // Fecha formateada en el hero (Limpia)
     var heroDateTime = buildCleanHeroDateTime(inv);
@@ -1662,12 +1664,67 @@ function fitHeroTitleSingleLine() {
   title.style.fontSize = low + "px";
 }
 
+function fitHeroHonoreeSingleLine() {
+  const honoree = document.getElementById("inv-honoree");
+  const content = honoree ? honoree.closest(".inv-hero-content") : null;
+  if (!honoree || !content) return;
+
+  honoree.style.whiteSpace = "nowrap";
+  honoree.style.maxWidth = "100%";
+  honoree.style.fontSize = "";
+
+  const maxSize = parseFloat(window.getComputedStyle(honoree).fontSize) || 32;
+  const minSize = 14;
+  let low = minSize;
+  let high = maxSize;
+
+  for (let i = 0; i < 12; i += 1) {
+    const mid = (low + high) / 2;
+    honoree.style.fontSize = mid + "px";
+
+    if (honoree.scrollWidth <= content.clientWidth) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+
+  honoree.style.fontSize = low + "px";
+}
+
+function buildHeroEventTitle(title, honoreeName) {
+  const fallback = "XV Aniversario";
+  const rawTitle = String(title || "").trim();
+  const honoree = String(honoreeName || "").trim();
+
+  if (!rawTitle) return fallback;
+  if (!honoree) return rawTitle;
+
+  const escapedName = honoree.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  let cleanTitle = rawTitle
+    .replace(new RegExp("\\s+(de|para)\\s+" + escapedName + "\\s*$", "i"), "")
+    .replace(new RegExp("\\s+" + escapedName + "\\s*$", "i"), "")
+    .trim();
+
+  if (/^xv\s+a(?:\u00f1|n)os$/i.test(cleanTitle)) {
+    cleanTitle = fallback;
+  }
+
+  return cleanTitle || fallback;
+}
+
 window.addEventListener("resize", () => {
-  window.requestAnimationFrame(fitHeroTitleSingleLine);
+  window.requestAnimationFrame(() => {
+    fitHeroTitleSingleLine();
+    fitHeroHonoreeSingleLine();
+  });
 });
 
 if (document.fonts && document.fonts.ready) {
   document.fonts.ready.then(() => {
-    window.requestAnimationFrame(fitHeroTitleSingleLine);
+    window.requestAnimationFrame(() => {
+      fitHeroTitleSingleLine();
+      fitHeroHonoreeSingleLine();
+    });
   });
 }
