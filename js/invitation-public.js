@@ -1474,6 +1474,7 @@ function getInvitationRevealSections() {
       if (element.closest(".inv-hero")) return false;
       if (element.closest(".inv-music-player")) return false;
       if (element.classList.contains("inv-music-player")) return false;
+      if (isSlowRevealProblemElement(element)) return false;
       return true;
     });
 }
@@ -1524,6 +1525,11 @@ function getSlowRevealProblemSections() {
     });
 }
 
+function isSlowRevealProblemElement(element) {
+  const selector = "#inv-parents-block, #inv-welcome-block, #inv-ceremony-block, #inv-reception-block, #inv-dresscode-block, #inv-gifts-block, #inv-pass-section, #inv-pass-block, #inv-wa-block, #inv-rsvp-block";
+  return element.matches(selector) || Boolean(element.closest(selector));
+}
+
 function setupSlowRevealForProblemSections() {
   const sections = getSlowRevealProblemSections();
 
@@ -1540,8 +1546,8 @@ function setupSlowRevealForProblemSections() {
 
   sections.forEach((section) => {
     section.style.setProperty("opacity", "0", "important");
-    section.style.setProperty("transform", "translate3d(0, 92px, 0) scale(0.94)", "important");
-    section.style.setProperty("transition", "opacity 220ms linear, transform 220ms linear", "important");
+    section.style.setProperty("transform", "translate3d(0, 120px, 0) scale(0.92)", "important");
+    section.style.setProperty("transition", "opacity 120ms linear, transform 120ms linear", "important");
     section.style.setProperty("will-change", "opacity, transform");
   });
 
@@ -1549,8 +1555,8 @@ function setupSlowRevealForProblemSections() {
 
   function updateSlowReveal() {
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
-    const start = viewportHeight * 1.08;
-    const end = viewportHeight * 0.58;
+    const start = viewportHeight * 0.98;
+    const end = viewportHeight * 0.18;
 
     sections.forEach((section) => {
       const style = window.getComputedStyle(section);
@@ -1562,9 +1568,9 @@ function setupSlowRevealForProblemSections() {
       if (rect.bottom < 0) progress = 1;
       progress = Math.max(0, Math.min(1, progress));
 
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const translate = (1 - eased) * 92;
-      const scale = 0.94 + eased * 0.06;
+      const eased = Math.pow(progress, 1.65);
+      const translate = (1 - eased) * 120;
+      const scale = 0.92 + eased * 0.08;
 
       section.style.setProperty("opacity", eased.toFixed(3), "important");
       section.style.setProperty("transform", `translate3d(0, ${translate.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`, "important");
