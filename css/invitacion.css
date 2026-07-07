@@ -1215,8 +1215,8 @@ body.has-music-player {
 .inv-hero .inv-title {
   margin: 0;
   font-family: var(--font-title, serif);
-  font-size: clamp(3.3rem, 18vw, 6.5rem);
-  line-height: 0.9;
+  font-size: clamp(2.55rem, 11.5vw, 4.8rem);
+  line-height: 0.95;
   font-weight: 500;
   color: #fff;
   text-shadow: 0 8px 28px rgba(0,0,0,0.34);
@@ -1227,7 +1227,9 @@ body.has-music-player {
 }
 
 .inv-hero .inv-honoree {
-  margin: 0.95rem 0 0;
+  margin: 0.75rem 0 0;
+  font-size: clamp(2.05rem, 8.6vw, 3.6rem);
+  line-height: 1;
   color: rgba(255, 245, 231, 0.95);
   text-shadow: 0 3px 18px rgba(0,0,0,0.32);
   max-width: 100%;
