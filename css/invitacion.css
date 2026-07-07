@@ -1230,7 +1230,10 @@ body.has-music-player {
   margin: 0.95rem 0 0;
   color: rgba(255, 245, 231, 0.95);
   text-shadow: 0 3px 18px rgba(0,0,0,0.32);
-  text-wrap: balance;
+  max-width: 100%;
+  overflow: visible;
+  white-space: nowrap;
+  text-wrap: nowrap;
 }
 
 .inv-hero-date,
