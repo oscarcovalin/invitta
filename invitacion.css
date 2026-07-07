@@ -1735,3 +1735,34 @@ body.has-music-player {
     filter: none !important;
   }
 }
+/* FIX URGENTE: forzar visibles todas las secciones publicas */
+html body #inv-content .reveal-on-scroll,
+html body #inv-content .reveal-on-scroll *,
+html body #inv-content [data-reveal],
+html body #inv-content [data-reveal] *,
+html body #inv-content .inv-section,
+html body #inv-content .inv-section *,
+html body #inv-content .inv-event-card,
+html body #inv-content .inv-event-card *,
+html body #inv-content .inv-section-card,
+html body #inv-content .inv-section-card *,
+html body #inv-content .inv-pass-card,
+html body #inv-content .inv-pass-card *,
+html body #inv-content .inv-rsvp-card,
+html body #inv-content .inv-rsvp-card *,
+html body #inv-content .inv-ticket,
+html body #inv-content .inv-ticket *,
+html body #inv-content .inv-timeline-item,
+html body #inv-content .inv-timeline-item *,
+html body #inv-content #inv-itinerary-section,
+html body #inv-content #inv-itinerary-section *,
+html body #inv-content #inv-pass-section,
+html body #inv-content #inv-pass-section *,
+html body #inv-content #inv-rsvp-section,
+html body #inv-content #inv-rsvp-section * {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  filter: none !important;
+  clip-path: none !important;
+}
