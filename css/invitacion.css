@@ -2404,14 +2404,8 @@ body.theme-black-luxury .inv-section-icon {
 
 .inv-thank-you-card::before,
 .inv-share-card::before {
-  content: "âœ¦";
-  position: absolute;
-  top: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  color: var(--theme-gold, #b88a3d);
-  opacity: .45;
-  font-size: .85rem;
+  content: "";
+  display: none;
 }
 
 .inv-thank-you-kicker,
