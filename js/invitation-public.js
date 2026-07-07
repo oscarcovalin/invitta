@@ -1546,50 +1546,55 @@ function setupSlowRevealForProblemSections() {
 
   sections.forEach((section) => {
     section.style.setProperty("opacity", "0", "important");
-    section.style.setProperty("transform", "translate3d(0, 96px, 0) scale(0.94)", "important");
-    section.style.setProperty("transition", "opacity 120ms linear, transform 120ms linear", "important");
+    section.style.setProperty("transform", "translate3d(0, 74px, 0) scale(0.955)", "important");
+    section.style.setProperty("transition", "opacity 1550ms cubic-bezier(0.22, 1, 0.36, 1), transform 1550ms cubic-bezier(0.16, 1, 0.3, 1)", "important");
     section.style.setProperty("will-change", "opacity, transform");
   });
 
-  let ticking = false;
+  function showSection(section) {
+    section.style.setProperty("opacity", "1", "important");
+    section.style.setProperty("transform", "translate3d(0, 0, 0) scale(1)", "important");
+  }
 
-  function updateSlowReveal() {
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
-    const start = viewportHeight * 1.02;
-    const end = viewportHeight * 0.46;
+  if (!("IntersectionObserver" in window)) {
+    sections.forEach(showSection);
+    return;
+  }
 
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        showSection(entry.target);
+        observer.unobserve(entry.target);
+      });
+    },
+    {
+      threshold: 0.08,
+      rootMargin: "0px 0px -18% 0px"
+    }
+  );
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      sections.forEach((section) => {
+        observer.observe(section);
+      });
+    });
+  });
+
+  setTimeout(() => {
     sections.forEach((section) => {
       const style = window.getComputedStyle(section);
       if (style.display === "none" || style.visibility === "hidden") return;
 
       const rect = section.getBoundingClientRect();
-      let progress = (start - rect.top) / (start - end);
-
-      if (rect.bottom < 0) progress = 1;
-      progress = Math.max(0, Math.min(1, progress));
-
-      const eased = Math.pow(progress, 1.18);
-      const translate = (1 - eased) * 96;
-      const scale = 0.94 + eased * 0.06;
-
-      section.style.setProperty("opacity", eased.toFixed(3), "important");
-      section.style.setProperty("transform", `translate3d(0, ${translate.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`, "important");
+      if (rect.top < window.innerHeight * 0.82 && rect.bottom > 0) {
+        showSection(section);
+      }
     });
-
-    ticking = false;
-  }
-
-  function requestSlowRevealUpdate() {
-    if (ticking) return;
-    ticking = true;
-    window.requestAnimationFrame(updateSlowReveal);
-  }
-
-  updateSlowReveal();
-  setTimeout(updateSlowReveal, 350);
-  setTimeout(updateSlowReveal, 1000);
-  window.addEventListener("scroll", requestSlowRevealUpdate, { passive: true });
-  window.addEventListener("resize", requestSlowRevealUpdate);
+  }, 900);
 }
 
 function setupRevealOnScroll() {
