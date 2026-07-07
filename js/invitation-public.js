@@ -1680,7 +1680,7 @@ function fitHeroHonoreeSingleLine() {
   honoree.style.fontSize = "";
 
   const maxSize = parseFloat(window.getComputedStyle(honoree).fontSize) || 32;
-  const minSize = 14;
+  const minSize = 18;
   let low = minSize;
   let high = maxSize;
 
