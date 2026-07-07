@@ -3371,3 +3371,51 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible) {
     filter: none !important;
   }
 }
+
+/* Final safety: keep icons visible and make scroll reveal override older blocks. */
+.inv-scroll-fade {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  transition:
+    opacity 760ms ease,
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+  will-change: opacity, transform;
+}
+
+body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible) {
+  opacity: 0 !important;
+  transform: translateY(26px) scale(0.985) !important;
+  filter: none !important;
+}
+
+.inv-scroll-fade.inv-scroll-visible {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+  filter: none !important;
+}
+
+.inv-section-icon,
+.inv-card-icon,
+.inv-section-icon svg,
+.inv-card-icon svg {
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+}
+
+.inv-section-icon,
+.inv-card-icon {
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-scroll-fade,
+  body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible),
+  .inv-scroll-fade.inv-scroll-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    filter: none !important;
+  }
+}
