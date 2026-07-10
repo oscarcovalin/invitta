@@ -440,12 +440,12 @@ document.addEventListener("DOMContentLoaded", () => {
             let textMessage = "";
             const greetingNames = isXv ? activeConfig.brideName : `${activeConfig.brideName} y ${activeConfig.groomName}`;
             const eventWord = isXv ? "mis XV Años" : "su boda";
-            const emojiRing = isXv ? "👑" : "💍";
+            const emojiRing = isXv ? "\uD83D\uDC51" : "\uD83D\uDC8D";
             
             if (attendance === 'yes') {
-                textMessage = `¡Hola ${greetingNames}! ${emojiRing}\n\nConfirmo mi asistencia para ${eventWord}. 🥂✨\n\n*Nombre:* ${name}\n*Asistentes:* ${guestsCount} de ${invitationData.passes} autorizados.\n*Mesa:* ${invitationData.table}`;
+                textMessage = `¡Hola ${greetingNames}! ${emojiRing}\n\nConfirmo mi asistencia para ${eventWord}. \uD83E\uDD42\u2728\n\n*Nombre:* ${name}\n*Asistentes:* ${guestsCount} de ${invitationData.passes} autorizados.\n*Mesa:* ${invitationData.table}`;
             } else {
-                textMessage = `¡Hola ${greetingNames}! 🤍\n\nLamento informar que no podré asistir a ${eventWord}.\n\n*Nombre:* ${name}`;
+                textMessage = `¡Hola ${greetingNames}! \uD83E\uDD0D\n\nLamento informar que no podré asistir a ${eventWord}.\n\n*Nombre:* ${name}`;
             }
             
             if (message) {
@@ -629,7 +629,7 @@ const countdownTimer = setInterval(function() {
     if (distance < 0) {
         clearInterval(countdownTimer);
         const wrapper = document.querySelector(".countdown-wrapper");
-        if (wrapper) wrapper.innerHTML = "<h3 style='color: var(--primary-color); font-size: 2.2rem;'>¡Hoy es el gran día! 🥂💍</h3>";
+        if (wrapper) wrapper.innerHTML = "<h3 style='color: var(--primary-color); font-size: 2.2rem;'>¡Hoy es el gran día! 🥂\uD83D\uDC8D</h3>";
         return;
     }
 

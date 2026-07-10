@@ -354,6 +354,15 @@
                         <option value="otro">Otro Evento Social</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="paqueteInteres">Paquete de interés</label>
+                    <select id="paqueteInteres" required>
+                        <option value="" disabled selected>Selecciona un paquete</option>
+                        <option value="esencial">Paquete Esencial</option>
+                        <option value="premium">Paquete Premium</option>
+                        <option value="vip">Experiencia VIP</option>
+                    </select>
+                </div>
                 <div class="grid-2">
                     <div class="form-group">
                         <label id="labelBrideName" for="brideName">Nombre Principal / Novia</label>
@@ -909,6 +918,7 @@
 
             const clientData = {
                 eventType: document.getElementById("eventType").value,
+                paqueteInteres: document.getElementById("paqueteInteres").value,
                 brideName: document.getElementById("brideName").value,
                 groomName: document.getElementById("groomName").value,
                 brideGroomInitials: document.getElementById("brideGroomInitials").value,

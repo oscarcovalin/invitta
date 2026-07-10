@@ -575,6 +575,63 @@
             transition: var(--transition);
         }
         .catalog-card:hover .catalog-card-overlay { opacity: 1; }
+        
+        /* CATALOG PREVIEW STYLES */
+        .catalog-card-meta {
+            position: absolute;
+            top: 20px; left: 20px; right: 20px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            z-index: 2;
+        }
+        .catalog-card-pill, .catalog-level-badge {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--charcoal);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .catalog-level-badge.premium { color: var(--rose-deep); }
+        .catalog-level-badge.vip { color: #b8895b; background: rgba(20, 13, 18, 0.95); }
+        .catalog-level-badge.esencial { color: var(--sage); }
+
+        .catalog-card-preview {
+            position: relative;
+            height: 240px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 24px;
+            overflow: hidden;
+        }
+
+        .catalog-preview-screen {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 16px;
+            padding: 20px 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            width: 88%;
+            z-index: 2;
+            transition: var(--transition);
+        }
+        .catalog-card:hover .catalog-preview-screen { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.1); }
+
+        .catalog-preview-ornament {
+            font-size: 0.6rem; letter-spacing: 0.15em; color: var(--rose); margin-bottom: 8px; text-transform: uppercase; font-weight: 600;
+        }
+
+        .catalog-preview-title {
+            font-family: var(--serif); font-size: 1.6rem; color: var(--charcoal); margin-bottom: 6px; line-height: 1.2;
+        }
+
+        .catalog-preview-subtitle {
+            font-size: 0.75rem; color: var(--warm-grey); font-weight: 400;
+        }
         .overlay-btn {
             width: 100%;
             padding: 12px;
@@ -1859,8 +1916,8 @@
                     <a href="https://wa.me/525566790073" target="_blank">WhatsApp</a>
                 </div>
                 <div class="footer-social">
-                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                    <a href="https://instagram.com/invitta.studio" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://tiktok.com/@invitta.studio" target="_blank" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
                     <a href="https://wa.me/525566790073" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                 </div>
             </div>

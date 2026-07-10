@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const brainDir = 'C:\\Users\\Oscar\\.gemini\\antigravity-ide\\brain\\e80404d5-721c-4f9c-945f-499e722f90b7';
+const brainDir = 'C:\\Users\\oscar\\.gemini\\antigravity-ide\\brain\\b1022f7d-ad86-4020-ad42-149307b95eb0';
 const demosDir = path.join(__dirname, 'demos');
 
 // Función para encontrar imagen por prefijo en la carpeta de artifacts
