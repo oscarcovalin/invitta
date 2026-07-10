@@ -2146,6 +2146,27 @@
                 ? '0 4px 24px rgba(46,46,46,0.08)'
                 : 'none';
         });
+
+        // Catalog filter tabs
+        function filterCatalog(cat, btn) {
+            // Update active tab
+            document.querySelectorAll('.catalog-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Filter cards with smooth transition
+            const cards = document.querySelectorAll('#catalogShowcase .catalog-card');
+            cards.forEach(card => {
+                const match = cat === 'all' || card.dataset.cat === cat;
+                if (match) {
+                    card.style.display = '';
+                    // Re-trigger reveal animation
+                    setTimeout(() => card.classList.add('visible'), 20);
+                } else {
+                    card.style.display = 'none';
+                    card.classList.remove('visible');
+                }
+            });
+        }
     </script>
 </body>
 </html>
