@@ -1,120 +1,81 @@
 /**
- * CONFIGURACIÓN INYECTADA DESDE JSON
+ * CONFIGURACIÓN DEMO — XV Años VIP: Colección Esmeralda
+ * Isabella Morales · CDMX, 15 Ago 2026
  */
 const WEDDING_CONFIG = {
     "eventType": "xv",
-    "brideName": "Camila Rodríguez",
+    "brideName": "Isabella Morales",
     "groomName": "",
-    "brideGroomInitials": "C",
-    "hashtag": "#CamilaXV2026",
-    "quote": "Una noche mágica llena de sueños que hoy se hacen realidad.",
-    "weddingDateText": "21 de Noviembre, 2026",
+    "brideGroomInitials": "I",
+    "hashtag": "#IsabellaXV2026",
+    "quote": "Quince años de amor, risas y sueños. Esta noche, el cuento comienza.",
+    "weddingDateText": "15 de Agosto, 2026",
     "countdownDate": {
         "year": 2026,
-        "month": 10,
-        "day": 21,
-        "hour": 20,
-        "minute": 0,
+        "month": 7,
+        "day": 15,
+        "hour": 18,
+        "minute": 30,
         "second": 0
     },
     "family": {
         "brideParents": {
-            "mother": "Gabriela Villarreal",
-            "father": "Eduardo Castillo"
+            "mother": "Sofía Castillo de Morales",
+            "father": "Héctor Morales Vidal"
         },
         "groomParents": {
-            "mother": "Silvia Torres",
-            "father": "Héctor Ramírez"
+            "mother": "",
+            "father": ""
         },
-        "padrinos": "Fernando y Marcela Domínguez"
+        "padrinos": "Familia Ramírez-Ibarra y Familia Vidal-Cortés"
     },
     "ceremonia": {
-        "title": "Misa de Acción de Gracias",
-        "time": "17:00 hrs",
-        "place": "Parroquia Fátima",
-        "address1": "Av. Vasconcelos",
-        "address2": "México",
-        "mapQuery": "Parroquia+Fatima+San+Pedro"
+        "title": "Ceremonia de XV Años",
+        "time": "18:30 hrs",
+        "place": "Basílica de Nuestra Señora de Guadalupe",
+        "address1": "Plaza de las Américas 1, Villa de Guadalupe",
+        "address2": "Ciudad de México, CDMX",
+        "mapQuery": "Basilica+de+Guadalupe+CDMX"
     },
     "recepcion": {
-        "title": "Recepción",
-        "time": "19:00 hrs",
-        "place": "Horno 3 Parque Fundidora",
-        "address1": "Av. Vasconcelos",
-        "address2": "México",
-        "mapQuery": "Horno+3+Monterrey"
+        "title": "Gran Fiesta VIP",
+        "time": "20:30 hrs",
+        "place": "Salón Imperial Pedregal",
+        "address1": "Periférico Sur 4580, Jardines del Pedregal",
+        "address2": "Ciudad de México, CDMX",
+        "mapQuery": "Salon+Imperial+Pedregal+CDMX"
     },
     "itinerary": [
-        {
-            "time": "20:00 hrs",
-            "title": "Alfombra Roja",
-            "description": "Llegada de invitados",
-            "iconClass": "fa-star"
-        },
-        {
-            "time": "21:30 hrs",
-            "title": "Brindis",
-            "description": "Cena de gala",
-            "iconClass": "fa-champagne-glasses"
-        },
-        {
-            "time": "23:00 hrs",
-            "title": "Show Principal",
-            "description": "Presentación y vals",
-            "iconClass": "fa-crown"
-        },
-        {
-            "time": "01:00 am",
-            "title": "After Party",
-            "description": "DJ en vivo",
-            "iconClass": "fa-headphones"
-        }
+        { "time": "18:30 hrs", "title": "Ceremonia Religiosa", "description": "Misa de acción de gracias", "iconClass": "fa-church" },
+        { "time": "19:30 hrs", "title": "Llegada en Carroza", "description": "Entrada espectacular al salón", "iconClass": "fa-star" },
+        { "time": "20:00 hrs", "title": "Cóctel VIP", "description": "Bienvenida con barra libre y aperitivos finos", "iconClass": "fa-champagne-glasses" },
+        { "time": "21:00 hrs", "title": "Gran Vals de Honor", "description": "El baile más esperado", "iconClass": "fa-crown" },
+        { "time": "21:30 hrs", "title": "Show de Sorpresas", "description": "Artistas invitados", "iconClass": "fa-wand-magic-sparkles" },
+        { "time": "22:00 hrs", "title": "Banquete de 6 Tiempos", "description": "Gastronomía de autor", "iconClass": "fa-utensils" },
+        { "time": "23:30 hrs", "title": "Fiesta Total", "description": "DJ internacional hasta el amanecer", "iconClass": "fa-music" }
     ],
     "dressCode": {
-        "title": "Formal",
-        "women": {
-            "title": "Mujeres",
-            "desc": "Vestido elegante",
-            "note": "Se reserva el color principal para la quinceañera"
-        },
-        "men": {
-            "title": "Hombres",
-            "desc": "Traje y corbata"
-        }
+        "title": "Black Tie — Esmeralda y Dorado",
+        "women": { "title": "Mujeres", "desc": "Vestido de gala o coctel largo", "note": "Evitar tonos esmeralda y azul royal (reservado para la quinceañera)" },
+        "men": { "title": "Hombres", "desc": "Esmoquin negro o traje de gala" }
     },
     "registry": {
-        "description": "El mejor regalo es tu presencia.",
-        "registry1": {
-            "name": "Liverpool",
-            "url": "https://www.liverpool.com.mx"
-        },
-        "registry2": {
-            "name": "Amazon",
-            "url": "https://www.amazon.com.mx"
-        },
+        "description": "Isabella sueña con viajar. Si deseas regalarle algo especial:",
+        "registry1": { "name": "Fondo de Viaje", "url": "https://wa.me/525566790073" },
+        "registry2": { "name": "El Palacio de Hierro", "url": "https://www.elpalaciodehierro.com" },
         "lluviaSobres": true
     },
     "incluirHospedaje": true,
     "hospedaje": {
-        "description": "Opciones recomendadas.",
+        "description": "Para nuestros invitados de otras ciudades, hemos preparado opciones especiales:",
         "opciones": [
-            {
-                "name": "Hotel Demo Centro",
-                "address": "Datos de hospedaje personalizables para cada evento.",
-                "phone": "Tel. 55 1234 5678",
-                "url": "https://hotel-demo.invitta.mx"
-            },
-            {
-                "name": "Hotel Demo Jardín",
-                "address": "Datos de hospedaje personalizables para cada evento.",
-                "phone": "Tel. 55 8765 4321",
-                "url": "https://hotel-demo.invitta.mx"
-            }
+            { "name": "Hotel InterContinental Presidente CDMX", "address": "Campos Elíseos 218, Polanco", "phone": "Tel. 55 5327 7700", "url": "https://ihg.com" },
+            { "name": "Grand Velas México City", "address": "Leibnitz 24, Anzures", "phone": "Tel. 55 5207 6060", "url": "https://grandvelas.com" }
         ]
     },
     "rsvp": {
         "title": "Confirma tu Asistencia",
-        "description": "Favor de confirmar.",
+        "description": "Lugares muy limitados. Por favor confirma antes del 1 de Agosto de 2026.",
         "whatsappNumber": "525566790073",
         "whatsappNumber2": "525512345678"
     },
@@ -131,46 +92,39 @@ const WEDDING_CONFIG = {
     },
     "theme": {
         "colors": {
-            "background": "#130C12",
-            "surface": "#21161F",
-            "primary": "#D6B56D",
-            "secondary": "#6D1F3A",
-            "accent": "#B8895B",
-            "text": "#FFF8EF",
-            "muted": "#CBB8B2"
+            "background": "#0A1A14",
+            "surface": "#0F2219",
+            "primary": "#D4AF37",
+            "secondary": "#2E7D52",
+            "accent": "#A0522D",
+            "text": "#F0EDE0",
+            "muted": "#9AB09A"
         },
         "typography": {
-            "script": "Allura",
-            "heading": "Playfair Display",
-            "body": "Inter"
+            "script": "Great Vibes",
+            "heading": "Cormorant Garamond",
+            "body": "Jost"
         },
         "images": {
             "hero": "assets/hero_bg.jpg",
             "ogImage": "assets/hero_bg.jpg",
-            "gallery": [
-                "assets/gallery_1.jpg",
-                "assets/gallery_2.jpg",
-                "assets/gallery_3.jpg",
-                "assets/grid_1.jpg",
-                "assets/grid_2.jpg"
-            ]
+            "gallery": ["assets/gallery_1.jpg","assets/gallery_2.jpg","assets/gallery_3.jpg","assets/grid_1.jpg","assets/grid_2.jpg"]
         },
-        "primaryColor": "#D6B56D",
-        "secondaryColor": "#6D1F3A",
-        "bgColor": "#130C12",
-        "textColor": "#FFF8EF",
-        "bgImage": "",
-        "fontScript": "Allura",
-        "fontPrimary": "Playfair Display",
-        "fontSecondary": "Inter"
+        "primaryColor": "#D4AF37",
+        "secondaryColor": "#2E7D52",
+        "bgColor": "#0A1A14",
+        "textColor": "#F0EDE0",
+        "fontScript": "Great Vibes",
+        "fontPrimary": "Cormorant Garamond",
+        "fontSecondary": "Jost"
     },
     "passSection": {
-        "title": "Pase de Invitación",
-        "subtitle": "Válido para:",
+        "title": "Pase VIP de Honor",
+        "subtitle": "Invitados especiales:",
         "defaultGuestName": "Familia Invitada",
         "defaultPasses": 2,
-        "defaultTable": "14",
-        "message": "\"Gracias por acompañarme en esta celebración tan especial.\"",
-        "qrPrefix": "CamilaXV2026"
+        "defaultTable": "VIP-01",
+        "message": "\"Isabella te espera esta noche para vivir juntos el sueño de sus quince años.\"",
+        "qrPrefix": "IsabellaVIPXV2026"
     }
 };

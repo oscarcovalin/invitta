@@ -1,120 +1,80 @@
 /**
- * CONFIGURACIÓN INYECTADA DESDE JSON
+ * CONFIGURACIÓN DEMO — Boda VIP: Plum Noir
+ * Valentina & Sebastián · Ciudad de México, 7 Feb 2026
  */
 const WEDDING_CONFIG = {
     "eventType": "boda",
-    "brideName": "Valeria Martínez",
-    "groomName": "Sebastián Garza",
+    "brideName": "Valentina Ríos",
+    "groomName": "Sebastián Montoya",
     "brideGroomInitials": "V & S",
-    "hashtag": "#ValeYSebas",
-    "quote": "Juntos es mi lugar favorito en todo el mundo.",
-    "weddingDateText": "5 de Diciembre, 2026",
+    "hashtag": "#ValentinaYSebastian",
+    "quote": "Dos almas que se encontraron en la oscuridad y crearon su propia luz.",
+    "weddingDateText": "7 de Febrero, 2027",
     "countdownDate": {
-        "year": 2026,
-        "month": 11,
-        "day": 5,
+        "year": 2027,
+        "month": 1,
+        "day": 7,
         "hour": 19,
         "minute": 0,
         "second": 0
     },
     "family": {
         "brideParents": {
-            "mother": "Silvia Cantú",
-            "father": "Arturo Garza"
+            "mother": "Carmen Fuentes de Ríos",
+            "father": "Roberto Ríos Gutiérrez"
         },
         "groomParents": {
-            "mother": "Margarita Treviño",
-            "father": "Raúl Lozano"
+            "mother": "Patricia Salinas de Montoya",
+            "father": "Alejandro Montoya Cruz"
         },
-        "padrinos": "Diego y Valeria Sada"
+        "padrinos": "Fernando y Lucía Castañeda"
     },
     "ceremonia": {
-        "title": "Ceremonia Religiosa",
-        "time": "17:00 hrs",
-        "place": "Basílica de Guadalupe",
-        "address1": "Guanajuato 715",
-        "address2": "México",
-        "mapQuery": "Basilica+de+Guadalupe+Monterrey"
+        "title": "Ceremonia Civil",
+        "time": "18:00 hrs",
+        "place": "Palacio de Bellas Artes — Salón Principal",
+        "address1": "Av. Juárez s/n, Centro Histórico",
+        "address2": "Ciudad de México, CDMX",
+        "mapQuery": "Palacio+de+Bellas+Artes+CDMX"
     },
     "recepcion": {
-        "title": "Recepción",
-        "time": "19:00 hrs",
-        "place": "Club Industrial",
-        "address1": "Guanajuato 715",
-        "address2": "México",
-        "mapQuery": "Club+Industrial+Monterrey"
+        "title": "Recepción de Gala",
+        "time": "20:30 hrs",
+        "place": "Club Industrial Santa Fe",
+        "address1": "Vasco de Quiroga 3000, Santa Fe",
+        "address2": "Ciudad de México, CDMX",
+        "mapQuery": "Club+Industrial+Santa+Fe+CDMX"
     },
     "itinerary": [
-        {
-            "time": "19:00 hrs",
-            "title": "Ceremonia de Gala",
-            "description": "Basílica",
-            "iconClass": "fa-church"
-        },
-        {
-            "time": "21:00 hrs",
-            "title": "Recepción de Lujo",
-            "description": "Club Industrial",
-            "iconClass": "fa-champagne-glasses"
-        },
-        {
-            "time": "22:00 hrs",
-            "title": "Banquete VIP",
-            "description": "Cena de 4 tiempos",
-            "iconClass": "fa-utensils"
-        },
-        {
-            "time": "00:00 hrs",
-            "title": "Tornaboda",
-            "description": "Música y antojitos",
-            "iconClass": "fa-moon"
-        }
+        { "time": "18:00 hrs", "title": "Ceremonia Civil", "description": "Unión oficial ante el juez", "iconClass": "fa-rings-wedding" },
+        { "time": "19:30 hrs", "title": "Coctel Exclusivo", "description": "Bienvenida con música en vivo", "iconClass": "fa-champagne-glasses" },
+        { "time": "20:30 hrs", "title": "Banquete de Gala", "description": "Cena de 7 tiempos con maridaje", "iconClass": "fa-utensils" },
+        { "time": "22:00 hrs", "title": "Primer Vals", "description": "El baile de los novios", "iconClass": "fa-heart" },
+        { "time": "22:30 hrs", "title": "Show en Vivo", "description": "Grupo musical y DJ", "iconClass": "fa-music" },
+        { "time": "01:00 hrs", "title": "Brindis Final", "description": "Hasta el amanecer", "iconClass": "fa-star" }
     ],
     "dressCode": {
-        "title": "Formal",
-        "women": {
-            "title": "Mujeres",
-            "desc": "Vestido elegante",
-            "note": "Evitar color blanco"
-        },
-        "men": {
-            "title": "Hombres",
-            "desc": "Traje y corbata"
-        }
+        "title": "Black Tie — Gala Nocturna",
+        "women": { "title": "Mujeres", "desc": "Vestido de gala largo", "note": "Evitar blanco, ivory y negro puro" },
+        "men": { "title": "Hombres", "desc": "Esmoquin o traje negro con pajarita" }
     },
     "registry": {
-        "description": "El mejor regalo es tu presencia.",
-        "registry1": {
-            "name": "Liverpool",
-            "url": "https://www.liverpool.com.mx"
-        },
-        "registry2": {
-            "name": "Amazon",
-            "url": "https://www.amazon.com.mx"
-        },
+        "description": "Tu presencia ilumina nuestra noche más especial. Si deseas celebrarnos con un detalle:",
+        "registry1": { "name": "El Palacio de Hierro", "url": "https://www.elpalaciodehierro.com" },
+        "registry2": { "name": "Sears", "url": "https://www.sears.com.mx" },
         "lluviaSobres": true
     },
     "incluirHospedaje": true,
     "hospedaje": {
-        "description": "Opciones recomendadas.",
+        "description": "Para nuestros invitados foráneos, hemos negociado tarifas preferenciales en:",
         "opciones": [
-            {
-                "name": "Hotel Demo Centro",
-                "address": "Datos de hospedaje personalizables para cada evento.",
-                "phone": "Tel. 55 1234 5678",
-                "url": "https://hotel-demo.invitta.mx"
-            },
-            {
-                "name": "Hotel Demo Jardín",
-                "address": "Datos de hospedaje personalizables para cada evento.",
-                "phone": "Tel. 55 8765 4321",
-                "url": "https://hotel-demo.invitta.mx"
-            }
+            { "name": "Hotel St. Regis México City", "address": "Paseo de la Reforma 439, Cuauhtémoc", "phone": "Tel. 55 5228 1818", "url": "https://marriott.com" },
+            { "name": "Four Seasons México City", "address": "Paseo de la Reforma 500, Juárez", "phone": "Tel. 55 5230 1818", "url": "https://fourseasons.com/mexicocity" }
         ]
     },
     "rsvp": {
         "title": "Confirma tu Asistencia",
-        "description": "Favor de confirmar.",
+        "description": "Cupos limitados. Confirma antes del 7 de Enero de 2027.",
         "whatsappNumber": "525566790073",
         "whatsappNumber2": "525512345678"
     },
@@ -131,46 +91,39 @@ const WEDDING_CONFIG = {
     },
     "theme": {
         "colors": {
-            "background": "#100C10",
-            "surface": "#1D171C",
+            "background": "#0d0810",
+            "surface": "#1a0d18",
             "primary": "#D4AF37",
-            "secondary": "#4A1832",
-            "accent": "#B8895B",
-            "text": "#FFF8EF",
-            "muted": "#C8B8AE"
+            "secondary": "#8B6914",
+            "accent": "#b8895b",
+            "text": "#F5EDD8",
+            "muted": "#A89070"
         },
         "typography": {
-            "script": "Pinyon Script",
-            "heading": "Cinzel",
-            "body": "Cinzel"
+            "script": "Great Vibes",
+            "heading": "Cormorant Garamond",
+            "body": "Jost"
         },
         "images": {
             "hero": "assets/hero_bg.jpg",
             "ogImage": "assets/hero_bg.jpg",
-            "gallery": [
-                "assets/gallery_1.jpg",
-                "assets/gallery_2.jpg",
-                "assets/gallery_3.jpg",
-                "assets/grid_1.jpg",
-                "assets/grid_2.jpg"
-            ]
+            "gallery": ["assets/gallery_1.jpg","assets/gallery_2.jpg","assets/gallery_3.jpg","assets/grid_1.jpg","assets/grid_2.jpg"]
         },
         "primaryColor": "#D4AF37",
-        "secondaryColor": "#4A1832",
-        "bgColor": "#100C10",
-        "textColor": "#FFF8EF",
-        "bgImage": "",
-        "fontScript": "Pinyon Script",
-        "fontPrimary": "Cinzel",
-        "fontSecondary": "Cinzel"
+        "secondaryColor": "#4a1832",
+        "bgColor": "#0d0810",
+        "textColor": "#F5EDD8",
+        "fontScript": "Great Vibes",
+        "fontPrimary": "Cormorant Garamond",
+        "fontSecondary": "Jost"
     },
     "passSection": {
-        "title": "Pase de Invitación",
-        "subtitle": "Válido para:",
+        "title": "Pase VIP de Invitación",
+        "subtitle": "Asistentes autorizados:",
         "defaultGuestName": "Familia Invitada",
         "defaultPasses": 2,
-        "defaultTable": "14",
-        "message": "\"Con alegría en el corazón, los esperamos para compartir nuestra unión.\"",
-        "qrPrefix": "ValeriaSebastianBoda2026"
+        "defaultTable": "VIP-03",
+        "message": "\"Esta noche solo existimos nosotros. Gracias por ser parte de nuestra historia.\"",
+        "qrPrefix": "ValentinaSebastianVIP2027"
     }
 };
