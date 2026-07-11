@@ -24,17 +24,118 @@
 <body>
 
     <!-- Envelope Overlay (Sobre Digital) -->
-    <div id="envelope-overlay" class="envelope-overlay env-boda-premium env-arch">
-        <div class="envelope-container">
-            <div class="envelope-flap" id="envelope-flap"></div>
-            <div class="envelope-back"></div>
-            <div class="envelope-liner"></div>
-            <div class="envelope-front"></div>
-            <div class="envelope-seal" id="envelope-seal">
-                <i class="fa-solid fa-envelope-open" style="font-size:1.2rem;"></i>
+    <div id="envelope-overlay" class="envelope-overlay">
+        <!-- Fondo de imagen con la foto del sobre -->
+        <div class="env-photo-wrap" id="env-photo-wrap">
+            <!-- Imagen del sobre que el usuario proporcionó -->
+            <img src="assets/envelope.jpg" alt="Invitación" class="env-photo-img" id="env-photo-img">
+            <!-- Sello/overlay clicable centrado sobre el sobre -->
+            <div class="env-tap-zone" id="env-tap-zone">
+                <div class="env-pulse-ring"></div>
+                <div class="env-seal-btn">
+                    <i class="fa-solid fa-wax-seal" style="font-size:1.4rem;"></i>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+    /* ── SOBRE PHOTO PREMIUM ── */
+    #envelope-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0a0608;
+        transition: opacity 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        overflow: hidden;
+    }
+    #envelope-overlay.env-opening {
+        animation: envOpenPulse 0.5s ease;
+    }
+    #envelope-overlay.env-closed {
+        opacity: 0;
+        transform: scale(1.04);
+        pointer-events: none;
+    }
+    .env-photo-wrap {
+        position: relative;
+        width: min(90vw, 420px);
+        cursor: pointer;
+        filter: drop-shadow(0 30px 60px rgba(0,0,0,0.7));
+        animation: envFloat 3s ease-in-out infinite;
+        transition: transform 0.35s ease, filter 0.35s ease;
+    }
+    .env-photo-wrap:hover {
+        filter: drop-shadow(0 40px 80px rgba(0,0,0,0.8)) brightness(1.05);
+        transform: translateY(-6px);
+    }
+    .env-photo-wrap:active {
+        transform: scale(0.97);
+    }
+    .env-photo-img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 12px;
+        pointer-events: none;
+        user-select: none;
+    }
+    /* Zona clicable centrada en el sello de cera */
+    .env-tap-zone {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -36%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px; height: 80px;
+        cursor: pointer;
+    }
+    /* Anillo pulsante */
+    .env-pulse-ring {
+        position: absolute;
+        inset: -12px;
+        border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.5);
+        animation: envPulseRing 1.8s ease-out infinite;
+    }
+    .env-seal-btn {
+        width: 60px; height: 60px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.01);
+        display: flex; align-items: center; justify-content: center;
+        color: transparent;
+        font-size: 0;
+    }
+    /* Animación flotante sutil */
+    @keyframes envFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    /* Pulso del anillo */
+    @keyframes envPulseRing {
+        0% { transform: scale(0.85); opacity: 0.8; }
+        70% { transform: scale(1.4); opacity: 0; }
+        100% { transform: scale(1.4); opacity: 0; }
+    }
+    /* Apertura */
+    @keyframes envOpenPulse {
+        0% { transform: scale(1); }
+        30% { transform: scale(1.06); }
+        100% { transform: scale(1); }
+    }
+    /* Texto de toca para abrir - ya viene en la imagen, pero agregamos sutil brillo */
+    #envelope-overlay::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%);
+        pointer-events: none;
+    }
+    </style>
 
 
     
@@ -319,6 +420,67 @@
     <!-- Scripts -->
     <script src="js/config.js?v=1780781627969"></script>
     <script src="js/main.js?v=1780781627969"></script>
-    <script src="../../assets/js/envelopes.js"></script>
+    <script>
+    // ─ SOBRE FOTO PREMIUM ─ Apertura al tap/click
+    (function() {
+        var overlay = document.getElementById('envelope-overlay');
+        var photoWrap = document.getElementById('env-photo-wrap');
+        var tapZone = document.getElementById('env-tap-zone');
+        var opened = false;
+
+        // Bloquear scroll mientras el sobre está activo
+        document.body.style.overflow = 'hidden';
+
+        function openEnvelope() {
+            if (opened) return;
+            opened = true;
+
+            // 1. Animación de apertura: el sobre se escala hacia arriba y desaparece
+            if (photoWrap) {
+                photoWrap.style.transition = 'transform 0.7s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.7s ease, filter 0.7s ease';
+                photoWrap.style.transform = 'scale(1.12) translateY(-30px)';
+                photoWrap.style.opacity = '0';
+                photoWrap.style.filter = 'brightness(2) blur(4px)';
+            }
+
+            // 2. Fade out del overlay con demora
+            setTimeout(function() {
+                overlay.style.transition = 'opacity 0.6s ease';
+                overlay.style.opacity = '0';
+
+                setTimeout(function() {
+                    overlay.style.display = 'none';
+                    document.body.style.overflow = '';
+
+                    // 3. Arrancar música al abrir
+                    var music = document.getElementById('bg-music');
+                    var musicBtn = document.getElementById('music-btn');
+                    if (music) {
+                        music.play().then(function() {
+                            if (musicBtn) musicBtn.classList.add('playing');
+                        }).catch(function() {});
+                    }
+                }, 650);
+            }, 450);
+        }
+
+        // Escuchar click y touch en todo el sobre
+        if (photoWrap) {
+            photoWrap.addEventListener('click', openEnvelope);
+            photoWrap.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                openEnvelope();
+            }, { passive: false });
+        }
+
+        // También en la zona del sello (redundante pero seguro)
+        if (tapZone) {
+            tapZone.addEventListener('click', function(e) {
+                e.stopPropagation();
+                openEnvelope();
+            });
+        }
+    })();
+    </script>
 </body>
 </html>
