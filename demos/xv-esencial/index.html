@@ -1,280 +1,521 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis XV Años - Valentina</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=1780781627972">
-
-    <!-- Open Graph for WhatsApp & Social Media Previews -->
-    <meta property="og:title" content="Mis XV Años - Valentina">
-    <meta property="og:description" content="¡Estás invitado a mis XV años! Acompáñame en este día tan especial.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tudominio.com/">
-    <!-- Nota: WhatsApp requiere un enlace absoluto de internet (https://...) para mostrar la imagen -->
-    <meta property="og:image" content="https://tudominio.com/assets/hero_bg.jpg">
-    <link rel="stylesheet" href="../../assets/css/envelopes.css">
-    <style id="dynamic-theme">
-        @import url('https://fonts.googleapis.com/css2?family=Parisienne&family=Outfit:wght@300;400;600&display=swap');
-        :root {
-            --primary-color: #E89A9A !important;
-            --secondary-color: #C27A7A !important;
-            --bg-color: #FDFBFB !important;
-            --text-color: #444444 !important;
-            --font-script: 'Parisienne', cursive !important;
-            --font-primary: 'Outfit', sans-serif !important;
-            --font-secondary: 'Outfit', sans-serif !important;
+<!DOCTYPE html><html class="light" lang="es" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ÉLÉGANCE | Ana Camila Zavala - XV Años</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Montserrat:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#757870",
+                        "surface-container-low": "#f4f3f1",
+                        "sage": "#7a8471",
+                        "inverse-on-surface": "#f1f1ef",
+                        "surface-container-lowest": "#ffffff",
+                        "paper": "#faf9f7",
+                        "surface-variant": "#e3e2e0",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "primary": "#555f4e",
+                        "surface-dim": "#dadad8",
+                        "secondary-container": "#e2dfde",
+                        "surface-container-high": "#e9e8e6",
+                        "on-background": "#1a1c1b",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#dce6d0",
+                        "on-tertiary-fixed-variant": "#55414a",
+                        "outline-variant": "#c5c7be",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#404a39",
+                        "tertiary-fixed-dim": "#dac0c9",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2f3130",
+                        "secondary-fixed": "#e5e2e1",
+                        "inverse-primary": "#c0cab4",
+                        "champagne-gold": "#d4af37",
+                        "on-secondary-container": "#636262",
+                        "secondary": "#5f5e5e",
+                        "on-surface-variant": "#454841",
+                        "on-primary-container": "#f8ffee",
+                        "surface-tint": "#586150",
+                        "surface-container": "#efeeec",
+                        "status-success": "#4c6444",
+                        "on-primary-fixed": "#151e10",
+                        "background": "#faf9f7",
+                        "on-tertiary-fixed": "#26171e",
+                        "on-secondary": "#ffffff",
+                        "ink": "#1a1a1a",
+                        "primary-container": "#6e7865",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#6b565f",
+                        "surface": "#faf9f7",
+                        "surface-bright": "#faf9f7",
+                        "on-surface": "#1a1c1b",
+                        "on-tertiary-container": "#fffbff",
+                        "surface-container-highest": "#e3e2e0",
+                        "primary-fixed-dim": "#c0cab4",
+                        "on-secondary-fixed-variant": "#474746",
+                        "tertiary-container": "#856f77",
+                        "tertiary-fixed": "#f7dbe5",
+                        "on-secondary-fixed": "#1c1b1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "gutter": "24px",
+                        "section-gap": "120px",
+                        "margin-desktop": "80px"
+                    },
+                    "fontFamily": {
+                        "italic-accent": ["Cormorant Garamond", "serif"],
+                        "body-lg": ["Montserrat", "sans-serif"],
+                        "display-xl-mobile": ["Cormorant Garamond", "serif"],
+                        "label-caps": ["Montserrat", "sans-serif"],
+                        "headline-md": ["Cormorant Garamond", "serif"],
+                        "headline-lg": ["Cormorant Garamond", "serif"],
+                        "display-xl": ["Cormorant Garamond", "serif"],
+                        "body-md": ["Montserrat", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "italic-accent": ["inherit", {"fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0.02em", "fontWeight": "300"}],
+                        "display-xl-mobile": ["56px", {"lineHeight": "1", "fontWeight": "400", "letterSpacing": "-0.02em"}],
+                        "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.2em", "fontWeight": "500"}],
+                        "headline-md": ["28px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "headline-lg": ["40px", {"lineHeight": "1.3", "fontWeight": "400"}],
+                        "display-xl": ["88px", {"lineHeight": "0.9", "letterSpacing": "-0.03em", "fontWeight": "400"}],
+                        "body-md": ["15px", {"lineHeight": "1.6", "fontWeight": "300", "letterSpacing": "0.01em"}]
+                    }
+                },
+            },
         }
-        body { background-color: var(--bg-color); color: var(--text-color); }
-        h1, h2, .script-title { font-family: var(--font-script); }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .breathe-animation {
+            animation: breathe 12s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .text-subheading-caps {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        .divider-glyph::after {
+            content: "✦";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: #faf9f7;
+            padding: 0 16px;
+            color: #7a8471;
+        }
+        
+        /* Parallax Styles */
+        .parallax-layer {
+            will-change: transform;
+            transform: translateY(var(--parallax-y, 0));
+        }
     </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
 </head>
-<body>
-
-    <!-- Envelope Overlay (Sobre Digital) -->
-    <div id="envelope-overlay" class="envelope-overlay env-xv-esencial">
-        <div class="envelope-container">
-            <div class="envelope-flap" id="envelope-flap"></div>
-            <div class="envelope-back"></div>
-            <div class="envelope-liner"></div>
-            <div class="envelope-front"></div>
-            <div class="envelope-seal" id="envelope-seal">
-                <i class="fa-solid fa-envelope-open" style="font-size:1.2rem;"></i>
-            </div>
-        </div>
+<body class="bg-paper text-on-surface selection:bg-sage/20">
+<!-- Top Navigation Bar -->
+<header class="bg-transparent absolute top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-gutter py-6">
+<div class="flex items-center gap-4">
+<button class="text-primary hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<h1 class="font-display-lg text-headline-md tracking-[0.3em] text-primary dark:text-primary-fixed-dim uppercase text-sm md:text-base">ÉLÉGANCE</h1>
+<div class="flex items-center gap-4">
+<a class="font-subheading-caps text-subheading-caps text-primary hover:text-primary transition-all duration-300" href="#rsvp">RSVP</a>
+</div>
+</header>
+<main class="w-full overflow-hidden">
+<!-- Hero Section -->
+<section class="relative min-h-screen flex flex-col md:flex-row items-center pt-24 md:pt-0">
+<div class="w-full md:w-5/12 flex flex-col justify-center items-start px-margin-mobile md:pl-24 z-10 space-y-8 pt-12 md:pt-0 relative transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<span class="font-label-caps text-label-caps text-sage uppercase tracking-[0.4em]">Mis Quince Años</span>
+<h2 class="font-display-xl-mobile md:font-display-xl text-ink uppercase flex flex-col">
+<span class="block">Ana</span>
+<span class="block md:ml-12 italic text-sage">Camila</span>
+<span class="block md:ml-24">Zavala</span>
+</h2>
+<div class="mt-8 md:mt-16 border-l border-outline-variant/30 pl-6 relative before:absolute before:left-[-1px] before:top-0 before:w-px before:h-12 before:bg-sage">
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm italic">
+                    "Hay momentos inolvidables que se atesoran en el corazón para siempre, por esa razón, quiero que compartas conmigo este día tan especial..."
+                </p>
+</div>
+</div>
+<div class="w-full md:w-7/12 h-[60vh] md:h-screen mt-12 md:mt-0 relative overflow-hidden transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="parallax-layer w-full h-[120%] -top-[10%] relative" style="--parallax-y: -490.39687499999997px;">
+<img class="w-full h-full object-cover breathe-animation object-center md:object-right" data-alt="An editorial, high-fashion portrait of a young woman in a stunning red ball gown, standing in a sun-drenched architectural courtyard with stone arches and palm trees. The lighting is golden-hour soft, highlighting the textures of the silk fabric and the serene, elegant expression on her face. The overall mood is sophisticated, regal, and captures the 'Quiet Luxury' aesthetic with muted sage and cream tones in the background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGp8n5Ng6p1-hEL10ct7BPcL1m3RfIvLKaMbyAEEUhf0mZykSbOM1O2qochoiZoWMcnoGY5yT7r7uPd_GNUiqLkz9GIbEltfS1FlhgdmPo4vFvMAZKA72nu9ggR-4R5NefFXF8E--mszs4t-TxbKXy2uTqma3Kik5UKHnkJ6DFOi40Hu0Vk4gRoGrkzi_kiwKO4ECZWd_yfNrWRDmcyHWlKiQKQ_jGzVn04aBvq-nyeFtg1ew41eMxAGVkVjjq1CqlbjwrlfVai_c">
+</div>
+<div class="absolute inset-0 bg-gradient-to-r from-paper via-transparent to-transparent md:block hidden opacity-50"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-paper via-transparent to-transparent md:hidden block opacity-80 h-32 bottom-0 top-auto"></div>
+</div>
+</section>
+<!-- Family Honors Section -->
+<section class="py-section-gap px-margin-mobile">
+<div class="max-w-6xl mx-auto transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-24">
+<div class="md:col-span-6 space-y-24 text-left">
+<div class="space-y-6">
+<h3 class="font-label-caps text-label-caps text-sage uppercase tracking-[0.3em] flex items-center gap-4">
+<span class="w-8 h-px bg-sage/50"></span>
+                                Con la bendición de Dios y mis padres
+                            </h3>
+<div class="flex flex-col gap-3">
+<span class="font-headline-md text-headline-md text-ink">Susana Almazán Bernal</span>
+<span class="font-italic-accent text-italic-accent text-sage italic text-2xl pl-8">&amp;</span>
+<span class="font-headline-md text-headline-md text-ink pl-16">César Roberto Zavala</span>
+</div>
+</div>
+<div class="space-y-6">
+<h3 class="font-label-caps text-label-caps text-sage uppercase tracking-[0.3em] flex items-center gap-4">
+<span class="w-8 h-px bg-sage/50"></span>
+                                Mis Padrinos
+                            </h3>
+<div class="flex flex-col gap-3">
+<span class="font-headline-md text-headline-md text-ink">Diana Almanza García</span>
+<span class="font-italic-accent text-italic-accent text-sage italic text-2xl pl-8">&amp;</span>
+<span class="font-headline-md text-headline-md text-ink pl-16">Enrique O'Farrill Zúñiga</span>
+</div>
+</div>
+</div>
+<div class="md:col-span-5 md:col-start-8 mt-12 md:mt-48">
+<div class="space-y-6 p-12 bg-surface-container-low/50 relative">
+<div class="absolute top-0 left-0 w-16 h-16 border-t border-l border-sage/30"></div>
+<div class="absolute bottom-0 right-0 w-16 h-16 border-b border-r border-sage/30"></div>
+<h3 class="font-label-caps text-label-caps text-sage uppercase tracking-[0.3em]">Mi Chambelán</h3>
+<span class="font-headline-md text-headline-md text-ink block">Carlos González Farrera</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Countdown Banner -->
+<section class="relative py-32 bg-ink text-paper overflow-hidden">
+<div class="absolute inset-0 opacity-40 overflow-hidden transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="parallax-layer w-full h-[120%] -top-[10%] relative" style="--parallax-y: -249.0375px;">
+<img class="w-full h-full object-cover" data-alt="A dark, atmospheric background of deep forest trees at twilight. The scene is moody and ethereal, with tiny specks of warm bokeh light resembling fireflies scattered across the lower third. The lighting is cinematic, highlighting the rugged textures of the tree bark while maintaining a sophisticated, high-contrast aesthetic consistent with a luxury evening event." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3mOR_AUaFh8Ii8Pi74QfwogxFgaEfY6NBPu3HV-B49kW3bvm3CCiXH3rReh6eQ2d57aBy1Efm-pJI6vJ06spX0kZhECc7oTfe8rrNCbM-HBLSgoBHEt5a4KF9a-guS8vhoHnvUofD1fxUMXjBtiZqu2krG6klmu0jPt_UhiJKHFw4-wW4OPG-3Y3L1fspyY3VJDlptycuhxe2Ro30xj7JBelicUduJMbyJoCSlbup68AmstNYHEULlCBfePC7PH4jY1Oqg0dOe1E">
+</div>
+</div>
+<div class="relative z-10 max-w-4xl mx-auto px-margin-mobile flex flex-col md:flex-row items-center justify-between gap-16 transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="text-left space-y-6">
+<h3 class="font-label-caps text-label-caps uppercase tracking-[0.4em] text-sage flex items-center gap-4">
+<span class="w-12 h-px bg-sage"></span>
+                        Te espero el día
+                    </h3>
+<span class="font-display-xl-mobile text-display-xl-mobile block">12 Diciembre <br><span class="italic text-sage/80">2026</span></span>
+</div>
+<div class="flex flex-col items-start gap-12">
+<div class="flex gap-8 md:gap-12 text-center">
+<div class="flex flex-col items-center">
+<span class="font-headline-lg text-headline-lg font-light text-5xl">154</span>
+<span class="font-label-caps text-label-caps text-sage/70 mt-2 tracking-[0.2em]">Días</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-headline-lg text-headline-lg font-light text-5xl">06</span>
+<span class="font-label-caps text-label-caps text-sage/70 mt-2 tracking-[0.2em]">Horas</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-headline-lg text-headline-lg font-light text-5xl">50</span>
+<span class="font-label-caps text-label-caps text-sage/70 mt-2 tracking-[0.2em]">Minutos</span>
+</div>
+</div>
+<button class="px-8 py-4 border border-paper/20 hover:bg-paper hover:text-ink transition-all font-label-caps text-label-caps tracking-[0.3em] text-xs">
+                        AGREGAR AL CALENDARIO
+                    </button>
+</div>
+</div>
+</section>
+<!-- Locations Grid -->
+<section class="py-section-gap px-margin-mobile bg-surface-container-low/20">
+<div class="max-w-6xl mx-auto space-y-24 transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<!-- Ceremony -->
+<div class="flex flex-col md:flex-row gap-12 items-center">
+<div class="w-full md:w-1/3 flex justify-center md:justify-end">
+<div class="w-24 h-24 rounded-full border border-sage/30 flex items-center justify-center relative">
+<span class="material-symbols-outlined text-4xl text-sage">church</span>
+<div class="absolute -bottom-8 left-1/2 w-px h-16 bg-sage/30 md:hidden"></div>
+<div class="absolute top-1/2 -right-8 w-16 h-px bg-sage/30 hidden md:block"></div>
+</div>
+</div>
+<div class="w-full md:w-2/3 text-center md:text-left space-y-6">
+<h3 class="font-headline-lg text-headline-lg text-ink">Ceremonia Religiosa</h3>
+<div class="space-y-2 font-body-md text-body-md text-on-surface-variant max-w-sm mx-auto md:mx-0">
+<p class="font-medium text-ink">Parroquia Sagrado Corazón de Jesús</p>
+<p class="text-sage font-medium tracking-widest text-sm py-2">3:00 P.M.</p>
+<p class="opacity-80">Blv. Calle 20 de Noviembre y Av. Melchor Ocampo<br>Col. Pacifico, C.P. 31030<br>Chihuahua, Chih.</p>
+</div>
+<a class="inline-block mt-4 text-xs font-label-caps text-label-caps tracking-[0.3em] text-ink border-b border-ink pb-1 hover:text-sage hover:border-sage transition-colors" href="#">COMO LLEGAR</a>
+</div>
+</div>
+<!-- Reception -->
+<div class="flex flex-col md:flex-row-reverse gap-12 items-center">
+<div class="w-full md:w-1/3 flex justify-center md:justify-start">
+<div class="w-24 h-24 rounded-full border border-sage/30 flex items-center justify-center relative">
+<span class="material-symbols-outlined text-4xl text-sage">celebration</span>
+<div class="absolute -top-8 left-1/2 w-px h-16 bg-sage/30 md:hidden"></div>
+<div class="absolute top-1/2 -left-8 w-16 h-px bg-sage/30 hidden md:block"></div>
+</div>
+</div>
+<div class="w-full md:w-2/3 text-center md:text-right space-y-6">
+<h3 class="font-headline-lg text-headline-lg text-ink">Salón de Recepción</h3>
+<div class="space-y-2 font-body-md text-body-md text-on-surface-variant max-w-sm mx-auto md:mx-0 md:ml-auto">
+<p class="font-medium text-ink">Cantabria Salón de Eventos</p>
+<p class="text-sage font-medium tracking-widest text-sm py-2">9:00 P.M.</p>
+<p class="opacity-80">Blv. Col. Sierra Magisterial #6103 esq. con Tejas<br>Col. Los Angeles, C.P. 31380<br>Chihuahua, Chih.</p>
+</div>
+<a class="inline-block mt-4 text-xs font-label-caps text-label-caps tracking-[0.3em] text-ink border-b border-ink pb-1 hover:text-sage hover:border-sage transition-colors" href="#">COMO LLEGAR</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Dress Code & Details -->
+<section class="relative py-section-gap bg-ink text-paper flex flex-col md:flex-row items-center min-h-[70vh]">
+<div class="w-full md:w-1/2 h-[50vh] md:h-full absolute md:relative top-0 left-0 opacity-30 md:opacity-100 overflow-hidden transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="parallax-layer w-full h-[120%] -top-[10%] relative" style="--parallax-y: 10.040625px;">
+<img class="w-full h-full object-cover object-center breathe-animation" data-alt="A macro photograph of high-end evening wear textures. Fine lace patterns, soft silk drapes, and the subtle shimmer of high-quality fabrics are captured in low-key lighting. The color palette is monochromatic with hints of deep charcoal and silver, emphasizing the sophisticated 'Formal' theme and 'Quiet Luxury' aesthetic requested for the event." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvfHbfCANp8YxxIdVEmZJngRGQSp-9M8vWN1OohatnPdIWdOkT93PZbucEfGNcnS2FuFcfBW2BK20c2-hswKclndmWPnxHKN46GVvI2hL1Vnh0rD4Q3yg6uKCeb3xlQVdLvSgHhuPdL6WLz1KcPz2rgSnYKyY1Y_tbF0mUWvuNaFxHkXQ6wiIUD1ltoO4LspVjLARNJtmMMh0iklFsPJM-dBOl8oNmb73Ge3VQSncHQJ7dg7zfZO9qvljtJdRE_2Dy3ncMmB-X_lE">
+</div>
+</div>
+<div class="w-full md:w-1/2 relative z-10 px-margin-mobile md:px-24 text-center md:text-left space-y-12 py-24 md:py-0 transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="space-y-6">
+<span class="font-label-caps text-label-caps text-sage uppercase tracking-[0.4em] flex items-center justify-center md:justify-start gap-4">
+<span class="material-symbols-outlined text-2xl">apparel</span>
+                            Dress Code
+                        </span>
+<h4 class="font-display-xl-mobile text-display-xl-mobile font-light tracking-widest text-6xl">FORMAL</h4>
+</div>
+<div class="space-y-8 pl-0 md:pl-8 border-l-0 md:border-l border-sage/30">
+<p class="font-body-lg text-body-lg italic opacity-80 max-w-md mx-auto md:mx-0 font-light">
+                        "Este es un día dedicado sólo a jóvenes y adultos, agradecemos de antemano su comprensión."
+                    </p>
+<span class="font-label-caps text-label-caps tracking-[0.3em] text-sage block text-xs">NO NIÑOS</span>
+</div>
+</div>
+</section><section id="registry" class="py-section-gap px-margin-mobile bg-paper relative overflow-hidden">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center space-y-6 mb-16">
+      <span class="font-label-caps text-label-caps text-sage uppercase tracking-[0.4em] block">Sugerencias</span>
+      <h2 class="font-display-xl-mobile md:font-display-xl text-ink uppercase">Mesa de Regalos</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto italic">
+        "Tu presencia es nuestro mejor regalo, pero si deseas tener un detalle con nosotros, aquí tienes nuestras sugerencias."
+      </p>
     </div>
 
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+      <!-- Amazon Card -->
+      <div class="p-12 border border-outline-variant/20 bg-surface-container-low/20 flex flex-col items-center text-center space-y-6 group hover:border-sage transition-colors duration-500">
+        <span class="material-symbols-outlined text-4xl text-sage opacity-80">shopping_bag</span>
+        <h3 class="font-headline-md text-ink">Amazon Registry</h3>
+        <a href="#" class="px-8 py-3 border border-ink text-ink font-label-caps text-[10px] tracking-[0.3em] hover:bg-ink hover:text-paper transition-all duration-300">VER MESA</a>
+      </div>
 
-    <!-- Background Music -->
-    <audio id="bg-music" loop autoplay>
-        <source src="assets/music.mp3" type="audio/mpeg">
-        Tu navegador no soporta el elemento de audio.
-    </audio>
+      <!-- Liverpool Card -->
+      <div class="p-12 border border-outline-variant/20 bg-surface-container-low/20 flex flex-col items-center text-center space-y-6 group hover:border-sage transition-colors duration-500">
+        <span class="material-symbols-outlined text-4xl text-sage opacity-80">featured_seasonal</span>
+        <h3 class="font-headline-md text-ink">Liverpool</h3>
+        <a href="#" class="px-8 py-3 border border-ink text-ink font-label-caps text-[10px] tracking-[0.3em] hover:bg-ink hover:text-paper transition-all duration-300">VER MESA</a>
+      </div>
 
-    <!-- Floating Music Button -->
-    <button id="music-btn" class="music-btn">
-        <i class="fa-solid fa-music"></i>
-    </button>    <!-- Hero Section -->
-    <header class="hero" id="home">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h2 class="pre-title fade-in-up">Mis XV Años</h2>
-            <h1 class="title fade-in-up delay-1">Valentina</h1>
-            <p class="date fade-in-up delay-2">11 de Julio, 2026</p>
+      <!-- Bank Details Card -->
+      <div class="p-12 border border-outline-variant/20 bg-surface-container-low/20 flex flex-col items-center text-center space-y-6 group hover:border-sage transition-colors duration-500">
+        <span class="material-symbols-outlined text-4xl text-sage opacity-80">account_balance</span>
+        <h3 class="font-headline-md text-ink">Datos Bancarios</h3>
+        <button class="px-8 py-3 border border-ink text-ink font-label-caps text-[10px] tracking-[0.3em] hover:bg-ink hover:text-paper transition-all duration-300 uppercase">Copiar CLABE</button>
+      </div>
+    <div class="p-12 border border-outline-variant/20 bg-surface-container-low/20 flex flex-col items-center text-center space-y-6 group hover:border-sage transition-colors duration-500">
+  <span class="material-symbols-outlined text-4xl text-sage opacity-80">mail</span>
+  <h3 class="font-headline-md text-ink">Lluvia de Sobres</h3>
+  <p class="font-body-md text-on-surface-variant italic text-sm">
+    Tu presencia es nuestro mejor regalo, pero si deseas tener un detalle, tendremos una urna el día del evento.
+  </p>
+</div></div>
+  </div>
+</section>
+<!-- Gallery / Minimalist Layout -->
+<section class="py-section-gap px-margin-mobile max-w-[1600px] mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 items-center transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="md:col-span-7 h-[60vh] md:h-[80vh] overflow-hidden relative">
+<div class="parallax-layer w-full h-[120%] -top-[10%] relative" style="--parallax-y: 143.59921875px;">
+<img class="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-1000 ease-out" data-alt="An editorial photo of a young woman in a vibrant red dress standing next to a vintage black classic car. The setting is an elegant estate driveway lined with trees. The composition is asymmetrically balanced, using the car as a sophisticated prop. Lighting is natural and warm, creating a premium lifestyle magazine aesthetic with rich colors and sharp details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBp1UneYNO0MeP74YJFv-y9jJMLb985CltX4HNGUUjNDtuuArrnBazRw1y8JY4ocNSSVB7thJbUs5Y0JsrKLhP36U2RTf2ajfuSB1cTYJBzzH2k7JPU3Yqc3bnne6vmtM_IzZz3xspY9RSNyK6_Jiem3qMPI3VTxxyPbODjaU5hNZg3j1N72UYjYvO28CCyHom3thNtdCxb2_b2_Cpx8tXXLwhAOCASX3WFLByQzjmluZMgoupI8EMQKbBXz5RGHjHrvYgnV8CWW3k">
+</div>
+</div>
+<div class="md:col-span-5 flex flex-col gap-6 md:gap-12 mt-6 md:mt-32">
+<div class="h-[40vh] overflow-hidden ml-0 md:ml-12 relative">
+<div class="parallax-layer w-full h-[120%] -top-[10%] relative" style="--parallax-y: 217.02421875px;">
+<img class="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-1000 ease-out object-top" data-alt="A close-up artistic shot of delicate hands wearing red evening gloves, holding a small bouquet of white roses. The background is a soft-focus architectural stone balcony. The lighting is bright and high-key, emphasizing a clean, light-mode luxury aesthetic. The image is serene and focuses on the elegance of small details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmkBAwKY_AcELlMqiUh3i3ymA0rcSEoI4fPk7xt_kZ4fqeOvtwD1KaHbKYYRhDxUiNMxD_u_GaE2klTDpVGup_mwgPOPZvPK8SCycbyRxVUQhEc74tR96p35pp3PFESVADJ6JFQI7MZBEmxnpchGx16isgrBQW4H0vXjQohQ7VYQRysI8hfyiD9jaurOdTCYJ_hhjgukTYHtgEqiC_HtxaQfW9MtpMl92RxEVUF4_UryVzP2Lq_A-mwaG_WKGdzeLx0mH0Q5gP1MI">
+</div>
+</div>
+<div class="h-[50vh] overflow-hidden mr-0 md:mr-12 relative">
+<div class="parallax-layer w-full h-[120%] -top-[10%] relative" style="--parallax-y: 280.24921875px;">
+<img class="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-1000 ease-out" data-alt="A full-length editorial portrait of a young woman in a sky-blue lace cocktail dress, sitting gracefully on a fallen tree trunk in a lush, green forest clearing. The light filters through the canopy in soft rays, creating a dreamlike, ethereal atmosphere. The color palette of sage greens and soft blues provides a refreshing contrast to the red-themed sections." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA63u7Nf29k4YUsMPLvfbG2-fwaDaSW4PfhRApXk4bXsn8nSyNp6FBZwg512EtyMt8xgd_-TvEGPh10Dm-eTFvOL3TAxXGrLjPa_GFtcn19pn5-ZT0vG3rJlZnw_oyQy3oT3wyHOniIh9QwlP23FpGtx5DSdr4lZW4ir6NFdvTHIZmQRBcrpJjh194DffPlSO2J2RYFZ_w0J4AwPRVx9UUWPtfnPDV0P7spgv2V5Ie9G9IgQ9aes8-kaRjlRPf6u1uaX_A8XbLBCtQ">
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 md:mt-12 h-[40vh] md:h-[60vh] overflow-hidden max-w-4xl mx-auto relative transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="parallax-layer w-full h-[120%] -top-[10%] relative" style="--parallax-y: 343.47421875px;">
+<img class="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-1000 ease-out object-bottom" data-alt="A cinematic low-angle shot of a grand stone archway leading into a garden. The sunlight creates dramatic shadows across the stone floor. The image captures the feeling of an exclusive, historic venue. The mood is timeless and prestigious, reinforcing the 'Quiet Luxury' theme of the celebration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBszB4aYMznOR1Sn24ktvDMGgQVfXwA5I_jSBjJcU6Vw5_Fs7Qh-7Zab4VQaZXKdBS7RsEieC15SxSu_FqqASjNN-Yu1OOOT2LRyi_sl51feM8a5SU8B_0i6egw3xMAAtuVqTm-hnUGKTT4EN2VwOQvtcVlqA_U5cQqXeRt_K4XO6OC5LzB1FDbulSXN17zix91rrkx5ut8BhetyQtncA-w5ocLEvVKpkyrYyVpwZYtDsIiE1q0CL2WTmtDJMUuZFevsHONsbRncic">
+</div>
+</div>
+</section>
+<!-- RSVP Form -->
+<section class="py-section-gap px-margin-mobile bg-paper relative" id="rsvp">
+<div class="absolute inset-0 bg-[linear-gradient(to_right,#e3e2e0_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20 transition-all duration-1000 ease-out opacity-100 translate-y-0"></div>
+<div class="max-w-2xl mx-auto bg-paper relative z-10 p-8 md:p-20 space-y-16 border border-outline-variant/20 shadow-2xl shadow-ink/5 transition-all duration-1000 ease-out opacity-100 translate-y-0">
+<div class="text-center space-y-6">
+<span class="font-label-caps text-label-caps text-sage uppercase tracking-[0.4em] block">RSVP</span>
+<h2 class="font-headline-lg text-headline-lg text-ink font-light">Confirmar Asistencia</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm mx-auto font-light">Lo más importante es contar contigo en este día, agradecemos tu confirmación.</p>
+</div>
+<form class="space-y-12">
+<div class="flex flex-col md:flex-row gap-6 md:gap-12 justify-center border-y border-outline-variant/20 py-8">
+<label class="flex items-center gap-4 cursor-pointer group">
+<input checked="" class="w-4 h-4 text-sage border-outline focus:ring-sage" name="attendance" type="radio">
+<span class="font-label-caps text-label-caps tracking-[0.2em] group-hover:text-sage transition-colors text-xs">SÍ, ASISTIRÉ</span>
+</label>
+<label class="flex items-center gap-4 cursor-pointer group">
+<input class="w-4 h-4 text-sage border-outline focus:ring-sage" name="attendance" type="radio">
+<span class="font-label-caps text-label-caps tracking-[0.2em] group-hover:text-sage transition-colors text-xs">NO PODRÉ ASISTIR</span>
+</label>
+</div>
+<div class="space-y-8">
+<div class="relative focus-within:border-sage transition-all group">
+<label class="block font-label-caps text-label-caps text-sage uppercase mb-3 tracking-[0.2em] text-[10px]">Nombre completo</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/40 p-0 pb-3 focus:ring-0 focus:border-sage text-ink placeholder:opacity-30 font-body-md transition-colors" placeholder="Ej. Juan Pérez" type="text">
+</div>
+<div class="relative focus-within:border-sage transition-all group">
+<label class="block font-label-caps text-label-caps text-sage uppercase mb-3 tracking-[0.2em] text-[10px]">Correo electrónico</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/40 p-0 pb-3 focus:ring-0 focus:border-sage text-ink placeholder:opacity-30 font-body-md transition-colors" placeholder="para recibir tu QR de acceso" type="email">
+</div>
+</div>
+<button class="w-full py-5 bg-ink text-paper font-label-caps text-label-caps tracking-[0.3em] hover:bg-sage transition-colors duration-500 text-xs" type="submit">
+                        CONFIRMAR MI ASISTENCIA
+                    </button>
+</form>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest full-width border-t border-outline-variant/20 w-full py-24 px-margin-mobile md:px-gutter flex flex-col items-center space-y-12">
+<h2 class="font-headline-lg text-primary tracking-[0.4em] uppercase text-xl font-light">ÉLÉGANCE</h2>
+<div class="flex flex-wrap justify-center gap-8 md:gap-16">
+<a class="font-label-caps text-label-caps tracking-[0.2em] text-xs text-on-surface-variant hover:text-sage transition-colors" href="#">THE COLLECTION</a>
+<a class="font-label-caps text-label-caps tracking-[0.2em] text-xs text-on-surface-variant hover:text-sage transition-colors" href="#">CUSTOM DESIGN</a>
+<a class="font-label-caps text-label-caps tracking-[0.2em] text-xs text-on-surface-variant hover:text-sage transition-colors" href="#">OUR STORY</a>
+<a class="font-label-caps text-label-caps tracking-[0.2em] text-xs text-on-surface-variant hover:text-sage transition-colors" href="#">CONTACT</a>
+</div>
+<p class="font-body-md text-on-surface-variant/50 uppercase tracking-[0.3em] text-[9px] pt-8 font-light">© 2024 ÉLÉGANCE DIGITAL ATELIER. ALL RIGHTS RESERVED.</p>
+</footer>
+<!-- Bottom Mobile Nav -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center py-4 px-2 bg-paper/90 backdrop-blur-xl z-50 border-t border-outline-variant/10">
+<a class="flex flex-col items-center justify-center text-sage font-medium scale-95 transition-transform duration-200 gap-1" href="#">
+<span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+<span class="font-subheading-caps text-[8px] tracking-widest">INVITE</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/50 hover:text-sage transition-colors duration-300 gap-1" href="#details">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span class="font-subheading-caps text-[8px] tracking-widest">DETAILS</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/50 hover:text-sage transition-colors duration-300 gap-1" href="#locations">
+<span class="material-symbols-outlined text-[20px]">distance</span>
+<span class="font-subheading-caps text-[8px] tracking-widest">LOCATION</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/50 hover:text-sage transition-colors duration-300 gap-1" href="#registry">
+<span class="material-symbols-outlined text-[20px]">redeem</span>
+<span class="font-subheading-caps text-[8px] tracking-widest">REGISTRY</span>
+</a>
+</nav>
+<script>
+        // Smooth scroll for anchors
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Simple reveal effect on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-12');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section > div').forEach(section => {
+            section.classList.add('transition-all', 'duration-1000', 'ease-out', 'opacity-0', 'translate-y-12');
+            observer.observe(section);
+        });
+
+        // Parallax Effect
+        document.addEventListener("DOMContentLoaded", () => {
+            const parallaxLayers = document.querySelectorAll('.parallax-layer');
             
-            <div class="countdown-wrapper fade-in-up delay-3">
-                <div class="countdown-item">
-                    <span id="days">00</span>
-                    <p>Días</p>
-                </div>
-                <div class="countdown-item">
-                    <span id="hours">00</span>
-                    <p>Horas</p>
-                </div>
-                <div class="countdown-item">
-                    <span id="minutes">00</span>
-                    <p>Minutos</p>
-                </div>
-                <div class="countdown-item">
-                    <span id="seconds">00</span>
-                    <p>Segundos</p>
-                </div>
-            </div>
-            <a href="#rsvp" class="btn-primary fade-in-up delay-4">Confirma tu asistencia</a>
-        </div>
-    </header>
-
-    <!-- Parents & Godparents Section -->
-    <section class="family container section-padding text-center" id="family">
-        <h2 class="script-title family-main-title">Con la Bendición de Nuestros Padres</h2>
-        <div class="divider"></div>
-        
-        
-        <div class="family-flex-container" style="justify-content: center; width: 100%; margin-bottom: 30px;">
-            <div style="text-align: center;">
-                <p class="family-member-name" id="bride-mother" style="font-size: 1.5rem; margin-bottom: 5px;">Adriana Montes</p>
-                <p class="family-member-name" id="bride-father" style="font-size: 1.5rem;">Luis Fernández</p>
-            </div>
-        </div>
-    
-
-        <div class="family-padrinos reveal">
-            <h3 class="family-role-title">Padrinos</h3>
-            <p class="family-member-name">Ángel Patiño y Lucila Osorio</p>
-        </div>
-    </section>
-
-    <!-- Parallax 1 -->
-    <div class="parallax-section parallax-1 reveal"></div>
-
-    <!-- Details Section -->
-    <section class="details container section-padding" id="details">
-        <div class="section-title text-center">
-            <h2 class="script-title">Detalles del Evento</h2>
-            <div class="divider"></div>
-        </div>
-        <div class="grid">
-            <div class="card reveal">
-                <i class="fa-solid fa-church card-icon"></i>
-                <h3>Ceremonia Religiosa</h3>
-                <p>16:00 hrs</p>
-                <p>Iglesia y Ex Convento de San Juan Bautista Centenario 8</p>
-                <p>Villa de Coyoacán, Coyoacán 04000 CDMX</p>
-                <a href="https://maps.google.com/?q=Iglesia+y+Ex+Convento+de+San+Juan+Bautista+Centenario+8,+Coyoacan" target="_blank" class="btn-secondary">Ver en Mapa</a>
-            </div>
-            <div class="card reveal">
-                <i class="fa-solid fa-martini-glass-citrus card-icon"></i>
-                <h3>Recepción</h3>
-                <p>19:00 hrs</p>
-                <p>Salon Miami</p>
-                <p>Boulevar Bosque de Las Naciones 30</p>
-                <p>Bosques de Aragon, 57170 Cdad. Nezahualcóyotl, Méx.</p>
-                <a href="https://maps.google.com/?q=Salon+Miami+Boulevar+Bosque+de+Las+Naciones+30+Nezahualcoyotl" target="_blank" class="btn-secondary">Ver en Mapa</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Itinerary Section -->
-    <section class="itinerary-section section-padding" id="itinerary">
-        <div class="container">
-            <div class="section-title text-center reveal">
-                <h2 class="script-title">Itinerario</h2>
-                <div class="divider"></div>
-            </div>
-            <div class="timeline reveal">
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fa-solid fa-church"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <span class="time">16:00 hrs</span>
-                        <h3>Ceremonia Religiosa</h3>
-                        <p>Iglesia y Ex Convento de San Juan Bautista Centenario 8</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fa-solid fa-martini-glass-citrus"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <span class="time">19:00 hrs</span>
-                        <h3>Recepción</h3>
-                        <p>Salon Miami</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fa-solid fa-champagne-glasses"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <span class="time">19:30 hrs</span>
-                        <h3>Recepción del Salón</h3>
-                        <p>Cóctel de bienvenida</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fa-solid fa-utensils"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <span class="time">20:00 hrs</span>
-                        <h3>Cena y Brindis</h3>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fa-solid fa-heart"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <span class="time">21:00 hrs</span>
-                        <h3>Vals de XV Años</h3>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fa-solid fa-music"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <span class="time">21:30 hrs</span>
-                        <h3>Inicia la Fiesta</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    
-
-    <!-- Parallax 2 -->
-    <div class="parallax-section parallax-2 reveal"></div>
-
-    
+            const updateParallax = () => {
+                parallaxLayers.forEach(layer => {
+                    const container = layer.parentElement;
+                    const rect = container.getBoundingClientRect();
+                    
+                    // Check if element is in viewport
+                    if (rect.top <= window.innerHeight && rect.bottom >= 0) {
+                        // Calculate offset based on scroll position relative to screen center
+                        const centerOffset = (rect.top + rect.height / 2) - window.innerHeight / 2;
+                        // Subtle 15% parallax scroll rate
+                        const yOffset = centerOffset * 0.15; 
+                        
+                        layer.style.setProperty('--parallax-y', `${yOffset}px`);
+                    }
+                });
+            };
+            
+            // Listen to scroll events with requestAnimationFrame for smooth performance
+            window.addEventListener('scroll', () => {
+                requestAnimationFrame(updateParallax);
+            }, { passive: true });
+            
+            // Initial call
+            updateParallax();
+        });
+    </script>
 
 
-
-    
-
-    <!-- Parallax 3 -->
-    <div class="parallax-section parallax-3 reveal"></div>
-
-    <!-- RSVP Section -->
-    <section class="rsvp section-padding" id="rsvp">
-        <div class="container">
-            <div class="rsvp-container reveal">
-                <h2 class="script-title rsvp-title">Confirma tu Asistencia</h2>
-                <p>Por favor, haznos saber si podrás acompañarnos en este día tan especial.</p>
-                <form id="rsvp-form" class="form">
-                    <div class="form-group">
-                        <label for="name">Nombre Completo</label>
-                        <input type="text" id="name" placeholder="Ej. Juan Pérez" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="attendance">¿Asistirás?</label>
-                        <select id="attendance" required>
-                            <option value="">Selecciona una opción...</option>
-                            <option value="yes">¡Sí, ahí estaré!</option>
-                            <option value="no">Lamentablemente no podré asistir</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="guests">Número de personas</label>
-                        <select id="guests">
-                            <option value="1">1 persona</option>
-                            <option value="2">2 personas</option>
-                            <option value="3">3 personas</option>
-                            <option value="4">4 personas</option>
-                            <option value="5">5 personas</option>
-                            <option value="6">6 personas</option>
-                            <option value="7">7 personas</option>
-                            <option value="8">8 personas</option>
-                            <option value="9">9 personas</option>
-                            <option value="10">10 personas</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">Mensaje (Opcional)</label>
-                        <textarea id="message" rows="4" placeholder="Déjanos un mensaje o coméntanos sobre alergias/restricciones..."></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary w-100">Enviar Confirmación</button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <p>¡Esperamos verte ahí!</p>
-        <h2>Valentina XV</h2>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="js/main.js?v=1780781627972"></script>
-    <script src="../../assets/js/envelopes.js"></script>
-</body>
-</html>
+</body></html>
