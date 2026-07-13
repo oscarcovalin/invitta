@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "api/invitation-meta.js": {
+      "includeFiles": [
+        "invitacion.html",
+        "assets/js/env.js"
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/invitacion.html",
+      "destination": "/api/invitation-meta"
+    }
+  ]
+}
