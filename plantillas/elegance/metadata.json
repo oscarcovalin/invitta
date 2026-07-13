@@ -1,0 +1,6 @@
+{
+  "name": "Invitación Digital XV Años - ÉLÉGANCE",
+  "description": "Invitación digital interactiva de Quince Años con estética Quiet Luxury, cuenta regresiva, confirmación RSVP, lightbox y panel de invitados.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
