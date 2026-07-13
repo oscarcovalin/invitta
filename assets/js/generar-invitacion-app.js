@@ -8,6 +8,7 @@
 
 let loadedConfig = null;
 let finalHTML    = null;
+let previewBlobUrl = null;
 
 // ─────────────────────────────────────────────
 // FILE HANDLING
@@ -1009,6 +1010,56 @@ function buildTemplateCSS(p, t, design) {
 // ─────────────────────────────────────────────
 // MAIN GENERATOR
 // ─────────────────────────────────────────────
+function validateInvitationForPreview(data, media, studio) {
+    const errors = [];
+    const warnings = [];
+
+    if (!data.event) errors.push("Faltan los datos del evento.");
+    else if (!data.event.primaryName) errors.push("Falta el nombre principal del evento.");
+
+    if (!data.template) errors.push("Faltan los datos de la plantilla.");
+    else if (!data.template.id) errors.push("Falta el identificador de la plantilla (template.id).");
+
+    if (!data.visual) errors.push("Faltan los datos visuales.");
+    if (!finalHTML) errors.push("No se pudo generar el HTML final.");
+
+    if (!media.heroImage) warnings.push("Falta imagen de portada.");
+    if (!media.gallery || media.gallery.length === 0) warnings.push("Falta galería de fotografías.");
+    if (!media.music) warnings.push("Falta música de fondo.");
+    if (!media.studioLogo) warnings.push("Falta logotipo del estudio.");
+    
+    if (!studio.name) warnings.push("Falta nombre del estudio.");
+    if (!studio.whatsapp) warnings.push("Falta WhatsApp del estudio.");
+
+    return { errors, warnings };
+}
+
+function openPreview() {
+    if (!finalHTML) return;
+    
+    if (previewBlobUrl) {
+        URL.revokeObjectURL(previewBlobUrl);
+        previewBlobUrl = null;
+    }
+    
+    const blob = new Blob([finalHTML], { type: "text/html;charset=utf-8" });
+    previewBlobUrl = URL.createObjectURL(blob);
+    
+    const newWindow = window.open(previewBlobUrl, "_blank");
+    const statusMsg = document.getElementById("previewStatusMsg");
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
+        if (statusMsg) {
+            statusMsg.textContent = "El navegador bloqueó la ventana emergente. Por favor, permite las ventanas emergentes e inténtalo de nuevo.";
+            statusMsg.style.display = "block";
+            statusMsg.style.color = "#d9534f";
+        }
+    } else {
+        if (statusMsg) {
+             statusMsg.style.display = "none";
+        }
+    }
+}
+
 function generateInvitation() {
     if (!loadedConfig) return;
     const d = loadedConfig;
@@ -1084,6 +1135,9 @@ ${musicJS}
 </body>
 </html>`;
 
+    // Validate
+    const validation = validateInvitationForPreview(d, media, studio);
+
     // Show result
     document.getElementById("generateCard").style.display = "none";
     const resultCard = document.getElementById("resultCard");
@@ -1095,6 +1149,50 @@ ${musicJS}
 
     document.getElementById("codePreview").textContent =
         finalHTML.split("\n").slice(0, 80).join("\n") + "\n\n... (archivo completo disponible al descargar)";
+
+    let controlsContainer = document.getElementById("previewControlsContainer");
+    if (!controlsContainer) {
+        controlsContainer = document.createElement("div");
+        controlsContainer.id = "previewControlsContainer";
+        controlsContainer.style.marginTop = "20px";
+        resultCard.appendChild(controlsContainer);
+    }
+    
+    controlsContainer.textContent = ""; 
+    
+    if (validation.errors.length > 0) {
+        const errDiv = document.createElement("div");
+        errDiv.style.color = "#d9534f";
+        errDiv.style.marginBottom = "10px";
+        errDiv.textContent = "Errores bloqueantes: " + validation.errors.join(" | ");
+        controlsContainer.appendChild(errDiv);
+    } else {
+        if (validation.warnings.length > 0) {
+            const warnDiv = document.createElement("div");
+            warnDiv.style.color = "#f0ad4e";
+            warnDiv.style.marginBottom = "10px";
+            warnDiv.textContent = "Advertencias: " + validation.warnings.join(" | ");
+            controlsContainer.appendChild(warnDiv);
+        }
+        
+        const previewBtn = document.createElement("button");
+        previewBtn.type = "button";
+        previewBtn.id = "btnPreviewInvitation";
+        previewBtn.className = "btn";
+        previewBtn.style.marginTop = "10px";
+        previewBtn.textContent = "Vista previa completa";
+        previewBtn.ariaLabel = "Abrir vista previa completa en una nueva pestaña";
+        previewBtn.addEventListener("click", openPreview);
+        
+        const statusMsg = document.createElement("div");
+        statusMsg.id = "previewStatusMsg";
+        statusMsg.style.marginTop = "10px";
+        statusMsg.style.fontSize = "0.9rem";
+        statusMsg.style.display = "none";
+        
+        controlsContainer.appendChild(previewBtn);
+        controlsContainer.appendChild(statusMsg);
+    }
 
     resultCard.scrollIntoView({ behavior: "smooth" });
 }
