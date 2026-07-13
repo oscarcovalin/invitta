@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Invitación Final - Invitta Studio</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #FAF8F5;
+            --card: #FFFFFF;
+            --border: #EAE4DD;
+            --text: #111111;
+            --muted: #6B6560;
+            --accent: #D4AF37;
+            --danger: #E53935;
+            --success: #2E7D32;
+            --sans: 'Inter', sans-serif;
+            --serif: 'Playfair Display', serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        .container { max-width: 780px; margin: 0 auto; padding: 40px 24px 80px; }
+
+        header { text-align: center; margin-bottom: 40px; }
+        header h1 { font-family: var(--serif); font-size: 2rem; font-weight: 500; }
+        header p { color: var(--muted); margin-top: 8px; font-size: 0.95rem; }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .card-title { font-family: var(--serif); font-size: 1.25rem; font-weight: 500; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+
+        /* Upload */
+        .upload-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 48px 20px; text-align: center; cursor: pointer; transition: all 0.25s; background: #fafafa; }
+        .upload-zone:hover, .upload-zone.over { border-color: var(--accent); background: #fdfaf5; }
+        .upload-zone i { font-size: 2.5rem; color: var(--accent); display: block; margin-bottom: 14px; }
+        .upload-zone p { color: var(--muted); font-size: 0.9rem; margin-top: 6px; }
+        input[type="file"] { display: none; }
+
+        /* Messages */
+        .msg { display: none; padding: 12px 16px; border-radius: 6px; font-size: 0.9rem; margin-top: 14px; }
+        .msg-error { background: #ffebee; color: var(--danger); border-left: 4px solid var(--danger); display: none; }
+        .msg-success { background: #e8f5e9; color: var(--success); border-left: 4px solid var(--success); display: none; }
+
+        /* Summary grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+        .sum-item { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+        .sum-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+        .sum-value { font-size: 0.95rem; font-weight: 500; }
+
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: 6px; font-family: var(--sans); font-size: 0.9rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-generate { background: var(--text); color: #fff; width: 100%; justify-content: center; font-size: 1rem; padding: 14px; margin-top: 8px; }
+        .btn-generate:hover { background: #333; }
+        .btn-download { background: var(--accent); color: #fff; }
+        .btn-download:hover { background: #c29f30; }
+        .btn-reset { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-reset:hover { background: var(--bg); }
+
+        /* Code Preview */
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 0.8rem; line-height: 1.5; max-height: 300px; overflow-y: auto; }
+
+        .action-row { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 16px; }
+
+        /* Sections hidden until needed */
+        #summaryCard, #generateCard, #resultCard { display: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <h1>Generar Invitación Final</h1>
+        <p>Carga el archivo <code>invitta-configuracion.json</code> para generar un HTML publicable.</p>
+    </header>
+
+    <!-- Step 1: Upload -->
+    <div class="card" id="uploadCard">
+        <h2 class="card-title">1 · Cargar configuración</h2>
+        <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <i class="fa-solid fa-file-code"></i>
+            <strong>Arrastra aquí tu archivo JSON</strong>
+            <p>o haz clic para explorar</p>
+            <input type="file" id="fileInput" accept=".json">
+        </div>
+        <div class="msg msg-error" id="errorMsg"></div>
+    </div>
+
+    <!-- Step 2: Summary -->
+    <div class="card" id="summaryCard">
+        <h2 class="card-title">2 · Resumen del evento</h2>
+        <div class="summary-grid" id="summaryGrid"></div>
+    </div>
+
+    <!-- Step 3: Generate -->
+    <div class="card" id="generateCard">
+        <h2 class="card-title">3 · Generar invitación</h2>
+        <p style="color:var(--muted); font-size:0.9rem; margin-bottom:16px;">
+            Al hacer clic se construirá el HTML final completo listo para publicarse.
+        </p>
+        <button class="btn btn-generate" id="btnGenerate" onclick="generateInvitation()">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Generar invitación final
+        </button>
+    </div>
+
+    <!-- Step 4: Result -->
+    <div class="card" id="resultCard">
+        <h2 class="card-title">4 · Resultado</h2>
+        <div class="msg msg-success" id="successMsg"></div>
+        <pre id="codePreview"></pre>
+        <div class="action-row">
+            <button class="btn btn-reset" onclick="location.reload()">
+                <i class="fa-solid fa-rotate-left"></i> Empezar de nuevo
+            </button>
+            <button class="btn btn-download" id="btnDownload" onclick="downloadFinal()">
+                <i class="fa-solid fa-download"></i> Descargar invitacion-final.html
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script src="../assets/js/generar-invitacion-app.js"></script>
+</body>
+</html>
