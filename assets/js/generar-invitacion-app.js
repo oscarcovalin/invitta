@@ -64,7 +64,15 @@ function buildDraftInsertPayload() {
         thank_you_signature: cp.thank_you_signature,
         hashtag_section_title: cp.hashtag_section_title,
         hashtag_section_message: cp.hashtag_section_message,
-        godparents: Array.isArray(cp.godparents) ? cp.godparents.map(g => ({ ...g })) : [],
+        godparents: Array.isArray(cp.godparents) 
+            ? cp.godparents
+                .filter(g => g && typeof g === "object" && typeof g.name === "string" && g.name.trim() !== "")
+                .map(g => ({
+                    role: String(g.role || "").trim(),
+                    name: String(g.name).trim()
+                }))
+                .slice(0, 20)
+            : [],
         font_preset: cp.font_preset,
         visual_theme: cp.visual_theme,
         color_primary: cp.color_primary,
@@ -90,8 +98,20 @@ function buildDraftInsertPayload() {
         link_builder_pin: "",
         link_builder_title: cp.link_builder_title,
         link_builder_message: cp.link_builder_message,
-        gallery_urls: Array.isArray(cp.gallery_urls) ? [...cp.gallery_urls] : [],
-        itinerary: Array.isArray(cp.itinerary) ? cp.itinerary.map(i => ({ ...i })) : [],
+        gallery_urls: Array.isArray(cp.gallery_urls) 
+            ? cp.gallery_urls
+                .filter(url => typeof url === "string" && safeHttpsUrl(url))
+                .slice(0, 10)
+            : [],
+        itinerary: Array.isArray(cp.itinerary) 
+            ? cp.itinerary
+                .filter(i => i && typeof i === "object" && typeof i.title === "string" && i.title.trim() !== "")
+                .map(i => ({
+                    time: String(i.time || "").trim(),
+                    title: String(i.title).replace(/<[^>]*>?/gm, "").trim()
+                }))
+                .slice(0, 30)
+            : [],
         background_image_url: cp.background_image_url,
         music_title: cp.music_title,
         music_artist: cp.music_artist,
