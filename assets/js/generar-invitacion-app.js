@@ -1284,6 +1284,178 @@ document.addEventListener("DOMContentLoaded", () => {
     fileInput.addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 });
 
+function inspectConfigurationComplexity(value) {
+    let depthCount = 0;
+    let nodeCount = 0;
+    let tooDeep = false;
+    let tooManyNodes = false;
+
+    function traverse(obj, currentDepth) {
+        if (tooDeep || tooManyNodes) return;
+        if (currentDepth > 20) {
+            tooDeep = true;
+            return;
+        }
+        if (obj && typeof obj === "object") {
+            const keys = Object.keys(obj);
+            nodeCount += keys.length;
+            if (nodeCount > 5000) {
+                tooManyNodes = true;
+                return;
+            }
+            for (let i = 0; i < keys.length; i++) {
+                traverse(obj[keys[i]], currentDepth + 1);
+            }
+        }
+    }
+    traverse(value, 1);
+    return { tooDeep, tooManyNodes };
+}
+
+function containsDangerousConfigurationKeys(value) {
+    if (!value || typeof value !== "object") return false;
+    let dangerous = false;
+    function traverse(obj) {
+        if (dangerous) return;
+        if (obj && typeof obj === "object") {
+            const keys = Object.keys(obj);
+            if (keys.includes("__proto__") || keys.includes("prototype") || keys.includes("constructor")) {
+                dangerous = true;
+                return;
+            }
+            for (let i = 0; i < keys.length; i++) {
+                traverse(obj[keys[i]]);
+            }
+        }
+    }
+    traverse(value);
+    return dangerous;
+}
+
+function validateLoadedConfigurationStructure(data) {
+    const result = { errors: [], warnings: [] };
+    
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+        result.errors.push("data no es objeto plano.");
+        return result;
+    }
+    
+    if (!data.meta || typeof data.meta !== "object" || Array.isArray(data.meta)) {
+        result.errors.push("falta meta o no es objeto.");
+    }
+    if (!data.template || typeof data.template !== "object" || Array.isArray(data.template)) {
+        result.errors.push("falta template o no es objeto.");
+    } else {
+        const tid = String(data.template.id || "").trim();
+        const tname = String(data.template.name || "").trim();
+        if (!tid && !tname) result.errors.push("template.id y template.name están ambos ausentes o vacíos.");
+        if ("id" in data.template && typeof data.template.id !== "string") result.errors.push("template.id existe y no es string.");
+        if ("name" in data.template && typeof data.template.name !== "string") result.errors.push("template.name existe y no es string.");
+        if (!("level" in data.template)) result.warnings.push("template.level no existe.");
+    }
+    
+    if (!data.event || typeof data.event !== "object" || Array.isArray(data.event)) {
+        result.errors.push("falta event o no es objeto.");
+    } else {
+        if (typeof data.event.primaryName !== "string") {
+            result.errors.push("event.primaryName no es string.");
+        } else {
+            const pname = data.event.primaryName.trim();
+            if (pname === "") result.errors.push("event.primaryName vacío después de trim.");
+            if (pname.length > 200) result.errors.push("event.primaryName supera 200 caracteres.");
+        }
+        if ("type" in data.event) {
+            if (typeof data.event.type !== "string") result.errors.push("event.type existe y no es string.");
+            else if (data.event.type.length > 100) result.errors.push("event.type supera 100 caracteres.");
+        }
+        if (!("secondaryName" in data.event)) result.warnings.push("event.secondaryName no existe.");
+        if (!("dateText" in data.event)) result.warnings.push("event.dateText no existe.");
+    }
+    
+    if (!data.visual || typeof data.visual !== "object" || Array.isArray(data.visual)) {
+        result.errors.push("falta visual o no es objeto.");
+    } else {
+        if ("palette" in data.visual && typeof data.visual.palette !== "string") result.errors.push("visual.palette existe y no es string.");
+        if ("typography" in data.visual && typeof data.visual.typography !== "string") result.errors.push("visual.typography existe y no es string.");
+        
+        if (!("typography" in data.visual)) result.warnings.push("visual.typography no existe.");
+        if (!("handwritten" in data.visual)) result.warnings.push("visual.handwritten no existe.");
+    }
+    
+    return result;
+}
+
+function clearLoadedConfigurationUI() {
+    loadedConfig = null;
+    const grid = document.getElementById("summaryGrid");
+    if (grid) grid.replaceChildren();
+    
+    const summaryCard = document.getElementById("summaryCard");
+    if (summaryCard) summaryCard.style.display = "none";
+    
+    const generateCard = document.getElementById("generateCard");
+    if (generateCard) generateCard.style.display = "none";
+    
+    const resultCard = document.getElementById("resultCard");
+    if (resultCard) resultCard.style.display = "none";
+    
+    const errorEl = document.getElementById("errorMsg");
+    if (errorEl) {
+        errorEl.textContent = "";
+        errorEl.style.display = "none";
+    }
+    
+    const warningEl = document.getElementById("warningMsg");
+    if (warningEl) {
+        warningEl.textContent = "";
+        warningEl.style.display = "none";
+    }
+    
+    updateGeneratorActionState();
+    updateConfigurationBackupButtonState();
+}
+
+function createSafeSummaryValue(value, maxLength = 160) {
+    if (value === null || value === undefined || typeof value === "object" || typeof value === "function") {
+        return "—";
+    }
+    const type = typeof value;
+    if (type !== "string" && type !== "number" && type !== "boolean") {
+        return "—";
+    }
+    const str = String(value).trim();
+    if (str === "") return "—";
+    if (str.length > maxLength) return str.substring(0, maxLength);
+    return str;
+}
+
+function createSummaryItem(label, value) {
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "sum-item";
+    
+    const labelDiv = document.createElement("div");
+    labelDiv.className = "sum-label";
+    labelDiv.textContent = label;
+    
+    const valueDiv = document.createElement("div");
+    valueDiv.className = "sum-value";
+    valueDiv.textContent = value;
+    
+    itemDiv.appendChild(labelDiv);
+    itemDiv.appendChild(valueDiv);
+    
+    return itemDiv;
+}
+
+function showErrorAndClear(msg) {
+    clearLoadedConfigurationUI();
+    const el = document.getElementById("errorMsg");
+    if (el) {
+        el.textContent = msg;
+        el.style.display = "block";
+    }
+}
+
 function createWorkingConfiguration(parsedData) {
     if (!parsedData || typeof parsedData !== "object" || Array.isArray(parsedData)) {
         throw new Error("Configuración no es un objeto válido");
@@ -1295,64 +1467,113 @@ function createWorkingConfiguration(parsedData) {
 
 function handleFile(file) {
     if (!enforceStudioReady()) return;
-    if (!file.name.endsWith(".json")) { 
-        loadedConfig = null;
-        showError("Selecciona un archivo .json válido."); 
-        updateGeneratorActionState();
-        return; 
+    
+    if (!/\.json$/i.test(file.name)) {
+        showErrorAndClear("Selecciona un archivo .json válido.");
+        return;
     }
+    
+    const allowedMime = ["application/json", "text/json", "text/plain", ""];
+    if (!allowedMime.includes(file.type)) {
+        showErrorAndClear("El archivo seleccionado no tiene un formato compatible.");
+        return;
+    }
+    
+    if (file.size > 2 * 1024 * 1024) {
+        showErrorAndClear("El archivo de configuración supera el tamaño permitido.");
+        return;
+    }
+    
     const reader = new FileReader();
     reader.onload = (e) => {
+        let data;
         try {
-            const data = JSON.parse(e.target.result);
-            if (!data.meta || !data.template || !data.event || !data.visual) {
-                loadedConfig = null;
-                showError("El archivo no parece ser una configuración Invitta válida.");
-                updateGeneratorActionState();
-                return;
-            }
+            data = JSON.parse(e.target.result);
+        } catch {
+            showErrorAndClear("Error al parsear el archivo JSON. Verifica que el archivo no esté corrupto.");
+            return;
+        }
+        
+        const complexity = inspectConfigurationComplexity(data);
+        if (complexity.tooDeep) {
+            showErrorAndClear("La configuración contiene una estructura demasiado profunda.");
+            return;
+        }
+        if (complexity.tooManyNodes) {
+            showErrorAndClear("La configuración contiene demasiados elementos.");
+            return;
+        }
+        
+        if (containsDangerousConfigurationKeys(data)) {
+            showErrorAndClear("La configuración contiene propiedades no permitidas.");
+            return;
+        }
+        
+        const structuralValidation = validateLoadedConfigurationStructure(data);
+        if (structuralValidation.errors.length > 0) {
+            console.error("Errores estructurales:", structuralValidation.errors);
+            showErrorAndClear("El archivo no parece ser una configuración Invitta válida.");
+            return;
+        }
+        
+        try {
             const workingConfig = createWorkingConfiguration(data);
+            clearLoadedConfigurationUI();
             loadedConfig = workingConfig;
+            
+            if (structuralValidation.warnings.length > 0) {
+                let warningEl = document.getElementById("warningMsg");
+                if (!warningEl) {
+                    warningEl = document.createElement("div");
+                    warningEl.id = "warningMsg";
+                    warningEl.style.color = "#f0ad4e";
+                    warningEl.style.marginTop = "10px";
+                    warningEl.style.marginBottom = "10px";
+                    const sumCard = document.getElementById("summaryCard");
+                    if (sumCard) sumCard.insertBefore(warningEl, document.getElementById("summaryGrid"));
+                }
+                warningEl.textContent = "La configuración se cargó con advertencias: " + structuralValidation.warnings.join(" | ");
+                warningEl.style.display = "block";
+            }
+            
             renderSummary(workingConfig);
             updateGeneratorActionState();
-        } catch { 
-            loadedConfig = null;
-            showError("Error al parsear el archivo JSON. Verifica que el archivo no esté corrupto."); 
-            updateGeneratorActionState();
+            updateConfigurationBackupButtonState();
+        } catch (err) {
+            console.error("Error al procesar configuración:", err);
+            showErrorAndClear("Error al procesar la configuración.");
         }
     };
     reader.readAsText(file);
 }
 
 function showError(msg) {
-    const el = document.getElementById("errorMsg");
-    el.textContent = msg;
-    el.style.display = "block";
+    showErrorAndClear(msg);
 }
 
 function renderSummary(data) {
     document.getElementById("uploadCard").style.display = "none";
 
     const items = [
-        { label: "Nombre principal",  value: data.event.primaryName },
-        { label: "Nombre secundario", value: data.event.secondaryName || "—" },
-        { label: "Tipo de evento",    value: data.event.type },
-        { label: "Paquete",           value: data.event.packageLevel },
-        { label: "Plantilla",         value: data.template.name || data.template.id || "—" },
-        { label: "Nivel",             value: data.template.level || "—" },
-        { label: "Paleta",            value: data.visual.palette },
-        { label: "Tipografía",        value: data.visual.typography || "—" },
-        { label: "Handwritten",       value: data.visual.handwritten || "—" },
-        { label: "Fecha",             value: data.event.dateText || "—" },
-        { label: "Generado el",       value: new Date().toLocaleDateString("es-MX", { dateStyle: "long" }) }
+        { label: "Nombre principal",  value: createSafeSummaryValue(data.event.primaryName, 160) },
+        { label: "Nombre secundario", value: createSafeSummaryValue(data.event.secondaryName, 160) },
+        { label: "Tipo de evento",    value: createSafeSummaryValue(data.event.type, 80) },
+        { label: "Paquete",           value: createSafeSummaryValue(data.event.packageLevel, 80) },
+        { label: "Plantilla",         value: createSafeSummaryValue(data.template.name || data.template.id, 120) },
+        { label: "Nivel",             value: createSafeSummaryValue(data.template.level, 80) },
+        { label: "Paleta",            value: createSafeSummaryValue(data.visual.palette, 80) },
+        { label: "Tipografía",        value: createSafeSummaryValue(data.visual.typography, 120) },
+        { label: "Handwritten",       value: createSafeSummaryValue(data.visual.handwritten, 120) },
+        { label: "Fecha",             value: createSafeSummaryValue(data.event.dateText, 120) },
+        { label: "Generado el",       value: createSafeSummaryValue(new Date().toLocaleDateString("es-MX", { dateStyle: "long" }), 80) }
     ];
 
     const grid = document.getElementById("summaryGrid");
-    grid.innerHTML = items.map(i => `
-        <div class="sum-item">
-            <div class="sum-label">${i.label}</div>
-            <div class="sum-value">${i.value || "—"}</div>
-        </div>`).join("");
+    grid.replaceChildren();
+    
+    for (let i = 0; i < items.length; i++) {
+        grid.appendChild(createSummaryItem(items[i].label, items[i].value));
+    }
 
     document.getElementById("summaryCard").style.display  = "block";
     document.getElementById("generateCard").style.display = "block";
