@@ -121,7 +121,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       h3.appendChild(document.createTextNode(" "));
     }
 
+    
+    if (inv.template_id && TEMPLATE_NAMES[inv.template_id]) {
+      h3.appendChild(createBadge("🎨 " + TEMPLATE_NAMES[inv.template_id], "badge badge-media"));
+      h3.appendChild(document.createTextNode(" "));
+    }
     const galleryCount = countArrayValues(inv.gallery_urls, 10);
+
     if (galleryCount > 0) {
       h3.appendChild(createBadge(`🖼️ Galería ${galleryCount}`, "badge badge-media badge-gallery"));
       h3.appendChild(document.createTextNode(" "));

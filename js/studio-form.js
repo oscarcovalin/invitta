@@ -3,6 +3,72 @@
  * Lógica para crear y editar invitaciones en Invitta Studio
  */
 
+
+const VALID_TEMPLATES = [
+  "xv-elegance-basic",
+  "xv-rose-gold-premium",
+  "xv-champagne-rose-vip",
+  "boda-classic-basic",
+  "boda-golden-romance-premium",
+  "boda-midnight-gold-vip"
+];
+
+function updateTemplateOptions() {
+  const eventType = document.getElementById("event_type").value;
+  const templateSelect = document.getElementById("template_id");
+  const currentVal = templateSelect.value;
+  
+  templateSelect.innerHTML = "";
+  
+  if (eventType === "xv") {
+    const opts = [
+      {val: "xv-elegance-basic", text: "Élégance XV — Básica"},
+      {val: "xv-rose-gold-premium", text: "Rose Gold XV — Premium"},
+      {val: "xv-champagne-rose-vip", text: "Champagne Rose VIP"}
+    ];
+    opts.forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = o.val;
+      opt.textContent = o.text;
+      templateSelect.appendChild(opt);
+    });
+    // Si no habia valor previo de XV, usar Rose Gold XV por defecto
+    if (!currentVal || !currentVal.startsWith("xv-")) {
+      templateSelect.value = "xv-rose-gold-premium";
+    } else {
+      templateSelect.value = currentVal;
+    }
+  } else {
+    // Por defecto Boda
+    const opts = [
+      {val: "boda-classic-basic", text: "Classic Boda — Básica"},
+      {val: "boda-golden-romance-premium", text: "Golden Romance — Premium"},
+      {val: "boda-midnight-gold-vip", text: "Midnight Gold — VIP"}
+    ];
+    opts.forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = o.val;
+      opt.textContent = o.text;
+      templateSelect.appendChild(opt);
+    });
+    // Si no habia valor previo de boda, usar por defecto
+    if (!currentVal || !currentVal.startsWith("boda-")) {
+      templateSelect.value = "boda-classic-basic";
+    } else {
+      templateSelect.value = currentVal;
+    }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const et = document.getElementById("event_type");
+  if (et) {
+    et.addEventListener("change", updateTemplateOptions);
+    // Inicializar al cargar
+    updateTemplateOptions();
+  }
+});
+
 function parseItineraryText(text) {
   if (!text) return [];
   return text
@@ -357,6 +423,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("title").value = data.title || "";
     document.getElementById("slug").value = data.slug || "";
     document.getElementById("event_type").value = data.event_type || "boda";
+    updateTemplateOptions();
+    if (data.template_id && VALID_TEMPLATES.includes(data.template_id)) {
+      document.getElementById("template_id").value = data.template_id;
+    }
     document.getElementById("honoree_name").value = data.honoree_name || "";
     document.getElementById("event_date").value = data.event_date || "";
     document.getElementById("event_time").value = data.event_time || "";
@@ -643,6 +713,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       title: document.getElementById("title").value,
       slug: slugToUse,
       event_type: document.getElementById("event_type").value,
+      template_id: VALID_TEMPLATES.includes(document.getElementById("template_id").value) ? document.getElementById("template_id").value : null,
       honoree_name: document.getElementById("honoree_name").value,
       event_date: document.getElementById("event_date").value || null,
       event_time: document.getElementById("event_time").value || null,

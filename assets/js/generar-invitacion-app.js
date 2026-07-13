@@ -3841,6 +3841,11 @@ ${musicJS}
     currentPublicationManifest = buildPublicationManifest(d, media, studio, currentPublicationSlug);
     currentStudioPayload = buildStudioInvitationPayload(d, media, studio, currentPublicationSlug);
     
+    // Preservar template_id original si existe en el borrador recuperado
+    if (typeof recoveredStudioDraft !== 'undefined' && recoveredStudioDraft && recoveredStudioDraft.template_id) {
+        currentStudioPayload.template_id = recoveredStudioDraft.template_id;
+    }
+    
     currentGenerationVersion += 1;
 
     const msgEl = document.getElementById("authStatusMsg");
