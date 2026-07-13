@@ -186,6 +186,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       n: "Familia Garcia",
       p: "4",
       m: "5",
+      preview: "studio",
       v: `preview-${Date.now()}`
     });
     return `https://invitta.vercel.app/invitacion.html?${params.toString()}`;

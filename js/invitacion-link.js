@@ -422,8 +422,10 @@ function openGeneratedInvitation() {
     return;
   }
 
-  const separator = generatedInvitationLink.includes("?") ? "&" : "?";
-  window.open(`${generatedInvitationLink}${separator}v=preview-${Date.now()}`, "_blank", "noopener,noreferrer");
+  const previewUrl = new URL(generatedInvitationLink, window.location.origin);
+  previewUrl.searchParams.set("preview", "studio");
+  previewUrl.searchParams.set("v", `preview-${Date.now()}`);
+  window.open(previewUrl.toString(), "_blank", "noopener,noreferrer");
 }
 
 async function downloadGeneratedPass() {

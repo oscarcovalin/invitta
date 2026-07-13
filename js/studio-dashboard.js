@@ -71,6 +71,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     return `/invitacion.html?slug=${encodeURIComponent(safeSlug)}`;
   }
 
+  function buildStudioPreviewPath(safeSlug) {
+    const params = new URLSearchParams({
+      slug: safeSlug,
+      n: "Familia Garcia",
+      p: "4",
+      m: "5",
+      preview: "studio",
+      v: `preview-${Date.now()}`
+    });
+    return `/invitacion.html?${params.toString()}`;
+  }
+
   function setCopyButtonFeedback(btn, baseLink) {
     btn.addEventListener("click", () => {
       const originalText = btn.textContent;
@@ -209,11 +221,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       copyBtn.disabled = true;
       demoBtn.textContent = "Demo no disponible";
     } else {
-      demoBtn.textContent = "Ver Demo";
+      demoBtn.textContent = inv.published === true ? "Ver Demo" : "Vista previa";
       demoBtn.target = "_blank";
       demoBtn.rel = "noopener noreferrer";
-      demoBtn.href = `${buildPublicInvitationPath(safeSlug)}&n=Familia%20Garcia&p=4&m=5`;
-      setCopyButtonFeedback(copyBtn, baseLink);
+      demoBtn.href = inv.published === true
+        ? `${buildPublicInvitationPath(safeSlug)}&n=Familia%20Garcia&p=4&m=5`
+        : buildStudioPreviewPath(safeSlug);
+
+      if (inv.published === true) {
+        setCopyButtonFeedback(copyBtn, baseLink);
+      } else {
+        copyBtn.disabled = true;
+        copyBtn.textContent = "Publica para copiar";
+        copyBtn.title = "Activa Publicar Invitacion antes de compartir el enlace publico.";
+      }
     }
     
     actionsDiv.appendChild(copyBtn);
