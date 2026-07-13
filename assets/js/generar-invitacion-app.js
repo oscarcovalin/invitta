@@ -23,6 +23,10 @@ let draftUpdateInProgress = false;
 let draftPayloadDirty = false;
 let lastSavedDraftPayloadFingerprint = null;
 
+let draftPublishInProgress = false;
+let publishedStudioInvitation = null;
+let publishConfirmationArmed = false;
+
 function createDraftPayloadFingerprint(payload) {
     if (!payload) return null;
     const copy = JSON.parse(JSON.stringify(payload));
@@ -80,6 +84,38 @@ function validateDraftUpdateReadiness() {
     if (currentStudioPayload && currentStudioPayload.published !== false) errors.push("El borrador no puede estar marcado como publicado.");
     if (!draftPayloadDirty) errors.push("El borrador no tiene cambios pendientes de guardar.");
     if (!window.studioAuth || !window.studioAuth.db) errors.push("No existe conexión con la base de datos.");
+
+    if (currentStudioPayload) {
+        const payloadValidation = validateStudioInvitationPayload(currentStudioPayload);
+        if (payloadValidation.errors.length > 0) {
+            errors.push("El payload contiene errores de validación.");
+        }
+        warnings.push(...payloadValidation.warnings);
+    }
+
+    return { errors, warnings };
+}
+
+function validateDraftPublishReadiness() {
+    const errors = [];
+    const warnings = [];
+
+    if (!isStudioGeneratorReady()) errors.push("No hay una sesión de estudio válida o activa.");
+    if (draftCreationInProgress) errors.push("Ya hay una creación de borrador en progreso.");
+    if (draftUpdateInProgress) errors.push("Ya hay una actualización de borrador en progreso.");
+    if (draftPublishInProgress) errors.push("Ya hay una publicación en progreso.");
+    if (!createdStudioDraft) errors.push("No existe un borrador creado previamente.");
+    if (createdStudioDraft && !createdStudioDraft.id) errors.push("El borrador previo no tiene un ID válido.");
+    if (createdStudioDraft && !createdStudioDraft.slug) errors.push("El borrador previo no tiene un slug válido.");
+    if (!currentStudioPayload) errors.push("No se ha generado el payload para Invitta Studio.");
+    if (!currentPublicationSlug) errors.push("No se ha generado un slug de publicación.");
+    if (createdStudioDraft && currentPublicationSlug !== createdStudioDraft.slug) errors.push("El slug actual es diferente al del borrador original.");
+    if (currentStudioPayload && createdStudioDraft && currentStudioPayload.slug !== createdStudioDraft.slug) errors.push("El slug del payload no coincide con el del borrador original.");
+    if (draftPayloadDirty) errors.push("El borrador tiene cambios pendientes de guardar.");
+    if (!lastSavedDraftPayloadFingerprint) errors.push("No existe fingerprint del último borrador guardado.");
+    if (publishedStudioInvitation) errors.push("La invitación ya está publicada localmente.");
+    if (!window.studioAuth || !window.studioAuth.db) errors.push("No existe conexión con la base de datos.");
+    if (!publishConfirmationArmed) errors.push("La confirmación de publicación no está armada.");
 
     if (currentStudioPayload) {
         const payloadValidation = validateStudioInvitationPayload(currentStudioPayload);
@@ -185,7 +221,7 @@ function updateDraftCreationButtonState() {
     const btn = document.getElementById("btnCreateStudioDraft");
     if (!btn) return;
 
-    if (draftCreationInProgress || draftUpdateInProgress || !isStudioGeneratorReady() || !currentStudioPayload || createdStudioDraft) {
+    if (draftCreationInProgress || draftUpdateInProgress || draftPublishInProgress || !isStudioGeneratorReady() || !currentStudioPayload || createdStudioDraft) {
         btn.disabled = true;
     } else {
         const validation = validateStudioInvitationPayload(currentStudioPayload);
@@ -223,6 +259,13 @@ function updateDraftUpdateButtonState() {
         return;
     }
 
+    if (draftPublishInProgress) {
+        btn.style.display = "inline-block";
+        btn.disabled = true;
+        btn.textContent = "Publicación no disponible";
+        return;
+    }
+
     if (draftCreationInProgress) {
         btn.style.display = "inline-block";
         btn.disabled = true;
@@ -248,6 +291,78 @@ function updateDraftUpdateButtonState() {
     btn.style.display = "inline-block";
     btn.disabled = false;
     btn.textContent = "Actualizar borrador en Invitta Studio";
+}
+
+function updateDraftPublishButtonState() {
+    const btn = document.getElementById("btnPublishStudioInvitation");
+    const panel = document.getElementById("publishConfirmationPanel");
+    if (!btn) return;
+    
+    if (!createdStudioDraft || 
+        !currentPublicationSlug || 
+        currentPublicationSlug !== createdStudioDraft.slug) {
+        btn.style.display = "none";
+        btn.disabled = true;
+        if (panel) panel.style.display = "none";
+        return;
+    }
+
+    btn.style.display = "inline-block";
+
+    if (publishedStudioInvitation) {
+        btn.disabled = true;
+        btn.textContent = "Invitación publicada";
+        if (panel) panel.style.display = "none";
+        return;
+    }
+
+    if (draftPublishInProgress) {
+        btn.disabled = true;
+        btn.textContent = "Publicando invitación...";
+        if (panel) panel.style.display = "none";
+        return;
+    }
+
+    if (draftCreationInProgress || draftUpdateInProgress) {
+        btn.disabled = true;
+        btn.textContent = "Publicación no disponible";
+        if (panel) panel.style.display = "none";
+        return;
+    }
+
+    if (draftPayloadDirty) {
+        btn.disabled = true;
+        btn.textContent = "Guarda los cambios antes de publicar";
+        if (panel) panel.style.display = "none";
+        return;
+    }
+
+    if (publishConfirmationArmed) {
+        btn.style.display = "none";
+        if (panel) panel.style.display = "block";
+        return;
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Publicar invitación";
+    if (panel) panel.style.display = "none";
+}
+
+function preparePublishConfirmation() {
+    if (draftCreationInProgress || draftUpdateInProgress || draftPublishInProgress || draftPayloadDirty) return;
+    
+    publishConfirmationArmed = true;
+    updateDraftPublishButtonState();
+    
+    const panel = document.getElementById("publishConfirmationPanel");
+    if (panel) panel.style.display = "block";
+}
+
+function cancelPublishConfirmation() {
+    publishConfirmationArmed = false;
+    updateDraftPublishButtonState();
+    const panel = document.getElementById("publishConfirmationPanel");
+    if (panel) panel.style.display = "none";
 }
 
 async function createStudioInvitationDraft() {
@@ -509,6 +624,174 @@ async function updateStudioInvitationDraft() {
         draftUpdateInProgress = false;
         updateDraftUpdateButtonState();
         updateDraftCreationButtonState();
+        updateDraftPublishButtonState();
+    }
+}
+
+async function publishStudioInvitation() {
+    if (!enforceStudioReady()) return;
+    if (draftCreationInProgress || draftUpdateInProgress || draftPublishInProgress) return;
+    
+    const readiness = validateDraftPublishReadiness();
+    const msgEl = document.getElementById("studioPublishStatusMsg");
+    
+    if (readiness.errors.length > 0) {
+        if (msgEl) {
+            msgEl.textContent = "Errores: " + readiness.errors.join(" ");
+            msgEl.style.color = "var(--danger)";
+            msgEl.setAttribute("role", "alert");
+            msgEl.setAttribute("aria-live", "assertive");
+        }
+        return;
+    }
+
+    draftPublishInProgress = true;
+    updateDraftCreationButtonState();
+    updateDraftUpdateButtonState();
+    updateDraftPublishButtonState();
+    
+    if (msgEl) {
+        msgEl.textContent = "Publicando invitación...";
+        msgEl.style.color = "var(--text)";
+        msgEl.setAttribute("role", "status");
+        msgEl.setAttribute("aria-live", "polite");
+        Array.from(msgEl.children).forEach(c => c.remove());
+    }
+
+    try {
+        const db = window.studioAuth.db;
+        
+        const { data: existing, error: findError } = await db
+            .from("studio_invitations")
+            .select("id, slug, studio_id, published")
+            .eq("id", createdStudioDraft.id)
+            .eq("studio_id", currentStudioContext.id)
+            .maybeSingle();
+
+        if (findError) {
+            console.error("Error verificando borrador para publicación:", findError);
+            const err = new Error("PUBLISH_CHECK_FAILED");
+            err.code = "PUBLISH_CHECK_FAILED";
+            throw err;
+        }
+        if (!existing) {
+            const err = new Error("DRAFT_NOT_FOUND");
+            err.code = "DRAFT_NOT_FOUND";
+            throw err;
+        }
+        if (existing.id !== createdStudioDraft.id) {
+            const err = new Error("PUBLISH_CHECK_FAILED");
+            err.code = "PUBLISH_CHECK_FAILED";
+            throw err;
+        }
+        if (existing.slug !== createdStudioDraft.slug) {
+            const err = new Error("PUBLISH_SLUG_MISMATCH");
+            err.code = "PUBLISH_SLUG_MISMATCH";
+            throw err;
+        }
+        if (existing.studio_id !== currentStudioContext.id) {
+            const err = new Error("PUBLISH_STUDIO_MISMATCH");
+            err.code = "PUBLISH_STUDIO_MISMATCH";
+            throw err;
+        }
+        if (existing.published === true) {
+            publishedStudioInvitation = {
+                id: String(existing.id),
+                slug: String(existing.slug),
+                published: true
+            };
+            publishConfirmationArmed = false;
+            const err = new Error("ALREADY_PUBLISHED");
+            err.code = "ALREADY_PUBLISHED";
+            throw err;
+        }
+        if (existing.published !== false) {
+            const err = new Error("PUBLISH_CHECK_FAILED");
+            err.code = "PUBLISH_CHECK_FAILED";
+            throw err;
+        }
+
+        const { data, error: updateError } = await db
+            .from("studio_invitations")
+            .update({ published: true })
+            .eq("id", createdStudioDraft.id)
+            .eq("studio_id", currentStudioContext.id)
+            .eq("slug", createdStudioDraft.slug)
+            .eq("published", false)
+            .select("id, slug, published")
+            .single();
+
+        if (updateError) {
+            console.error("Error publicando invitación:", updateError);
+            const err = new Error("PUBLISH_FAILED");
+            err.code = "PUBLISH_FAILED";
+            throw err;
+        }
+        
+        if (!data || !data.id || !data.slug || data.published !== true) {
+            console.error("Respuesta inesperada al publicar invitación:", data);
+            const err = new Error("INVALID_PUBLISH_RESPONSE");
+            err.code = "INVALID_PUBLISH_RESPONSE";
+            throw err;
+        }
+        if (data.id !== createdStudioDraft.id || data.slug !== createdStudioDraft.slug) {
+            console.error("Inconsistencia en respuesta al publicar:", data);
+            const err = new Error("INVALID_PUBLISH_RESPONSE");
+            err.code = "INVALID_PUBLISH_RESPONSE";
+            throw err;
+        }
+
+        publishedStudioInvitation = {
+            id: String(data.id),
+            slug: String(data.slug),
+            published: true
+        };
+        publishConfirmationArmed = false;
+
+        if (msgEl) {
+            msgEl.textContent = `Invitación publicada correctamente.`;
+            msgEl.style.color = "var(--success)";
+            msgEl.setAttribute("role", "status");
+            msgEl.setAttribute("aria-live", "polite");
+            
+            const a = document.createElement("a");
+            a.href = `/invitacion.html?slug=${encodeURIComponent(publishedStudioInvitation.slug)}`;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.textContent = "Ver invitación publicada";
+            a.style.display = "block";
+            a.style.marginTop = "8px";
+            a.style.color = "var(--accent)";
+            a.style.fontWeight = "500";
+            a.style.textDecoration = "none";
+            msgEl.appendChild(document.createElement("br"));
+            msgEl.appendChild(a);
+        }
+    } catch (err) {
+        console.error("Error en publishStudioInvitation:", err);
+        if (msgEl) {
+            let uiMsg = "No fue posible publicar la invitación.";
+            if (err.code === "DRAFT_NOT_FOUND") {
+                uiMsg = "No se encontró el borrador asociado.";
+            } else if (err.code === "ALREADY_PUBLISHED") {
+                uiMsg = "La invitación ya se encuentra publicada.";
+            }
+            msgEl.textContent = uiMsg;
+            if (err.code === "ALREADY_PUBLISHED") {
+                msgEl.style.color = "var(--success)";
+                msgEl.setAttribute("role", "status");
+                msgEl.setAttribute("aria-live", "polite");
+            } else {
+                msgEl.style.color = "var(--danger)";
+                msgEl.setAttribute("role", "alert");
+                msgEl.setAttribute("aria-live", "assertive");
+            }
+        }
+    } finally {
+        draftPublishInProgress = false;
+        updateDraftCreationButtonState();
+        updateDraftUpdateButtonState();
+        updateDraftPublishButtonState();
     }
 }
 
@@ -2092,11 +2375,22 @@ ${musicJS}
     currentPublicationManifest = buildPublicationManifest(d, media, studio, currentPublicationSlug);
     currentStudioPayload = buildStudioInvitationPayload(d, media, studio, currentPublicationSlug);
 
-    if (createdStudioDraft) {
+    if (publishedStudioInvitation) {
+        if (currentPublicationSlug !== publishedStudioInvitation.slug) {
+            createdStudioDraft = null;
+            publishedStudioInvitation = null;
+            lastSavedDraftPayloadFingerprint = null;
+            draftPayloadDirty = false;
+            publishConfirmationArmed = false;
+        } else {
+            draftPayloadDirty = false;
+        }
+    } else if (createdStudioDraft) {
         if (currentPublicationSlug !== createdStudioDraft.slug) {
             createdStudioDraft = null;
             lastSavedDraftPayloadFingerprint = null;
             draftPayloadDirty = false;
+            publishConfirmationArmed = false;
         } else {
             const currentFingerprint = createDraftPayloadFingerprint(buildDraftInsertPayload());
             draftPayloadDirty = (currentFingerprint !== lastSavedDraftPayloadFingerprint);
@@ -2193,36 +2487,101 @@ ${musicJS}
             controlsContainer.appendChild(downloadStudioBtn);
             
             if (isStudioGeneratorReady() && currentStudioPayload) {
-                const btnDraft = document.createElement("button");
-                btnDraft.type = "button";
-                btnDraft.id = "btnCreateStudioDraft";
-                btnDraft.className = "btn";
-                btnDraft.style.marginTop = "10px";
-                btnDraft.style.marginLeft = "10px";
-                btnDraft.textContent = "Crear borrador en Invitta Studio";
-                btnDraft.ariaLabel = "Crear borrador de la invitación en Invitta Studio";
-                btnDraft.addEventListener("click", createStudioInvitationDraft);
-                controlsContainer.appendChild(btnDraft);
-                
-                const btnUpdate = document.createElement("button");
-                btnUpdate.type = "button";
-                btnUpdate.id = "btnUpdateStudioDraft";
-                btnUpdate.className = "btn";
-                btnUpdate.style.marginTop = "10px";
-                btnUpdate.style.marginLeft = "10px";
-                btnUpdate.textContent = "Actualizar borrador en Invitta Studio";
-                btnUpdate.ariaLabel = "Actualizar el borrador de la invitación en Invitta Studio";
-                btnUpdate.addEventListener("click", updateStudioInvitationDraft);
-                controlsContainer.appendChild(btnUpdate);
-                
-                const draftStatus = document.createElement("div");
-                draftStatus.id = "studioDraftStatusMsg";
-                draftStatus.style.marginTop = "10px";
-                draftStatus.style.fontSize = "0.9rem";
-                controlsContainer.appendChild(draftStatus);
-                
-                updateDraftCreationButtonState();
-                updateDraftUpdateButtonState();
+                if (publishedStudioInvitation) {
+                    const msgEl = document.createElement("div");
+                    msgEl.style.marginTop = "10px";
+                    msgEl.style.color = "var(--success)";
+                    msgEl.textContent = "Esta invitación ya fue publicada. Para modificarla utiliza el editor de Studio.";
+                    controlsContainer.appendChild(msgEl);
+                } else {
+                    const btnDraft = document.createElement("button");
+                    btnDraft.type = "button";
+                    btnDraft.id = "btnCreateStudioDraft";
+                    btnDraft.className = "btn";
+                    btnDraft.style.marginTop = "10px";
+                    btnDraft.style.marginLeft = "10px";
+                    btnDraft.textContent = "Crear borrador en Invitta Studio";
+                    btnDraft.ariaLabel = "Crear borrador de la invitación en Invitta Studio";
+                    btnDraft.addEventListener("click", createStudioInvitationDraft);
+                    controlsContainer.appendChild(btnDraft);
+                    
+                    const btnUpdate = document.createElement("button");
+                    btnUpdate.type = "button";
+                    btnUpdate.id = "btnUpdateStudioDraft";
+                    btnUpdate.className = "btn";
+                    btnUpdate.style.marginTop = "10px";
+                    btnUpdate.style.marginLeft = "10px";
+                    btnUpdate.textContent = "Actualizar borrador en Invitta Studio";
+                    btnUpdate.ariaLabel = "Actualizar el borrador de la invitación en Invitta Studio";
+                    btnUpdate.addEventListener("click", updateStudioInvitationDraft);
+                    controlsContainer.appendChild(btnUpdate);
+
+                    const btnPublish = document.createElement("button");
+                    btnPublish.type = "button";
+                    btnPublish.id = "btnPublishStudioInvitation";
+                    btnPublish.className = "btn";
+                    btnPublish.style.marginTop = "10px";
+                    btnPublish.style.marginLeft = "10px";
+                    btnPublish.textContent = "Publicar invitación";
+                    btnPublish.ariaLabel = "Publicar invitación de Invitta Studio";
+                    btnPublish.addEventListener("click", preparePublishConfirmation);
+                    controlsContainer.appendChild(btnPublish);
+                    
+                    const draftStatus = document.createElement("div");
+                    draftStatus.id = "studioDraftStatusMsg";
+                    draftStatus.style.marginTop = "10px";
+                    draftStatus.style.fontSize = "0.9rem";
+                    controlsContainer.appendChild(draftStatus);
+                    
+                    const publishStatus = document.createElement("div");
+                    publishStatus.id = "studioPublishStatusMsg";
+                    publishStatus.style.marginTop = "10px";
+                    publishStatus.style.fontSize = "0.9rem";
+                    controlsContainer.appendChild(publishStatus);
+
+                    const confirmPanel = document.createElement("div");
+                    confirmPanel.id = "publishConfirmationPanel";
+                    confirmPanel.style.display = "none";
+                    confirmPanel.style.marginTop = "15px";
+                    confirmPanel.style.padding = "15px";
+                    confirmPanel.style.border = "1px solid var(--border)";
+                    confirmPanel.style.borderRadius = "8px";
+                    confirmPanel.style.backgroundColor = "var(--bg-secondary)";
+                    
+                    const confirmText = document.createElement("p");
+                    confirmText.style.margin = "0 0 10px 0";
+                    confirmText.style.fontSize = "0.95rem";
+                    confirmText.textContent = "Al publicar, la invitación quedará disponible mediante su enlace público. Verifica que la información y las fotografías sean correctas.";
+                    confirmPanel.appendChild(confirmText);
+                    
+                    const btnGroup = document.createElement("div");
+                    btnGroup.setAttribute("role", "group");
+                    btnGroup.setAttribute("aria-label", "Confirmación de publicación");
+                    
+                    const btnConfirm = document.createElement("button");
+                    btnConfirm.type = "button";
+                    btnConfirm.id = "btnConfirmPublishStudioInvitation";
+                    btnConfirm.className = "btn";
+                    btnConfirm.textContent = "Sí, publicar invitación";
+                    btnConfirm.addEventListener("click", publishStudioInvitation);
+                    
+                    const btnCancel = document.createElement("button");
+                    btnCancel.type = "button";
+                    btnCancel.id = "btnCancelPublishStudioInvitation";
+                    btnCancel.className = "btn";
+                    btnCancel.style.marginLeft = "10px";
+                    btnCancel.textContent = "Cancelar";
+                    btnCancel.addEventListener("click", cancelPublishConfirmation);
+                    
+                    btnGroup.appendChild(btnConfirm);
+                    btnGroup.appendChild(btnCancel);
+                    confirmPanel.appendChild(btnGroup);
+                    controlsContainer.appendChild(confirmPanel);
+                    
+                    updateDraftCreationButtonState();
+                    updateDraftUpdateButtonState();
+                    updateDraftPublishButtonState();
+                }
             }
             
             if (studioValidation.warnings.length > 0) {
