@@ -91,6 +91,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  
+  const TEMPLATE_NAMES = (window.InvittaTemplateCatalog && window.InvittaTemplateCatalog.TEMPLATE_NAMES) 
+    ? window.InvittaTemplateCatalog.TEMPLATE_NAMES 
+    : {
+        "xv-elegance-basic": "Élégance XV",
+        "xv-rose-gold-premium": "Rose Gold XV",
+        "xv-champagne-rose-vip": "Champagne Rose VIP",
+        "boda-classic-basic": "Classic Wedding",
+        "boda-golden-romance-premium": "Golden Romance",
+        "boda-midnight-gold-vip": "Midnight Gold Wedding"
+      };
+
   function createInvitationItem(inv) {
     const item = document.createElement("div");
     item.className = "invitation-item";

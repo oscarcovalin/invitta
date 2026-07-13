@@ -3618,7 +3618,29 @@ function buildStudioInvitationPayload(data, media, studio, slug) {
         background_image_url: "",
         music_title: media.music?.title || null,
         music_artist: null,
-        template_id: data.template?.id || null,
+        
+        template_id: (() => {
+            const evType = data.event?.type === "boda" ? "boda" : "xv";
+            const valid = {
+                xv: ["xv-elegance-basic", "xv-rose-gold-premium", "xv-champagne-rose-vip"],
+                boda: ["boda-classic-basic", "boda-golden-romance-premium", "boda-midnight-gold-vip"]
+            };
+            
+            // 1. Extraer del draft recuperado si existe
+            let draftTmpl = (typeof recoveredStudioDraft !== 'undefined' && recoveredStudioDraft && recoveredStudioDraft.template_id) ? recoveredStudioDraft.template_id : null;
+            
+            // 2. Extraer del payload generado
+            let payloadTmpl = data.template?.id || null;
+            
+            let finalTmpl = draftTmpl || payloadTmpl;
+            
+            // 3. Validar compatibilidad
+            if (finalTmpl && valid[evType] && valid[evType].includes(finalTmpl)) {
+                return finalTmpl;
+            }
+            return null; // Si no es válido o está vacío, null (no inventar)
+        })(),
+
         main_photo_url: media.heroImage || "",
         music_url: media.music?.url || ""
     };

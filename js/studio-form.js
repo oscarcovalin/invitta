@@ -4,14 +4,7 @@
  */
 
 
-const VALID_TEMPLATES = [
-  "xv-elegance-basic",
-  "xv-rose-gold-premium",
-  "xv-champagne-rose-vip",
-  "boda-classic-basic",
-  "boda-golden-romance-premium",
-  "boda-midnight-gold-vip"
-];
+
 
 function updateTemplateOptions() {
   const eventType = document.getElementById("event_type").value;
@@ -713,7 +706,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       title: document.getElementById("title").value,
       slug: slugToUse,
       event_type: document.getElementById("event_type").value,
-      template_id: VALID_TEMPLATES.includes(document.getElementById("template_id").value) ? document.getElementById("template_id").value : null,
+      template_id: VALID_TEMPLATES[document.getElementById("event_type").value]?.includes(document.getElementById("template_id").value) ? document.getElementById("template_id").value : null,
       honoree_name: document.getElementById("honoree_name").value,
       event_date: document.getElementById("event_date").value || null,
       event_time: document.getElementById("event_time").value || null,
