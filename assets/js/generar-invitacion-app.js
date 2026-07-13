@@ -11,6 +11,7 @@ let finalHTML    = null;
 let previewBlobUrl = null;
 let currentPublicationSlug = null;
 let currentPublicationManifest = null;
+let currentStudioPayload = null;
 
 // ─────────────────────────────────────────────
 // FILE HANDLING
@@ -1130,6 +1131,173 @@ function downloadPublicationManifest() {
     URL.revokeObjectURL(url);
 }
 
+function buildStudioInvitationPayload(data, media, studio, slug) {
+    const isBoda = data.event?.type === "boda";
+    const pName = data.event?.primaryName || "";
+    const sName = data.event?.secondaryName || "";
+    
+    let honoree_name = pName;
+    if (isBoda && sName) {
+        honoree_name = `${pName} & ${sName}`;
+    }
+    
+    let title = data.meta?.title || "";
+    if (!title) {
+        title = isBoda ? `Boda de ${honoree_name}` : `XV Años de ${honoree_name}`;
+    }
+    
+    let godparents = [];
+    if (Array.isArray(data.family?.godparents)) {
+        godparents = data.family.godparents
+            .filter(g => g && g.name && typeof g.name === 'string' && g.name.trim() !== '')
+            .map(g => ({
+                role: String(g.role || ""),
+                name: String(g.name)
+            }))
+            .slice(0, 20);
+    }
+    
+    function safeHex(val) {
+        if (typeof val === 'string' && /^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/.test(val)) {
+            return val;
+        }
+        return "";
+    }
+    
+    let gallery_urls = [];
+    if (media.gallery && Array.isArray(media.gallery)) {
+        gallery_urls = media.gallery
+            .map(g => g.url)
+            .filter(url => safeHttpsUrl(url))
+            .slice(0, 10);
+    }
+    
+    let itinerary = [];
+    if (Array.isArray(data.itinerary)) {
+        itinerary = data.itinerary
+            .filter(i => i && i.title)
+            .map(i => ({
+                time: String(i.time || ""),
+                title: String(i.title).replace(/<[^>]*>?/gm, '')
+            }))
+            .slice(0, 30);
+    }
+    
+    return {
+        title: title,
+        slug: slug,
+        event_type: isBoda ? "boda" : "xv",
+        honoree_name: honoree_name,
+        event_date: data.event?.date || null,
+        event_time: data.event?.time || null,
+        welcome_text: data.event?.welcomeText || data.event?.quote || "",
+        father_name: data.family?.father || null,
+        mother_name: data.family?.mother || null,
+        instagram_hashtag: data.event?.hashtag || null,
+        thank_you_title: data.event?.thankYouTitle || "",
+        thank_you_message: data.event?.thankYouMessage || "",
+        thank_you_signature: data.event?.thankYouSignature || null,
+        hashtag_section_title: data.event?.hashtagTitle || "",
+        hashtag_section_message: data.event?.hashtagMessage || "",
+        godparents: godparents,
+        font_preset: data.visual?.typography || "",
+        visual_theme: data.visual?.palette || "",
+        color_primary: safeHex(data.visual?.customPalette?.accent),
+        color_secondary: safeHex(data.visual?.customPalette?.bg),
+        ceremony_name: data.locations?.ceremony?.name || "",
+        ceremony_address: data.locations?.ceremony?.address || "",
+        ceremony_map_url: safeHttpsUrl(data.locations?.ceremony?.mapUrl) || "",
+        reception_name: data.locations?.reception?.name || "",
+        reception_address: data.locations?.reception?.address || "",
+        reception_map_url: safeHttpsUrl(data.locations?.reception?.mapUrl) || "",
+        gift_table_url: safeHttpsUrl(data.registry?.url) || "",
+        dress_code: data.dressCode?.text || "",
+        whatsapp_number: data.rsvp?.whatsapp || "",
+        published: false,
+        studio_name: studio.name || "",
+        studio_logo_url: media.studioLogo || "",
+        music_player_brand_enabled: false,
+        studio_whatsapp: studio.whatsapp || "",
+        studio_cta_enabled: !!(studio.whatsapp),
+        studio_cta_text: "",
+        studio_cta_message: "",
+        link_builder_enabled: false,
+        link_builder_pin: "",
+        link_builder_title: "",
+        link_builder_message: "",
+        gallery_urls: gallery_urls,
+        itinerary: itinerary,
+        background_image_url: "",
+        music_title: media.music?.title || null,
+        music_artist: null,
+        template_id: data.template?.id || null,
+        main_photo_url: media.heroImage || "",
+        music_url: media.music?.url || ""
+    };
+}
+
+function validateStudioInvitationPayload(payload) {
+    const errors = [];
+    const warnings = [];
+    
+    if (!payload.slug) errors.push("Falta el slug.");
+    if (payload.slug !== currentPublicationSlug) errors.push("El slug no coincide con la publicación actual.");
+    if (payload.event_type !== "xv" && payload.event_type !== "boda") errors.push("Tipo de evento inválido.");
+    if (!payload.honoree_name) errors.push("Falta el nombre del festejado.");
+    if (payload.published !== false) errors.push("El payload no puede estar marcado como publicado.");
+    if (Array.isArray(payload.gallery_urls) && payload.gallery_urls.length > 10) errors.push("La galería excede 10 elementos.");
+    
+    const mediaKeys = ['main_photo_url', 'music_url', 'studio_logo_url', 'ceremony_map_url', 'reception_map_url', 'gift_table_url'];
+    mediaKeys.forEach(k => {
+        if (payload[k] && !safeHttpsUrl(payload[k])) {
+            errors.push(`URL no segura detectada en ${k}.`);
+        }
+    });
+    
+    if (payload.gallery_urls) {
+        payload.gallery_urls.forEach(url => {
+            if (url && !safeHttpsUrl(url)) errors.push("URL no segura detectada en la galería.");
+        });
+    }
+    
+    const forbidden = ['studio_id', 'user_id', 'id', 'token', 'access_token', 'refresh_token', 'finalHTML'];
+    forbidden.forEach(k => {
+        if (k in payload) errors.push(`Campo prohibido detectado: ${k}.`);
+    });
+    
+    if (!payload.main_photo_url) warnings.push("Sin portada.");
+    if (!payload.gallery_urls || payload.gallery_urls.length === 0) warnings.push("Sin galería.");
+    if (!payload.music_url) warnings.push("Sin música.");
+    if (!payload.ceremony_name) warnings.push("Sin ceremonia.");
+    if (!payload.reception_name) warnings.push("Sin recepción.");
+    if (!payload.studio_name) warnings.push("Sin nombre de estudio.");
+    if (!payload.template_id) warnings.push("Sin template_id.");
+    
+    return { errors, warnings };
+}
+
+function downloadStudioInvitationPayload() {
+    if (!currentStudioPayload || !currentPublicationSlug) {
+        const msgEl = document.getElementById("previewStatusMsg");
+        if (msgEl) {
+            msgEl.textContent = "Error: El payload de Studio no está disponible para descargar.";
+            msgEl.style.display = "block";
+            msgEl.style.color = "#d9534f";
+        }
+        return;
+    }
+    
+    const blob = new Blob([JSON.stringify(currentStudioPayload, null, 2)], { type: "application/json;charset=utf-8" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `invitta-studio-payload-${currentPublicationSlug}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
 function validateInvitationForPreview(data, media, studio) {
     const errors = [];
     const warnings = [];
@@ -1271,9 +1439,11 @@ ${musicJS}
     // Publication Package
     currentPublicationSlug = createSafePublicationSlug(d);
     currentPublicationManifest = buildPublicationManifest(d, media, studio, currentPublicationSlug);
+    currentStudioPayload = buildStudioInvitationPayload(d, media, studio, currentPublicationSlug);
 
     // Validate
     const validation = validateInvitationForPreview(d, media, studio);
+    const studioValidation = validateStudioInvitationPayload(currentStudioPayload);
 
     // Show result
     document.getElementById("generateCard").style.display = "none";
@@ -1339,13 +1509,41 @@ ${musicJS}
         
         controlsContainer.appendChild(previewBtn);
         controlsContainer.appendChild(downloadManifestBtn);
+        
+        if (studioValidation.errors.length > 0) {
+            const stuErrDiv = document.createElement("div");
+            stuErrDiv.style.color = "#d9534f";
+            stuErrDiv.style.marginTop = "10px";
+            stuErrDiv.textContent = `Errores Studio (${studioValidation.errors.length}): ` + studioValidation.errors.join(" | ");
+            controlsContainer.appendChild(stuErrDiv);
+        } else {
+            const downloadStudioBtn = document.createElement("button");
+            downloadStudioBtn.type = "button";
+            downloadStudioBtn.id = "btnDownloadStudioPayload";
+            downloadStudioBtn.className = "btn";
+            downloadStudioBtn.style.marginTop = "10px";
+            downloadStudioBtn.style.marginLeft = "10px";
+            downloadStudioBtn.textContent = "Descargar payload Studio";
+            downloadStudioBtn.ariaLabel = "Descargar el payload de Invitta Studio";
+            downloadStudioBtn.addEventListener("click", downloadStudioInvitationPayload);
+            controlsContainer.appendChild(downloadStudioBtn);
+            
+            if (studioValidation.warnings.length > 0) {
+                const stuWarnDiv = document.createElement("div");
+                stuWarnDiv.style.color = "#f0ad4e";
+                stuWarnDiv.style.marginTop = "10px";
+                stuWarnDiv.textContent = `Advertencias Studio (${studioValidation.warnings.length}): ` + studioValidation.warnings.join(" | ");
+                controlsContainer.appendChild(stuWarnDiv);
+            }
+        }
+        
         controlsContainer.appendChild(statusMsg);
         
         const filesInfo = document.createElement("div");
         filesInfo.style.marginTop = "15px";
         filesInfo.style.fontSize = "0.85rem";
         filesInfo.style.color = "#666";
-        filesInfo.textContent = `Archivo HTML: ${currentPublicationSlug}.html | Manifiesto: invitta-publicacion-${currentPublicationSlug}.json`;
+        filesInfo.textContent = `Archivo HTML: ${currentPublicationSlug}.html | Manifiesto: invitta-publicacion-${currentPublicationSlug}.json | Payload Studio: invitta-studio-payload-${currentPublicationSlug}.json`;
         controlsContainer.appendChild(filesInfo);
     }
 
