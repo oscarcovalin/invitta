@@ -75,7 +75,7 @@ export function MusicPlayer({ autoPlay }: { autoPlay?: boolean }) {
   return (
     <div 
       id="music-player-bottom-bar"
-      className="fixed bottom-[68px] md:bottom-0 left-0 right-0 w-full z-50 bg-[#161715]/95 backdrop-blur-md border-t border-sage/20 py-3 px-6 md:px-12 flex items-center justify-between transition-all duration-500 shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.3)]"
+      className="fixed bottom-[68px] md:bottom-0 left-0 right-0 w-full z-50 bg-paper/95 backdrop-blur-md border-t border-sage/20 py-3 px-6 md:px-12 flex items-center justify-between transition-all duration-500 shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.3)]"
     >
       <div className="flex items-center gap-4">
         {/* Waveform Animation */}
@@ -95,7 +95,7 @@ export function MusicPlayer({ autoPlay }: { autoPlay?: boolean }) {
 
         <div className="flex flex-col">
           <span className="text-[9px] tracking-[0.25em] font-medium text-sage uppercase">Música de Fondo</span>
-          <span className="text-[10px] font-medium text-paper/80 font-sans truncate max-w-[120px] md:max-w-[180px]">
+          <span className="text-[10px] font-medium text-on-surface-variant font-sans truncate max-w-[120px] md:max-w-[180px]">
             {isPlaying ? "Reproduciendo Melodía" : "Música Pausada"}
           </span>
         </div>
@@ -107,7 +107,7 @@ export function MusicPlayer({ autoPlay }: { autoPlay?: boolean }) {
         <button
           onClick={togglePlay}
           id="music-toggle-play-btn"
-          className="w-9 h-9 rounded-full border border-sage/30 hover:border-sage bg-[#242622] hover:bg-[#2d302a] flex items-center justify-center text-paper hover:text-champagne-gold transition-all duration-300 cursor-pointer shadow-md"
+          className="w-9 h-9 rounded-full border border-sage/30 hover:border-sage bg-surface-container-low hover:bg-outline-variant flex items-center justify-center text-ink hover:text-champagne-gold transition-all duration-300 cursor-pointer shadow-md"
           title={isPlaying ? "Pausar música" : "Reproducir música"}
         >
           <span className="material-symbols-outlined text-[20px] leading-none select-none">
@@ -121,7 +121,7 @@ export function MusicPlayer({ autoPlay }: { autoPlay?: boolean }) {
         <button
           onClick={toggleMute}
           id="music-mute-toggle-btn"
-          className="text-paper/60 hover:text-champagne-gold transition-colors p-1.5 flex items-center justify-center cursor-pointer"
+          className="text-on-surface-variant hover:text-champagne-gold transition-colors p-1.5 flex items-center justify-center cursor-pointer"
           title={isMuted ? "Activar sonido" : "Silenciar"}
         >
           <span className="material-symbols-outlined text-[18px] select-none">
