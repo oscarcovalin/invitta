@@ -1,13 +1,14 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/invitation-meta.js": {
       "includeFiles": "invitacion.html"
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/invitacion.html",
-      "destination": "/api/invitation-meta"
+      "src": "/invitacion\\.html",
+      "dest": "/api/invitation-meta"
     }
   ]
 }
