@@ -4,61 +4,81 @@
  */
 
 
+const VALID_TEMPLATES = {
+  xv: [
+    "xv-elegance-basic",
+    "xv-rose-gold-premium",
+    "xv-champagne-rose-vip"
+  ],
+  boda: [
+    "boda-classic-basic",
+    "boda-golden-romance-premium",
+    "boda-midnight-gold-vip"
+  ]
+};
 
+let isEditMode = false;
+let originalTemplateId = null;
+let originalEventType = null;
 
-function updateTemplateOptions() {
+function updateTemplateOptions(options = { preserveLegacyNull: false }) {
   const eventType = document.getElementById("event_type").value;
   const templateSelect = document.getElementById("template_id");
   const currentVal = templateSelect.value;
   
   templateSelect.innerHTML = "";
   
-  if (eventType === "xv") {
-    const opts = [
-      {val: "xv-elegance-basic", text: "Élégance XV — Básica"},
-      {val: "xv-rose-gold-premium", text: "Rose Gold XV — Premium"},
-      {val: "xv-champagne-rose-vip", text: "Champagne Rose VIP"}
-    ];
-    opts.forEach(o => {
-      const opt = document.createElement("option");
-      opt.value = o.val;
-      opt.textContent = o.text;
-      templateSelect.appendChild(opt);
-    });
-    // Si no habia valor previo de XV, usar Rose Gold XV por defecto
-    if (!currentVal || !currentVal.startsWith("xv-")) {
-      templateSelect.value = "xv-rose-gold-premium";
+  const showLegacyNull = isEditMode && originalTemplateId === null && options.preserveLegacyNull;
+
+  if (showLegacyNull) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Diseño anterior / sin plantilla asignada";
+    templateSelect.appendChild(opt);
+  }
+  
+  const optsXV = [
+    {val: "xv-elegance-basic", text: "Élégance XV — Básica"},
+    {val: "xv-rose-gold-premium", text: "Rose Gold XV — Premium"},
+    {val: "xv-champagne-rose-vip", text: "Champagne Rose VIP"}
+  ];
+  
+  const optsBoda = [
+    {val: "boda-classic-basic", text: "Classic Boda — Básica"},
+    {val: "boda-golden-romance-premium", text: "Golden Romance — Premium"},
+    {val: "boda-midnight-gold-vip", text: "Midnight Gold — VIP"}
+  ];
+
+  const opts = eventType === "xv" ? optsXV : optsBoda;
+  const validArray = VALID_TEMPLATES[eventType] || [];
+
+  opts.forEach(o => {
+    const opt = document.createElement("option");
+    opt.value = o.val;
+    opt.textContent = o.text;
+    templateSelect.appendChild(opt);
+  });
+  
+  if (showLegacyNull && currentVal === "") {
+    templateSelect.value = "";
+  } else if (!currentVal || !validArray.includes(currentVal)) {
+    if (showLegacyNull) {
+      templateSelect.value = "";
     } else {
-      templateSelect.value = currentVal;
+      templateSelect.value = eventType === "xv" ? "xv-rose-gold-premium" : "boda-classic-basic";
     }
   } else {
-    // Por defecto Boda
-    const opts = [
-      {val: "boda-classic-basic", text: "Classic Boda — Básica"},
-      {val: "boda-golden-romance-premium", text: "Golden Romance — Premium"},
-      {val: "boda-midnight-gold-vip", text: "Midnight Gold — VIP"}
-    ];
-    opts.forEach(o => {
-      const opt = document.createElement("option");
-      opt.value = o.val;
-      opt.textContent = o.text;
-      templateSelect.appendChild(opt);
-    });
-    // Si no habia valor previo de boda, usar por defecto
-    if (!currentVal || !currentVal.startsWith("boda-")) {
-      templateSelect.value = "boda-classic-basic";
-    } else {
-      templateSelect.value = currentVal;
-    }
+    templateSelect.value = currentVal;
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   const et = document.getElementById("event_type");
   if (et) {
-    et.addEventListener("change", updateTemplateOptions);
-    // Inicializar al cargar
-    updateTemplateOptions();
+    et.addEventListener("change", () => {
+      // El usuario cambió explícitamente el tipo de evento
+      updateTemplateOptions({ preserveLegacyNull: false });
+    });
   }
 });
 
@@ -274,6 +294,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadInvitationData(inviteId);
   } else {
     // Modo creación
+    updateTemplateOptions({ preserveLegacyNull: false });
     loading.style.display = "none";
     form.style.display = "block";
   }
@@ -416,10 +437,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("title").value = data.title || "";
     document.getElementById("slug").value = data.slug || "";
     document.getElementById("event_type").value = data.event_type || "boda";
-    updateTemplateOptions();
-    if (data.template_id && VALID_TEMPLATES.includes(data.template_id)) {
-      document.getElementById("template_id").value = data.template_id;
+    
+    isEditMode = true;
+    originalTemplateId = data.template_id || null;
+    originalEventType = data.event_type || null;
+    
+    if (originalTemplateId) {
+        document.getElementById("template_id").value = originalTemplateId;
+    } else {
+        document.getElementById("template_id").value = "";
     }
+    updateTemplateOptions({ preserveLegacyNull: true });
     document.getElementById("honoree_name").value = data.honoree_name || "";
     document.getElementById("event_date").value = data.event_date || "";
     document.getElementById("event_time").value = data.event_time || "";
@@ -702,11 +730,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // ── Payload ──
+    const eventType = document.getElementById("event_type").value;
+    const templateIdRaw = document.getElementById("template_id").value;
+    
+    let validTemplateId = null;
+    const validArray = VALID_TEMPLATES[eventType] || [];
+    
+    if (!isEditMode) {
+      if (!validArray.includes(templateIdRaw)) {
+        errorAlert.textContent = "La plantilla seleccionada no es válida para este tipo de evento.";
+        errorAlert.style.display = "block";
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar cambios";
+        return;
+      }
+      validTemplateId = templateIdRaw;
+    } else {
+      // Es edición
+      if (originalTemplateId === null && eventType === originalEventType && templateIdRaw === "") {
+        // Caso histórico sin modificar plantilla ni tipo
+        validTemplateId = null;
+      } else {
+        if (!validArray.includes(templateIdRaw)) {
+          errorAlert.textContent = "La plantilla seleccionada no es válida para el tipo de evento actual.";
+          errorAlert.style.display = "block";
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Guardar cambios";
+          return;
+        }
+        validTemplateId = templateIdRaw;
+      }
+    }
+
     const payload = {
       title: document.getElementById("title").value,
       slug: slugToUse,
-      event_type: document.getElementById("event_type").value,
-      template_id: VALID_TEMPLATES[document.getElementById("event_type").value]?.includes(document.getElementById("template_id").value) ? document.getElementById("template_id").value : null,
+      event_type: eventType,
+      template_id: validTemplateId || null,
       honoree_name: document.getElementById("honoree_name").value,
       event_date: document.getElementById("event_date").value || null,
       event_time: document.getElementById("event_time").value || null,

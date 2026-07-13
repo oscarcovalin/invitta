@@ -3632,11 +3632,12 @@ function buildStudioInvitationPayload(data, media, studio, slug) {
             // 2. Extraer del payload generado
             let payloadTmpl = data.template?.id || null;
             
-            let finalTmpl = draftTmpl || payloadTmpl;
-            
-            // 3. Validar compatibilidad
-            if (finalTmpl && valid[evType] && valid[evType].includes(finalTmpl)) {
-                return finalTmpl;
+            // Prioridad: payload válido > draft válido > null
+            if (payloadTmpl && valid[evType] && valid[evType].includes(payloadTmpl)) {
+                return payloadTmpl;
+            }
+            if (draftTmpl && valid[evType] && valid[evType].includes(draftTmpl)) {
+                return draftTmpl;
             }
             return null; // Si no es válido o está vacío, null (no inventar)
         })(),
