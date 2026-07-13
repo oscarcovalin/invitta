@@ -168,6 +168,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let existingMusicUrl = null;
   let existingBackgroundUrl = null;
   let existingGalleryUrls = [];
+  let selectedGalleryFiles = [];
+  let selectedGalleryPreviewUrls = [];
 
   let currentStudioId = localStorage.getItem("invitta_studio_id");
   let currentSlug = "";
@@ -417,6 +419,207 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  function clearSelectedGalleryPreviews() {
+    selectedGalleryPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    selectedGalleryPreviewUrls = [];
+  }
+
+  function getActiveGalleryItems() {
+    if (selectedGalleryFiles.length > 0) {
+      return selectedGalleryFiles.map((file, index) => ({
+        src: selectedGalleryPreviewUrls[index],
+        alt: file.name || `Foto ${index + 1}`
+      }));
+    }
+
+    return existingGalleryUrls.map((url, index) => ({
+      src: url,
+      alt: `Foto ${index + 1}`
+    }));
+  }
+
+  function renderGalleryThumbnails() {
+    const galCurrent = document.getElementById("gallery-current");
+    const galCount = document.getElementById("gallery-count-label");
+    const galThumbs = document.getElementById("gallery-thumbnails");
+    const galHint = document.getElementById("gallery-order-hint");
+    const items = getActiveGalleryItems();
+
+    if (galCurrent) galCurrent.style.display = items.length ? "block" : "none";
+    if (galHint) galHint.hidden = items.length < 2;
+    if (galCount) {
+      const label = selectedGalleryFiles.length > 0 ? "Fotos seleccionadas" : "Galer\u00eda actual";
+      galCount.textContent = `${label}: ${items.length} foto${items.length !== 1 ? "s" : ""}`;
+    }
+    if (!galThumbs) return;
+
+    galThumbs.innerHTML = "";
+    items.forEach((item, index) => {
+      const wrap = document.createElement("div");
+      wrap.className = "gallery-thumb-wrap";
+      wrap.draggable = true;
+      wrap.dataset.index = String(index);
+
+      const img = document.createElement("img");
+      img.src = item.src;
+      img.alt = item.alt;
+      img.loading = "lazy";
+
+      const order = document.createElement("span");
+      order.className = "gallery-order-badge";
+      order.textContent = String(index + 1);
+      order.setAttribute("aria-hidden", "true");
+
+      const handle = document.createElement("button");
+      handle.type = "button";
+      handle.className = "gallery-drag-handle";
+      handle.setAttribute("aria-label", `Mover foto ${index + 1}`);
+      handle.title = "Arrastrar para reordenar";
+
+      const grip = document.createElement("span");
+      grip.className = "gallery-drag-grip";
+      grip.setAttribute("aria-hidden", "true");
+
+      handle.appendChild(grip);
+      wrap.append(img, order, handle);
+      galThumbs.appendChild(wrap);
+    });
+  }
+
+  function moveGalleryItem(fromIndex, toIndex) {
+    const items = selectedGalleryFiles.length > 0 ? selectedGalleryFiles : existingGalleryUrls;
+    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= items.length || toIndex >= items.length) return;
+
+    const [moved] = items.splice(fromIndex, 1);
+    items.splice(toIndex, 0, moved);
+
+    if (selectedGalleryFiles.length > 0) {
+      const [movedPreview] = selectedGalleryPreviewUrls.splice(fromIndex, 1);
+      selectedGalleryPreviewUrls.splice(toIndex, 0, movedPreview);
+    }
+
+    renderGalleryThumbnails();
+  }
+
+  function setupGalleryOrdering() {
+    const galThumbs = document.getElementById("gallery-thumbnails");
+    const galleryInput = document.getElementById("galleryFiles");
+    if (!galThumbs || !galleryInput) return;
+
+    let draggedIndex = null;
+    let touchStartIndex = null;
+    let touchTargetIndex = null;
+
+    function getThumb(target) {
+      return target instanceof Element ? target.closest(".gallery-thumb-wrap") : null;
+    }
+
+    function clearDragState() {
+      galThumbs.querySelectorAll(".gallery-thumb-wrap").forEach((thumb) => {
+        thumb.classList.remove("is-dragging", "is-drop-target");
+      });
+    }
+
+    galThumbs.addEventListener("dragstart", (event) => {
+      const thumb = getThumb(event.target);
+      if (!thumb) return;
+      draggedIndex = Number(thumb.dataset.index);
+      thumb.classList.add("is-dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", String(draggedIndex));
+    });
+
+    galThumbs.addEventListener("dragover", (event) => {
+      const thumb = getThumb(event.target);
+      if (!thumb || draggedIndex === null) return;
+      event.preventDefault();
+      clearDragState();
+      galThumbs.querySelector(`[data-index="${draggedIndex}"]`)?.classList.add("is-dragging");
+      thumb.classList.add("is-drop-target");
+      event.dataTransfer.dropEffect = "move";
+    });
+
+    galThumbs.addEventListener("drop", (event) => {
+      const thumb = getThumb(event.target);
+      if (!thumb || draggedIndex === null) return;
+      event.preventDefault();
+      moveGalleryItem(draggedIndex, Number(thumb.dataset.index));
+      draggedIndex = null;
+      clearDragState();
+    });
+
+    galThumbs.addEventListener("dragend", () => {
+      draggedIndex = null;
+      clearDragState();
+    });
+
+    galThumbs.addEventListener("keydown", (event) => {
+      const handle = event.target.closest(".gallery-drag-handle");
+      const thumb = getThumb(handle);
+      if (!handle || !thumb) return;
+
+      const currentIndex = Number(thumb.dataset.index);
+      const direction = event.key === "ArrowLeft" || event.key === "ArrowUp"
+        ? -1
+        : event.key === "ArrowRight" || event.key === "ArrowDown"
+          ? 1
+          : 0;
+
+      if (!direction) return;
+      event.preventDefault();
+      const targetIndex = currentIndex + direction;
+      moveGalleryItem(currentIndex, targetIndex);
+      galThumbs.querySelector(`[data-index="${targetIndex}"] .gallery-drag-handle`)?.focus();
+    });
+
+    galThumbs.addEventListener("touchstart", (event) => {
+      const handle = event.target.closest(".gallery-drag-handle");
+      const thumb = getThumb(handle);
+      if (!handle || !thumb) return;
+      touchStartIndex = Number(thumb.dataset.index);
+      touchTargetIndex = touchStartIndex;
+      thumb.classList.add("is-dragging");
+    }, { passive: true });
+
+    document.addEventListener("touchmove", (event) => {
+      if (touchStartIndex === null || !event.touches.length) return;
+      event.preventDefault();
+      const touch = event.touches[0];
+      const thumb = getThumb(document.elementFromPoint(touch.clientX, touch.clientY));
+      if (!thumb) return;
+      touchTargetIndex = Number(thumb.dataset.index);
+      clearDragState();
+      galThumbs.querySelector(`[data-index="${touchStartIndex}"]`)?.classList.add("is-dragging");
+      thumb.classList.add("is-drop-target");
+    }, { passive: false });
+
+    document.addEventListener("touchend", () => {
+      if (touchStartIndex !== null && touchTargetIndex !== null) {
+        moveGalleryItem(touchStartIndex, touchTargetIndex);
+      }
+      touchStartIndex = null;
+      touchTargetIndex = null;
+      clearDragState();
+    });
+
+    document.addEventListener("touchcancel", () => {
+      touchStartIndex = null;
+      touchTargetIndex = null;
+      clearDragState();
+    });
+
+    galleryInput.addEventListener("change", () => {
+      clearSelectedGalleryPreviews();
+      selectedGalleryFiles = Array.from(galleryInput.files || []);
+      selectedGalleryPreviewUrls = selectedGalleryFiles.map((file) => URL.createObjectURL(file));
+      renderGalleryThumbnails();
+    });
+
+    window.addEventListener("beforeunload", clearSelectedGalleryPreviews);
+  }
+
+  setupGalleryOrdering();
+
   // ── Función para cargar datos ─────────────────────────────────────
   async function loadInvitationData(id) {
     const { data, error } = await db
@@ -589,6 +792,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           galThumbs.appendChild(wrap);
         });
       }
+      renderGalleryThumbnails();
     }
 
     form.style.display = "block";
@@ -672,8 +876,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ── Subida de galería ──
     let finalGalleryUrls = existingGalleryUrls;
-    const galleryInput   = document.getElementById("galleryFiles");
-    const galleryFiles   = galleryInput ? Array.from(galleryInput.files) : [];
+    const galleryFiles   = selectedGalleryFiles;
 
     if (galleryFiles.length > 0) {
       clearMediaError("gallery");

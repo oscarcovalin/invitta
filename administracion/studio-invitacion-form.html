@@ -73,17 +73,76 @@
     /* ── Galería thumbnails ── */
     .gallery-thumb-wrap {
       position: relative;
-      width: 70px;
-      height: 70px;
+      width: 78px;
+      height: 78px;
       border-radius: 6px;
       overflow: hidden;
       border: 1px solid var(--border-color);
+      cursor: grab;
+      user-select: none;
+      transition: opacity 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+    }
+    .gallery-thumb-wrap:active { cursor: grabbing; }
+    .gallery-thumb-wrap.is-dragging { opacity: 0.42; transform: scale(0.96); }
+    .gallery-thumb-wrap.is-drop-target {
+      box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.28);
+      transform: translateY(-2px);
     }
     .gallery-thumb-wrap img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      pointer-events: none;
+    }
+    .gallery-drag-handle {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid rgba(16, 42, 67, 0.18);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 2px 8px rgba(16, 42, 67, 0.16);
+      cursor: grab;
+      touch-action: none;
+    }
+    .gallery-drag-handle:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+    }
+    .gallery-drag-grip {
+      width: 13px;
+      height: 13px;
+      background-image: radial-gradient(circle, #334e68 1.5px, transparent 1.7px);
+      background-size: 6px 6px;
+      background-position: 0 0;
+    }
+    .gallery-order-badge {
+      position: absolute;
+      left: 5px;
+      bottom: 5px;
+      min-width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: rgba(16, 42, 67, 0.88);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .gallery-order-hint {
+      margin: 10px 0 0;
+      color: #52667a;
+      font-size: 12px;
     }
     #gallery-thumbnails {
       margin-top: 12px;
@@ -243,6 +302,7 @@
           </div>
           <!-- Miniaturas de galería existente -->
           <div id="gallery-thumbnails"></div>
+          <p id="gallery-order-hint" class="gallery-order-hint" hidden>Arrastra las fotos para cambiar el orden. Tambi&eacute;n puedes usar las flechas del teclado sobre el control de cada foto.</p>
         </div>
       </div>
 
