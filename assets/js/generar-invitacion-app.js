@@ -461,8 +461,20 @@ async function createStudioInvitationDraft() {
             a.style.color = "var(--accent)";
             a.style.fontWeight = "500";
             a.style.textDecoration = "none";
+            
+            const linkDash = document.createElement("a");
+            linkDash.href = `/administracion/studio-dashboard.html`;
+            linkDash.id = "goToDashboardAfterDraft";
+            linkDash.textContent = "Ver todas mis invitaciones";
+            linkDash.style.display = "block";
+            linkDash.style.marginTop = "8px";
+            linkDash.style.color = "var(--text)";
+            linkDash.style.fontWeight = "500";
+            linkDash.style.textDecoration = "none";
+            
             msgEl.appendChild(document.createElement("br"));
             msgEl.appendChild(a);
+            msgEl.appendChild(linkDash);
         }
     } catch (err) {
         console.error("Error creando borrador Studio:", err);
@@ -603,8 +615,20 @@ async function updateStudioInvitationDraft() {
             a.style.color = "var(--accent)";
             a.style.fontWeight = "500";
             a.style.textDecoration = "none";
+            
+            const linkDash = document.createElement("a");
+            linkDash.href = `/administracion/studio-dashboard.html`;
+            linkDash.id = "goToDashboardAfterUpdate";
+            linkDash.textContent = "Ver todas mis invitaciones";
+            linkDash.style.display = "block";
+            linkDash.style.marginTop = "8px";
+            linkDash.style.color = "var(--text)";
+            linkDash.style.fontWeight = "500";
+            linkDash.style.textDecoration = "none";
+            
             msgEl.appendChild(document.createElement("br"));
             msgEl.appendChild(a);
+            msgEl.appendChild(linkDash);
         }
     } catch (err) {
         console.error("Error en updateStudioInvitationDraft:", err);
@@ -764,8 +788,20 @@ async function publishStudioInvitation() {
             a.style.color = "var(--accent)";
             a.style.fontWeight = "500";
             a.style.textDecoration = "none";
+            
+            const linkDash = document.createElement("a");
+            linkDash.href = `/administracion/studio-dashboard.html`;
+            linkDash.id = "goToDashboardAfterPublish";
+            linkDash.textContent = "Ir al panel de Studio";
+            linkDash.style.display = "block";
+            linkDash.style.marginTop = "8px";
+            linkDash.style.color = "var(--text)";
+            linkDash.style.fontWeight = "500";
+            linkDash.style.textDecoration = "none";
+            
             msgEl.appendChild(document.createElement("br"));
             msgEl.appendChild(a);
+            msgEl.appendChild(linkDash);
         }
     } catch (err) {
         console.error("Error en publishStudioInvitation:", err);
@@ -2492,6 +2528,31 @@ ${musicJS}
                     msgEl.style.marginTop = "10px";
                     msgEl.style.color = "var(--success)";
                     msgEl.textContent = "Esta invitación ya fue publicada. Para modificarla utiliza el editor de Studio.";
+                    
+                    const aPublic = document.createElement("a");
+                    aPublic.href = `/invitacion.html?slug=${encodeURIComponent(publishedStudioInvitation.slug)}`;
+                    aPublic.target = "_blank";
+                    aPublic.rel = "noopener noreferrer";
+                    aPublic.textContent = "Ver invitación publicada";
+                    aPublic.style.display = "block";
+                    aPublic.style.marginTop = "8px";
+                    aPublic.style.color = "var(--accent)";
+                    aPublic.style.fontWeight = "500";
+                    aPublic.style.textDecoration = "none";
+
+                    const linkDash = document.createElement("a");
+                    linkDash.href = `/administracion/studio-dashboard.html`;
+                    linkDash.textContent = "Ir al panel de Studio";
+                    linkDash.style.display = "block";
+                    linkDash.style.marginTop = "8px";
+                    linkDash.style.color = "var(--text)";
+                    linkDash.style.fontWeight = "500";
+                    linkDash.style.textDecoration = "none";
+                    
+                    msgEl.appendChild(document.createElement("br"));
+                    msgEl.appendChild(aPublic);
+                    msgEl.appendChild(linkDash);
+                    
                     controlsContainer.appendChild(msgEl);
                 } else {
                     const btnDraft = document.createElement("button");
