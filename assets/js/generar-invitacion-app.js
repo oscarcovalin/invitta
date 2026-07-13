@@ -296,7 +296,8 @@ function removeInternalBackupFields(value) {
         "published", "link_builder_pin", "access_token", "refresh_token", "token", "session",
         "requestedDraftId", "recoveredStudioDraft", "draftRecoveryReady",
         "createdStudioDraft", "publishedStudioInvitation", "lastSavedDraftPayloadFingerprint",
-        "draftPayloadDirty", "currentStudioContext", "currentStudioSession"
+        "draftPayloadDirty", "currentStudioContext", "currentStudioSession",
+        "initialStudioUserId", "draftConflictDetected", "knownDraftUpdatedAt", "studioSessionInvalidated"
     ];
 
     for (const key of Object.keys(value)) {
