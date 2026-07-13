@@ -781,8 +781,51 @@ function renderDefaultTemplate(inv) {
   let invitationAudio = null;
   let isMusicPlaying = false;
 
+  function decodeMojibakePass(value) {
+    const windows1252Bytes = {
+      "€": 0x80, "‚": 0x82, "ƒ": 0x83, "„": 0x84, "…": 0x85,
+      "†": 0x86, "‡": 0x87, "ˆ": 0x88, "‰": 0x89, "Š": 0x8a,
+      "‹": 0x8b, "Œ": 0x8c, "Ž": 0x8e, "‘": 0x91, "’": 0x92,
+      "“": 0x93, "”": 0x94, "•": 0x95, "–": 0x96, "—": 0x97,
+      "˜": 0x98, "™": 0x99, "š": 0x9a, "›": 0x9b, "œ": 0x9c,
+      "ž": 0x9e, "Ÿ": 0x9f
+    };
+    const bytes = [];
+
+    for (const character of String(value || "")) {
+      const code = character.charCodeAt(0);
+      if (code <= 0xff) {
+        bytes.push(code);
+      } else if (Object.prototype.hasOwnProperty.call(windows1252Bytes, character)) {
+        bytes.push(windows1252Bytes[character]);
+      } else {
+        return value;
+      }
+    }
+
+    return new TextDecoder("utf-8", { fatal: true }).decode(Uint8Array.from(bytes));
+  }
+
+  function repairMojibake(value) {
+    let repaired = String(value || "");
+
+    for (let pass = 0; pass < 4 && /[ÃÂâðÆÅ]/.test(repaired); pass += 1) {
+      try {
+        const candidate = decodeMojibakePass(repaired);
+        const currentMarkers = (repaired.match(/[ÃÂâðÆÅ]/g) || []).length;
+        const candidateMarkers = (candidate.match(/[ÃÂâðÆÅ]/g) || []).length;
+        if (candidate === repaired || candidateMarkers >= currentMarkers) break;
+        repaired = candidate;
+      } catch (_error) {
+        break;
+      }
+    }
+
+    return repaired;
+  }
+
   function cleanMusicTitle(value) {
-    return String(value || "")
+    return repairMojibake(value)
       .replace(/[-_]+/g, " ")
       .replace(/\s+/g, " ")
       .trim();
@@ -815,12 +858,35 @@ function renderDefaultTemplate(inv) {
     return "MÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºsica del evento";
   }
 
-  function getMusicDisplayTitle(invitation) {
+  function getLegacyMusicDisplayTitle(invitation) {
     const musicTitle = getMusicTitle(invitation);
     const musicArtist = cleanMusicTitle(invitation.music_artist);
 
     if (musicArtist && musicTitle && musicTitle !== "MÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºsica del evento") {
       return `${musicArtist} ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· ${musicTitle}`;
+    }
+
+    return musicArtist || musicTitle;
+  }
+
+  function getMusicDisplayTitle(invitation) {
+    const defaultTitle = "Música del evento";
+    const musicArtist = cleanMusicTitle(invitation.music_artist);
+    let musicTitle = cleanMusicTitle(invitation.music_title);
+
+    if (!musicTitle && invitation.music_url) {
+      try {
+        const url = new URL(invitation.music_url);
+        musicTitle = cleanMusicFileName(url.pathname.split("/").pop() || "");
+      } catch (_error) {
+        musicTitle = cleanMusicFileName(invitation.music_url.split("/").pop() || "");
+      }
+    }
+
+    musicTitle = musicTitle || defaultTitle;
+
+    if (musicArtist && musicTitle !== defaultTitle) {
+      return `${musicArtist} · ${musicTitle}`;
     }
 
     return musicArtist || musicTitle;
