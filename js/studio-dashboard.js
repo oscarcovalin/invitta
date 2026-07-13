@@ -209,6 +209,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       editBtn.textContent = "Editar";
       editBtn.href = `/administracion/studio-invitacion-form.html?id=${encodeURIComponent(String(inv.id))}`;
       actionsDiv.appendChild(editBtn);
+      
+      actionsDiv.appendChild(document.createTextNode(" "));
+      
+      const resumeBtn = document.createElement("a");
+      resumeBtn.className = "btn btn-secondary btn-small";
+      resumeBtn.textContent = "Continuar en generador";
+      resumeBtn.href = `/administracion/generar-invitacion.html?draft=${encodeURIComponent(String(inv.id))}`;
+      actionsDiv.appendChild(resumeBtn);
     } else {
       const editDisabled = document.createElement("span");
       editDisabled.className = "btn btn-primary btn-small";

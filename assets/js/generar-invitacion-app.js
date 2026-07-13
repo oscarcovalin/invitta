@@ -27,6 +27,27 @@ let draftPublishInProgress = false;
 let publishedStudioInvitation = null;
 let publishConfirmationArmed = false;
 
+let requestedDraftId = null;
+let recoveredStudioDraft = null;
+let draftRecoveryInProgress = false;
+let draftRecoveryReady = false;
+
+function readRequestedDraftId() {
+    const params = new URLSearchParams(window.location.search);
+    const id = String(params.get("draft") || "").trim();
+    if (!id) return null;
+    
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+        const msgEl = document.getElementById("authStatusMsg");
+        if (msgEl) {
+            msgEl.textContent = "El enlace de recuperación no es válido.";
+            msgEl.style.color = "var(--danger)";
+        }
+        return null;
+    }
+    return id;
+}
+
 function createDraftPayloadFingerprint(payload) {
     if (!payload) return null;
     const copy = JSON.parse(JSON.stringify(payload));
@@ -217,11 +238,45 @@ function buildDraftUpdatePayload() {
     return payload;
 }
 
+function cancelDraftRecovery() {
+    requestedDraftId = null;
+    recoveredStudioDraft = null;
+    draftRecoveryReady = false;
+    createdStudioDraft = null;
+    publishedStudioInvitation = null;
+    lastSavedDraftPayloadFingerprint = null;
+    draftPayloadDirty = false;
+    publishConfirmationArmed = false;
+
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.delete("draft");
+    window.history.replaceState({}, document.title, newUrl.toString());
+
+    updateDraftCreationButtonState();
+    updateDraftUpdateButtonState();
+    updateDraftPublishButtonState();
+
+    const btnCancel = document.getElementById("btnCancelDraftRecovery");
+    if (btnCancel) btnCancel.style.display = "none";
+
+    const msgEl = document.getElementById("authStatusMsg");
+    if (msgEl) {
+        msgEl.textContent = "Ahora estás trabajando como una invitación nueva.";
+        msgEl.style.color = "var(--text)";
+    }
+}
+
 function updateDraftCreationButtonState() {
     const btn = document.getElementById("btnCreateStudioDraft");
     if (!btn) return;
 
-    if (draftCreationInProgress || draftUpdateInProgress || draftPublishInProgress || !isStudioGeneratorReady() || !currentStudioPayload || createdStudioDraft) {
+    if (draftRecoveryInProgress || (draftRecoveryReady && recoveredStudioDraft && (!currentPublicationSlug || currentPublicationSlug !== recoveredStudioDraft.slug))) {
+        btn.disabled = true;
+        btn.textContent = "Archivo no correspondiente";
+        return;
+    }
+
+    if (draftCreationInProgress || draftUpdateInProgress || draftPublishInProgress || !isStudioGeneratorReady() || !currentStudioPayload || createdStudioDraft || (draftRecoveryReady && recoveredStudioDraft)) {
         btn.disabled = true;
     } else {
         const validation = validateStudioInvitationPayload(currentStudioPayload);
@@ -230,7 +285,7 @@ function updateDraftCreationButtonState() {
 
     if (draftCreationInProgress) {
         btn.textContent = "Creando borrador...";
-    } else if (createdStudioDraft) {
+    } else if (createdStudioDraft || (draftRecoveryReady && recoveredStudioDraft)) {
         btn.textContent = "Borrador creado";
     } else {
         btn.textContent = "Crear borrador en Invitta Studio";
@@ -240,6 +295,12 @@ function updateDraftCreationButtonState() {
 function updateDraftUpdateButtonState() {
     const btn = document.getElementById("btnUpdateStudioDraft");
     if (!btn) return;
+    
+    if (draftRecoveryInProgress || (draftRecoveryReady && recoveredStudioDraft && (!currentPublicationSlug || currentPublicationSlug !== recoveredStudioDraft.slug))) {
+        btn.style.display = "none";
+        btn.disabled = true;
+        return;
+    }
     
     if (!createdStudioDraft || 
         !currentPublicationSlug || 
@@ -297,6 +358,13 @@ function updateDraftPublishButtonState() {
     const btn = document.getElementById("btnPublishStudioInvitation");
     const panel = document.getElementById("publishConfirmationPanel");
     if (!btn) return;
+    
+    if (draftRecoveryInProgress || (draftRecoveryReady && recoveredStudioDraft && (!currentPublicationSlug || currentPublicationSlug !== recoveredStudioDraft.slug))) {
+        btn.style.display = "none";
+        if (panel) panel.style.display = "none";
+        btn.disabled = true;
+        return;
+    }
     
     if (!createdStudioDraft || 
         !currentPublicationSlug || 
@@ -831,6 +899,100 @@ async function publishStudioInvitation() {
     }
 }
 
+async function recoverStudioDraftContext() {
+    if (draftRecoveryInProgress) return;
+    if (!isStudioGeneratorReady()) return;
+    if (!requestedDraftId) return;
+
+    draftRecoveryInProgress = true;
+    updateDraftCreationButtonState();
+    updateDraftUpdateButtonState();
+    updateDraftPublishButtonState();
+
+    const msgEl = document.getElementById("authStatusMsg");
+    if (msgEl) {
+        msgEl.textContent = "Recuperando contexto del borrador...";
+        msgEl.style.color = "var(--text)";
+    }
+
+    try {
+        const db = window.studioAuth.db;
+        const { data, error } = await db
+            .from("studio_invitations")
+            .select("id, slug, published")
+            .eq("id", requestedDraftId)
+            .eq("studio_id", currentStudioContext.id)
+            .maybeSingle();
+
+        if (error) {
+            console.error("Error recuperando borrador:", error);
+            const err = new Error("RECOVERY_CHECK_FAILED");
+            err.code = "RECOVERY_CHECK_FAILED";
+            throw err;
+        }
+
+        if (!data) {
+            const err = new Error("RECOVERY_NOT_FOUND");
+            err.code = "RECOVERY_NOT_FOUND";
+            throw err;
+        }
+
+        if (!data.id || !data.slug || typeof data.published !== "boolean") {
+            const err = new Error("INVALID_RECOVERY_RESPONSE");
+            err.code = "INVALID_RECOVERY_RESPONSE";
+            throw err;
+        }
+
+        if (String(data.id) !== requestedDraftId) {
+            const err = new Error("INVALID_RECOVERY_RESPONSE");
+            err.code = "INVALID_RECOVERY_RESPONSE";
+            throw err;
+        }
+
+        const safeSlug = String(data.slug).trim().slice(0, 160);
+        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(safeSlug) || safeSlug !== data.slug) {
+            const err = new Error("RECOVERY_SLUG_MISMATCH");
+            err.code = "RECOVERY_SLUG_MISMATCH";
+            throw err;
+        }
+
+        recoveredStudioDraft = {
+            id: String(data.id),
+            slug: safeSlug,
+            published: data.published === true
+        };
+
+        draftRecoveryReady = true;
+
+        if (msgEl) {
+            if (recoveredStudioDraft.published) {
+                msgEl.textContent = "Invitación publicada localizada. Carga el archivo JSON correspondiente para verificarla.";
+            } else {
+                msgEl.textContent = "Borrador localizado. Carga el archivo JSON correspondiente para continuar.";
+            }
+            msgEl.style.color = "var(--accent)";
+        }
+    } catch (err) {
+        console.error("Error en recoverStudioDraftContext:", err);
+        requestedDraftId = null;
+        if (msgEl) {
+            let uiMsg = "No fue posible recuperar la invitación.";
+            if (err.code === "INVALID_RECOVERY_ID") {
+                uiMsg = "El enlace de recuperación no es válido.";
+            } else if (err.code === "RECOVERY_NOT_FOUND") {
+                uiMsg = "No se encontró una invitación asociada a este enlace.";
+            }
+            msgEl.textContent = uiMsg;
+            msgEl.style.color = "var(--danger)";
+        }
+    } finally {
+        draftRecoveryInProgress = false;
+        updateDraftCreationButtonState();
+        updateDraftUpdateButtonState();
+        updateDraftPublishButtonState();
+    }
+}
+
 function isStudioGeneratorReady() {
     return !!(currentStudioSession && currentStudioContext && currentStudioContext.id && studioContextReady);
 }
@@ -915,6 +1077,11 @@ async function initializeStudioGeneratorContext() {
             authStatusMsg.style.color = "var(--success)";
             authStatusMsg.setAttribute("role", "status");
             authStatusMsg.setAttribute("aria-live", "polite");
+        }
+        
+        requestedDraftId = readRequestedDraftId();
+        if (requestedDraftId) {
+            await recoverStudioDraftContext();
         }
         
         if (dropZone) dropZone.style.pointerEvents = "auto";
@@ -2406,33 +2573,78 @@ ${musicJS}
 </body>
 </html>`;
 
-    // Publication Package
     currentPublicationSlug = createSafePublicationSlug(d);
     currentPublicationManifest = buildPublicationManifest(d, media, studio, currentPublicationSlug);
     currentStudioPayload = buildStudioInvitationPayload(d, media, studio, currentPublicationSlug);
 
-    if (publishedStudioInvitation) {
-        if (currentPublicationSlug !== publishedStudioInvitation.slug) {
+    const msgEl = document.getElementById("authStatusMsg");
+
+    if (draftRecoveryReady && recoveredStudioDraft) {
+        if (currentPublicationSlug === recoveredStudioDraft.slug && currentStudioPayload.slug === recoveredStudioDraft.slug) {
+            if (recoveredStudioDraft.published === false) {
+                // Caso A
+                createdStudioDraft = {
+                    id: recoveredStudioDraft.id,
+                    slug: recoveredStudioDraft.slug
+                };
+                publishedStudioInvitation = null;
+                lastSavedDraftPayloadFingerprint = createDraftPayloadFingerprint(buildDraftInsertPayload());
+                draftPayloadDirty = false;
+                if (msgEl) {
+                    msgEl.textContent = "Borrador recuperado correctamente. Puedes actualizarlo o publicarlo.";
+                    msgEl.style.color = "var(--success)";
+                }
+            } else {
+                // Caso B
+                createdStudioDraft = {
+                    id: recoveredStudioDraft.id,
+                    slug: recoveredStudioDraft.slug
+                };
+                publishedStudioInvitation = {
+                    id: recoveredStudioDraft.id,
+                    slug: recoveredStudioDraft.slug,
+                    published: true
+                };
+                lastSavedDraftPayloadFingerprint = null;
+                draftPayloadDirty = false;
+                if (msgEl) {
+                    msgEl.textContent = "Esta invitación ya está publicada. Para modificarla utiliza el editor de Studio.";
+                    msgEl.style.color = "var(--success)";
+                }
+            }
+        } else {
+            // Caso C
             createdStudioDraft = null;
             publishedStudioInvitation = null;
-            lastSavedDraftPayloadFingerprint = null;
-            draftPayloadDirty = false;
-            publishConfirmationArmed = false;
-        } else {
-            draftPayloadDirty = false;
-        }
-    } else if (createdStudioDraft) {
-        if (currentPublicationSlug !== createdStudioDraft.slug) {
-            createdStudioDraft = null;
-            lastSavedDraftPayloadFingerprint = null;
-            draftPayloadDirty = false;
-            publishConfirmationArmed = false;
-        } else {
-            const currentFingerprint = createDraftPayloadFingerprint(buildDraftInsertPayload());
-            draftPayloadDirty = (currentFingerprint !== lastSavedDraftPayloadFingerprint);
+            if (msgEl) {
+                msgEl.textContent = "El archivo cargado no corresponde a la invitación recuperada.";
+                msgEl.style.color = "var(--danger)";
+            }
         }
     } else {
-        draftPayloadDirty = false;
+        if (publishedStudioInvitation) {
+            if (currentPublicationSlug !== publishedStudioInvitation.slug) {
+                createdStudioDraft = null;
+                publishedStudioInvitation = null;
+                lastSavedDraftPayloadFingerprint = null;
+                draftPayloadDirty = false;
+                publishConfirmationArmed = false;
+            } else {
+                draftPayloadDirty = false;
+            }
+        } else if (createdStudioDraft) {
+            if (currentPublicationSlug !== createdStudioDraft.slug) {
+                createdStudioDraft = null;
+                lastSavedDraftPayloadFingerprint = null;
+                draftPayloadDirty = false;
+                publishConfirmationArmed = false;
+            } else {
+                const currentFingerprint = createDraftPayloadFingerprint(buildDraftInsertPayload());
+                draftPayloadDirty = (currentFingerprint !== lastSavedDraftPayloadFingerprint);
+            }
+        } else {
+            draftPayloadDirty = false;
+        }
     }
 
     // Validate
@@ -2638,6 +2850,18 @@ ${musicJS}
                     btnGroup.appendChild(btnCancel);
                     confirmPanel.appendChild(btnGroup);
                     controlsContainer.appendChild(confirmPanel);
+                    
+                    if (recoveredStudioDraft) {
+                        const btnCancelRecovery = document.createElement("button");
+                        btnCancelRecovery.type = "button";
+                        btnCancelRecovery.id = "btnCancelDraftRecovery";
+                        btnCancelRecovery.className = "btn";
+                        btnCancelRecovery.style.marginTop = "10px";
+                        btnCancelRecovery.style.marginLeft = "10px";
+                        btnCancelRecovery.textContent = "Trabajar como invitación nueva";
+                        btnCancelRecovery.addEventListener("click", cancelDraftRecovery);
+                        controlsContainer.appendChild(btnCancelRecovery);
+                    }
                     
                     updateDraftCreationButtonState();
                     updateDraftUpdateButtonState();
