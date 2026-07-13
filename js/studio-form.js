@@ -21,7 +21,7 @@ let isEditMode = false;
 let originalTemplateId = null;
 let originalEventType = null;
 
-function updateTemplateOptions(options = { preserveLegacyNull: false }) {
+function updateTemplateOptions(options = { preserveLegacyNull: false, preferredTemplateId: null }) {
   const eventType = document.getElementById("event_type").value;
   const templateSelect = document.getElementById("template_id");
   const currentVal = templateSelect.value;
@@ -59,16 +59,18 @@ function updateTemplateOptions(options = { preserveLegacyNull: false }) {
     templateSelect.appendChild(opt);
   });
   
-  if (showLegacyNull && currentVal === "") {
+  const preferred = options.preferredTemplateId;
+  const isPreferredValid = preferred && validArray.includes(preferred);
+  const isCurrentValid = currentVal && validArray.includes(currentVal);
+
+  if (isPreferredValid) {
+    templateSelect.value = preferred;
+  } else if (showLegacyNull && (!currentVal || currentVal === "")) {
     templateSelect.value = "";
-  } else if (!currentVal || !validArray.includes(currentVal)) {
-    if (showLegacyNull) {
-      templateSelect.value = "";
-    } else {
-      templateSelect.value = eventType === "xv" ? "xv-rose-gold-premium" : "boda-classic-basic";
-    }
-  } else {
+  } else if (isCurrentValid) {
     templateSelect.value = currentVal;
+  } else {
+    templateSelect.value = eventType === "xv" ? "xv-rose-gold-premium" : "boda-classic-basic";
   }
 }
 
@@ -442,12 +444,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     originalTemplateId = data.template_id || null;
     originalEventType = data.event_type || null;
     
-    if (originalTemplateId) {
-        document.getElementById("template_id").value = originalTemplateId;
-    } else {
-        document.getElementById("template_id").value = "";
-    }
-    updateTemplateOptions({ preserveLegacyNull: true });
+    updateTemplateOptions({ 
+        preserveLegacyNull: originalTemplateId === null,
+        preferredTemplateId: originalTemplateId 
+    });
     document.getElementById("honoree_name").value = data.honoree_name || "";
     document.getElementById("event_date").value = data.event_date || "";
     document.getElementById("event_time").value = data.event_time || "";
