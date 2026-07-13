@@ -1385,7 +1385,9 @@ function validateLoadedConfigurationStructure(data) {
     return result;
 }
 
-function clearLoadedConfigurationUI() {
+function clearLoadedConfigurationUI(options = {}) {
+    const showUploadCard = options.showUploadCard !== false;
+    
     loadedConfig = null;
     const grid = document.getElementById("summaryGrid");
     if (grid) grid.replaceChildren();
@@ -1409,6 +1411,16 @@ function clearLoadedConfigurationUI() {
     if (warningEl) {
         warningEl.textContent = "";
         warningEl.style.display = "none";
+    }
+    
+    const uploadCard = document.getElementById("uploadCard");
+    if (uploadCard) {
+        uploadCard.style.display = showUploadCard ? "block" : "none";
+    }
+    
+    if (showUploadCard) {
+        const fileInput = document.getElementById("fileInput");
+        if (fileInput) fileInput.value = "";
     }
     
     updateGeneratorActionState();
@@ -1485,6 +1497,9 @@ function handleFile(file) {
     }
     
     const reader = new FileReader();
+    reader.onerror = () => {
+        showErrorAndClear("No fue posible leer el archivo seleccionado.");
+    };
     reader.onload = (e) => {
         let data;
         try {
@@ -1518,7 +1533,7 @@ function handleFile(file) {
         
         try {
             const workingConfig = createWorkingConfiguration(data);
-            clearLoadedConfigurationUI();
+            clearLoadedConfigurationUI({ showUploadCard: false });
             loadedConfig = workingConfig;
             
             if (structuralValidation.warnings.length > 0) {
