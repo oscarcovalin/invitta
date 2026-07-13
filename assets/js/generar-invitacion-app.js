@@ -9,6 +9,8 @@
 let loadedConfig = null;
 let finalHTML    = null;
 let previewBlobUrl = null;
+let currentPublicationSlug = null;
+let currentPublicationManifest = null;
 
 // ─────────────────────────────────────────────
 // FILE HANDLING
@@ -1010,6 +1012,96 @@ function buildTemplateCSS(p, t, design) {
 // ─────────────────────────────────────────────
 // MAIN GENERATOR
 // ─────────────────────────────────────────────
+function createSafePublicationSlug(data) {
+    let raw = "";
+    if (data.meta && data.meta.slug && typeof data.meta.slug === "string" && data.meta.slug.trim()) {
+        raw = data.meta.slug;
+    } else if (data.event) {
+        const pName = data.event.primaryName || "";
+        const sName = data.event.secondaryName || "";
+        const type = data.event.type === "boda" ? "boda" : "xv";
+        if (data.event.type === "boda" && sName) {
+            raw = `${pName}-y-${sName}-${type}`;
+        } else {
+            raw = `${pName}-${type}`;
+        }
+    }
+    
+    let slug = raw.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+        .replace(/[^a-z0-9-]/g, "-") 
+        .replace(/-+/g, "-") 
+        .replace(/^-+|-+$/g, ""); 
+        
+    slug = slug.substring(0, 80);
+    
+    if (!slug) {
+        slug = "evento-invitta";
+    }
+    
+    const reserved = ["admin", "administracion", "api", "assets", "dashboard", "login", "checkin", "host", "index", "invitacion", "invitacion-final", "recursos", "supabase", "null", "undefined"];
+    
+    if (reserved.includes(slug)) {
+        slug += "-evento";
+    }
+    
+    return slug;
+}
+
+function buildPublicationManifest(data, media, studio, slug) {
+    return {
+        schemaVersion: "1.0",
+        generatedBy: "Invitta",
+        generatedAt: new Date().toISOString(),
+        slug: slug,
+        htmlFilename: `${slug}.html`,
+        event: {
+            type: data.event?.type || "",
+            primaryName: data.event?.primaryName || "",
+            secondaryName: data.event?.secondaryName || "",
+            dateText: data.event?.dateText || ""
+        },
+        template: {
+            id: data.template?.id || "",
+            name: data.template?.name || "",
+            level: data.template?.level || ""
+        },
+        media: {
+            hasHeroImage: !!(media && media.heroImage),
+            galleryCount: (media && media.gallery) ? media.gallery.length : 0,
+            hasMusic: !!(media && media.music),
+            hasStudioLogo: !!(media && media.studioLogo)
+        },
+        studio: {
+            name: studio?.name || "",
+            hasWhatsapp: !!(studio && studio.whatsapp),
+            hasWebsite: !!(studio && studio.website)
+        }
+    };
+}
+
+function downloadPublicationManifest() {
+    if (!currentPublicationManifest || !currentPublicationSlug) {
+        const msgEl = document.getElementById("previewStatusMsg");
+        if (msgEl) {
+            msgEl.textContent = "Error: El manifiesto no está disponible para descargar.";
+            msgEl.style.display = "block";
+            msgEl.style.color = "#d9534f";
+        }
+        return;
+    }
+    
+    const blob = new Blob([JSON.stringify(currentPublicationManifest, null, 2)], { type: "application/json;charset=utf-8" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `invitta-publicacion-${currentPublicationSlug}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
 function validateInvitationForPreview(data, media, studio) {
     const errors = [];
     const warnings = [];
@@ -1148,6 +1240,10 @@ ${musicJS}
 </body>
 </html>`;
 
+    // Publication Package
+    currentPublicationSlug = createSafePublicationSlug(d);
+    currentPublicationManifest = buildPublicationManifest(d, media, studio, currentPublicationSlug);
+
     // Validate
     const validation = validateInvitationForPreview(d, media, studio);
 
@@ -1197,6 +1293,16 @@ ${musicJS}
         previewBtn.ariaLabel = "Abrir vista previa completa en una nueva pestaña";
         previewBtn.addEventListener("click", openPreview);
         
+        const downloadManifestBtn = document.createElement("button");
+        downloadManifestBtn.type = "button";
+        downloadManifestBtn.id = "btnDownloadManifest";
+        downloadManifestBtn.className = "btn";
+        downloadManifestBtn.style.marginTop = "10px";
+        downloadManifestBtn.style.marginLeft = "10px";
+        downloadManifestBtn.textContent = "Descargar manifiesto";
+        downloadManifestBtn.ariaLabel = "Descargar el manifiesto de publicación del evento";
+        downloadManifestBtn.addEventListener("click", downloadPublicationManifest);
+        
         const statusMsg = document.createElement("div");
         statusMsg.id = "previewStatusMsg";
         statusMsg.style.marginTop = "10px";
@@ -1204,7 +1310,15 @@ ${musicJS}
         statusMsg.style.display = "none";
         
         controlsContainer.appendChild(previewBtn);
+        controlsContainer.appendChild(downloadManifestBtn);
         controlsContainer.appendChild(statusMsg);
+        
+        const filesInfo = document.createElement("div");
+        filesInfo.style.marginTop = "15px";
+        filesInfo.style.fontSize = "0.85rem";
+        filesInfo.style.color = "#666";
+        filesInfo.textContent = `Archivo HTML: ${currentPublicationSlug}.html | Manifiesto: invitta-publicacion-${currentPublicationSlug}.json`;
+        controlsContainer.appendChild(filesInfo);
     }
 
     resultCard.scrollIntoView({ behavior: "smooth" });
@@ -1219,7 +1333,7 @@ function downloadFinal() {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
     a.href     = url;
-    a.download = "invitacion-final.html";
+    a.download = currentPublicationSlug ? `${currentPublicationSlug}.html` : "evento-invitta.html";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
