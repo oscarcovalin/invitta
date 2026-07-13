@@ -13,6 +13,104 @@ let currentPublicationSlug = null;
 let currentPublicationManifest = null;
 let currentStudioPayload = null;
 
+let currentStudioSession = null;
+let currentStudioContext = null;
+let studioContextReady = false;
+
+function isStudioGeneratorReady() {
+    return !!(currentStudioSession && currentStudioContext && currentStudioContext.id && studioContextReady);
+}
+
+function enforceStudioReady() {
+    if (!isStudioGeneratorReady()) {
+        const msgEl = document.getElementById("authStatusMsg");
+        if (msgEl) {
+            msgEl.textContent = "Error: Acción bloqueada. El generador requiere autenticación activa en Invitta Studio.";
+            msgEl.style.color = "var(--danger)";
+            msgEl.setAttribute("role", "alert");
+            msgEl.setAttribute("aria-live", "assertive");
+        }
+        return false;
+    }
+    return true;
+}
+
+async function initializeStudioGeneratorContext() {
+    const authStatusMsg = document.getElementById("authStatusMsg");
+    const dropZone = document.getElementById("dropZone");
+    const fileInput = document.getElementById("fileInput");
+    const btnGenerate = document.getElementById("btnGenerate");
+    
+    if (dropZone) dropZone.style.pointerEvents = "none";
+    if (fileInput) fileInput.disabled = true;
+    if (btnGenerate) btnGenerate.disabled = true;
+    
+    if (!window.studioAuth) {
+        if (authStatusMsg) {
+            authStatusMsg.textContent = "Error interno: El módulo de autenticación no está disponible.";
+            authStatusMsg.style.color = "var(--danger)";
+            authStatusMsg.setAttribute("role", "alert");
+            authStatusMsg.setAttribute("aria-live", "assertive");
+        }
+        return;
+    }
+    
+    const session = await window.studioAuth.requireSession();
+    if (!session) return;
+    
+    currentStudioSession = { user: { id: session.user.id } };
+    
+    try {
+        const db = window.studioAuth.db;
+        if (!db) throw new Error("No database client");
+        
+        const { data: studio, error } = await db
+            .from("studios")
+            .select("id, name")
+            .eq("user_id", session.user.id)
+            .single();
+            
+        if (error) throw error;
+        
+        if (!studio || !studio.id) {
+            if (authStatusMsg) {
+                authStatusMsg.textContent = "No se encontró un estudio asociado a esta cuenta.";
+                authStatusMsg.style.color = "var(--danger)";
+                authStatusMsg.setAttribute("role", "alert");
+                authStatusMsg.setAttribute("aria-live", "assertive");
+            }
+            return;
+        }
+        
+        currentStudioContext = {
+            id: String(studio.id),
+            name: escapeHTML(studio.name || "")
+        };
+        studioContextReady = true;
+        
+        if (authStatusMsg) {
+            authStatusMsg.textContent = `Estudio activo: ${currentStudioContext.name}`;
+            authStatusMsg.style.color = "var(--success)";
+            authStatusMsg.setAttribute("role", "status");
+            authStatusMsg.setAttribute("aria-live", "polite");
+        }
+        
+        if (dropZone) dropZone.style.pointerEvents = "auto";
+        if (fileInput) fileInput.disabled = false;
+        
+    } catch (err) {
+        console.error("Error validando el estudio:", err);
+        if (authStatusMsg) {
+            authStatusMsg.textContent = "Error al validar la configuración del estudio.";
+            authStatusMsg.style.color = "var(--danger)";
+            authStatusMsg.setAttribute("role", "alert");
+            authStatusMsg.setAttribute("aria-live", "assertive");
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", initializeStudioGeneratorContext);
+
 // ─────────────────────────────────────────────
 // FILE HANDLING
 // ─────────────────────────────────────────────
@@ -30,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function handleFile(file) {
+    if (!enforceStudioReady()) return;
     if (!file.name.endsWith(".json")) { showError("Selecciona un archivo .json válido."); return; }
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -1110,6 +1209,7 @@ function buildPublicationManifest(data, media, studio, slug) {
 }
 
 function downloadPublicationManifest() {
+    if (!enforceStudioReady()) return;
     if (!currentPublicationManifest || !currentPublicationSlug) {
         const msgEl = document.getElementById("previewStatusMsg");
         if (msgEl) {
@@ -1307,6 +1407,7 @@ function validateStudioInvitationPayload(payload) {
 }
 
 function downloadStudioInvitationPayload() {
+    if (!enforceStudioReady()) return;
     if (!currentStudioPayload || !currentPublicationSlug) {
         const msgEl = document.getElementById("previewStatusMsg");
         if (msgEl) {
@@ -1353,6 +1454,7 @@ function validateInvitationForPreview(data, media, studio) {
 }
 
 function openPreview() {
+    if (!enforceStudioReady()) return;
     if (!finalHTML) return;
     
     if (previewBlobUrl) {
@@ -1392,6 +1494,7 @@ function openPreview() {
 }
 
 function generateInvitation() {
+    if (!enforceStudioReady()) return;
     if (!loadedConfig) return;
     const d = loadedConfig;
 
@@ -1584,6 +1687,7 @@ ${musicJS}
 // DOWNLOAD
 // ─────────────────────────────────────────────
 function downloadFinal() {
+    if (!enforceStudioReady()) return;
     if (!finalHTML) return;
     const blob = new Blob([finalHTML], { type: "text/html;charset=utf-8" });
     const url  = URL.createObjectURL(blob);

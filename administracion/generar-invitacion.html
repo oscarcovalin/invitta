@@ -75,6 +75,7 @@
     <header>
         <h1>Generar Invitación Final</h1>
         <p>Carga el archivo <code>invitta-configuracion.json</code> para generar un HTML publicable.</p>
+        <div id="authStatusMsg" role="status" aria-live="polite" style="margin-top: 15px; font-size: 0.95rem; font-weight: 500; color: var(--accent);">Validando sesión de Invitta Studio...</div>
     </header>
 
     <!-- Step 1: Upload -->
@@ -123,6 +124,9 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/env.js"></script>
+<script src="../js/studio-auth.js"></script>
 <script src="../assets/js/generar-invitacion-app.js"></script>
 </body>
 </html>
