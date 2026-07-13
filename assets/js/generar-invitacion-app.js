@@ -147,17 +147,19 @@ function showUnsavedChangesConfirmation(options) {
     confirmBtn.className = "btn";
     confirmBtn.textContent = options.confirmText || "Descartar cambios";
     confirmBtn.style.backgroundColor = "var(--danger)";
-    confirmBtn.onclick = () => {
+    confirmBtn.addEventListener("click", () => {
         closeUnsavedChangesConfirmation();
-        if (typeof options.onConfirm === "function") options.onConfirm();
-    };
+        if (typeof options.onConfirm === "function") {
+            options.onConfirm();
+        }
+    });
     
     const cancelBtn = document.createElement("button");
     cancelBtn.className = "btn";
     cancelBtn.textContent = options.cancelText || "Conservar cambios";
-    cancelBtn.onclick = () => {
+    cancelBtn.addEventListener("click", () => {
         closeUnsavedChangesConfirmation();
-    };
+    });
     
     btnContainer.appendChild(confirmBtn);
     btnContainer.appendChild(cancelBtn);
@@ -190,6 +192,7 @@ function closeUnsavedChangesConfirmation() {
             document.removeEventListener("keydown", panel._escapeHandler);
             panel._escapeHandler = null;
         }
+        panel.replaceChildren();
     }
     if (lastFocusedElement) {
         lastFocusedElement.focus();
@@ -199,21 +202,35 @@ function closeUnsavedChangesConfirmation() {
 
 function attachProtectedNavigation(link) {
     if (!link) return;
+
+    if (link.dataset.unsavedGuardAttached === "true") return;
+    link.dataset.unsavedGuardAttached = "true";
+
+    const rawHref = String(link.getAttribute("href") || "").trim();
+
+    let url;
+    try {
+        url = new URL(rawHref, window.location.origin);
+    } catch {
+        return;
+    }
+
+    if (url.origin !== window.location.origin) return;
+    if (url.pathname !== "/administracion/studio-dashboard.html") return;
+    if (link.target === "_blank") return;
+
     link.addEventListener("click", (e) => {
         if (hasUnsavedGeneratorChanges()) {
             e.preventDefault();
-            const safeHref = link.getAttribute("href");
-            if (safeHref && safeHref.startsWith("/administracion/")) {
-                showUnsavedChangesConfirmation({
-                    message: "Hay cambios sin guardar. ¿Deseas salir de esta página?",
-                    confirmText: "Salir sin guardar",
-                    cancelText: "Permanecer aquí",
-                    onConfirm: () => {
-                        unsavedChangesGuardEnabled = false;
-                        window.location.href = safeHref;
-                    }
-                });
-            }
+            showUnsavedChangesConfirmation({
+                message: "Hay cambios sin guardar. ¿Deseas salir de esta página?",
+                confirmText: "Salir sin guardar",
+                cancelText: "Permanecer aquí",
+                onConfirm: () => {
+                    unsavedChangesGuardEnabled = false;
+                    window.location.href = url.pathname + url.search + url.hash;
+                }
+            });
         }
     });
 }
@@ -910,7 +927,6 @@ async function createStudioInvitationDraft() {
             msgEl.appendChild(a);
             msgEl.appendChild(linkDash);
             
-            attachProtectedNavigation(a);
             attachProtectedNavigation(linkDash);
             updateUnsavedChangesIndicator();
         }
@@ -1068,7 +1084,6 @@ async function updateStudioInvitationDraft() {
             msgEl.appendChild(a);
             msgEl.appendChild(linkDash);
             
-            attachProtectedNavigation(a);
             attachProtectedNavigation(linkDash);
             updateUnsavedChangesIndicator();
         }
@@ -1247,7 +1262,6 @@ async function publishStudioInvitation() {
             msgEl.appendChild(a);
             msgEl.appendChild(linkDash);
             
-            attachProtectedNavigation(a);
             attachProtectedNavigation(linkDash);
             updateUnsavedChangesIndicator();
         }
@@ -1488,7 +1502,6 @@ async function initializeStudioGeneratorContext() {
 
 document.addEventListener("DOMContentLoaded", () => {
     initializeStudioGeneratorContext();
-    document.querySelectorAll("a").forEach(attachProtectedNavigation);
 });
 
 // ─────────────────────────────────────────────
