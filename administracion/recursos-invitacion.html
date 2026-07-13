@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursos Multimedia - Invitta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --primary-color: #1a1a1a;
+            --accent-color: #c48473;
+            --border-color: #e5e5e5;
+            --text-color: #333333;
+            --text-muted: #666666;
+            --error-color: #dc3545;
+            --success-color: #198754;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; padding: 20px; }
+        
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { font-family: 'Playfair Display', serif; color: var(--primary-color); font-size: 2rem; margin-bottom: 5px; }
+        header p { color: var(--text-muted); font-size: 0.95rem; }
+
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--primary-color); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .card-title i { color: var(--accent-color); font-size: 1rem; }
+
+        /* Dropzone */
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: var(--bg-color);
+        }
+        .drop-zone:hover, .drop-zone.over {
+            border-color: var(--accent-color);
+            background-color: rgba(196, 132, 115, 0.05);
+        }
+        .drop-zone i { font-size: 2.5rem; color: var(--accent-color); margin-bottom: 10px; }
+        .drop-zone p { color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem; }
+        .file-input { display: none; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 20px; border-radius: 6px; font-weight: 500; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.2s; border: none; font-family: 'Inter', sans-serif;
+            text-decoration: none;
+        }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: #000; transform: translateY(-1px); }
+        .btn-accent { background-color: var(--accent-color); color: white; }
+        .btn-accent:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-color); }
+        .btn-outline:hover { background-color: var(--bg-color); }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        .btn-icon { padding: 6px; color: var(--text-muted); background: transparent; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; }
+        .btn-icon:hover { background: var(--bg-color); color: var(--primary-color); }
+        .btn-icon.danger:hover { color: var(--error-color); border-color: var(--error-color); }
+
+        .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 0.9rem; display: none; }
+        .alert-error { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+        .alert-warning { background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; }
+        .alert-success { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+        .sum-item { background: var(--bg-color); padding: 12px; border-radius: 6px; border: 1px solid var(--border-color); }
+        .sum-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 4px; }
+        .sum-value { font-weight: 500; font-size: 0.95rem; color: var(--primary-color); }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-color); margin-bottom: 6px; }
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: border-color 0.2s; }
+        .form-control:focus { outline: none; border-color: var(--accent-color); }
+        
+        .input-group { display: flex; gap: 8px; }
+        .input-group .form-control { flex: 1; }
+
+        /* Preview blocks */
+        .img-preview-container { margin-top: 12px; display: none; }
+        .img-preview { max-width: 100%; max-height: 200px; border-radius: 6px; border: 1px solid var(--border-color); object-fit: contain; background-color: var(--bg-color); }
+        .audio-preview-container { margin-top: 12px; display: none; }
+        .audio-preview { width: 100%; }
+
+        /* Gallery */
+        .gallery-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+        .gallery-item { display: flex; gap: 12px; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); align-items: flex-start; }
+        .gallery-item-content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .gallery-item-actions { display: flex; flex-direction: column; gap: 6px; }
+        .gallery-controls { display: flex; gap: 12px; }
+        .gallery-controls select { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.85rem; }
+        
+        .gallery-img-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); background-color: #eaeaea; display: none; flex-shrink: 0; }
+
+        .checkbox-group { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+        .checkbox-group input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent-color); }
+        .checkbox-group label { font-size: 0.9rem; color: var(--text-color); cursor: pointer; }
+
+        pre.code-preview { background-color: #f4f4f4; padding: 16px; border-radius: 6px; overflow-x: auto; font-family: monospace; font-size: 0.85rem; border: 1px solid #e0e0e0; max-height: 400px; overflow-y: auto; }
+
+        .hidden { display: none !important; }
+
+        .hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; display: block; }
+
+        @media (max-width: 600px) {
+            .gallery-item { flex-direction: column; }
+            .gallery-item-actions { flex-direction: row; width: 100%; justify-content: flex-end; }
+            .gallery-controls { flex-direction: column; }
+            .gallery-img-thumb { width: 100%; height: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Gestor de Recursos Multimedia</h1>
+        <p>Añade fotografías, música y la marca del estudio (Fase 7I.1)</p>
+    </header>
+
+    <div id="errorMsg" class="alert alert-error"></div>
+    <div id="warningMsg" class="alert alert-warning"></div>
+
+    <!-- 1. CARGA DE ARCHIVO -->
+    <div class="card" id="uploadCard">
+        <h2 class="card-title"><i class="fa-solid fa-file-import"></i> 1. Cargar Configuración</h2>
+        <div class="drop-zone" id="dropZone">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <p>Arrastra tu archivo <strong>invitta-configuracion.json</strong> aquí<br>o haz clic para explorar.</p>
+            <input type="file" id="fileInput" class="file-input" accept=".json">
+            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">Seleccionar Archivo</button>
+        </div>
+    </div>
+
+    <div id="mainWorkspace" class="hidden">
+        
+        <!-- 2. RESUMEN -->
+        <div class="card" id="summaryCard">
+            <h2 class="card-title"><i class="fa-solid fa-clipboard-check"></i> 2. Resumen del Evento</h2>
+            <div class="summary-grid" id="summaryGrid"></div>
+            <div style="margin-top: 16px; text-align: right;">
+                <button class="btn btn-outline btn-sm" onclick="location.reload()"><i class="fa-solid fa-rotate-left"></i> Cargar otra configuración</button>
+            </div>
+        </div>
+
+        <!-- 3. IMAGEN PRINCIPAL -->
+        <div class="card">
+            <h2 class="card-title"><i class="fa-regular fa-image"></i> 3. Imagen Principal (Portada)</h2>
+            <div class="form-group">
+                <label class="form-label" for="heroImageUrl">URL de la imagen (HTTPS)</label>
+                <div class="input-group">
+                    <input type="url" id="heroImageUrl" class="form-control" placeholder="https://ejemplo.com/portada.webp">
+                    <button type="button" class="btn btn-outline" onclick="testHeroImage()"><i class="fa-solid fa-eye"></i> Probar</button>
+                </div>
+                <span class="hint">Recomendado: webp o jpg comprimido, orientación vertical para hero.</span>
+                <div class="img-preview-container" id="heroImagePreviewContainer">
+                    <img id="heroImagePreview" class="img-preview" src="" alt="Vista previa Portada">
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. GALERÍA -->
+        <div class="card">
+            <h2 class="card-title"><i class="fa-solid fa-images"></i> 4. Galería Fotográfica</h2>
+            <p class="hint" style="margin-bottom: 12px;">Agrega hasta 10 imágenes. Arrastra desde un servicio externo o pega URLs HTTPS.</p>
+            
+            <div id="galleryList" class="gallery-list">
+                <!-- Los ítems se renderizan por JS -->
+            </div>
+            
+            <button type="button" class="btn btn-outline" id="btnAddGallery" onclick="addGalleryItem()">
+                <i class="fa-solid fa-plus"></i> Agregar fotografía
+            </button>
+            <span id="galleryLimitMsg" class="hint error hidden" style="color:var(--error-color); margin-left: 10px;">Límite de 10 imágenes alcanzado.</span>
+        </div>
+
+        <!-- 5. MÚSICA -->
+        <div class="card">
+            <h2 class="card-title"><i class="fa-solid fa-music"></i> 5. Música de Fondo</h2>
+            <div class="form-group">
+                <label class="form-label" for="musicUrl">URL del archivo de audio (HTTPS)</label>
+                <div class="input-group">
+                    <input type="url" id="musicUrl" class="form-control" placeholder="https://ejemplo.com/cancion.mp3">
+                    <button type="button" class="btn btn-outline" onclick="testAudio()"><i class="fa-solid fa-play"></i> Probar</button>
+                </div>
+                <span class="hint">Formatos soportados: mp3, m4a, ogg.</span>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="musicTitle">Título de la canción (para mostrar en controles)</label>
+                <input type="text" id="musicTitle" class="form-control" placeholder="Ej. Perfect - Ed Sheeran">
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="musicAutoplay">
+                <label for="musicAutoplay">Solicitar reproducción automática al abrir la invitación</label>
+            </div>
+            <div class="alert alert-warning" style="display:block; margin-top:12px; padding:8px 12px; font-size:0.8rem;">
+                <i class="fa-solid fa-circle-info"></i> Nota: Los navegadores modernos pueden bloquear la reproducción automática hasta que el visitante interactúe (toque la pantalla) en la invitación.
+            </div>
+            <div class="audio-preview-container" id="audioPreviewContainer">
+                <audio id="audioPreview" class="audio-preview" controls></audio>
+            </div>
+        </div>
+
+        <!-- 6. MARCA DEL ESTUDIO -->
+        <div class="card">
+            <h2 class="card-title"><i class="fa-solid fa-building"></i> 6. Marca del Estudio</h2>
+            <div class="form-group">
+                <label class="form-label" for="studioName">Nombre comercial del estudio</label>
+                <input type="text" id="studioName" class="form-control" placeholder="Invitta Digital">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="studioWhatsapp">WhatsApp comercial</label>
+                <input type="text" id="studioWhatsapp" class="form-control" placeholder="5215551234567">
+                <span class="hint">Incluye código de país. Los caracteres no numéricos se limpiarán.</span>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="studioWebsite">Sitio web (HTTPS) (Opcional)</label>
+                <input type="url" id="studioWebsite" class="form-control" placeholder="https://invitta.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="studioLogoUrl">Logotipo del estudio (URL HTTPS)</label>
+                <div class="input-group">
+                    <input type="url" id="studioLogoUrl" class="form-control" placeholder="https://ejemplo.com/logo.png">
+                    <button type="button" class="btn btn-outline" onclick="testStudioLogo()"><i class="fa-solid fa-eye"></i> Probar</button>
+                </div>
+                <div class="img-preview-container" id="studioLogoPreviewContainer">
+                    <img id="studioLogoPreview" class="img-preview" src="" alt="Logotipo del estudio">
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. REVISAR Y DESCARGAR -->
+        <div class="card">
+            <h2 class="card-title"><i class="fa-solid fa-file-export"></i> 7. Revisar y Descargar</h2>
+            <div style="margin-bottom: 20px;">
+                <button type="button" class="btn btn-accent" onclick="generateMediaConfig()"><i class="fa-solid fa-gears"></i> Generar Configuración Multimedia</button>
+            </div>
+            
+            <div id="resultContainer" class="hidden">
+                <div class="alert alert-success" id="successMsg">
+                    <i class="fa-solid fa-check-circle"></i> Configuración actualizada correctamente.
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Vista previa del bloque <code>media</code> y <code>studio</code>:</label>
+                    <pre id="codePreview" class="code-preview"></pre>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="downloadMediaConfig()"><i class="fa-solid fa-download"></i> Descargar invitta-configuracion-media.json</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="../assets/js/recursos-invitacion-app.js"></script>
+</body>
+</html>
