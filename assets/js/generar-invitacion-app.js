@@ -21,6 +21,8 @@ let studioSessionInvalidated = false;
 let initialStudioUserId = null;
 let studioAuthSubscription = null;
 let sessionValidationInProgress = false;
+let studioGeneratorInitialized = false;
+let studioSessionPanelLastFocusedElement = null;
 
 function normalizeStudioUserId(value) {
     if (typeof value !== "string") return null;
@@ -894,7 +896,7 @@ function cancelPublishConfirmation() {
 }
 
 async function createStudioInvitationDraft() {
-    if (!enforceStudioReady()) return;
+    if (!enforceStudioRemoteReady()) return;
     if (draftCreationInProgress || createdStudioDraft) return;
     
     const sessionValid = await verifyStudioSessionBeforeMutation();
@@ -1139,7 +1141,7 @@ function showDraftConflictPanel(context) {
 }
 
 async function updateStudioInvitationDraft() {
-    if (!enforceStudioReady()) return;
+    if (!enforceStudioRemoteReady()) return;
     if (draftUpdateInProgress || draftCreationInProgress) return;
     
     const sessionValid = await verifyStudioSessionBeforeMutation();
@@ -1345,7 +1347,7 @@ async function updateStudioInvitationDraft() {
 }
 
 async function publishStudioInvitation() {
-    if (!enforceStudioReady()) return;
+    if (!enforceStudioRemoteReady()) return;
     if (draftCreationInProgress || draftUpdateInProgress || draftPublishInProgress) return;
     
     const sessionValid = await verifyStudioSessionBeforeMutation();
@@ -1577,7 +1579,7 @@ async function publishStudioInvitation() {
 
 async function recoverStudioDraftContext() {
     if (draftRecoveryInProgress) return;
-    if (!isStudioGeneratorReady()) return;
+    if (!enforceStudioRemoteReady()) return;
     if (!requestedDraftId) return;
 
     const sessionValid = await verifyStudioSessionBeforeMutation();
@@ -1706,17 +1708,61 @@ function isStudioGeneratorReady() {
     return isCurrentStudioSessionValid() && !!(currentStudioContext && currentStudioContext.id);
 }
 
+function isStudioLocalGeneratorAvailable() {
+    return (
+        studioGeneratorInitialized === true &&
+        currentStudioContext != null &&
+        currentStudioContext.id != null
+    );
+}
+
+function enforceStudioRemoteReady() {
+    if (studioSessionInvalidated) {
+        const msgEl = document.getElementById("authStatusMsg");
+        if (msgEl) {
+            msgEl.textContent = "La sesión de Studio finalizó. Inicia sesión nuevamente para guardar.";
+            msgEl.style.color = "var(--danger)";
+            msgEl.setAttribute("role", "alert");
+        }
+        showStudioSessionInvalidatedPanel();
+        return false;
+    }
+    
+    if (!isCurrentStudioSessionValid()) {
+        const msgEl = document.getElementById("authStatusMsg");
+        if (msgEl) {
+            msgEl.textContent = "No hay una sesión de estudio válida o activa.";
+            msgEl.style.color = "var(--danger)";
+            msgEl.setAttribute("role", "alert");
+        }
+        return false;
+    }
+    
+    return true;
+}
+
 function isStudioAuthenticationError(error) {
     if (!error) return false;
     const msg = String(error.message || "").toLowerCase();
     const code = String(error.code || "").toLowerCase();
-    // avoid throwing 401 unauthenticated if it doesn't mention jwt/session (but it usually does)
     const str = `${msg} ${code}`;
-    return str.includes("jwt expired") || 
-           str.includes("invalid jwt") || 
-           str.includes("not authenticated") || 
-           str.includes("refresh token") || 
-           str.includes("session");
+    const status = error.status;
+    
+    if (str.includes("jwt expired") || 
+        str.includes("invalid jwt") || 
+        str.includes("not authenticated") || 
+        str.includes("refresh token") || 
+        str.includes("auth session missing") || 
+        str.includes("session not found") || 
+        str.includes("no active session")) {
+        return true;
+    }
+    
+    if (status === 401 && (str.includes("auth") || str.includes("jwt") || str.includes("session"))) {
+        return true;
+    }
+    
+    return false;
 }
 
 function invalidateStudioGeneratorSession(reason) {
@@ -1788,6 +1834,8 @@ async function verifyStudioSessionBeforeMutation() {
 }
 
 function showStudioSessionInvalidatedPanel() {
+    studioSessionPanelLastFocusedElement = document.activeElement;
+
     let panel = document.getElementById("studioSessionInvalidatedPanel");
     if (!panel) {
         panel = document.createElement("div");
@@ -1806,6 +1854,11 @@ function showStudioSessionInvalidatedPanel() {
         panel.setAttribute("aria-modal", "true");
         panel.setAttribute("aria-labelledby", "studioSessionInvalidatedPanelTitle");
         document.body.appendChild(panel);
+    }
+    
+    if (panel._escapeListener) {
+        document.removeEventListener("keydown", panel._escapeListener);
+        panel._escapeListener = null;
     }
     
     panel.replaceChildren();
@@ -1893,7 +1946,6 @@ function showStudioSessionInvalidatedPanel() {
         }
     };
     document.addEventListener("keydown", escapeListener);
-    panel.dataset.escapeListenerAttached = "true";
     panel._escapeListener = escapeListener;
     
     btnStay.focus();
@@ -1906,24 +1958,29 @@ function closeStudioSessionInvalidatedPanel() {
         panel.replaceChildren();
         if (panel._escapeListener) {
             document.removeEventListener("keydown", panel._escapeListener);
-            delete panel._escapeListener;
+            panel._escapeListener = null;
         }
     }
+    
+    if (studioSessionPanelLastFocusedElement && typeof studioSessionPanelLastFocusedElement.focus === "function" && document.body.contains(studioSessionPanelLastFocusedElement)) {
+        studioSessionPanelLastFocusedElement.focus();
+    }
+    studioSessionPanelLastFocusedElement = null;
 }
 
 function updateGeneratorActionState() {
     const btnGenerate = document.getElementById("btnGenerate");
     if (btnGenerate) {
-        const canGenerate = isStudioGeneratorReady() && !!loadedConfig;
+        const canGenerate = isStudioLocalGeneratorAvailable() && !!loadedConfig;
         btnGenerate.disabled = !canGenerate;
     }
 }
 
 function enforceStudioReady() {
-    if (!isStudioGeneratorReady()) {
+    if (!isStudioLocalGeneratorAvailable()) {
         const msgEl = document.getElementById("authStatusMsg");
         if (msgEl) {
-            msgEl.textContent = "Error: Acción bloqueada. El generador requiere autenticación activa en Invitta Studio.";
+            msgEl.textContent = "Error: Acción bloqueada. El generador no ha sido inicializado correctamente.";
             msgEl.style.color = "var(--danger)";
             msgEl.setAttribute("role", "alert");
             msgEl.setAttribute("aria-live", "assertive");
@@ -2017,6 +2074,7 @@ async function initializeStudioGeneratorContext() {
         if (fileInput) fileInput.disabled = false;
         
         unsavedChangesGuardEnabled = true;
+        studioGeneratorInitialized = true;
         updateGeneratorActionState();
         updateDraftCreationButtonState();
         updateDraftUpdateButtonState();
@@ -2335,7 +2393,10 @@ function processConfigurationFile(file) {
 }
 
 function handleFile(file) {
-    if (!enforceStudioReady()) return;
+    if (!studioGeneratorInitialized) {
+        showError("El generador no está listo. Inicia la página desde Invitta Studio.");
+        return;
+    }
     if (hasUnsavedGeneratorChanges()) {
         showUnsavedChangesConfirmation({
             message: "Hay cambios sin guardar. ¿Deseas cargar otra configuración y descartarlos?",
@@ -3697,7 +3758,10 @@ function openPreview() {
 }
 
 function generateInvitation() {
-    if (!enforceStudioReady()) return;
+    if (!studioGeneratorInitialized) {
+        showError("El generador no está listo. Inicia la página desde Invitta Studio.");
+        return;
+    }
     if (!loadedConfig) return;
     const d = loadedConfig;
 
