@@ -1036,16 +1036,29 @@ function createSafePublicationSlug(data) {
     }
     
     if (!slug && data.event) {
-        const pName = data.event.primaryName || "";
-        const sName = data.event.secondaryName || "";
+        const pNameStr = data.event.primaryName || "";
+        const sNameStr = data.event.secondaryName || "";
         const type = data.event.type === "boda" ? "boda" : "xv";
-        let raw = "";
-        if (data.event.type === "boda" && sName) {
-            raw = `${pName}-y-${sName}-${type}`;
-        } else {
-            raw = `${pName}-${type}`;
+        
+        let pName = normalize(pNameStr);
+        let sName = normalize(sNameStr);
+        
+        const pValid = pName.length > 0 && /[a-z0-9]/.test(pName);
+        const sValid = sName.length > 0 && /[a-z0-9]/.test(sName);
+        
+        if (pValid) {
+            let raw = "";
+            if (type === "boda") {
+                if (sValid) {
+                    raw = `${pName}-y-${sName}-boda`;
+                } else {
+                    raw = `${pName}-boda`;
+                }
+            } else {
+                raw = `${pName}-xv`;
+            }
+            slug = normalize(raw);
         }
-        slug = normalize(raw);
     }
     
     if (!slug) {
