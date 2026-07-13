@@ -1013,27 +1013,40 @@ function buildTemplateCSS(p, t, design) {
 // MAIN GENERATOR
 // ─────────────────────────────────────────────
 function createSafePublicationSlug(data) {
-    let raw = "";
-    if (data.meta && data.meta.slug && typeof data.meta.slug === "string" && data.meta.slug.trim()) {
-        raw = data.meta.slug;
-    } else if (data.event) {
+    function normalize(str) {
+        if (!str || typeof str !== "string") return "";
+        let s = str.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+            .replace(/[^a-z0-9-]/g, "-") 
+            .replace(/-+/g, "-") 
+            .replace(/^-+|-+$/g, ""); 
+            
+        s = s.substring(0, 80);
+        s = s.replace(/^-+|-+$/g, "");
+        return s;
+    }
+
+    let slug = "";
+    
+    if (data.meta && data.meta.slug) {
+        let metaSlug = normalize(data.meta.slug);
+        if (metaSlug.length > 0 && /[a-z0-9]/.test(metaSlug)) {
+            slug = metaSlug;
+        }
+    }
+    
+    if (!slug && data.event) {
         const pName = data.event.primaryName || "";
         const sName = data.event.secondaryName || "";
         const type = data.event.type === "boda" ? "boda" : "xv";
+        let raw = "";
         if (data.event.type === "boda" && sName) {
             raw = `${pName}-y-${sName}-${type}`;
         } else {
             raw = `${pName}-${type}`;
         }
+        slug = normalize(raw);
     }
-    
-    let slug = raw.toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
-        .replace(/[^a-z0-9-]/g, "-") 
-        .replace(/-+/g, "-") 
-        .replace(/^-+|-+$/g, ""); 
-        
-    slug = slug.substring(0, 80);
     
     if (!slug) {
         slug = "evento-invitta";
@@ -1043,6 +1056,8 @@ function createSafePublicationSlug(data) {
     
     if (reserved.includes(slug)) {
         slug += "-evento";
+        slug = normalize(slug);
+        if (!slug) slug = "evento-invitta";
     }
     
     return slug;
