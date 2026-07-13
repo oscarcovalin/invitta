@@ -46,23 +46,60 @@ function validateDraftCreationReadiness() {
 }
 
 function buildDraftInsertPayload() {
-    const payload = JSON.parse(JSON.stringify(currentStudioPayload));
+    const cp = currentStudioPayload;
     
-    payload.studio_id = String(currentStudioContext.id);
-    payload.published = false;
-    payload.link_builder_pin = "";
-    
-    delete payload.id;
-    delete payload.user_id;
-    delete payload.created_at;
-    delete payload.updated_at;
-    delete payload.finalHTML;
-    delete payload.access_token;
-    delete payload.refresh_token;
-    delete payload.email;
-    delete payload.sesion;
-    delete payload.manifiesto;
-    delete payload.currentStudioContext;
+    const payload = {
+        title: cp.title,
+        slug: cp.slug,
+        event_type: cp.event_type,
+        honoree_name: cp.honoree_name,
+        event_date: cp.event_date,
+        event_time: cp.event_time,
+        welcome_text: cp.welcome_text,
+        father_name: cp.father_name,
+        mother_name: cp.mother_name,
+        instagram_hashtag: cp.instagram_hashtag,
+        thank_you_title: cp.thank_you_title,
+        thank_you_message: cp.thank_you_message,
+        thank_you_signature: cp.thank_you_signature,
+        hashtag_section_title: cp.hashtag_section_title,
+        hashtag_section_message: cp.hashtag_section_message,
+        godparents: Array.isArray(cp.godparents) ? cp.godparents.map(g => ({ ...g })) : [],
+        font_preset: cp.font_preset,
+        visual_theme: cp.visual_theme,
+        color_primary: cp.color_primary,
+        color_secondary: cp.color_secondary,
+        ceremony_name: cp.ceremony_name,
+        ceremony_address: cp.ceremony_address,
+        ceremony_map_url: cp.ceremony_map_url,
+        reception_name: cp.reception_name,
+        reception_address: cp.reception_address,
+        reception_map_url: cp.reception_map_url,
+        gift_table_url: cp.gift_table_url,
+        dress_code: cp.dress_code,
+        whatsapp_number: cp.whatsapp_number,
+        published: false,
+        studio_name: cp.studio_name,
+        studio_logo_url: cp.studio_logo_url,
+        music_player_brand_enabled: cp.music_player_brand_enabled,
+        studio_whatsapp: cp.studio_whatsapp,
+        studio_cta_enabled: cp.studio_cta_enabled,
+        studio_cta_text: cp.studio_cta_text,
+        studio_cta_message: cp.studio_cta_message,
+        link_builder_enabled: cp.link_builder_enabled,
+        link_builder_pin: "",
+        link_builder_title: cp.link_builder_title,
+        link_builder_message: cp.link_builder_message,
+        gallery_urls: Array.isArray(cp.gallery_urls) ? [...cp.gallery_urls] : [],
+        itinerary: Array.isArray(cp.itinerary) ? cp.itinerary.map(i => ({ ...i })) : [],
+        background_image_url: cp.background_image_url,
+        music_title: cp.music_title,
+        music_artist: cp.music_artist,
+        template_id: cp.template_id,
+        main_photo_url: cp.main_photo_url,
+        music_url: cp.music_url,
+        studio_id: String(currentStudioContext.id)
+    };
 
     return payload;
 }
@@ -128,10 +165,14 @@ async function createStudioInvitationDraft() {
 
         if (findError) {
             console.error("Error buscando slug duplicado:", findError);
-            throw new Error("No se pudo comprobar la disponibilidad del enlace.");
+            const err = new Error("DUPLICATE_CHECK_FAILED");
+            err.code = "DUPLICATE_CHECK_FAILED";
+            throw err;
         }
         if (existing) {
-            throw new Error("Ya existe una invitación con este slug en tu estudio.");
+            const err = new Error("DUPLICATE_SLUG");
+            err.code = "DUPLICATE_SLUG";
+            throw err;
         }
 
         const payload = buildDraftInsertPayload();
@@ -144,11 +185,15 @@ async function createStudioInvitationDraft() {
 
         if (insertError) {
             console.error("Error insertando borrador:", insertError);
-            throw new Error("No fue posible crear el borrador.");
+            const err = new Error("INSERT_FAILED");
+            err.code = "INSERT_FAILED";
+            throw err;
         }
         if (!data || !data.id || !data.slug) {
             console.error("Respuesta inesperada al crear borrador:", data);
-            throw new Error("No fue posible crear el borrador.");
+            const err = new Error("INVALID_RESPONSE");
+            err.code = "INVALID_RESPONSE";
+            throw err;
         }
 
         createdStudioDraft = {
@@ -176,8 +221,16 @@ async function createStudioInvitationDraft() {
             msgEl.appendChild(a);
         }
     } catch (err) {
+        console.error("Error creando borrador Studio:", err);
         if (msgEl) {
-            msgEl.textContent = err.message || "Error al crear el borrador.";
+            let uiMsg = "No fue posible crear el borrador.";
+            if (err.code === "DUPLICATE_SLUG") {
+                uiMsg = "Ya existe una invitación con este slug en tu estudio.";
+            } else if (err.code === "DUPLICATE_CHECK_FAILED") {
+                uiMsg = "No fue posible comprobar la disponibilidad del enlace.";
+            }
+            
+            msgEl.textContent = uiMsg;
             msgEl.style.color = "var(--danger)";
             msgEl.setAttribute("role", "alert");
             msgEl.setAttribute("aria-live", "assertive");
