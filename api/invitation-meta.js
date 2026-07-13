@@ -2,8 +2,9 @@ const fs = require("fs");
 const path = require("path");
 
 const APP_URL = "https://invitta.vercel.app";
+const SUPABASE_URL = "https://zqnlvmafwcioizzxhnhz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_aGhY_wqkcuv0c2wLDMb-nw_wsjjfTcd";
 const HTML_PATH = path.join(process.cwd(), "invitacion.html");
-const ENV_PATH = path.join(process.cwd(), "assets", "js", "env.js");
 
 function escapeHtml(value) {
   return String(value || "")
@@ -12,18 +13,6 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-function readPublicSupabaseConfig() {
-  const source = fs.readFileSync(ENV_PATH, "utf8");
-  const url = source.match(/SUPABASE_URL\s*:\s*["']([^"']+)["']/)?.[1];
-  const key = source.match(/SUPABASE_ANON_KEY\s*:\s*["']([^"']+)["']/)?.[1];
-
-  if (!url || !key) {
-    throw new Error("Missing public Supabase configuration.");
-  }
-
-  return { url, key };
 }
 
 function firstGalleryImage(value) {
@@ -41,17 +30,16 @@ function firstGalleryImage(value) {
 async function getInvitation(slug) {
   if (!slug) return null;
 
-  const { url, key } = readPublicSupabaseConfig();
   const query = new URLSearchParams({
     select: "title,honoree_name,event_type,event_date,main_photo_url,gallery_urls",
     slug: `eq.${slug}`,
     published: "eq.true",
     limit: "1"
   });
-  const response = await fetch(`${url}/rest/v1/studio_invitations?${query}`, {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/studio_invitations?${query}`, {
     headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       Accept: "application/json"
     }
   });
