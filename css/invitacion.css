@@ -3561,7 +3561,7 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
   object-fit: contain;
   object-position: center;
   filter: none;
-  transform: translate3d(-50%, calc(-50% + var(--moment-foreground-shift, 0px)), 0) scale(0.985);
+  transform: translate3d(-50%, calc(-50% + var(--moment-foreground-shift, 0px)), 0) scale(1);
   transform-origin: center;
   will-change: transform;
 }
@@ -3588,7 +3588,7 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
 
 @media (prefers-reduced-motion: reduce) {
   .inv-moment-image {
-    transform: translate3d(-50%, -50%, 0) scale(0.985) !important;
+    transform: translate3d(-50%, -50%, 0) scale(1) !important;
   }
 
   .inv-moment-backdrop {
