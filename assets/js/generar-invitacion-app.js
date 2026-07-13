@@ -33,6 +33,191 @@ let draftRecoveryInProgress = false;
 let draftRecoveryReady = false;
 let configurationBackupInProgress = false;
 
+let unsavedChangesGuardEnabled = false;
+let configurationBackupDownloaded = false;
+let currentGenerationVersion = 0;
+let backedUpGenerationVersion = null;
+
+function hasUnsavedGeneratorChanges() {
+    if (!unsavedChangesGuardEnabled) return false;
+    
+    // CASO A — INVITACIÓN NUEVA GENERADA
+    if (loadedConfig && currentStudioPayload && !createdStudioDraft && !publishedStudioInvitation) {
+        if (!configurationBackupDownloaded || backedUpGenerationVersion !== currentGenerationVersion) {
+            return true;
+        }
+    }
+    
+    // CASO B — BORRADOR EXISTENTE MODIFICADO
+    if (createdStudioDraft && !publishedStudioInvitation && draftPayloadDirty) {
+        return true;
+    }
+    
+    return false;
+}
+
+function handleBeforeUnload(event) {
+    if (!hasUnsavedGeneratorChanges()) return;
+    event.preventDefault();
+    event.returnValue = "";
+}
+
+window.addEventListener("beforeunload", handleBeforeUnload);
+
+function updateUnsavedChangesIndicator() {
+    let indicator = document.getElementById("unsavedChangesIndicator");
+    if (!indicator) {
+        indicator = document.createElement("div");
+        indicator.id = "unsavedChangesIndicator";
+        indicator.style.marginTop = "15px";
+        indicator.style.fontWeight = "bold";
+        indicator.style.fontSize = "0.95rem";
+        indicator.setAttribute("role", "status");
+        indicator.setAttribute("aria-live", "polite");
+        
+        const controlsContainer = document.getElementById("controlsContainer");
+        if (controlsContainer) {
+            controlsContainer.appendChild(indicator);
+        } else {
+            return;
+        }
+    }
+    
+    if (hasUnsavedGeneratorChanges()) {
+        indicator.textContent = "Hay cambios sin guardar.";
+        indicator.style.color = "var(--danger)";
+        indicator.style.display = "block";
+    } else if (currentGenerationVersion > 0 || createdStudioDraft || publishedStudioInvitation) {
+        indicator.textContent = "Los cambios están protegidos.";
+        indicator.style.color = "var(--success)";
+        indicator.style.display = "block";
+    } else {
+        indicator.style.display = "none";
+    }
+}
+
+let lastFocusedElement = null;
+
+function showUnsavedChangesConfirmation(options) {
+    lastFocusedElement = document.activeElement;
+    
+    let panel = document.getElementById("unsavedChangesConfirmPanel");
+    if (!panel) {
+        panel = document.createElement("div");
+        panel.id = "unsavedChangesConfirmPanel";
+        panel.setAttribute("role", "dialog");
+        panel.setAttribute("aria-modal", "true");
+        panel.setAttribute("aria-labelledby", "unsavedChangesConfirmTitle");
+        panel.style.position = "fixed";
+        panel.style.top = "0";
+        panel.style.left = "0";
+        panel.style.width = "100vw";
+        panel.style.height = "100vh";
+        panel.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+        panel.style.display = "flex";
+        panel.style.alignItems = "center";
+        panel.style.justifyContent = "center";
+        panel.style.zIndex = "9999";
+        document.body.appendChild(panel);
+    }
+    
+    panel.replaceChildren();
+    
+    const dialogBox = document.createElement("div");
+    dialogBox.style.backgroundColor = "var(--surface, #1e1e1e)";
+    dialogBox.style.padding = "20px";
+    dialogBox.style.borderRadius = "8px";
+    dialogBox.style.maxWidth = "400px";
+    dialogBox.style.textAlign = "center";
+    
+    const title = document.createElement("h2");
+    title.id = "unsavedChangesConfirmTitle";
+    title.textContent = "Cambios sin guardar";
+    title.style.marginTop = "0";
+    
+    const msg = document.createElement("p");
+    msg.textContent = options.message || "Hay cambios sin guardar. ¿Deseas continuar y descartarlos?";
+    
+    const btnContainer = document.createElement("div");
+    btnContainer.style.marginTop = "20px";
+    btnContainer.style.display = "flex";
+    btnContainer.style.justifyContent = "space-around";
+    
+    const confirmBtn = document.createElement("button");
+    confirmBtn.className = "btn";
+    confirmBtn.textContent = options.confirmText || "Descartar cambios";
+    confirmBtn.style.backgroundColor = "var(--danger)";
+    confirmBtn.onclick = () => {
+        closeUnsavedChangesConfirmation();
+        if (typeof options.onConfirm === "function") options.onConfirm();
+    };
+    
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "btn";
+    cancelBtn.textContent = options.cancelText || "Conservar cambios";
+    cancelBtn.onclick = () => {
+        closeUnsavedChangesConfirmation();
+    };
+    
+    btnContainer.appendChild(confirmBtn);
+    btnContainer.appendChild(cancelBtn);
+    
+    dialogBox.appendChild(title);
+    dialogBox.appendChild(msg);
+    dialogBox.appendChild(btnContainer);
+    panel.appendChild(dialogBox);
+    
+    panel.style.display = "flex";
+    
+    const escapeHandler = (e) => {
+        if (e.key === "Escape") {
+            e.preventDefault();
+            closeUnsavedChangesConfirmation();
+        }
+    };
+    
+    document.addEventListener("keydown", escapeHandler);
+    panel._escapeHandler = escapeHandler;
+    
+    setTimeout(() => cancelBtn.focus(), 10);
+}
+
+function closeUnsavedChangesConfirmation() {
+    const panel = document.getElementById("unsavedChangesConfirmPanel");
+    if (panel) {
+        panel.style.display = "none";
+        if (panel._escapeHandler) {
+            document.removeEventListener("keydown", panel._escapeHandler);
+            panel._escapeHandler = null;
+        }
+    }
+    if (lastFocusedElement) {
+        lastFocusedElement.focus();
+        lastFocusedElement = null;
+    }
+}
+
+function attachProtectedNavigation(link) {
+    if (!link) return;
+    link.addEventListener("click", (e) => {
+        if (hasUnsavedGeneratorChanges()) {
+            e.preventDefault();
+            const safeHref = link.getAttribute("href");
+            if (safeHref && safeHref.startsWith("/administracion/")) {
+                showUnsavedChangesConfirmation({
+                    message: "Hay cambios sin guardar. ¿Deseas salir de esta página?",
+                    confirmText: "Salir sin guardar",
+                    cancelText: "Permanecer aquí",
+                    onConfirm: () => {
+                        unsavedChangesGuardEnabled = false;
+                        window.location.href = safeHref;
+                    }
+                });
+            }
+        }
+    });
+}
+
 function cloneConfigurationForBackup(source) {
     if (!source || typeof source !== "object" || Array.isArray(source)) {
         return null;
@@ -122,6 +307,10 @@ function downloadConfigurationBackup() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        
+        configurationBackupDownloaded = true;
+        backedUpGenerationVersion = currentGenerationVersion;
+        updateUnsavedChangesIndicator();
         
         const msgEl = document.getElementById("configurationBackupStatusMsg") || document.getElementById("previewStatusMsg");
         if (msgEl) {
@@ -379,7 +568,7 @@ function buildDraftUpdatePayload() {
     return payload;
 }
 
-function cancelDraftRecovery() {
+function executeCancelDraftRecovery() {
     requestedDraftId = null;
     recoveredStudioDraft = null;
     draftRecoveryReady = false;
@@ -405,6 +594,23 @@ function cancelDraftRecovery() {
     if (msgEl) {
         msgEl.textContent = "Ahora estás trabajando como una invitación nueva.";
         msgEl.style.color = "var(--text)";
+    }
+    
+    updateUnsavedChangesIndicator();
+}
+
+function cancelDraftRecovery() {
+    if (hasUnsavedGeneratorChanges()) {
+        showUnsavedChangesConfirmation({
+            message: "Hay cambios sin guardar. ¿Deseas descartarlos y trabajar como una invitación nueva?",
+            confirmText: "Descartar cambios",
+            cancelText: "Conservar cambios",
+            onConfirm: () => {
+                executeCancelDraftRecovery();
+            }
+        });
+    } else {
+        executeCancelDraftRecovery();
     }
 }
 
@@ -703,6 +909,10 @@ async function createStudioInvitationDraft() {
             msgEl.appendChild(document.createElement("br"));
             msgEl.appendChild(a);
             msgEl.appendChild(linkDash);
+            
+            attachProtectedNavigation(a);
+            attachProtectedNavigation(linkDash);
+            updateUnsavedChangesIndicator();
         }
     } catch (err) {
         console.error("Error creando borrador Studio:", err);
@@ -857,6 +1067,10 @@ async function updateStudioInvitationDraft() {
             msgEl.appendChild(document.createElement("br"));
             msgEl.appendChild(a);
             msgEl.appendChild(linkDash);
+            
+            attachProtectedNavigation(a);
+            attachProtectedNavigation(linkDash);
+            updateUnsavedChangesIndicator();
         }
     } catch (err) {
         console.error("Error en updateStudioInvitationDraft:", err);
@@ -1032,6 +1246,10 @@ async function publishStudioInvitation() {
             msgEl.appendChild(document.createElement("br"));
             msgEl.appendChild(a);
             msgEl.appendChild(linkDash);
+            
+            attachProtectedNavigation(a);
+            attachProtectedNavigation(linkDash);
+            updateUnsavedChangesIndicator();
         }
     } catch (err) {
         console.error("Error en publishStudioInvitation:", err);
@@ -1154,7 +1372,8 @@ async function recoverStudioDraftContext() {
         updateDraftCreationButtonState();
         updateDraftUpdateButtonState();
         updateDraftPublishButtonState();
-    updateConfigurationBackupButtonState();
+        updateConfigurationBackupButtonState();
+        updateUnsavedChangesIndicator();
     }
 }
 
@@ -1253,6 +1472,7 @@ async function initializeStudioGeneratorContext() {
         if (fileInput) fileInput.disabled = false;
         
         updateGeneratorActionState();
+        unsavedChangesGuardEnabled = true;
         
     } catch (err) {
         console.error("Error validando el estudio:", err);
@@ -1266,7 +1486,10 @@ async function initializeStudioGeneratorContext() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", initializeStudioGeneratorContext);
+document.addEventListener("DOMContentLoaded", () => {
+    initializeStudioGeneratorContext();
+    document.querySelectorAll("a").forEach(attachProtectedNavigation);
+});
 
 // ─────────────────────────────────────────────
 // FILE HANDLING
@@ -1423,8 +1646,12 @@ function clearLoadedConfigurationUI(options = {}) {
         if (fileInput) fileInput.value = "";
     }
     
+    configurationBackupDownloaded = false;
+    backedUpGenerationVersion = null;
+    
     updateGeneratorActionState();
     updateConfigurationBackupButtonState();
+    updateUnsavedChangesIndicator();
 }
 
 function createSafeSummaryValue(value, maxLength = 160) {
@@ -1477,9 +1704,7 @@ function createWorkingConfiguration(parsedData) {
     return workingCopy;
 }
 
-function handleFile(file) {
-    if (!enforceStudioReady()) return;
-    
+function processConfigurationFile(file) {
     if (!/\.json$/i.test(file.name)) {
         showErrorAndClear("Selecciona un archivo .json válido.");
         return;
@@ -1560,6 +1785,22 @@ function handleFile(file) {
         }
     };
     reader.readAsText(file);
+}
+
+function handleFile(file) {
+    if (!enforceStudioReady()) return;
+    if (hasUnsavedGeneratorChanges()) {
+        showUnsavedChangesConfirmation({
+            message: "Hay cambios sin guardar. ¿Deseas cargar otra configuración y descartarlos?",
+            confirmText: "Cargar nueva configuración",
+            cancelText: "Cancelar",
+            onConfirm: () => {
+                processConfigurationFile(file);
+            }
+        });
+    } else {
+        processConfigurationFile(file);
+    }
 }
 
 function showError(msg) {
@@ -2987,6 +3228,8 @@ ${musicJS}
     currentPublicationSlug = createSafePublicationSlug(d);
     currentPublicationManifest = buildPublicationManifest(d, media, studio, currentPublicationSlug);
     currentStudioPayload = buildStudioInvitationPayload(d, media, studio, currentPublicationSlug);
+    
+    currentGenerationVersion += 1;
 
     const msgEl = document.getElementById("authStatusMsg");
 
@@ -3191,6 +3434,8 @@ ${musicJS}
                     linkDash.style.fontWeight = "500";
                     linkDash.style.textDecoration = "none";
                     
+                    attachProtectedNavigation(linkDash);
+                    
                     msgEl.appendChild(document.createElement("br"));
                     msgEl.appendChild(aPublic);
                     msgEl.appendChild(linkDash);
@@ -3310,6 +3555,7 @@ ${musicJS}
         controlsContainer.appendChild(filesInfo);
     }
 
+    updateUnsavedChangesIndicator();
     resultCard.scrollIntoView({ behavior: "smooth" });
 }
 
