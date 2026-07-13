@@ -22,7 +22,17 @@ let createdStudioDraft = null;
 let draftUpdateInProgress = false;
 let draftPayloadDirty = false;
 let lastSavedDraftPayloadFingerprint = null;
+let knownDraftUpdatedAt = null;
+let draftConflictDetected = false;
 
+function normalizeDraftUpdatedAt(value) {
+    if (typeof value !== "string") return null;
+    const str = value.trim();
+    if (!str) return null;
+    const d = new Date(str);
+    if (isNaN(d.getTime())) return null;
+    return str;
+}
 let draftPublishInProgress = false;
 let publishedStudioInvitation = null;
 let publishConfirmationArmed = false;
@@ -83,7 +93,11 @@ function updateUnsavedChangesIndicator() {
         }
     }
     
-    if (hasUnsavedGeneratorChanges()) {
+    if (draftConflictDetected) {
+        indicator.textContent = "Existe un conflicto con una versión más reciente.";
+        indicator.style.color = "var(--danger)";
+        indicator.style.display = "block";
+    } else if (hasUnsavedGeneratorChanges()) {
         indicator.textContent = "Hay cambios sin guardar.";
         indicator.style.color = "var(--danger)";
         indicator.style.display = "block";
@@ -449,6 +463,8 @@ function validateDraftUpdateReadiness() {
     if (!currentPublicationSlug) errors.push("No se ha generado un slug de publicación.");
     if (createdStudioDraft && currentPublicationSlug !== createdStudioDraft.slug) errors.push("El slug actual es diferente al del borrador original.");
     if (currentStudioPayload && createdStudioDraft && currentStudioPayload.slug !== createdStudioDraft.slug) errors.push("El slug del payload no coincide con el del borrador original.");
+    if (!knownDraftUpdatedAt) errors.push("No fue posible verificar la versión del borrador.");
+    if (draftConflictDetected) errors.push("Este borrador fue modificado desde otra sesión.");
     if (currentStudioPayload && currentStudioPayload.published !== false) errors.push("El borrador no puede estar marcado como publicado.");
     if (!draftPayloadDirty) errors.push("El borrador no tiene cambios pendientes de guardar.");
     if (!window.studioAuth || !window.studioAuth.db) errors.push("No existe conexión con la base de datos.");
@@ -594,6 +610,8 @@ function executeCancelDraftRecovery() {
     lastSavedDraftPayloadFingerprint = null;
     draftPayloadDirty = false;
     publishConfirmationArmed = false;
+    knownDraftUpdatedAt = null;
+    draftConflictDetected = false;
 
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.delete("draft");
@@ -694,6 +712,13 @@ function updateDraftUpdateButtonState() {
         return;
     }
 
+    if (draftConflictDetected) {
+        btn.style.display = "inline-block";
+        btn.disabled = true;
+        btn.textContent = "Conflicto detectado";
+        return;
+    }
+
     if (draftUpdateInProgress) {
         btn.style.display = "inline-block";
         btn.disabled = true;
@@ -752,6 +777,14 @@ function updateDraftPublishButtonState() {
         currentPublicationSlug !== createdStudioDraft.slug) {
         btn.style.display = "none";
         btn.disabled = true;
+        if (panel) panel.style.display = "none";
+        return;
+    }
+
+    if (draftConflictDetected) {
+        btn.style.display = "inline-block";
+        btn.disabled = true;
+        btn.textContent = "Conflicto detectado";
         if (panel) panel.style.display = "none";
         return;
     }
@@ -872,7 +905,7 @@ async function createStudioInvitationDraft() {
         const { data, error: insertError } = await db
             .from("studio_invitations")
             .insert([payload])
-            .select("id, slug")
+            .select("id, slug, updated_at")
             .single();
 
         if (insertError) {
@@ -887,6 +920,24 @@ async function createStudioInvitationDraft() {
             err.code = "INVALID_RESPONSE";
             throw err;
         }
+
+        const validUpdatedAt = normalizeDraftUpdatedAt(data.updated_at);
+        if (!validUpdatedAt) {
+            if (msgEl) {
+                msgEl.innerHTML = "";
+                msgEl.textContent = "El borrador fue creado, pero no fue posible establecer su control de versión.";
+                msgEl.style.color = "var(--warning)";
+                msgEl.setAttribute("role", "alert");
+            }
+            createdStudioDraft = {
+                id: String(data.id),
+                slug: String(data.slug)
+            };
+            return;
+        }
+
+        knownDraftUpdatedAt = validUpdatedAt;
+        draftConflictDetected = false;
 
         createdStudioDraft = {
             id: String(data.id),
@@ -952,6 +1003,85 @@ async function createStudioInvitationDraft() {
     }
 }
 
+function showDraftConflictPanel(context) {
+    let panel = document.getElementById("draftConflictPanel");
+    if (!panel) {
+        panel = document.createElement("div");
+        panel.id = "draftConflictPanel";
+        panel.setAttribute("role", "dialog");
+        panel.setAttribute("aria-modal", "true");
+        panel.style.position = "fixed";
+        panel.style.top = "0";
+        panel.style.left = "0";
+        panel.style.width = "100vw";
+        panel.style.height = "100vh";
+        panel.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+        panel.style.display = "flex";
+        panel.style.alignItems = "center";
+        panel.style.justifyContent = "center";
+        panel.style.zIndex = "10000";
+        document.body.appendChild(panel);
+    }
+    
+    panel.replaceChildren();
+    
+    const dialogBox = document.createElement("div");
+    dialogBox.style.backgroundColor = "var(--surface, #1e1e1e)";
+    dialogBox.style.padding = "20px";
+    dialogBox.style.borderRadius = "8px";
+    dialogBox.style.maxWidth = "400px";
+    dialogBox.style.textAlign = "center";
+    
+    const title = document.createElement("h2");
+    title.textContent = "Cambios detectados en otra sesión";
+    title.style.marginTop = "0";
+    title.style.color = "var(--danger)";
+    
+    const msg = document.createElement("p");
+    msg.textContent = "Esta invitación fue modificada después de que la abriste. Para evitar sobrescribir cambios, debes recargar la información desde el Dashboard.";
+    
+    const btnContainer = document.createElement("div");
+    btnContainer.style.marginTop = "20px";
+    btnContainer.style.display = "flex";
+    btnContainer.style.flexDirection = "column";
+    btnContainer.style.gap = "10px";
+    
+    const btnDashboard = document.createElement("a");
+    btnDashboard.href = "/administracion/studio-dashboard.html";
+    btnDashboard.className = "btn";
+    btnDashboard.textContent = "Volver al Dashboard";
+    btnDashboard.style.textDecoration = "none";
+    attachProtectedNavigation(btnDashboard);
+    
+    const btnStay = document.createElement("button");
+    btnStay.className = "btn";
+    btnStay.textContent = "Permanecer aquí";
+    btnStay.style.backgroundColor = "transparent";
+    btnStay.style.border = "1px solid var(--text)";
+    btnStay.addEventListener("click", () => {
+        panel.style.display = "none";
+    });
+    
+    const btnBackup = document.createElement("button");
+    btnBackup.className = "btn btn-small";
+    btnBackup.textContent = "Descargar respaldo de mis cambios";
+    btnBackup.style.backgroundColor = "var(--primary)";
+    btnBackup.addEventListener("click", () => {
+        downloadConfigurationBackup();
+    });
+    
+    btnContainer.appendChild(btnDashboard);
+    btnContainer.appendChild(btnStay);
+    btnContainer.appendChild(btnBackup);
+    
+    dialogBox.appendChild(title);
+    dialogBox.appendChild(msg);
+    dialogBox.appendChild(btnContainer);
+    panel.appendChild(dialogBox);
+    
+    panel.style.display = "flex";
+}
+
 async function updateStudioInvitationDraft() {
     if (!enforceStudioReady()) return;
     if (draftUpdateInProgress || draftCreationInProgress) return;
@@ -986,7 +1116,7 @@ async function updateStudioInvitationDraft() {
         
         const { data: existing, error: findError } = await db
             .from("studio_invitations")
-            .select("id, slug, studio_id, published")
+            .select("id, slug, studio_id, published, updated_at")
             .eq("id", createdStudioDraft.id)
             .eq("studio_id", currentStudioContext.id)
             .maybeSingle();
@@ -1018,6 +1148,18 @@ async function updateStudioInvitationDraft() {
             throw err;
         }
 
+        const validExistingUpdatedAt = normalizeDraftUpdatedAt(existing.updated_at);
+        if (validExistingUpdatedAt !== knownDraftUpdatedAt) {
+            draftConflictDetected = true;
+            showDraftConflictPanel("update");
+            updateDraftUpdateButtonState();
+            updateDraftPublishButtonState();
+            updateUnsavedChangesIndicator();
+            const err = new Error("DRAFT_VERSION_CONFLICT");
+            err.code = "DRAFT_VERSION_CONFLICT";
+            throw err;
+        }
+
         const payload = buildDraftUpdatePayload();
 
         const { data, error: updateError } = await db
@@ -1027,8 +1169,9 @@ async function updateStudioInvitationDraft() {
             .eq("studio_id", currentStudioContext.id)
             .eq("slug", createdStudioDraft.slug)
             .eq("published", false)
-            .select("id, slug, published")
-            .single();
+            .eq("updated_at", knownDraftUpdatedAt)
+            .select("id, slug, published, updated_at")
+            .maybeSingle();
 
         if (updateError) {
             console.error("Error actualizando borrador:", updateError);
@@ -1036,7 +1179,21 @@ async function updateStudioInvitationDraft() {
             err.code = "UPDATE_FAILED";
             throw err;
         }
-        if (!data || !data.id || !data.slug || data.published !== false) {
+
+        if (!data) {
+            draftConflictDetected = true;
+            showDraftConflictPanel("update");
+            updateDraftUpdateButtonState();
+            updateDraftPublishButtonState();
+            updateUnsavedChangesIndicator();
+            const err = new Error("DRAFT_VERSION_CONFLICT");
+            err.code = "DRAFT_VERSION_CONFLICT";
+            throw err;
+        }
+
+        const validNewUpdatedAt = normalizeDraftUpdatedAt(data.updated_at);
+
+        if (!data.id || !data.slug || data.published !== false || !validNewUpdatedAt || validNewUpdatedAt === knownDraftUpdatedAt) {
             console.error("Respuesta inesperada al actualizar borrador:", data);
             const err = new Error("INVALID_UPDATE_RESPONSE");
             err.code = "INVALID_UPDATE_RESPONSE";
@@ -1049,6 +1206,8 @@ async function updateStudioInvitationDraft() {
             throw err;
         }
 
+        knownDraftUpdatedAt = validNewUpdatedAt;
+        draftConflictDetected = false;
         const fullPayload = buildDraftInsertPayload();
         lastSavedDraftPayloadFingerprint = createDraftPayloadFingerprint(fullPayload);
         draftPayloadDirty = false;
@@ -1146,7 +1305,7 @@ async function publishStudioInvitation() {
         
         const { data: existing, error: findError } = await db
             .from("studio_invitations")
-            .select("id, slug, studio_id, published")
+            .select("id, slug, studio_id, published, updated_at")
             .eq("id", createdStudioDraft.id)
             .eq("studio_id", currentStudioContext.id)
             .maybeSingle();
@@ -1194,6 +1353,18 @@ async function publishStudioInvitation() {
             throw err;
         }
 
+        const validExistingUpdatedAt = normalizeDraftUpdatedAt(existing.updated_at);
+        if (validExistingUpdatedAt !== knownDraftUpdatedAt) {
+            draftConflictDetected = true;
+            showDraftConflictPanel("publish");
+            updateDraftUpdateButtonState();
+            updateDraftPublishButtonState();
+            updateUnsavedChangesIndicator();
+            const err = new Error("PUBLISH_VERSION_CONFLICT");
+            err.code = "PUBLISH_VERSION_CONFLICT";
+            throw err;
+        }
+
         const { data, error: updateError } = await db
             .from("studio_invitations")
             .update({ published: true })
@@ -1201,8 +1372,9 @@ async function publishStudioInvitation() {
             .eq("studio_id", currentStudioContext.id)
             .eq("slug", createdStudioDraft.slug)
             .eq("published", false)
-            .select("id, slug, published")
-            .single();
+            .eq("updated_at", knownDraftUpdatedAt)
+            .select("id, slug, published, updated_at")
+            .maybeSingle();
 
         if (updateError) {
             console.error("Error publicando invitación:", updateError);
@@ -1210,8 +1382,21 @@ async function publishStudioInvitation() {
             err.code = "PUBLISH_FAILED";
             throw err;
         }
+
+        if (!data) {
+            draftConflictDetected = true;
+            showDraftConflictPanel("publish");
+            updateDraftUpdateButtonState();
+            updateDraftPublishButtonState();
+            updateUnsavedChangesIndicator();
+            const err = new Error("PUBLISH_VERSION_CONFLICT");
+            err.code = "PUBLISH_VERSION_CONFLICT";
+            throw err;
+        }
         
-        if (!data || !data.id || !data.slug || data.published !== true) {
+        const validNewUpdatedAt = normalizeDraftUpdatedAt(data.updated_at);
+
+        if (!data.id || !data.slug || data.published !== true || !validNewUpdatedAt || validNewUpdatedAt === knownDraftUpdatedAt) {
             console.error("Respuesta inesperada al publicar invitación:", data);
             const err = new Error("INVALID_PUBLISH_RESPONSE");
             err.code = "INVALID_PUBLISH_RESPONSE";
@@ -1224,6 +1409,8 @@ async function publishStudioInvitation() {
             throw err;
         }
 
+        knownDraftUpdatedAt = validNewUpdatedAt;
+        draftConflictDetected = false;
         publishedStudioInvitation = {
             id: String(data.id),
             slug: String(data.slug),
@@ -1315,7 +1502,7 @@ async function recoverStudioDraftContext() {
         const db = window.studioAuth.db;
         const { data, error } = await db
             .from("studio_invitations")
-            .select("id, slug, published")
+            .select("id, slug, published, updated_at")
             .eq("id", requestedDraftId)
             .eq("studio_id", currentStudioContext.id)
             .maybeSingle();
@@ -1360,13 +1547,23 @@ async function recoverStudioDraftContext() {
 
         draftRecoveryReady = true;
 
-        if (msgEl) {
-            if (recoveredStudioDraft.published) {
-                msgEl.textContent = "Invitación publicada localizada. Carga el archivo JSON correspondiente para verificarla.";
-            } else {
-                msgEl.textContent = "Borrador localizado. Carga el archivo JSON correspondiente para continuar.";
+        const validUpdatedAt = normalizeDraftUpdatedAt(data.updated_at);
+        if (!validUpdatedAt) {
+            knownDraftUpdatedAt = null;
+            if (msgEl) {
+                msgEl.textContent = "No fue posible verificar la versión actual de esta invitación.";
+                msgEl.style.color = "var(--warning)";
             }
-            msgEl.style.color = "var(--accent)";
+        } else {
+            knownDraftUpdatedAt = validUpdatedAt;
+            if (msgEl) {
+                if (recoveredStudioDraft.published) {
+                    msgEl.textContent = "Invitación publicada localizada. Carga el archivo JSON correspondiente para verificarla.";
+                } else {
+                    msgEl.textContent = "Borrador localizado. Carga el archivo JSON correspondiente para continuar.";
+                }
+                msgEl.style.color = "var(--accent)";
+            }
         }
     } catch (err) {
         console.error("Error en recoverStudioDraftContext:", err);
@@ -3257,6 +3454,7 @@ ${musicJS}
                 publishedStudioInvitation = null;
                 lastSavedDraftPayloadFingerprint = createDraftPayloadFingerprint(buildDraftInsertPayload());
                 draftPayloadDirty = false;
+                draftConflictDetected = false;
                 if (msgEl) {
                     msgEl.textContent = "Borrador recuperado correctamente. Puedes actualizarlo o publicarlo.";
                     msgEl.style.color = "var(--success)";

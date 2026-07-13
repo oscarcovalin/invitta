@@ -689,6 +689,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       template_id: null,
       main_photo_url: finalPhotoUrl,
       music_url: finalMusicUrl,
+      updated_at: new Date().toISOString()
     };
 
     let result;
