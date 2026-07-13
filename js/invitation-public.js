@@ -1623,7 +1623,6 @@ function getSafeRevealSections() {
     ".inv-rsvp-card",
     ".inv-thanks-card",
     ".inv-thank-you-card",
-    ".inv-share-card",
     ".inv-share-section",
     ".inv-timeline-alt-section"
   ];
