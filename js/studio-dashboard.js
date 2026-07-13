@@ -71,6 +71,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return `/invitacion.html?slug=${encodeURIComponent(safeSlug)}`;
   }
 
+  function buildShareInvitationPath(safeSlug) {
+    const params = new URLSearchParams({
+      slug: safeSlug,
+      v: `share-${Date.now()}`
+    });
+    return `/invitacion.html?${params.toString()}`;
+  }
+
   function buildStudioPreviewPath(safeSlug) {
     const params = new URLSearchParams({
       slug: safeSlug,
@@ -83,11 +91,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     return `/invitacion.html?${params.toString()}`;
   }
 
-  function setCopyButtonFeedback(btn, baseLink) {
+  function setCopyButtonFeedback(btn, getLink) {
     btn.addEventListener("click", () => {
       const originalText = btn.textContent;
+      const link = typeof getLink === "function" ? getLink() : getLink;
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(baseLink).then(() => {
+        navigator.clipboard.writeText(link).then(() => {
           btn.textContent = "¡Copiado!";
           setTimeout(() => btn.textContent = originalText, 2000);
         }).catch(err => {
@@ -207,8 +216,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const actionsDiv = document.createElement("div");
     actionsDiv.className = "invitation-item-actions";
 
-    const baseLink = window.location.origin + buildPublicInvitationPath(safeSlug);
-    
     const copyBtn = document.createElement("button");
     copyBtn.type = "button";
     copyBtn.className = "btn btn-secondary btn-small copy-btn";
@@ -229,7 +236,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         : buildStudioPreviewPath(safeSlug);
 
       if (inv.published === true) {
-        setCopyButtonFeedback(copyBtn, baseLink);
+        setCopyButtonFeedback(
+          copyBtn,
+          () => window.location.origin + buildShareInvitationPath(safeSlug)
+        );
       } else {
         copyBtn.disabled = true;
         copyBtn.textContent = "Publica para copiar";

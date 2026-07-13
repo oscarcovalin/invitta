@@ -194,7 +194,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function getPublicInvitationUrl(slug) {
-    return `https://invitta.vercel.app/invitacion.html?slug=${encodeURIComponent(slug)}`;
+    const params = new URLSearchParams({
+      slug,
+      v: `share-${Date.now()}`
+    });
+    return `https://invitta.vercel.app/invitacion.html?${params.toString()}`;
   }
 
   function getPreviewInvitationUrl(slug) {

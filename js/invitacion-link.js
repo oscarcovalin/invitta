@@ -316,6 +316,7 @@ function generateEmergencyPass() {
   if (name) params.set("n", name);
   if (passes) params.set("p", passes);
   if (table) params.set("m", table);
+  params.set("v", `share-${Date.now()}`);
 
   generatedInvitationLink = `${window.location.origin}/invitacion.html?${params.toString()}`;
 
