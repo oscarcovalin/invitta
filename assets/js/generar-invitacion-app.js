@@ -266,6 +266,22 @@ function cancelDraftRecovery() {
     }
 }
 
+function appendCancelDraftRecoveryButton(container) {
+    if (!container || !recoveredStudioDraft) return;
+    if (document.getElementById("btnCancelDraftRecovery")) return;
+
+    const btnCancelRecovery = document.createElement("button");
+    btnCancelRecovery.type = "button";
+    btnCancelRecovery.id = "btnCancelDraftRecovery";
+    btnCancelRecovery.className = "btn";
+    btnCancelRecovery.style.marginTop = "10px";
+    btnCancelRecovery.style.marginLeft = "10px";
+    btnCancelRecovery.textContent = "Trabajar como invitación nueva";
+    btnCancelRecovery.addEventListener("click", cancelDraftRecovery);
+    
+    container.appendChild(btnCancelRecovery);
+}
+
 function updateDraftCreationButtonState() {
     const btn = document.getElementById("btnCreateStudioDraft");
     if (!btn) return;
@@ -2851,23 +2867,13 @@ ${musicJS}
                     confirmPanel.appendChild(btnGroup);
                     controlsContainer.appendChild(confirmPanel);
                     
-                    if (recoveredStudioDraft) {
-                        const btnCancelRecovery = document.createElement("button");
-                        btnCancelRecovery.type = "button";
-                        btnCancelRecovery.id = "btnCancelDraftRecovery";
-                        btnCancelRecovery.className = "btn";
-                        btnCancelRecovery.style.marginTop = "10px";
-                        btnCancelRecovery.style.marginLeft = "10px";
-                        btnCancelRecovery.textContent = "Trabajar como invitación nueva";
-                        btnCancelRecovery.addEventListener("click", cancelDraftRecovery);
-                        controlsContainer.appendChild(btnCancelRecovery);
-                    }
-                    
                     updateDraftCreationButtonState();
                     updateDraftUpdateButtonState();
                     updateDraftPublishButtonState();
                 }
             }
+            
+            appendCancelDraftRecoveryButton(controlsContainer);
             
             if (studioValidation.warnings.length > 0) {
                 const stuWarnDiv = document.createElement("div");
