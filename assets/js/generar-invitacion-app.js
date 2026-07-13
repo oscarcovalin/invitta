@@ -593,7 +593,9 @@ function buildGalleryJS() {
       }
       
       function openLightbox(index) {
-         lastFocusedElement = document.activeElement;
+         if (lightbox.hidden) {
+             lastFocusedElement = document.activeElement;
+         }
          currentIndex = index;
          lbImage.src = images[currentIndex].src;
          lbImage.alt = images[currentIndex].alt;
