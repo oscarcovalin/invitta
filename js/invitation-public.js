@@ -1221,7 +1221,15 @@ function renderDefaultTemplate(inv) {
       img.loading = "lazy";
       img.decoding = "async";
 
-      frame.appendChild(img);
+      var backdrop = document.createElement("img");
+      backdrop.className = "inv-moment-backdrop";
+      backdrop.src = url;
+      backdrop.alt = "";
+      backdrop.setAttribute("aria-hidden", "true");
+      backdrop.loading = "lazy";
+      backdrop.decoding = "async";
+
+      frame.append(backdrop, img);
       container.appendChild(frame);
     });
   }
@@ -1229,8 +1237,14 @@ function renderDefaultTemplate(inv) {
   function setupMomentImageOrientation() {
     document.querySelectorAll(".inv-moment-image").forEach((img) => {
       function setOrientation() {
-        img.classList.toggle("is-landscape", img.naturalWidth >= img.naturalHeight);
-        img.classList.toggle("is-portrait", img.naturalHeight > img.naturalWidth);
+        var isLandscape = img.naturalWidth >= img.naturalHeight;
+        var frame = img.closest(".inv-moment-frame");
+        img.classList.toggle("is-landscape", isLandscape);
+        img.classList.toggle("is-portrait", !isLandscape);
+        if (frame) {
+          frame.classList.toggle("is-landscape", isLandscape);
+          frame.classList.toggle("is-portrait", !isLandscape);
+        }
       }
 
       if (img.complete) {
@@ -1266,9 +1280,14 @@ function renderDefaultTemplate(inv) {
         const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
         const clamped = Math.max(0, Math.min(1, progress));
 
-        const translate = (clamped - 0.5) * 28;
+        const foregroundTranslate = (clamped - 0.5) * 18;
+        const backdropTranslate = (clamped - 0.5) * -36;
+        const backdrop = frame.querySelector(".inv-moment-backdrop");
 
-        img.style.transform = `translate3d(0, ${translate}px, 0) scale(1.06)`;
+        img.style.setProperty("--moment-foreground-shift", `${foregroundTranslate}px`);
+        if (backdrop) {
+          backdrop.style.setProperty("--moment-backdrop-shift", `${backdropTranslate}px`);
+        }
       });
 
       ticking = false;

@@ -3506,3 +3506,92 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
 .inv-confirm-actions .inv-premium-button[hidden] {
   display: none !important;
 }
+
+/* Full-photo cinematic gallery */
+
+.inv-moment-frame {
+  isolation: isolate;
+  height: min(92svh, 920px);
+  min-height: 620px;
+  background: #191513;
+}
+
+.inv-moment-frame.is-landscape {
+  height: clamp(440px, 68vw, 760px);
+  min-height: 0;
+}
+
+.inv-moment-backdrop {
+  position: absolute;
+  z-index: 0;
+  inset: -12%;
+  width: 124%;
+  height: 124%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  filter: blur(24px) brightness(0.56) saturate(0.88);
+  opacity: 0.82;
+  transform: translate3d(0, var(--moment-backdrop-shift, 0px), 0) scale(1.08);
+  transform-origin: center;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.inv-moment-frame::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block !important;
+  background: rgba(15, 12, 10, 0.12);
+  pointer-events: none;
+}
+
+.inv-moment-image,
+.inv-moment-image.is-landscape,
+.inv-moment-image.is-portrait {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: 96%;
+  height: 96%;
+  max-width: none;
+  object-fit: contain;
+  object-position: center;
+  filter: none;
+  transform: translate3d(-50%, calc(-50% + var(--moment-foreground-shift, 0px)), 0) scale(0.985);
+  transform-origin: center;
+  will-change: transform;
+}
+
+@media (max-width: 640px) {
+  .inv-moment-frame,
+  .inv-moment-frame.is-portrait {
+    height: 92svh;
+    min-height: 560px;
+  }
+
+  .inv-moment-frame.is-landscape {
+    height: clamp(320px, 72vw, 460px);
+    min-height: 0;
+  }
+
+  .inv-moment-image,
+  .inv-moment-image.is-landscape,
+  .inv-moment-image.is-portrait {
+    width: 98%;
+    height: 96%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-moment-image {
+    transform: translate3d(-50%, -50%, 0) scale(0.985) !important;
+  }
+
+  .inv-moment-backdrop {
+    transform: scale(1.08) !important;
+  }
+}
