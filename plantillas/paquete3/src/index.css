@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sage: #ab8478; /* Luxurious warm rose gold / champagne rose */
+  --color-paper: #fdfaf8; /* Ultra-soft shimmering champagne warm off-white */
+  --color-ink: #1e1b1a; /* Soft charcoal brown-black for high contrast readability */
+  --color-champagne-gold: #dfba6b; /* Polished elegant champagne gold */
+  --color-primary: #8e665c; /* Deep rosewood/bronze for main actions */
+  --color-surface-container-low: #faf3f1; /* Luminous soft blush rose base container */
+  --color-on-surface-variant: #6b5853; /* Warm, rich dusty rose-charcoal for readable paragraphs */
+  --color-outline-variant: #f0e2de; /* Delicate blush-line separators */
+  
+  --font-display: "Playfair Display", "Cormorant Garamond", serif;
+  --font-serif-accent: "Cormorant Garamond", serif;
+  --font-sans: "Hanken Grotesk", "Montserrat", sans-serif;
+  --font-montserrat: "Montserrat", sans-serif;
+}
+
+/* Elegant micro-animations and global utility rules */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.breathe-animation {
+  animation: breathe 16s ease-in-out infinite;
+}
+
+.text-subheading-caps {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Custom scrollbar styling for a high-end feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #fdfaf8;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(171, 132, 120, 0.4);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(171, 132, 120, 0.6);
+}
