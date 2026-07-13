@@ -10,6 +10,58 @@ import { ParallaxImage } from "./components/ParallaxImage";
 import { FloatingParticles } from "./components/FloatingParticles";
 import { Camera, Church, GlassWater, Sparkles, Heart, Music } from "lucide-react";
 
+
+const invData = (typeof window !== "undefined" && (window as any).INVITATION_DATA) ? (window as any).INVITATION_DATA : {
+  eventTitle: "ÉLÉGANCE | Ana Camila Zavala - XV Años",
+  celebrantName: "Ana Camila",
+  celebrantLastName: "Zavala",
+  eventDate: "2026-12-12",
+  parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+  godparents: ["Isabela Zavala", "Diego Bernal"],
+  quote: "Hay momentos en la vida que imaginamos desde niñas, y hoy, uno de mis sueños más hermosos se hace realidad.",
+  ceremony: {
+    name: "Parroquia Sagrado Corazón de Jesús",
+    time: "3:00 P.M.",
+    address: "Blv. Calle 20 de Noviembre y Av. Melchor Ocampo, Col. Pacífico, Chihuahua, Chih.",
+    mapUrl: "#"
+  },
+  reception: {
+    name: "Cantabria Salón de Eventos",
+    time: "9:00 P.M.",
+    address: "Blv. Col. Sierra Magisterial #6103, Col. Los Ángeles, Chihuahua, Chih.",
+    mapUrl: "#"
+  },
+  itinerary: [
+    { time: "16:00 P.M.", title: "Sesión Fotográfica de Gala", description: "Capturando recuerdos eternos", iconName: "Camera" },
+    { time: "17:00 P.M.", title: "Ceremonia de Acción de Gracias", description: "Santuario del Sagrado Corazón", iconName: "Church" },
+    { time: "19:00 P.M.", title: "Bienvenida y Cóctel", description: "Recibimiento de los invitados en el salón", iconName: "GlassWater" },
+    { time: "20:30 P.M.", title: "Vals de Gala & Brindis", description: "Momento estelar junto a mis seres queridos", iconName: "Sparkles" },
+    { time: "21:00 P.M.", title: "Banquete de Honor", description: "Cena de gala en el salón principal", iconName: "Heart" },
+    { time: "22:30 P.M.", title: "Gran Apertura de Pista", description: "Música, baile y diversión inolvidable", iconName: "Music" }
+  ],
+  whatsapp: "526142525050",
+  guestName: "Familia Zavala Almazán",
+  passes: 2,
+  table: "",
+  mainPhotoUrl: "https://images.unsplash.com/photo-1549471013-3364d7220b75?q=80&w=2070&auto=format&fit=crop",
+  galleryUrls: [
+    "https://images.unsplash.com/photo-1549471013-3364d7220b75?q=80&w=2070&auto=format&fit=crop"
+  ],
+  musicUrl: "",
+  musicTitle: ""
+};
+
+const getIcon = (name: string) => {
+  switch(name) {
+    case "Camera": return Camera;
+    case "Church": return Church;
+    case "GlassWater": return GlassWater;
+    case "Sparkles": return Sparkles;
+    case "Heart": return Heart;
+    case "Music": return Music;
+    default: return Heart;
+  }
+};
 export default function App() {
   // Parallax calculations
   const { scrollY } = useScroll();
@@ -199,10 +251,10 @@ export default function App() {
     dietaryVal?: string,
     msgVal?: string
   ) => {
-    const phone = "526142525050"; // Chihuahua, MX standard number (Susana Almazán Bernal / Madre)
-    let text = `¡Hola Ana Camila! ✨ Quiero confirmar mi asistencia a tu fiesta de Quince Años. 🌸`;
+    const phone = invData.whatsapp || "526142525050"; // Chihuahua, MX standard number (Susana Almazán Bernal / Madre)
+    let text = `¡Hola ${invData.celebrantName}! ✨ Quiero confirmar mi asistencia a tu fiesta de Quince Años. 🌸`;
     if (nameVal) {
-      text = `¡Hola Ana Camila! ✨ Soy *${nameVal}*.\n\n`;
+      text = `¡Hola ${invData.celebrantName}! ✨ Soy *${nameVal}*.\n\n`;
       if (attendingVal === true) {
         text += `Confirmo con mucha alegría que *SÍ asistiré* a tu hermosa celebración de Quince Años. 🌸🤍\n`;
         text += `🎟️ Pases solicitados: *${guestsVal || 1}*\n`;
@@ -316,28 +368,11 @@ export default function App() {
   ];
 
   // Gallery Editorial Assets
-  const galleryImages = [
-    {
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuAGp8n5Ng6p1-hEL10ct7BPcL1m3RfIvLKaMbyAEEUhf0mZykSbOM1O2qochoiZoWMcnoGY5yT7r7uPd_GNUiqLkz9GIbEltfS1FlhgdmPo4vFvMAZKA72nu9ggR-4R5NefFXF8E--mszs4t-TxbKXy2uTqma3Kik5UKHnkJ6DFOi40Hu0Vk4gRoGrkzi_kiwKO4ECZWd_yfNrWRDmcyHWlKiQKQ_jGzVn04aBvq-nyeFtg1ew41eMxAGVkVjjq1CqlbjwrlfVai_c",
-      caption: "Retrato principal de gala de Ana Camila, Sesión de Quince Años"
-    },
-    {
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuBp1UneYNO0MeP74YJFv-y9jJMLb985CltX4HNGUUjNDtuuArrnBazRw1y8JY4ocNSSVB7thJbUs5Y0JsrKLhP36U2RTf2ajfuSB1cTYJBzzH2k7JPU3Yqc3bnne6vmtM_IzZz3xspY9RSNyK6_Jiem3qMPI3VTxxyPbODjaU5hNZg3j1N72UYjYvO28CCyHom3thNtdCxb2_b2_Cpx8tXXLwhAOCASX3WFLByQzjmluZMgoupI8EMQKbBXz5RGHjHrvYgnV8CWW3k",
-      caption: "Retrato clásico con auto vintage, Hacienda del Fresno"
-    },
-    {
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuAmkBAwKY_AcELlMqiUh3i3ymA0rcSEoI4fPk7xt_kZ4fqeOvtwD1KaHbKYYRhDxUiNMxD_u_GaE2klTDpVGup_mwgPOPZvPK8SCycbyRxVUQhEc74tR96p35pp3PFESVADJ6JFQI7MZBEmxnpchGx16isgrBQW4H0vXjQohQ7VYQRysI8hfyiD9jaurOdTCYJ_hhjgukTYHtgEqiC_HtxaQfW9MtpMl92RxEVUF4_UryVzP2Lq_A-mwaG_WKGdzeLx0mH0Q5gP1MI",
-      caption: "Detalle de guantes de gala y ramo de rosas blancas"
-    },
-    {
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuA63u7Nf29k4YUsMPLvfbG2-fwaDaSW4PfhRApXk4bXsn8nSyNp6FBZwg512EtyMt8xgd_-TvEGPh10Dm-eTFvOL3TAxXGrLjPa_GFtcn19pn5-ZT0vG3rJlZnw_oyQy3oT3wyHOniIh9QwlP23FpGtx5DSdr4lZW4ir6NFdvTHIZmQRBcrpJjh194DffPlSO2J2RYFZ_w0J4AwPRVx9UUWPtfnPDV0P7spgv2V5Ie9G9IgQ9aes8-kaRjlRPf6u1uaX_A8XbLBCtQ",
-      caption: "Diseño contemporáneo en tonos celestes, Bosque Silvestre"
-    },
-    {
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuBszB4aYMznOR1Sn24ktvDMGgQVfXwA5I_jSBjJcU6Vw5_Fs7Qh-7Zab4VQaZXKdBS7RsEieC15SxSu_FqqASjNN-Yu1OOOT2LRyi_sl51feM8a5SU8B_0i6egw3xMAAtuVqTm-hnUGKTT4EN2VwOQvtcVlqA_U5cQqXeRt_K4XO6OC5LzB1FDbulSXN17zix91rrkx5ut8BhetyQtncA-w5ocLEvVKpkyrYyVpwZYtDsIiE1q0CL2WTmtDJMUuZFevsHONsbRncic",
-      caption: "Arcadas históricas y arquitectura de la recepción"
-    }
-  ];
+  
+const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? invData.galleryUrls.map(url => ({ src: url, alt: "Gallery Image" })) : [
+  { src: "https://images.unsplash.com/photo-1549471013-3364d7220b75?q=80&w=2070&auto=format&fit=crop", alt: "1" }
+];
+
 
   // Helper to scroll smoothly
   const scrollToSection = (id: string) => {
@@ -398,7 +433,7 @@ export default function App() {
               <div className="space-y-3">
                 <span className="font-serif italic text-3xl md:text-4xl text-sage block">Mis Quince Años</span>
                 <h2 className="font-serif text-4xl md:text-5xl text-paper tracking-wide font-light mt-1">
-                  Ana Camila
+                  ${invData.celebrantName}
                 </h2>
                 <p className="font-sans text-[11px] uppercase tracking-[0.3em] text-sage/80 mt-2">
                   Zavala Zavala
@@ -538,7 +573,7 @@ export default function App() {
                 className="text-subheading-caps text-left text-[11px] text-ink/80 hover:text-sage tracking-[0.2em] transition-colors py-2 flex items-center gap-3 border-b border-outline-variant/10"
               >
                 <span className="material-symbols-outlined text-sm text-sage">auto_awesome</span>
-                Ana Camila
+                ${invData.celebrantName}
               </button>
               <button 
                 onClick={() => scrollToSection("honors")}
@@ -614,7 +649,7 @@ export default function App() {
             <h2 className="font-display text-ink uppercase flex flex-col select-none">
               <span className="block text-5xl md:text-7xl font-light leading-none tracking-tight">Ana</span>
               <span className="block md:ml-12 italic text-sage text-6xl md:text-8xl font-normal leading-none my-1">Camila</span>
-              <span className="block md:ml-24 text-5xl md:text-7xl font-light leading-none tracking-tight">Zavala</span>
+              <span className="block md:ml-24 text-5xl md:text-7xl font-light leading-none tracking-tight">{invData.celebrantLastName}</span>
             </h2>
 
             <div className="mt-8 md:mt-16 border-l border-outline-variant/40 pl-6 relative before:absolute before:left-[-1px] before:top-0 before:w-px before:h-12 before:bg-sage">
@@ -648,7 +683,7 @@ export default function App() {
             >
               <img 
                 className="w-full h-full object-cover breathe-animation object-center md:object-right select-none" 
-                alt="Editorial portait of Ana Camila in a stunning red ball gown" 
+                alt="Editorial portait of ${invData.celebrantName} in a stunning red ball gown" 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGp8n5Ng6p1-hEL10ct7BPcL1m3RfIvLKaMbyAEEUhf0mZykSbOM1O2qochoiZoWMcnoGY5yT7r7uPd_GNUiqLkz9GIbEltfS1FlhgdmPo4vFvMAZKA72nu9ggR-4R5NefFXF8E--mszs4t-TxbKXy2uTqma3Kik5UKHnkJ6DFOi40Hu0Vk4gRoGrkzi_kiwKO4ECZWd_yfNrWRDmcyHWlKiQKQ_jGzVn04aBvq-nyeFtg1ew41eMxAGVkVjjq1CqlbjwrlfVai_c"
                 referrerPolicy="no-referrer"
               />
@@ -836,7 +871,7 @@ export default function App() {
                   <h3 className="font-display text-3xl text-ink font-light">Ceremonia Religiosa</h3>
                   
                   <div className="space-y-3 text-sm md:text-base leading-relaxed text-on-surface-variant font-light">
-                    <p className="font-semibold text-ink text-base">Parroquia Sagrado Corazón de Jesús</p>
+                    <p className="font-semibold text-ink text-base">{invData.ceremony.name}</p>
                     <p className="text-sage font-semibold tracking-[0.2em] uppercase text-xs">
                       Sábado 12 de Diciembre • 3:00 P.M.
                     </p>
@@ -888,7 +923,7 @@ export default function App() {
                   <h3 className="font-display text-3xl text-ink font-light">Salón de Recepción</h3>
                   
                   <div className="space-y-3 text-sm md:text-base leading-relaxed text-on-surface-variant font-light">
-                    <p className="font-semibold text-ink text-base">Cantabria Salón de Eventos</p>
+                    <p className="font-semibold text-ink text-base">{invData.reception.name}</p>
                     <p className="text-sage font-semibold tracking-[0.2em] uppercase text-xs">
                       Sábado 12 de Diciembre • 9:00 P.M.
                     </p>
@@ -1125,45 +1160,8 @@ export default function App() {
 
               {/* Timeline Entries list */}
               <div className="space-y-12 relative">
-                {[
-                  {
-                    time: "16:00 P.M.",
-                    title: "Sesión Fotográfica de Gala",
-                    description: "Capturando recuerdos eternos",
-                    icon: Camera,
-                  },
-                  {
-                    time: "17:00 P.M.",
-                    title: "Ceremonia de Acción de Gracias",
-                    description: "Santuario del Sagrado Corazón",
-                    icon: Church,
-                  },
-                  {
-                    time: "19:00 P.M.",
-                    title: "Bienvenida y Cóctel",
-                    description: "Recibimiento de los invitados en el salón",
-                    icon: GlassWater,
-                  },
-                  {
-                    time: "20:30 P.M.",
-                    title: "Vals de Gala & Brindis",
-                    description: "Momento estelar junto a mis seres queridos",
-                    icon: Sparkles,
-                  },
-                  {
-                    time: "21:00 P.M.",
-                    title: "Banquete de Honor",
-                    description: "Cena de gala en el salón principal",
-                    icon: Heart,
-                  },
-                  {
-                    time: "22:30 P.M.",
-                    title: "Gran Apertura de Pista",
-                    description: "Música, baile y diversión inolvidable",
-                    icon: Music,
-                  }
-                ].map((item, index) => {
-                  const IconComponent = item.icon;
+                {(invData.itinerary || []).map((item, index) => {
+                  const IconComponent = getIcon(item.iconName || item.icon);
 
                   return (
                     <motion.div 
@@ -1489,7 +1487,7 @@ export default function App() {
                   {/* Dedicatory Message */}
                   <div className="relative group border-b border-outline-variant/35 pb-2">
                     <label className="block text-subheading-caps text-[10px] text-sage mb-2 tracking-[0.2em]">
-                      Mensaje de felicitación para Ana Camila (Opcional)
+                      Mensaje de felicitación para ${invData.celebrantName} (Opcional)
                     </label>
                     <input 
                       type="text" 

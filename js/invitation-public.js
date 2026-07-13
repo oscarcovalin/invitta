@@ -1,4 +1,4 @@
-﻿/**
+/**
  * invitation-public.js
  * Invitta Studio ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â PÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblica de invitaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
  *
@@ -327,6 +327,111 @@ function cleanHeroDateTimeFallback(value) {
 }
 
 function renderInvitation(inv) {
+    if (inv.template_id === "xv-rose-gold-premium") {
+        renderRoseGoldPremium(inv);
+    } else {
+        renderDefaultTemplate(inv);
+    }
+}
+
+function renderRoseGoldPremium(inv) {
+    // 1. Ocultar loader y el default layout
+    var loader = document.getElementById("inv-loader");
+    if (loader) loader.style.display = "none";
+    var content = document.getElementById("inv-content");
+    if (content) content.style.display = "none";
+    
+    // Si habia un footer/music genérico, ocultarlo
+    var musicPlayer = document.getElementById("inv-music-player");
+    if (musicPlayer) musicPlayer.style.display = "none";
+
+    // 2. Setear title y limpiar CSS conflictivos
+    document.title = (inv.event_title || inv.title || "Invitación Digital") + " · Invitta";
+    var oldCss = document.querySelector('link[href="css/invitacion.css"]');
+    if (oldCss) oldCss.disabled = true;
+
+    // 3. Crear contenedor root para React
+    var root = document.createElement("div");
+    root.id = "root";
+    document.body.appendChild(root);
+
+    // 4. Preparar window.INVITATION_DATA con la estructura que el app parcheada espera
+    window.INVITATION_DATA = {
+        eventTitle: inv.event_title || inv.title || "Mis XV Años",
+        celebrantName: inv.celebrant_name || "Nombre",
+        celebrantLastName: "",
+        eventDate: inv.event_date || "",
+        parents: inv.parents || [],
+        godparents: inv.godparents || [],
+        quote: inv.quote || "",
+        ceremony: {
+            name: inv.ceremony_name || "",
+            time: inv.ceremony_time ? formatHeroTimeFromRaw(inv.ceremony_time) : "",
+            address: inv.ceremony_address || "",
+            mapUrl: inv.ceremony_url || "#"
+        },
+        reception: {
+            name: inv.reception_name || "",
+            time: inv.reception_time ? formatHeroTimeFromRaw(inv.reception_time) : "",
+            address: inv.reception_address || "",
+            mapUrl: inv.reception_url || "#"
+        },
+        itinerary: (function() {
+            try {
+                if (typeof inv.itinerary === "string") return JSON.parse(inv.itinerary);
+                if (Array.isArray(inv.itinerary)) return inv.itinerary;
+                return [];
+            } catch(e) { return []; }
+        })(),
+        whatsapp: inv.studio_whatsapp || "526142525050",
+        guestName: guestName,
+        passes: maxPasses,
+        table: tableNum,
+        mainPhotoUrl: inv.main_photo_url || "",
+        galleryUrls: (function() {
+            try {
+                if (typeof inv.gallery_urls === "string") return JSON.parse(inv.gallery_urls);
+                if (Array.isArray(inv.gallery_urls)) return inv.gallery_urls;
+                return [];
+            } catch(e) { return []; }
+        })(),
+        musicUrl: inv.music_url || "",
+        musicTitle: inv.music_title || ""
+    };
+
+    // 4. Inyectar CSS de la build de React
+    // Obtenemos los nombres de archivo correctos cargando dinámicamente index.html
+    fetch('/demos/xv-premium-2/index.html')
+        .then(res => res.text())
+        .then(html => {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            
+            // Inyectar CSS
+            var links = doc.querySelectorAll('link[rel="stylesheet"]');
+            links.forEach(function(link) {
+                var newLink = document.createElement("link");
+                newLink.rel = "stylesheet";
+                newLink.href = "/demos/xv-premium-2/" + link.getAttribute("href").replace('./', '');
+                document.head.appendChild(newLink);
+            });
+
+            // Inyectar JS
+            var scripts = doc.querySelectorAll('script[type="module"]');
+            scripts.forEach(function(script) {
+                var newScript = document.createElement("script");
+                newScript.type = "module";
+                newScript.src = "/demos/xv-premium-2/" + script.getAttribute("src").replace('./', '');
+                document.body.appendChild(newScript);
+            });
+        })
+        .catch(function(err) {
+            console.error("Error cargando el template XV Rose Gold:", err);
+            showError("No se pudo cargar la plantilla.");
+        });
+}
+
+function renderDefaultTemplate(inv) {
     applyVisualTheme(inv);
     injectPremiumIcons();
 
