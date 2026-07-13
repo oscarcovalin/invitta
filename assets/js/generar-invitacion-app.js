@@ -185,7 +185,7 @@ function updateDraftCreationButtonState() {
     const btn = document.getElementById("btnCreateStudioDraft");
     if (!btn) return;
 
-    if (draftCreationInProgress || !isStudioGeneratorReady() || !currentStudioPayload || createdStudioDraft) {
+    if (draftCreationInProgress || draftUpdateInProgress || !isStudioGeneratorReady() || !currentStudioPayload || createdStudioDraft) {
         btn.disabled = true;
     } else {
         const validation = validateStudioInvitationPayload(currentStudioPayload);
@@ -199,6 +199,55 @@ function updateDraftCreationButtonState() {
     } else {
         btn.textContent = "Crear borrador en Invitta Studio";
     }
+}
+
+function updateDraftUpdateButtonState() {
+    const btn = document.getElementById("btnUpdateStudioDraft");
+    if (!btn) return;
+    
+    if (!createdStudioDraft || 
+        !currentPublicationSlug || 
+        currentPublicationSlug !== createdStudioDraft.slug || 
+        !currentStudioPayload || 
+        currentStudioPayload.slug !== createdStudioDraft.slug) {
+        btn.style.display = "none";
+        btn.disabled = true;
+        btn.textContent = "Actualizar borrador en Invitta Studio";
+        return;
+    }
+
+    if (draftUpdateInProgress) {
+        btn.style.display = "inline-block";
+        btn.disabled = true;
+        btn.textContent = "Actualizando borrador...";
+        return;
+    }
+
+    if (draftCreationInProgress) {
+        btn.style.display = "inline-block";
+        btn.disabled = true;
+        btn.textContent = "Actualizar borrador en Invitta Studio";
+        return;
+    }
+
+    const validation = validateStudioInvitationPayload(currentStudioPayload);
+    if (validation.errors.length > 0) {
+        btn.style.display = "inline-block";
+        btn.disabled = true;
+        btn.textContent = "Actualizar borrador no disponible";
+        return;
+    }
+
+    if (!draftPayloadDirty) {
+        btn.style.display = "inline-block";
+        btn.disabled = true;
+        btn.textContent = "Borrador sin cambios";
+        return;
+    }
+
+    btn.style.display = "inline-block";
+    btn.disabled = false;
+    btn.textContent = "Actualizar borrador en Invitta Studio";
 }
 
 async function createStudioInvitationDraft() {
