@@ -1,26 +1,25 @@
 /**
- * Fase 7F/7G — Generador de invitación publicable desde invitta-configuracion.json.
- * 7G: Conecta template.id con estilos/layouts/ornamentos específicos por plantilla.
+ * Fase 7F/7G/7H — Generador de invitación publicable desde invitta-configuracion.json.
+ * 7H: Pulido visual real de los 6 layouts + seguridad de contenido + accesibilidad.
  * 100% local en el navegador. Sin Supabase. Sin APIs externas.
  */
 
 "use strict";
 
 let loadedConfig = null;
-let finalHTML = null;
+let finalHTML    = null;
 
 // ─────────────────────────────────────────────
 // FILE HANDLING
 // ─────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-    const dropZone = document.getElementById("dropZone");
+    const dropZone  = document.getElementById("dropZone");
     const fileInput = document.getElementById("fileInput");
 
-    dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("over"); });
-    dropZone.addEventListener("dragleave", () => dropZone.classList.remove("over"));
+    dropZone.addEventListener("dragover",  (e) => { e.preventDefault(); dropZone.classList.add("over"); });
+    dropZone.addEventListener("dragleave", ()  => dropZone.classList.remove("over"));
     dropZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropZone.classList.remove("over");
+        e.preventDefault(); dropZone.classList.remove("over");
         if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
     });
     fileInput.addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
@@ -38,9 +37,7 @@ function handleFile(file) {
             }
             loadedConfig = data;
             renderSummary(data);
-        } catch {
-            showError("Error al parsear el archivo JSON. Verifica que el archivo no esté corrupto.");
-        }
+        } catch { showError("Error al parsear el archivo JSON. Verifica que el archivo no esté corrupto."); }
     };
     reader.readAsText(file);
 }
@@ -55,18 +52,19 @@ function renderSummary(data) {
     document.getElementById("uploadCard").style.display = "none";
 
     const items = [
-        { label: "Nombre principal", value: data.event.primaryName },
+        { label: "Nombre principal",  value: data.event.primaryName },
         { label: "Nombre secundario", value: data.event.secondaryName || "—" },
-        { label: "Tipo de evento", value: data.event.type },
-        { label: "Paquete", value: data.event.packageLevel },
-        { label: "Plantilla", value: data.template.name || data.template.id || "—" },
-        { label: "Paleta", value: data.visual.palette },
-        { label: "Tipografía", value: data.visual.typography || "—" },
-        { label: "Handwritten", value: data.visual.handwritten || "—" },
-        { label: "Fecha", value: data.event.dateText || "—" },
-        { label: "Ceremonia", value: data.locations?.ceremony?.place || "—" },
-        { label: "Recepción", value: data.locations?.reception?.place || "—" },
-        { label: "Generado el", value: new Date().toLocaleDateString("es-MX", { dateStyle: "long" }) }
+        { label: "Tipo de evento",    value: data.event.type },
+        { label: "Paquete",           value: data.event.packageLevel },
+        { label: "Plantilla",         value: data.template.name || data.template.id || "—" },
+        { label: "Nivel",             value: data.template.level || "—" },
+        { label: "Paleta",            value: data.visual.palette },
+        { label: "Tipografía",        value: data.visual.typography || "—" },
+        { label: "Handwritten",       value: data.visual.handwritten || "—" },
+        { label: "Fecha",             value: data.event.dateText || "—" },
+        { label: "Ceremonia",         value: data.locations?.ceremony?.place || "—" },
+        { label: "Recepción",         value: data.locations?.reception?.place || "—" },
+        { label: "Generado el",       value: new Date().toLocaleDateString("es-MX", { dateStyle: "long" }) }
     ];
 
     const grid = document.getElementById("summaryGrid");
@@ -76,8 +74,53 @@ function renderSummary(data) {
             <div class="sum-value">${i.value || "—"}</div>
         </div>`).join("");
 
-    document.getElementById("summaryCard").style.display = "block";
+    document.getElementById("summaryCard").style.display  = "block";
     document.getElementById("generateCard").style.display = "block";
+}
+
+// ─────────────────────────────────────────────
+// SECURITY HELPERS
+// ─────────────────────────────────────────────
+function escapeHTML(val) {
+    if (val === null || val === undefined) return "";
+    return String(val)
+        .replace(/&/g,  "&amp;")
+        .replace(/</g,  "&lt;")
+        .replace(/>/g,  "&gt;")
+        .replace(/"/g,  "&quot;")
+        .replace(/'/g,  "&#39;");
+}
+
+function safeExternalUrl(val) {
+    if (!val || typeof val !== "string") return null;
+    const trimmed = val.trim();
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return null;
+}
+
+function cleanWhatsApp(number) {
+    return String(number || "").replace(/\D/g, "");
+}
+
+// ─────────────────────────────────────────────
+// COLOR HELPERS
+// ─────────────────────────────────────────────
+function isDarkColor(hex) {
+    if (!hex || typeof hex !== "string") return false;
+    const clean = hex.replace("#", "").trim();
+    let r, g, b;
+    if (clean.length === 3) {
+        r = parseInt(clean[0] + clean[0], 16);
+        g = parseInt(clean[1] + clean[1], 16);
+        b = parseInt(clean[2] + clean[2], 16);
+    } else if (clean.length === 6) {
+        r = parseInt(clean.slice(0,2), 16);
+        g = parseInt(clean.slice(2,4), 16);
+        b = parseInt(clean.slice(4,6), 16);
+    } else { return false; }
+    // Relative luminance
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance < 0.4;
 }
 
 // ─────────────────────────────────────────────
@@ -85,14 +128,14 @@ function renderSummary(data) {
 // ─────────────────────────────────────────────
 function getPaletteColors(name, custom) {
     const palettes = {
-        "Rosa Champagne":    { bg:"#faf8f5", surface:"#fdfbfa", accent:"#c48473", text:"#4a4443", muted:"#8a7a65", hero:"rgba(196,132,115,0.15)" },
-        "Lavanda Dream":     { bg:"#f8f6fa", surface:"#f2eef7", accent:"#9d8cb3", text:"#3b3542", muted:"#8b8594", hero:"rgba(157,140,179,0.18)" },
-        "Cool Blue":         { bg:"#f4f7f9", surface:"#eef3f7", accent:"#6c8da8", text:"#2c3e50", muted:"#7f8c8d", hero:"rgba(108,141,168,0.18)" },
-        "Olive Romance":     { bg:"#f5f6f4", surface:"#eff0ec", accent:"#7a8471", text:"#3a4035", muted:"#8a9481", hero:"rgba(122,132,113,0.15)" },
-        "Terracotta Sunset": { bg:"#faf5f3", surface:"#f7efec", accent:"#b86b53", text:"#4a332d", muted:"#9a837d", hero:"rgba(184,107,83,0.15)" },
+        "Rosa Champagne":    { bg:"#faf8f5", surface:"#fdfbfa", accent:"#c48473", text:"#4a4443", muted:"#8a7a65", hero:"rgba(196,132,115,0.12)" },
+        "Lavanda Dream":     { bg:"#f8f6fa", surface:"#f2eef7", accent:"#9d8cb3", text:"#3b3542", muted:"#8b8594", hero:"rgba(157,140,179,0.15)" },
+        "Cool Blue":         { bg:"#f4f7f9", surface:"#eef3f7", accent:"#6c8da8", text:"#2c3e50", muted:"#7f8c8d", hero:"rgba(108,141,168,0.15)" },
+        "Olive Romance":     { bg:"#f5f6f4", surface:"#eff0ec", accent:"#7a8471", text:"#3a4035", muted:"#8a9481", hero:"rgba(122,132,113,0.12)" },
+        "Terracotta Sunset": { bg:"#faf5f3", surface:"#f7efec", accent:"#b86b53", text:"#4a332d", muted:"#9a837d", hero:"rgba(184,107,83,0.12)" },
         "Plum Noir VIP":     { bg:"#1a1514", surface:"#2a2220", accent:"#dfba6b", text:"#f0eade", muted:"#8a7a65", hero:"rgba(0,0,0,0.5)" },
-        "Jade Garden":       { bg:"#f0f4f1", surface:"#e6ede8", accent:"#4a7c59", text:"#233d2b", muted:"#708c78", hero:"rgba(74,124,89,0.15)" },
-        "Personalizada":     { bg:"#f9f9f9", surface:"#f0f0f0", accent:"#aaaaaa", text:"#111111", muted:"#666666", hero:"rgba(0,0,0,0.1)", customNote: custom }
+        "Jade Garden":       { bg:"#f0f4f1", surface:"#e6ede8", accent:"#4a7c59", text:"#233d2b", muted:"#708c78", hero:"rgba(74,124,89,0.12)" },
+        "Personalizada":     { bg:"#f9f9f9", surface:"#f0f0f0", accent:"#aaaaaa", text:"#111111", muted:"#666666", hero:"rgba(0,0,0,0.06)", customNote: custom }
     };
     return palettes[name] || palettes["Rosa Champagne"];
 }
@@ -102,114 +145,23 @@ function getPaletteColors(name, custom) {
 // ─────────────────────────────────────────────
 function getTypography(typoName, handName) {
     const typos = {
-        "Clásica Editorial":  { title:"'Cormorant Garamond', serif", body:"'Jost', sans-serif", hw:"" },
-        "Romántica Fina":     { title:"'Playfair Display', serif",   body:"'Montserrat', sans-serif", hw:"" },
-        "Lujo Nocturno":      { title:"'Bodoni Moda', serif",        body:"'Lato', sans-serif", hw:"" },
-        "Moderna Minimal":    { title:"'Libre Baskerville', serif",   body:"'Inter', sans-serif", hw:"" },
-        "Jardín Romántico":   { title:"'Lora', serif",               body:"'Nunito Sans', sans-serif", hw:"" },
-        "Glam Editorial":     { title:"'Cinzel', serif",             body:"'Raleway', sans-serif", hw:"" },
+        "Clásica Editorial": { title:"'Cormorant Garamond', serif",  body:"'Jost', sans-serif" },
+        "Romántica Fina":    { title:"'Playfair Display', serif",    body:"'Montserrat', sans-serif" },
+        "Lujo Nocturno":     { title:"'Bodoni Moda', serif",         body:"'Lato', sans-serif" },
+        "Moderna Minimal":   { title:"'Libre Baskerville', serif",   body:"'Inter', sans-serif" },
+        "Jardín Romántico":  { title:"'Lora', serif",                body:"'Nunito Sans', sans-serif" },
+        "Glam Editorial":    { title:"'Cinzel', serif",              body:"'Raleway', sans-serif" }
     };
     const hands = {
         "Handwritten Romántica":   "'Great Vibes', cursive",
         "Handwritten Moderna":     "'Parisienne', cursive",
         "Handwritten de Lujo":     "'Allura', cursive",
         "Handwritten Orgánica":    "'Sacramento', cursive",
-        "Handwritten Sofisticada": "'Alex Brush', cursive",
+        "Handwritten Sofisticada": "'Alex Brush', cursive"
     };
-
     const base = typos[typoName] || typos["Romántica Fina"];
     const hand = hands[handName] || null;
-
-    return {
-        title:  base.title,
-        body:   base.body,
-        accent: hand || base.title   // Si hay handwritten, se usa para nombres principales
-    };
-}
-
-// ─────────────────────────────────────────────
-// TEMPLATE DESIGN MAP (Fase 7G)
-// ─────────────────────────────────────────────
-function getTemplateDesign(templateId, visual) {
-    // Sanitize id for CSS class name
-    const safeId = (templateId || "generic").replace(/[^a-z0-9-]/g, "-").toLowerCase();
-
-    const designs = {
-        "xv-elegance-basic": {
-            layout: "classic-xv",
-            mood: "elegante limpio juvenil",
-            heroStyle: "light",
-            sectionStyle: "clean",
-            ornaments: ["divider"],
-            buttonStyle: "classic",
-            animationLevel: "none",
-            notes: "Élégance XV — básica, detalles finos"
-        },
-        "xv-rose-gold-premium": {
-            layout: "rose-premium",
-            mood: "romántico rose-gold femenino",
-            heroStyle: "gradient",
-            sectionStyle: "soft",
-            ornaments: ["divider", "floral"],
-            buttonStyle: "soft",
-            animationLevel: "subtle",
-            notes: "Rose Gold XV — premium, flores CSS, bordes suaves"
-        },
-        "xv-champagne-rose-vip": {
-            layout: "champagne-vip",
-            mood: "luxury quinceañera champagne",
-            heroStyle: "shimmer",
-            sectionStyle: "prestige",
-            ornaments: ["divider", "sparkle", "gold-frame"],
-            buttonStyle: "gold",
-            animationLevel: "medium",
-            notes: "Champagne Rose VIP — editorial, detalles dorados"
-        },
-        "boda-classic-basic": {
-            layout: "classic-wedding",
-            mood: "clásico limpio elegante boda",
-            heroStyle: "light",
-            sectionStyle: "clean",
-            ornaments: ["divider"],
-            buttonStyle: "classic",
-            animationLevel: "none",
-            notes: "Classic Wedding — tradicional, tipografía sobria"
-        },
-        "boda-golden-romance-premium": {
-            layout: "golden-romance",
-            mood: "romántico dorado cálido",
-            heroStyle: "warm",
-            sectionStyle: "romantic",
-            ornaments: ["divider", "gold-frame"],
-            buttonStyle: "gold",
-            animationLevel: "subtle",
-            notes: "Golden Romance — líneas doradas, cálido"
-        },
-        "boda-midnight-gold-vip": {
-            layout: "midnight-luxury",
-            mood: "oscuro dorado luxury vip",
-            heroStyle: "dark",
-            sectionStyle: "luxury",
-            ornaments: ["divider", "sparkle", "gold-frame"],
-            buttonStyle: "luxury",
-            animationLevel: "medium",
-            notes: "Midnight Gold — VIP oscuro con acentos dorados"
-        }
-    };
-
-    // Fallback genérico si el id no está registrado
-    const base = designs[templateId] || {
-        layout: "generic",
-        mood: "neutro",
-        heroStyle: "light",
-        sectionStyle: "clean",
-        ornaments: [],
-        buttonStyle: "classic",
-        animationLevel: "none",
-        notes: "Diseño genérico"
-    };
-
-    return { ...base, safeId };
+    return { title: base.title, body: base.body, accent: hand || base.title };
 }
 
 // ─────────────────────────────────────────────
@@ -217,566 +169,665 @@ function getTemplateDesign(templateId, visual) {
 // ─────────────────────────────────────────────
 function buildGoogleFontsUrl(typoName, handName) {
     const families = new Set();
-
     const typoMap = {
-        "Clásica Editorial":  ["Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400", "Jost:wght@300;400;500;600"],
-        "Romántica Fina":     ["Playfair+Display:ital,wght@0,400;0,600;0,700;1,400", "Montserrat:wght@300;400;500;600"],
-        "Lujo Nocturno":      ["Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400;1,6..96,700", "Lato:wght@300;400;700"],
-        "Moderna Minimal":    ["Libre+Baskerville:ital,wght@0,400;0,700;1,400", "Inter:wght@300;400;500;600"],
-        "Jardín Romántico":   ["Lora:ital,wght@0,400;0,600;1,400", "Nunito+Sans:wght@300;400;600"],
-        "Glam Editorial":     ["Cinzel:wght@400;600;700", "Raleway:wght@300;400;500;600"],
+        "Clásica Editorial": ["Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400", "Jost:wght@300;400;500;600"],
+        "Romántica Fina":    ["Playfair+Display:ital,wght@0,400;0,600;0,700;1,400",          "Montserrat:wght@300;400;500;600"],
+        "Lujo Nocturno":     ["Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400",     "Lato:wght@300;400;700"],
+        "Moderna Minimal":   ["Libre+Baskerville:ital,wght@0,400;0,700;1,400",               "Inter:wght@300;400;500;600"],
+        "Jardín Romántico":  ["Lora:ital,wght@0,400;0,600;1,400",                            "Nunito+Sans:wght@300;400;600"],
+        "Glam Editorial":    ["Cinzel:wght@400;600;700",                                      "Raleway:wght@300;400;500;600"]
     };
     const handMap = {
         "Handwritten Romántica":   "Great+Vibes",
         "Handwritten Moderna":     "Parisienne",
         "Handwritten de Lujo":     "Allura",
         "Handwritten Orgánica":    "Sacramento",
-        "Handwritten Sofisticada": "Alex+Brush",
+        "Handwritten Sofisticada": "Alex+Brush"
     };
-
     (typoMap[typoName] || typoMap["Romántica Fina"]).forEach(f => families.add(f));
     if (handMap[handName]) families.add(handMap[handName]);
-
     return `https://fonts.googleapis.com/css2?family=${[...families].join("&family=")}&display=swap`;
+}
+
+// ─────────────────────────────────────────────
+// TEMPLATE DESIGN MAP
+// ─────────────────────────────────────────────
+function getTemplateDesign(templateId, visual) {
+    const safeId = (templateId || "generic").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+    const designs = {
+        "xv-elegance-basic": {
+            layout: "classic-xv", heroStyle: "light", sectionStyle: "clean",
+            ornaments: ["divider"], buttonStyle: "classic", animationLevel: "none"
+        },
+        "xv-rose-gold-premium": {
+            layout: "rose-premium", heroStyle: "gradient", sectionStyle: "soft",
+            ornaments: ["divider", "floral"], buttonStyle: "soft", animationLevel: "subtle"
+        },
+        "xv-champagne-rose-vip": {
+            layout: "champagne-vip", heroStyle: "shimmer", sectionStyle: "prestige",
+            ornaments: ["divider", "sparkle", "gold-frame"], buttonStyle: "gold", animationLevel: "medium"
+        },
+        "boda-classic-basic": {
+            layout: "classic-wedding", heroStyle: "light", sectionStyle: "clean",
+            ornaments: ["divider"], buttonStyle: "classic", animationLevel: "none"
+        },
+        "boda-golden-romance-premium": {
+            layout: "golden-romance", heroStyle: "warm", sectionStyle: "romantic",
+            ornaments: ["divider", "gold-frame"], buttonStyle: "gold", animationLevel: "subtle"
+        },
+        "boda-midnight-gold-vip": {
+            layout: "midnight-luxury", heroStyle: "dark", sectionStyle: "luxury",
+            ornaments: ["divider", "sparkle", "gold-frame"], buttonStyle: "luxury", animationLevel: "medium"
+        }
+    };
+    const base = designs[templateId] || {
+        layout: "generic", heroStyle: "light", sectionStyle: "clean",
+        ornaments: [], buttonStyle: "classic", animationLevel: "none"
+    };
+    return { ...base, safeId };
 }
 
 // ─────────────────────────────────────────────
 // HTML BUILDER — SECTIONS
 // ─────────────────────────────────────────────
 function buildSections(d, p, t, design) {
-    const hasDivider = design && design.ornaments && design.ornaments.includes("divider");
-    const sectionTagHTML = hasDivider
-        ? (label) => `<div class="ornament-line"></div><div class="section-tag">${label}</div><div class="ornament-line"></div>`
-        : (label) => `<div class="section-tag">${label}</div>`;
-    const isBoda = d.event.type === "boda";
-    const waText = encodeURIComponent(`Hola, confirmo mi asistencia al evento de ${d.event.primaryName}`);
+    const hasDivider   = design?.ornaments?.includes("divider");
+    const layout       = design?.layout || "generic";
+
+    const sTag = hasDivider
+        ? (label) => `<div class="ornament-line" aria-hidden="true"></div><div class="section-tag">${escapeHTML(label)}</div><div class="ornament-line" aria-hidden="true"></div>`
+        : (label) => `<div class="section-tag">${escapeHTML(label)}</div>`;
+
+    const isBoda    = d.event.type === "boda";
+    const heroClass = `hero hero-${design?.heroStyle || "light"}`;
+    const waText    = encodeURIComponent(`Hola, confirmo mi asistencia al evento de ${d.event.primaryName}`);
     let s = "";
 
-    const heroClass = `hero hero-${design ? design.heroStyle : "light"}`;
-
-    // A · Hero / Portada
+    // A · HERO
     s += `
   <!-- HERO -->
-  <section class="${heroClass}">
+  <section class="${heroClass}" aria-label="Portada">
     <div class="hero-inner">
       <div class="eyebrow">${isBoda ? "Nuestra Boda" : "Mis XV Años"}</div>
       <div class="hero-names">
-        ${t.accent ? `<span class="name-accent">${d.event.primaryName}</span>` : `<h1>${d.event.primaryName}</h1>`}
-        ${isBoda && d.event.secondaryName ? `<span class="ampersand">&amp;</span>
-        ${t.accent ? `<span class="name-accent">${d.event.secondaryName}</span>` : `<h1>${d.event.secondaryName}</h1>`}` : ""}
+        <span class="name-accent">${escapeHTML(d.event.primaryName)}</span>
+        ${isBoda && d.event.secondaryName ? `
+        <span class="ampersand" aria-hidden="true">&amp;</span>
+        <span class="name-accent">${escapeHTML(d.event.secondaryName)}</span>` : ""}
       </div>
-      ${d.event.initials ? `<div class="initials">${d.event.initials}</div>` : ""}
-      ${d.event.dateText ? `<div class="hero-date">${d.event.dateText}</div>` : ""}
-      ${d.event.quote ? `<blockquote class="hero-quote">"${d.event.quote}"</blockquote>` : ""}
+      ${d.event.initials ? `<div class="initials" aria-hidden="true">${escapeHTML(d.event.initials)}</div>` : ""}
+      ${d.event.dateText ? `<div class="hero-date">${escapeHTML(d.event.dateText)}</div>` : ""}
+      ${d.event.quote    ? `<blockquote class="hero-quote">${escapeHTML(d.event.quote)}</blockquote>` : ""}
     </div>
   </section>`;
 
-    // B · Countdown
+    // B · COUNTDOWN
     if (d.event.countdownDateTime) {
         s += `
   <!-- COUNTDOWN -->
-  <section class="section countdown-section">
-    <div class="section-tag">Faltan</div>
-    <div class="countdown" id="countdown">
-      <div class="cd-block"><span class="cd-num" id="cd-days">00</span><span class="cd-label">Días</span></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-block"><span class="cd-num" id="cd-hours">00</span><span class="cd-label">Horas</span></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-block"><span class="cd-num" id="cd-mins">00</span><span class="cd-label">Minutos</span></div>
-      <div class="cd-sep">:</div>
-      <div class="cd-block"><span class="cd-num" id="cd-secs">00</span><span class="cd-label">Segundos</span></div>
+  <section class="section countdown-section" aria-label="Cuenta regresiva">
+    <div class="section-inner">
+      ${sTag("Faltan")}
+      <div class="countdown" role="timer" aria-live="polite">
+        <div class="cd-block"><span class="cd-num" id="cd-days">00</span><span class="cd-label">Días</span></div>
+        <div class="cd-sep" aria-hidden="true">:</div>
+        <div class="cd-block"><span class="cd-num" id="cd-hours">00</span><span class="cd-label">Horas</span></div>
+        <div class="cd-sep" aria-hidden="true">:</div>
+        <div class="cd-block"><span class="cd-num" id="cd-mins">00</span><span class="cd-label">Minutos</span></div>
+        <div class="cd-sep" aria-hidden="true">:</div>
+        <div class="cd-block"><span class="cd-num" id="cd-secs">00</span><span class="cd-label">Segundos</span></div>
+      </div>
     </div>
   </section>`;
     }
 
-    // C · Familia
-    const hp = d.family?.hostParents || {};
-    const sp = d.family?.secondaryParents || {};
+    // C · FAMILIA
+    const hp     = d.family?.hostParents || {};
+    const sp     = d.family?.secondaryParents || {};
     const hasFam = hp.mother || hp.father || sp.mother || sp.father || d.family?.godparents;
     if (hasFam) {
         s += `
   <!-- FAMILIA -->
-  <section class="section surface">
-    ${sectionTagHTML("Con la bendición de Dios y nuestros padres")}
-    ${hp.mother || hp.father ? `<div class="family-block">${[hp.mother, hp.father].filter(Boolean).map(n => `<p class="family-name">${n}</p>`).join("")}</div>` : ""}
-    ${(sp.mother || sp.father) ? `<div class="divider-line"></div><div class="family-block">${[sp.mother, sp.father].filter(Boolean).map(n => `<p class="family-name">${n}</p>`).join("")}</div>` : ""}
-    ${d.family?.godparents ? `<div class="godparents">${sectionTagHTML("Padrinos")}<p class="family-name">${d.family.godparents}</p></div>` : ""}
-  </section>`;
-    }
-
-    // D · Ceremonia
-    const cer = d.locations?.ceremony;
-    if (cer?.title) {
-        const mapsUrl = cer.mapQuery ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cer.mapQuery)}` : "#";
-        s += `
-  <!-- CEREMONIA -->
-  <section class="section">
-    ${sectionTagHTML(cer.title)}
-    <div class="event-time">${cer.time}</div>
-    <div class="event-place">${cer.place}</div>
-    <div class="event-address">${cer.address}</div>
-    <a href="${mapsUrl}" target="_blank" class="btn-map"><i class="fa-solid fa-location-dot"></i> Ver ubicación</a>
-  </section>`;
-    }
-
-    // E · Recepción
-    const rec = d.locations?.reception;
-    if (rec?.title) {
-        const mapsUrl = rec.mapQuery ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rec.mapQuery)}` : "#";
-        s += `
-  <!-- RECEPCION -->
-  <section class="section surface">
-    ${sectionTagHTML(rec.title)}
-    <div class="event-time">${rec.time}</div>
-    <div class="event-place">${rec.place}</div>
-    <div class="event-address">${rec.address}</div>
-    <a href="${mapsUrl}" target="_blank" class="btn-map"><i class="fa-solid fa-location-dot"></i> Ver ubicación</a>
-  </section>`;
-    }
-
-    // F · Itinerario
-    const iti = d.itinerary || [];
-    if (iti.length > 0) {
-        s += `
-  <!-- ITINERARIO -->
-  <section class="section">
-    ${sectionTagHTML("Itinerario")}`;
-    s += `
-    <div class="iti-list">
-      ${iti.map(item => `
-      <div class="iti-item">
-        <span class="iti-time">${item.time}</span>
-        <div class="iti-body">
-          <span class="iti-title">${item.title}</span>
-          ${item.description ? `<span class="iti-desc">${item.description}</span>` : ""}
-        </div>
-      </div>`).join("")}
+  <section class="section surface family-section" aria-label="Familia">
+    <div class="section-inner">
+      ${sTag("Con la bendición de Dios y nuestros padres")}
+      ${(hp.mother || hp.father) ? `<div class="family-block">${[hp.mother, hp.father].filter(Boolean).map(n => `<p class="family-name">${escapeHTML(n)}</p>`).join("")}</div>` : ""}
+      ${(sp.mother || sp.father) ? `<div class="divider-line" aria-hidden="true"></div><div class="family-block">${[sp.mother, sp.father].filter(Boolean).map(n => `<p class="family-name">${escapeHTML(n)}</p>`).join("")}</div>` : ""}
+      ${d.family?.godparents ? `<div class="godparents">${sTag("Padrinos")}<p class="family-name">${escapeHTML(d.family.godparents)}</p></div>` : ""}
     </div>
   </section>`;
     }
 
-    // G · Dress Code
+    // D · CEREMONIA
+    const cer = d.locations?.ceremony;
+    if (cer?.title) {
+        const mapsUrl = cer.mapQuery
+            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cer.mapQuery)}`
+            : null;
+        s += `
+  <!-- CEREMONIA -->
+  <section class="section location-card ceremony-card" aria-label="Ceremonia">
+    <div class="section-inner">
+      ${sTag(cer.title)}
+      <div class="event-time">${escapeHTML(cer.time)}</div>
+      <div class="event-place">${escapeHTML(cer.place)}</div>
+      <div class="event-address">${escapeHTML(cer.address)}</div>
+      ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn-map" aria-label="Ver ubicación de la ceremonia en Google Maps"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Ver ubicación</a>` : ""}
+    </div>
+  </section>`;
+    }
+
+    // E · RECEPCIÓN
+    const rec = d.locations?.reception;
+    if (rec?.title) {
+        const mapsUrl = rec.mapQuery
+            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rec.mapQuery)}`
+            : null;
+        s += `
+  <!-- RECEPCION -->
+  <section class="section surface location-card reception-card" aria-label="Recepción">
+    <div class="section-inner">
+      ${sTag(rec.title)}
+      <div class="event-time">${escapeHTML(rec.time)}</div>
+      <div class="event-place">${escapeHTML(rec.place)}</div>
+      <div class="event-address">${escapeHTML(rec.address)}</div>
+      ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn-map" aria-label="Ver ubicación de la recepción en Google Maps"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Ver ubicación</a>` : ""}
+    </div>
+  </section>`;
+    }
+
+    // F · ITINERARIO
+    const iti = d.itinerary || [];
+    if (iti.length > 0) {
+        s += `
+  <!-- ITINERARIO -->
+  <section class="section itinerary-section" aria-label="Itinerario">
+    <div class="section-inner">
+      ${sTag("Itinerario")}
+      <div class="iti-list">
+        ${iti.map(item => `
+        <div class="iti-item">
+          <div class="iti-marker" aria-hidden="true"></div>
+          <span class="iti-time">${escapeHTML(item.time)}</span>
+          <div class="iti-body">
+            <span class="iti-title">${escapeHTML(item.title)}</span>
+            ${item.description ? `<span class="iti-desc">${escapeHTML(item.description)}</span>` : ""}
+          </div>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>`;
+    }
+
+    // G · DRESS CODE
     const dc = d.dressCode;
     if (dc?.title) {
         s += `
   <!-- DRESS CODE -->
-  <section class="section surface">
-    ${sectionTagHTML(dc.title)}`;
-    s += `
-    ${dc.women?.desc ? `<div class="dress-group"><b>${dc.women.title || "Mujeres"}:</b> ${dc.women.desc}${dc.women.note ? `<br><em style="font-size:0.85em;">${dc.women.note}</em>` : ""}</div>` : ""}
-    ${dc.men?.desc ? `<div class="dress-group"><b>${dc.men.title || "Hombres"}:</b> ${dc.men.desc}</div>` : ""}
+  <section class="section surface" aria-label="Dress Code">
+    <div class="section-inner">
+      ${sTag(dc.title)}
+      ${dc.women?.desc ? `<div class="dress-group"><b>${escapeHTML(dc.women.title || "Mujeres")}:</b> ${escapeHTML(dc.women.desc)}${dc.women.note ? `<br><em>${escapeHTML(dc.women.note)}</em>` : ""}</div>` : ""}
+      ${dc.men?.desc   ? `<div class="dress-group"><b>${escapeHTML(dc.men.title   || "Hombres")}:</b> ${escapeHTML(dc.men.desc)}</div>` : ""}
+    </div>
   </section>`;
     }
 
-    // H · Mesa de regalos
-    const reg = d.registry;
+    // H · MESA DE REGALOS
+    const reg    = d.registry;
     const hasReg = reg && (reg.lluviaSobres || (reg.options && reg.options.length > 0));
     if (hasReg) {
+        const regButtons = (reg.options || []).map(o => {
+            const url = safeExternalUrl(o.url);
+            return url ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="btn-map" aria-label="Ver mesa de regalos ${escapeHTML(o.name)}">${escapeHTML(o.name)}</a>` : "";
+        }).filter(Boolean).join("");
+
         s += `
   <!-- MESA REGALOS -->
-  <section class="section">
-    ${sectionTagHTML("Mesa de Regalos")}`;
-    s += `
-    ${reg.description ? `<p class="section-desc">${reg.description}</p>` : ""}
-    ${reg.lluviaSobres ? `<div class="lluvia"><i class="fa-solid fa-envelope-open-text"></i><p>Lluvia de Sobres</p></div>` : ""}
-    ${(reg.options || []).map(o => `<a href="${o.url || "#"}" target="_blank" class="btn-map">${o.name}</a>`).join("")}
+  <section class="section registry-section" aria-label="Mesa de Regalos">
+    <div class="section-inner">
+      ${sTag("Mesa de Regalos")}
+      ${reg.description ? `<p class="section-desc">${escapeHTML(reg.description)}</p>` : ""}
+      ${reg.lluviaSobres ? `<div class="lluvia"><i class="fa-solid fa-envelope-open-text" aria-hidden="true"></i><p>Lluvia de Sobres</p></div>` : ""}
+      ${regButtons}
+    </div>
   </section>`;
     }
 
-    // I · Hospedaje
+    // I · HOSPEDAJE
     const lod = d.lodging;
     if (lod?.enabled && lod.options?.length > 0) {
         s += `
   <!-- HOSPEDAJE -->
-  <section class="section surface">
-    ${sectionTagHTML("Hospedaje sugerido")}
-    ${lod.description ? `<p class="section-desc">${lod.description}</p>` : ""}
-    ${lod.options.map(h => `
-    <div class="hotel-card">
-      <strong>${h.name}</strong>
-      ${h.address ? `<p>${h.address}</p>` : ""}
-      ${h.phone ? `<p>${h.phone}</p>` : ""}
-      ${h.url ? `<a href="${h.url}" target="_blank" class="btn-map">Ver información</a>` : ""}
-    </div>`).join("")}
+  <section class="section surface lodging-section" aria-label="Hospedaje">
+    <div class="section-inner">
+      ${sTag("Hospedaje sugerido")}
+      ${lod.description ? `<p class="section-desc">${escapeHTML(lod.description)}</p>` : ""}
+      ${lod.options.map(h => {
+          const url = safeExternalUrl(h.url);
+          return `<div class="hotel-card">
+        <strong>${escapeHTML(h.name)}</strong>
+        ${h.address ? `<p>${escapeHTML(h.address)}</p>` : ""}
+        ${h.phone   ? `<p>${escapeHTML(h.phone)}</p>` : ""}
+        ${url ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="btn-map" aria-label="Ver información del hotel ${escapeHTML(h.name)}">Ver información</a>` : ""}
+      </div>`;
+      }).join("")}
+    </div>
   </section>`;
     }
 
     // J · RSVP
     const rsvp = d.rsvp;
     if (rsvp?.title) {
+        const waButtons = (rsvp.whatsappNumbers || []).map(num => {
+            const clean = cleanWhatsApp(num);
+            if (clean.length < 10) return "";
+            const waUrl = `https://wa.me/${clean}?text=${waText}`;
+            return `<a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp" aria-label="Confirmar asistencia por WhatsApp al número ${clean}"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Confirmar al +${clean}</a>`;
+        }).filter(Boolean).join("");
+
         s += `
   <!-- RSVP -->
-  <section class="section">
-    ${sectionTagHTML(rsvp.title)}`;
-    s += `
-    ${rsvp.description ? `<p class="section-desc">${rsvp.description}</p>` : ""}
-    ${(rsvp.whatsappNumbers || []).map(n => `<a href="https://wa.me/${n}?text=${waText}" target="_blank" class="btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> Confirmar al ${n}</a>`).join("")}
+  <section class="section rsvp-section" aria-label="Confirmar Asistencia">
+    <div class="section-inner">
+      ${sTag(rsvp.title)}
+      ${rsvp.description ? `<p class="section-desc">${escapeHTML(rsvp.description)}</p>` : ""}
+      ${waButtons}
+    </div>
   </section>`;
     }
 
-    // K · Créditos
+    // K · CRÉDITOS
     s += `
   <!-- CREDITS -->
-  <footer class="credits">Invitación digital creada con Invitta</footer>`;
+  <footer class="credits">Invitación digital creada con <strong>Invitta</strong></footer>`;
 
     return s;
 }
 
 // ─────────────────────────────────────────────
-// CSS BUILDER
+// CSS BUILDER — BASE
 // ─────────────────────────────────────────────
-function buildTemplateCSS(p, t, design) {
-    if (!design) return "";
-
-    const { layout, ornaments, buttonStyle, heroStyle, sectionStyle, safeId } = design;
-    const hasSparkle   = ornaments.includes("sparkle");
-    const hasFloral    = ornaments.includes("floral");
-    const hasGoldFrame = ornaments.includes("gold-frame");
-    const hasDivider   = ornaments.includes("divider");
-
-    let css = `/* ── Template: ${safeId} / Layout: ${layout} ── */`;
-
-    // Ornament divider line
-    if (hasDivider) {
-        css += `
-    .ornament-line {
-      width: 60px; height: 1px;
-      background: ${p.accent};
-      margin: 8px auto;
-      opacity: 0.6;
-    }`;
-    }
-
-    // Hero variants
-    if (heroStyle === "gradient") {
-        css += `
-    .hero-gradient {
-      background: linear-gradient(160deg, ${p.bg} 0%, ${p.surface} 100%) !important;
-    }`;
-    }
-    if (heroStyle === "warm") {
-        css += `
-    .hero-warm {
-      background: linear-gradient(180deg, ${p.bg} 0%, ${p.surface} 100%) !important;
-    }
-    .hero-warm::after {
-      content: "";
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, ${p.accent}, transparent);
-    }`;
-    }
-    if (heroStyle === "dark") {
-        // Only darken if palette is already dark (bg luminosity heuristic)
-        css += `
-    .hero-dark {
-      background: linear-gradient(160deg, ${p.bg} 0%, ${p.surface} 100%) !important;
-    }
-    .hero-dark::before {
-      background: radial-gradient(ellipse at center, rgba(212,175,55,0.12) 0%, transparent 65%) !important;
-    }`;
-    }
-    if (heroStyle === "shimmer") {
-        css += `
-    .hero-shimmer::after {
-      content: "";
-      position: absolute;
-      top: 20%; left: 10%; right: 10%;
-      height: 60%;
-      background: radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }`;
-    }
-
-    // Gold frame on hero
-    if (hasGoldFrame) {
-        css += `
-    .hero-inner::after {
-      content: "";
-      display: block;
-      width: 80px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, ${p.accent}, transparent);
-      margin: 28px auto 0;
-    }
-    .hero-inner::before {
-      content: "";
-      display: block;
-      width: 80px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, ${p.accent}, transparent);
-      margin: 0 auto 28px;
-    }`;
-    }
-
-    // Sparkle (subtle shimmer dots via CSS)
-    if (hasSparkle) {
-        css += `
-    .hero::after {
-      content: "✦  ✦  ✦";
-      position: absolute;
-      bottom: 28px;
-      left: 0; right: 0;
-      text-align: center;
-      font-size: 0.6rem;
-      letter-spacing: 8px;
-      color: ${p.accent};
-      opacity: 0.5;
-    }`;
-    }
-
-    // Floral (decorative CSS rings, no images)
-    if (hasFloral) {
-        css += `
-    .section::before {
-      content: "";
-      display: block;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 1px solid ${p.accent};
-      margin: 0 auto 24px;
-      opacity: 0.3;
-    }`;
-    }
-
-    // Button style overrides
-    const btnStyles = {
-        soft:    `border-radius: 50px !important; border: 1px solid ${p.accent} !important; background: transparent !important; color: ${p.accent} !important;`,
-        gold:    `background: linear-gradient(135deg, ${p.accent}, color-mix(in srgb, ${p.accent} 80%, #fff)) !important; letter-spacing: 2px !important;`,
-        luxury:  `background: transparent !important; border: 1px solid ${p.accent} !important; color: ${p.accent} !important; letter-spacing: 3px !important; padding: 14px 32px !important;`,
-        classic: ""
-    };
-    const btnOverride = btnStyles[buttonStyle] || "";
-    if (btnOverride) {
-        css += `
-    .btn-map { ${btnOverride} }`;
-    }
-
-    // Section style overrides
-    if (sectionStyle === "soft") {
-        css += `
-    .section { border-radius: 0; }
-    .section.surface { background: linear-gradient(180deg, ${p.surface} 0%, ${p.bg} 100%); }`;
-    }
-    if (sectionStyle === "prestige") {
-        css += `
-    .section-tag { letter-spacing: 5px; font-size: 0.65rem; }
-    .event-time { font-size: 2rem; }`;
-    }
-    if (sectionStyle === "romantic") {
-        css += `
-    .family-name { font-style: italic; }
-    .divider-line { width: 60px; background: ${p.accent}; }`;
-    }
-    if (sectionStyle === "luxury") {
-        css += `
-    .section-tag { letter-spacing: 6px; font-size: 0.62rem; }
-    .credits { background: linear-gradient(135deg, ${p.surface}, ${p.bg}); color: ${p.accent}; font-weight: 500; letter-spacing: 3px; }`;
-    }
-
-    return css;
-}
-
 function buildCSS(p, t, design) {
     return `
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body {
-      font-family: ${t.body};
-      background-color: ${p.bg};
-      color: ${p.text};
-      line-height: 1.7;
-      text-align: center;
-    }
+    body { font-family: ${t.body}; background-color: ${p.bg}; color: ${p.text}; line-height: 1.7; text-align: center; }
 
     /* HERO */
     .hero {
-      min-height: 100svh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      min-height: 90svh;
+      display: flex; align-items: center; justify-content: center;
       background-color: ${p.bg};
       padding: 60px 30px;
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
     .hero::before {
       content: "";
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: radial-gradient(ellipse at center, ${p.hero || "rgba(0,0,0,0.04)"} 0%, transparent 70%);
     }
-    .hero-inner { position: relative; z-index: 1; }
-    .hero-names { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 20px 0; }
-    .name-accent {
-      font-family: ${t.accent};
-      color: ${p.accent};
-      font-size: clamp(2.8rem, 9vw, 5rem);
-      line-height: 1.1;
-    }
-    h1 {
-      font-family: ${t.title};
-      color: ${p.accent};
-      font-size: clamp(2.2rem, 7vw, 4rem);
-      font-weight: 400;
-    }
-    .ampersand {
-      font-family: ${t.title};
-      font-size: clamp(1.6rem, 5vw, 2.5rem);
-      color: ${p.muted};
-      margin: 8px 0;
-    }
-    .eyebrow {
-      font-family: ${t.body};
-      font-size: 0.75rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: ${p.muted};
-      margin-bottom: 16px;
-    }
-    .initials {
-      font-family: ${t.title};
-      font-size: clamp(4rem, 15vw, 8rem);
-      color: ${p.accent};
-      opacity: 0.12;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 0;
-      line-height: 1;
-    }
-    .hero-date {
-      font-family: ${t.body};
-      font-size: 0.85rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: ${p.muted};
-      margin-top: 24px;
-    }
-    .hero-quote {
-      max-width: 360px;
-      margin: 28px auto 0;
-      font-style: italic;
-      font-size: 0.95rem;
-      color: ${p.muted};
-      border-left: 2px solid ${p.accent};
-      padding-left: 16px;
-      text-align: left;
-    }
+    .hero-inner { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; }
+    .hero-names { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+    .name-accent { font-family: ${t.accent}; color: ${p.accent}; font-size: clamp(2.6rem, 8vw, 4.8rem); line-height: 1.1; }
+    h1 { font-family: ${t.title}; color: ${p.accent}; font-size: clamp(2.2rem, 7vw, 4rem); font-weight: 400; }
+    .ampersand { font-family: ${t.title}; font-size: clamp(1.4rem, 4vw, 2.2rem); color: ${p.muted}; margin: 6px 0; }
+    .eyebrow { font-family: ${t.body}; font-size: 0.72rem; letter-spacing: 3.5px; text-transform: uppercase; color: ${p.muted}; margin-bottom: 18px; }
+    .initials { font-family: ${t.title}; font-size: clamp(4rem, 18vw, 9rem); color: ${p.accent}; opacity: 0.1; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; z-index: 0; line-height: 1; }
+    .hero-date { font-family: ${t.body}; font-size: 0.8rem; letter-spacing: 2.5px; text-transform: uppercase; color: ${p.muted}; margin-top: 28px; }
+    .hero-quote { max-width: 340px; margin: 28px auto 0; font-style: italic; font-size: 0.92rem; color: ${p.muted}; border-left: 2px solid ${p.accent}; padding-left: 16px; text-align: left; }
 
     /* SECTIONS */
-    .section {
-      padding: 70px 28px;
-      border-bottom: 1px solid ${p.surface};
-    }
+    .section { padding: 70px 28px; border-bottom: 1px solid ${p.surface}; }
     .section.surface { background-color: ${p.surface}; }
-    .section-tag {
-      font-family: ${t.body};
-      font-size: 0.72rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: ${p.muted};
-      margin-bottom: 24px;
-    }
-    .section-desc {
-      font-size: 0.9rem;
-      color: ${p.muted};
-      max-width: 400px;
-      margin: 0 auto 24px;
-    }
+    .section-inner { max-width: 600px; margin: 0 auto; }
+    .section-tag { font-family: ${t.body}; font-size: 0.7rem; letter-spacing: 3.5px; text-transform: uppercase; color: ${p.muted}; margin-bottom: 24px; }
+    .ornament-line { width: 50px; height: 1px; background: ${p.accent}; margin: 8px auto; opacity: 0.55; }
+    .section-desc { font-size: 0.9rem; color: ${p.muted}; max-width: 400px; margin: 0 auto 24px; }
 
     /* COUNTDOWN */
     .countdown-section { background: ${p.bg}; }
-    .countdown { display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .cd-block { display: flex; flex-direction: column; align-items: center; }
-    .cd-num {
-      font-family: ${t.title};
-      font-size: clamp(2.5rem, 8vw, 4rem);
-      color: ${p.accent};
-      line-height: 1;
-    }
-    .cd-label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: ${p.muted}; margin-top: 6px; }
-    .cd-sep { font-family: ${t.title}; font-size: 2rem; color: ${p.muted}; align-self: flex-start; margin-top: 8px; }
+    .countdown { display: flex; justify-content: center; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+    .cd-block { display: flex; flex-direction: column; align-items: center; min-width: 54px; }
+    .cd-num { font-family: ${t.title}; font-size: clamp(2.2rem, 7vw, 3.8rem); color: ${p.accent}; line-height: 1; }
+    .cd-label { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: ${p.muted}; margin-top: 6px; }
+    .cd-sep { font-family: ${t.title}; font-size: 2rem; color: ${p.muted}; margin-top: 4px; }
 
     /* FAMILY */
     .family-block { margin-bottom: 20px; }
-    .family-name { font-family: ${t.title}; font-size: 1.15rem; font-weight: 400; line-height: 1.4; }
-    .divider-line {
-      width: 40px; height: 1px;
-      background: ${p.accent};
-      margin: 20px auto;
-    }
+    .family-name { font-family: ${t.title}; font-size: 1.1rem; font-weight: 400; line-height: 1.5; }
+    .divider-line { width: 40px; height: 1px; background: ${p.accent}; margin: 20px auto; opacity: 0.6; }
     .godparents { margin-top: 30px; }
 
     /* LOCATION */
-    .event-time {
-      font-family: ${t.title};
-      font-size: 1.6rem;
-      color: ${p.accent};
-      margin-bottom: 8px;
-    }
+    .event-time { font-family: ${t.title}; font-size: 1.6rem; color: ${p.accent}; margin-bottom: 8px; }
     .event-place { font-weight: 600; font-size: 1rem; margin-bottom: 6px; }
-    .event-address { font-size: 0.9rem; color: ${p.muted}; margin-bottom: 24px; }
+    .event-address { font-size: 0.88rem; color: ${p.muted}; margin-bottom: 24px; }
 
     /* ITINERARY */
-    .iti-list { display: flex; flex-direction: column; gap: 24px; max-width: 400px; margin: 0 auto; text-align: left; }
-    .iti-item { display: flex; gap: 20px; align-items: flex-start; }
-    .iti-time { font-family: ${t.title}; color: ${p.accent}; min-width: 70px; font-size: 1rem; }
+    .iti-list { display: flex; flex-direction: column; gap: 28px; max-width: 440px; margin: 0 auto; text-align: left; position: relative; }
+    .iti-item { display: flex; gap: 16px; align-items: flex-start; position: relative; }
+    .iti-marker { width: 10px; height: 10px; border-radius: 50%; background: ${p.accent}; margin-top: 5px; flex-shrink: 0; opacity: 0.8; }
+    .iti-time { font-family: ${t.title}; color: ${p.accent}; min-width: 68px; font-size: 1rem; flex-shrink: 0; }
     .iti-body { display: flex; flex-direction: column; }
     .iti-title { font-weight: 600; font-size: 0.95rem; }
-    .iti-desc { font-size: 0.85rem; color: ${p.muted}; margin-top: 2px; }
+    .iti-desc { font-size: 0.83rem; color: ${p.muted}; margin-top: 2px; }
 
     /* DRESS CODE */
-    .dress-group { margin-bottom: 16px; font-size: 0.95rem; }
+    .dress-group { margin-bottom: 16px; font-size: 0.93rem; }
 
     /* REGISTRY */
     .lluvia { margin: 20px 0; }
     .lluvia i { font-size: 2rem; color: ${p.accent}; display: block; margin-bottom: 8px; }
 
     /* HOTELS */
-    .hotel-card { margin-bottom: 24px; }
-    .hotel-card p { font-size: 0.9rem; color: ${p.muted}; }
+    .hotel-card { margin-bottom: 26px; }
+    .hotel-card p { font-size: 0.88rem; color: ${p.muted}; margin: 3px 0; }
+    .hotel-card strong { font-size: 1rem; }
 
     /* BUTTONS */
     .btn-map, .btn-whatsapp {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 24px;
-      border-radius: 4px;
-      text-decoration: none;
-      font-family: ${t.body};
-      font-size: 0.85rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      transition: opacity 0.2s;
-      margin: 8px auto;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 26px; border-radius: 4px; text-decoration: none;
+      font-family: ${t.body}; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase;
+      transition: opacity 0.2s, transform 0.2s;
+      margin: 8px auto; cursor: pointer;
     }
     .btn-map { background: ${p.accent}; color: ${p.bg}; }
-    .btn-whatsapp { background: #25D366; color: #ffffff; display: flex; }
-    .btn-map:hover, .btn-whatsapp:hover { opacity: 0.85; }
+    .btn-whatsapp { background: #25D366; color: #ffffff; }
+    .btn-map:hover, .btn-whatsapp:hover { opacity: 0.82; transform: translateY(-1px); }
 
     /* CREDITS */
-    .credits {
-      padding: 32px;
-      font-size: 0.75rem;
-      color: ${p.bg};
-      background: ${p.text};
-      text-align: center;
-      letter-spacing: 1px;
-    }
+    .credits { padding: 36px 28px; font-size: 0.73rem; letter-spacing: 1.5px; color: ${p.bg}; background: ${p.text}; text-align: center; }
+    .credits strong { font-weight: 600; }
 
     @media (max-width: 480px) {
-      .section { padding: 50px 20px; }
+      .section { padding: 52px 18px; }
+      .hero { padding: 52px 20px; }
+      .iti-list { max-width: 100%; }
     }
 
     ${buildTemplateCSS(p, t, design)}
-    `;
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }`;
+}
+
+// ─────────────────────────────────────────────
+// CSS BUILDER — TEMPLATE SPECIFIC
+// ─────────────────────────────────────────────
+function buildTemplateCSS(p, t, design) {
+    if (!design) return "";
+    const { layout, ornaments = [], buttonStyle, heroStyle, sectionStyle, safeId } = design;
+    let css = `\n    /* ═══ Template: ${safeId} | Layout: ${layout} ═══ */`;
+
+    // ── A. classic-xv ──
+    if (layout === "classic-xv") {
+        css += `
+    .layout-classic-xv .hero { min-height: 88svh; }
+    .layout-classic-xv .hero-inner::after {
+      content: ""; display: block;
+      width: 48px; height: 1px;
+      background: ${p.accent};
+      margin: 20px auto 0; opacity: 0.5;
+    }
+    .layout-classic-xv .name-accent { font-size: clamp(2.8rem, 8vw, 4.2rem); }
+    .layout-classic-xv .hero-date { margin-top: 20px; }
+    .layout-classic-xv .section-inner { max-width: 560px; }
+    .layout-classic-xv .section { padding: 58px 24px; }
+    .layout-classic-xv .section.surface { background: ${p.surface}; }
+    .layout-classic-xv .btn-map {
+      background: transparent;
+      border: 1px solid ${p.accent};
+      color: ${p.accent};
+      border-radius: 2px;
+    }`;
+    }
+
+    // ── B. rose-premium ──
+    if (layout === "rose-premium") {
+        css += `
+    .layout-rose-premium .hero { min-height: 92svh; background: linear-gradient(160deg, ${p.bg} 0%, ${p.surface} 100%); }
+    .layout-rose-premium .hero::after {
+      content: "";
+      position: absolute;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      border: 1px solid ${p.accent};
+      opacity: 0.12;
+      top: 8%; right: -50px;
+    }
+    .layout-rose-premium .hero::before {
+      content: "";
+      position: absolute;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      border: 1px solid ${p.accent};
+      opacity: 0.1;
+      bottom: 10%; left: -30px;
+      background: none;
+    }
+    .layout-rose-premium .section.surface {
+      margin: 18px;
+      border-radius: 28px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+      padding: 52px 28px;
+    }
+    .layout-rose-premium .section { padding: 64px 28px; }
+    .layout-rose-premium .section-inner { max-width: 520px; }
+    .layout-rose-premium .btn-map {
+      border-radius: 50px;
+      border: 1px solid ${p.accent};
+      background: transparent;
+      color: ${p.accent};
+    }
+    .layout-rose-premium .iti-item { align-items: center; }
+    .layout-rose-premium .iti-marker {
+      width: 8px; height: 8px;
+      border: 2px solid ${p.accent};
+      background: transparent;
+    }
+    @media (max-width: 480px) {
+      .layout-rose-premium .section.surface { margin: 10px; border-radius: 20px; }
+    }`;
+    }
+
+    // ── C. champagne-vip ──
+    if (layout === "champagne-vip") {
+        css += `
+    .layout-champagne-vip .hero {
+      min-height: 100svh;
+      background: linear-gradient(170deg, ${p.bg} 0%, ${p.surface} 60%, ${p.bg} 100%);
+    }
+    .layout-champagne-vip .hero-inner {
+      position: relative;
+      border: 1px solid ${p.accent};
+      padding: 48px 36px;
+      margin: 16px;
+      opacity: 1;
+    }
+    .layout-champagne-vip .hero-inner::before {
+      content: "✦";
+      position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+      background: ${p.bg}; padding: 0 10px;
+      font-size: 0.75rem; color: ${p.accent}; opacity: 0.7;
+    }
+    .layout-champagne-vip .hero-inner::after {
+      content: "✦";
+      position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+      background: ${p.bg}; padding: 0 10px;
+      font-size: 0.75rem; color: ${p.accent}; opacity: 0.7;
+    }
+    .layout-champagne-vip .name-accent { font-size: clamp(2.8rem, 8vw, 5.2rem); }
+    .layout-champagne-vip .eyebrow { letter-spacing: 6px; font-size: 0.65rem; }
+    .layout-champagne-vip .hero-date { letter-spacing: 4px; font-size: 0.72rem; }
+    .layout-champagne-vip .section { padding: 80px 28px; }
+    .layout-champagne-vip .section-inner { max-width: 640px; }
+    .layout-champagne-vip .section-tag { letter-spacing: 6px; font-size: 0.6rem; }
+    .layout-champagne-vip .event-time { font-size: 2.2rem; }
+    .layout-champagne-vip .btn-map {
+      background: linear-gradient(135deg, ${p.accent} 0%, rgba(212,175,55,0.7) 100%);
+      color: ${p.bg};
+      letter-spacing: 2.5px;
+      border-radius: 2px;
+    }
+    .layout-champagne-vip .credits {
+      background: ${p.surface};
+      color: ${p.accent};
+      font-weight: 500;
+      letter-spacing: 4px;
+      border-top: 1px solid ${p.accent};
+    }
+    @keyframes champagne-shimmer {
+      0%   { opacity: 0.06; }
+      50%  { opacity: 0.12; }
+      100% { opacity: 0.06; }
+    }
+    .layout-champagne-vip .hero::before {
+      animation: champagne-shimmer 6s ease-in-out infinite;
+    }`;
+    }
+
+    // ── D. classic-wedding ──
+    if (layout === "classic-wedding") {
+        css += `
+    .layout-classic-wedding .hero { min-height: 88svh; }
+    .layout-classic-wedding .hero-names { gap: 4px; }
+    .layout-classic-wedding .name-accent { font-family: ${t.title}; font-size: clamp(2.4rem, 7vw, 4rem); }
+    .layout-classic-wedding .ampersand { font-size: clamp(1.8rem, 5vw, 2.6rem); opacity: 0.5; }
+    .layout-classic-wedding .hero-inner::after {
+      content: "";
+      display: block;
+      width: 80px; height: 1px;
+      background: ${p.accent};
+      margin: 22px auto 0; opacity: 0.45;
+    }
+    .layout-classic-wedding .section { padding: 66px 28px; }
+    .layout-classic-wedding .section-inner { max-width: 560px; }
+    .layout-classic-wedding .family-name { font-size: 1.05rem; }
+    .layout-classic-wedding .btn-map {
+      background: transparent;
+      border: 1px solid ${p.text};
+      color: ${p.text};
+      border-radius: 2px;
+      letter-spacing: 1.5px;
+    }
+    .layout-classic-wedding .btn-map:hover { background: ${p.text}; color: ${p.bg}; opacity: 1; }`;
+    }
+
+    // ── E. golden-romance ──
+    if (layout === "golden-romance") {
+        css += `
+    .layout-golden-romance .hero {
+      min-height: 92svh;
+      background: linear-gradient(180deg, ${p.bg} 0%, ${p.surface} 100%);
+    }
+    .layout-golden-romance .hero::after {
+      content: "";
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, ${p.accent}, transparent);
+    }
+    .layout-golden-romance .hero-inner::before {
+      content: "";
+      display: block;
+      width: 70px; height: 1px;
+      background: linear-gradient(90deg, transparent, ${p.accent}, transparent);
+      margin: 0 auto 22px;
+    }
+    .layout-golden-romance .hero-inner::after {
+      content: "";
+      display: block;
+      width: 70px; height: 1px;
+      background: linear-gradient(90deg, transparent, ${p.accent}, transparent);
+      margin: 22px auto 0;
+    }
+    .layout-golden-romance .location-card .section-inner {
+      max-width: 560px;
+      border: 1px solid ${p.accent};
+      border-radius: 6px;
+      padding: 36px 28px;
+    }
+    .layout-golden-romance .section { padding: 70px 28px; }
+    .layout-golden-romance .section-tag::before,
+    .layout-golden-romance .section-tag::after {
+      content: " ─── "; opacity: 0.4; color: ${p.accent};
+    }
+    .layout-golden-romance .iti-list { border-left: 1px solid ${p.accent}; padding-left: 20px; opacity-for-line: 0.3; }
+    .layout-golden-romance .iti-marker {
+      margin-left: -25px;
+      width: 10px; height: 10px;
+      border: 2px solid ${p.accent};
+      background: ${p.bg};
+    }
+    .layout-golden-romance .btn-map {
+      background: transparent;
+      border: 1px solid ${p.accent};
+      color: ${p.accent};
+      letter-spacing: 2px;
+    }
+    .layout-golden-romance .btn-map:hover { background: ${p.accent}; color: ${p.bg}; opacity: 1; }
+    .layout-golden-romance .family-name { font-style: italic; }`;
+    }
+
+    // ── F. midnight-luxury ──
+    if (layout === "midnight-luxury") {
+        css += `
+    .layout-midnight-luxury .hero { min-height: 100svh; }
+    .layout-midnight-luxury .hero-inner { max-width: 500px; }
+    .layout-midnight-luxury .eyebrow { letter-spacing: 7px; font-size: 0.62rem; }
+    .layout-midnight-luxury .hero-date { letter-spacing: 5px; font-size: 0.68rem; }
+    .layout-midnight-luxury .name-accent { font-size: clamp(2.8rem, 8vw, 5rem); letter-spacing: 1px; }
+    .layout-midnight-luxury .hero::after {
+      content: "✦   ✦   ✦";
+      position: absolute; bottom: 28px;
+      left: 0; right: 0; text-align: center;
+      font-size: 0.55rem; letter-spacing: 10px;
+      color: ${p.accent}; opacity: 0.45;
+    }
+    .layout-midnight-luxury .hero-inner::before,
+    .layout-midnight-luxury .hero-inner::after {
+      content: "";
+      display: block;
+      width: 90px; height: 1px;
+      background: linear-gradient(90deg, transparent, ${p.accent}, transparent);
+      margin: 0 auto;
+    }
+    .layout-midnight-luxury .hero-inner::before { margin-bottom: 28px; }
+    .layout-midnight-luxury .hero-inner::after  { margin-top: 28px; }
+    .layout-midnight-luxury .section { padding: 78px 28px; border-bottom: 1px solid ${p.accent}; border-bottom-width: 1px; border-bottom-opacity: 0.15; }
+    .layout-midnight-luxury .section-inner { max-width: 620px; }
+    .layout-midnight-luxury .section-tag { letter-spacing: 7px; font-size: 0.58rem; }
+    .layout-midnight-luxury .event-time { font-size: 2rem; letter-spacing: 2px; }
+    .layout-midnight-luxury .btn-map {
+      background: transparent;
+      border: 1px solid ${p.accent};
+      color: ${p.accent};
+      letter-spacing: 3px;
+      padding: 13px 30px;
+      border-radius: 0;
+    }
+    .layout-midnight-luxury .btn-map:hover { background: ${p.accent}; color: ${p.bg}; opacity: 1; }
+    .layout-midnight-luxury .credits {
+      background: ${p.surface};
+      color: ${p.accent};
+      letter-spacing: 4px;
+      font-weight: 500;
+      border-top: 1px solid ${p.accent};
+    }
+    /* Dark-theme overrides — only active when .is-dark-theme is set */
+    .is-dark-theme.layout-midnight-luxury .section.surface { background: ${p.surface}; }
+    .is-dark-theme.layout-midnight-luxury .hotel-card { border: 1px solid ${p.accent}; border-radius: 4px; padding: 18px; margin: 0 auto 20px; max-width: 360px; }`;
+    }
+
+    return css;
 }
 
 // ─────────────────────────────────────────────
@@ -789,26 +840,17 @@ function buildCountdownJS(targetDateTime) {
       const target = new Date("${targetDateTime}").getTime();
       function pad(n) { return String(n).padStart(2, "0"); }
       function tick() {
-        const now = Date.now();
-        const diff = target - now;
+        const diff = target - Date.now();
         if (diff <= 0) {
-          ["cd-days","cd-hours","cd-mins","cd-secs"].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = "00";
-          });
+          ["cd-days","cd-hours","cd-mins","cd-secs"].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = "00"; });
           return;
         }
-        const days  = Math.floor(diff / 86400000);
-        const hours = Math.floor((diff % 86400000) / 3600000);
-        const mins  = Math.floor((diff % 3600000) / 60000);
-        const secs  = Math.floor((diff % 60000) / 1000);
-        const dEl = document.getElementById("cd-days");   if(dEl) dEl.textContent = pad(days);
-        const hEl = document.getElementById("cd-hours");  if(hEl) hEl.textContent = pad(hours);
-        const mEl = document.getElementById("cd-mins");   if(mEl) mEl.textContent = pad(mins);
-        const sEl = document.getElementById("cd-secs");   if(sEl) sEl.textContent = pad(secs);
+        const dEl = document.getElementById("cd-days");   if (dEl) dEl.textContent = pad(Math.floor(diff / 86400000));
+        const hEl = document.getElementById("cd-hours");  if (hEl) hEl.textContent = pad(Math.floor((diff % 86400000) / 3600000));
+        const mEl = document.getElementById("cd-mins");   if (mEl) mEl.textContent = pad(Math.floor((diff % 3600000) / 60000));
+        const sEl = document.getElementById("cd-secs");   if (sEl) sEl.textContent = pad(Math.floor((diff % 60000) / 1000));
       }
-      tick();
-      setInterval(tick, 1000);
+      tick(); setInterval(tick, 1000);
     })();
   <\/script>`;
 }
@@ -820,29 +862,38 @@ function generateInvitation() {
     if (!loadedConfig) return;
     const d = loadedConfig;
 
-    const p = getPaletteColors(d.visual.palette, d.visual.customPalette);
-    const t = getTypography(d.visual.typography, d.visual.handwritten);
+    const p      = getPaletteColors(d.visual.palette, d.visual.customPalette);
+    const t      = getTypography(d.visual.typography, d.visual.handwritten);
     const design = getTemplateDesign(d.template?.id, d.visual);
-    const fontUrl = buildGoogleFontsUrl(d.visual.typography, d.visual.handwritten);
+    const fontUrl= buildGoogleFontsUrl(d.visual.typography, d.visual.handwritten);
     const isBoda = d.event.type === "boda";
     const titleName = isBoda
         ? `${d.event.primaryName} & ${d.event.secondaryName || ""}`.trim()
         : `XV Años de ${d.event.primaryName}`;
 
-    // Sanitized body classes for template/layout identification
-    const bodyClass = `template-${design.safeId} layout-${design.layout.replace(/[^a-z0-9-]/g, "-")}`;
+    // Body classes
+    const rawLevel  = (d.template?.level || "").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+    let bodyClasses = `template-${design.safeId} layout-${design.layout}${rawLevel ? ` level-${rawLevel}` : ""}`;
 
-    const css = buildCSS(p, t, design);
-    const sections = buildSections(d, p, t, design);
-    const countdownJS = d.event.countdownDateTime ? buildCountdownJS(d.event.countdownDateTime) : "";
-    const customNote = p.customNote ? `<div style="background:#fff3cd;color:#856404;padding:8px 14px;font-size:0.8rem;text-align:center;">Colores solicitados: ${p.customNote}</div>` : "";
+    // Dark theme detection for midnight-luxury
+    if (design.layout === "midnight-luxury") {
+        const paletteIsDark = d.visual.palette === "Plum Noir VIP" || isDarkColor(p.bg);
+        if (paletteIsDark) bodyClasses += " is-dark-theme";
+    }
+
+    const css        = buildCSS(p, t, design);
+    const sections   = buildSections(d, p, t, design);
+    const countdownJS= d.event.countdownDateTime ? buildCountdownJS(d.event.countdownDateTime) : "";
+    const customNote = p.customNote
+        ? `<div style="background:#fff3cd;color:#856404;padding:8px 14px;font-size:0.8rem;text-align:center;">Colores solicitados: ${escapeHTML(p.customNote)}</div>`
+        : "";
 
     finalHTML = `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${titleName}</title>
+  <title>${escapeHTML(titleName)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="${fontUrl}" rel="stylesheet">
@@ -851,25 +902,24 @@ function generateInvitation() {
 ${css}
   </style>
 </head>
-<body class="${bodyClass}">
+<body class="${bodyClasses}">
 ${customNote}
 ${sections}
 ${countdownJS}
 </body>
 </html>`;
 
-    // Mostrar resultado en la UI
+    // Show result
     document.getElementById("generateCard").style.display = "none";
     const resultCard = document.getElementById("resultCard");
     resultCard.style.display = "block";
 
     const successMsg = document.getElementById("successMsg");
-    successMsg.textContent = `✅ Invitación generada correctamente (${(finalHTML.length / 1024).toFixed(1)} KB). Haz clic en "Descargar" para obtener el archivo.`;
+    successMsg.textContent = `✅ Invitación generada (${(finalHTML.length / 1024).toFixed(1)} KB) — Layout: ${design.layout} | Clases: ${bodyClasses}`;
     successMsg.style.display = "block";
 
-    // Mostrar preview de código (primeras 80 líneas)
-    const preview = finalHTML.split("\n").slice(0, 80).join("\n") + "\n\n... (archivo completo disponible al descargar)";
-    document.getElementById("codePreview").textContent = preview;
+    document.getElementById("codePreview").textContent =
+        finalHTML.split("\n").slice(0, 80).join("\n") + "\n\n... (archivo completo disponible al descargar)";
 
     resultCard.scrollIntoView({ behavior: "smooth" });
 }
@@ -880,9 +930,9 @@ ${countdownJS}
 function downloadFinal() {
     if (!finalHTML) return;
     const blob = new Blob([finalHTML], { type: "text/html;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
     a.download = "invitacion-final.html";
     document.body.appendChild(a);
     a.click();
