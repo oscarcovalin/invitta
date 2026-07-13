@@ -56,7 +56,7 @@ function removeInternalBackupFields(value) {
     }
 
     const forbidden = [
-        "id", "studio_id", "user_id", "owner_id", "created_at", "updated_at",
+        "studio_id", "user_id", "owner_id", "created_at", "updated_at",
         "published", "link_builder_pin", "access_token", "refresh_token", "token", "session",
         "requestedDraftId", "recoveredStudioDraft", "draftRecoveryReady",
         "createdStudioDraft", "publishedStudioInvitation", "lastSavedDraftPayloadFingerprint",
@@ -91,8 +91,9 @@ function buildConfigurationBackup() {
 }
 
 function createConfigurationBackupFilename() {
-    if (currentPublicationSlug) {
-        return `invitta-configuracion-${currentPublicationSlug}.json`;
+    const safeSlug = String(currentPublicationSlug || "").trim();
+    if (/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(safeSlug) && safeSlug.length > 0 && safeSlug.length <= 160) {
+        return `invitta-configuracion-${safeSlug}.json`;
     }
     return "invitta-configuracion-respaldo.json";
 }
@@ -1283,6 +1284,15 @@ document.addEventListener("DOMContentLoaded", () => {
     fileInput.addEventListener("change", (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 });
 
+function createWorkingConfiguration(parsedData) {
+    if (!parsedData || typeof parsedData !== "object" || Array.isArray(parsedData)) {
+        throw new Error("Configuración no es un objeto válido");
+    }
+    const workingCopy = JSON.parse(JSON.stringify(parsedData));
+    delete workingCopy._backup;
+    return workingCopy;
+}
+
 function handleFile(file) {
     if (!enforceStudioReady()) return;
     if (!file.name.endsWith(".json")) { 
@@ -1301,8 +1311,9 @@ function handleFile(file) {
                 updateGeneratorActionState();
                 return;
             }
-            loadedConfig = data;
-            renderSummary(data);
+            const workingConfig = createWorkingConfiguration(data);
+            loadedConfig = workingConfig;
+            renderSummary(workingConfig);
             updateGeneratorActionState();
         } catch { 
             loadedConfig = null;
