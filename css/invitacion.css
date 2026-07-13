@@ -3455,3 +3455,35 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
     filter: none !important;
   }
 }
+/* Safe section reveal: only full cards, no child animations */
+.inv-safe-reveal {
+  opacity: 0;
+  transform: translate3d(0, 34px, 0) scale(0.965);
+  filter: blur(4px);
+  transition:
+    opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform, filter;
+}
+
+.inv-safe-reveal.inv-safe-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0);
+}
+
+.inv-safe-reveal.inv-safe-visible * {
+  filter: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-safe-reveal,
+  .inv-safe-reveal.inv-safe-visible,
+  .inv-safe-reveal * {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}
