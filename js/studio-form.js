@@ -144,6 +144,21 @@ function getChecked(id) {
   return Boolean(el && el.checked);
 }
 
+function parseConfirmationNumbers(value) {
+  return String(value || "")
+    .split(/[|,;\n]+/)
+    .map(number => number.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+}
+
+function serializeConfirmationNumbers(primary, secondary) {
+  return [primary, secondary]
+    .map(number => String(number || "").trim())
+    .filter(Boolean)
+    .join("|");
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const session = await window.studioAuth.requireSession();
   if (!session) return;
@@ -690,7 +705,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("reception_map_url").value = data.reception_map_url || "";
     document.getElementById("gift_table_url").value = data.gift_table_url || "";
     document.getElementById("dress_code").value = data.dress_code || "";
-    document.getElementById("whatsapp_number").value = data.whatsapp_number || "";
+    const confirmationNumbers = parseConfirmationNumbers(data.whatsapp_number);
+    document.getElementById("whatsapp_number").value = confirmationNumbers[0] || "";
+    document.getElementById("whatsapp_number_secondary").value = confirmationNumbers[1] || "";
     document.getElementById("published").checked = !!data.published;
     
     if (document.getElementById("studioName")) {
@@ -996,7 +1013,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       reception_map_url: document.getElementById("reception_map_url").value,
       gift_table_url: document.getElementById("gift_table_url").value,
       dress_code: document.getElementById("dress_code").value,
-      whatsapp_number: document.getElementById("whatsapp_number").value,
+      whatsapp_number: serializeConfirmationNumbers(
+        document.getElementById("whatsapp_number").value,
+        document.getElementById("whatsapp_number_secondary").value
+      ),
       published: document.getElementById("published").checked,
       studio_name: document.getElementById("studioName") ? document.getElementById("studioName").value || "Invitta Studio" : "Invitta Studio",
       studio_logo_url: document.getElementById("studioLogoUrl") ? document.getElementById("studioLogoUrl").value || "" : "",

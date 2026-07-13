@@ -3488,3 +3488,21 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
     transition: none !important;
   }
 }
+/* Optional confirmation contacts */
+
+.inv-confirm-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.inv-confirm-actions .inv-premium-button {
+  min-height: 52px;
+  margin: 0 auto;
+}
+
+.inv-confirm-actions .inv-premium-button[hidden] {
+  display: none !important;
+}
