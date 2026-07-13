@@ -804,15 +804,7 @@ export default function App() {
                     CÓMO LLEGAR
                     <span className="material-symbols-outlined text-xs">open_in_new</span>
                   </a>
-                  <a 
-                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Ceremonia+Religiosa+-+Boda+Ana+Camila+y+Carlos&dates=20261212T210000Z/20261212T223000Z&details=Ceremonia+Religiosa+de+la+Boda+de+Ana+Camila+y+Carlos+en+la+Parroquia+Sagrado+Coraz%C3%B3n+de+Jes%C3%BAs.&location=Parroquia+Sagrado+Coraz%C3%B3n+de+Jes%C3%BAs%2C+Blv.+Calle+20+de+Noviembre+y+Av.+Melchor+Ocampo%2C+Col.+Pac%C3%ADfico%2C+Chihuahua%2C+Chih.&sf=true&output=xml"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-[11px] font-subheading-caps tracking-[0.25em] text-sage hover:text-ink border-b border-sage/45 hover:border-ink pb-1 transition-all"
-                  >
-                    AGREGAR A GOOGLE CALENDAR
-                    <span className="material-symbols-outlined text-xs">calendar_today</span>
-                  </a>
+
                 </div>
               </motion.div>
 
@@ -856,15 +848,7 @@ export default function App() {
                     CÓMO LLEGAR
                     <span className="material-symbols-outlined text-xs">open_in_new</span>
                   </a>
-                  <a 
-                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Recepci%C3%B3n+-+Boda+Ana+Camila+y+Carlos&dates=20261213T030000Z/20261213T090000Z&details=Recepci%C3%B3n+de+la+Boda+de+Ana+Camila+y+Carlos+en+Cantabria+Sal%C3%B3n+de+Eventos.&location=Cantabria+Sal%C3%B3n+de+Eventos%2C+Blv.+Col.+Sierra+Magisterial+%236103%2C+Col.+Los+%C3%81ngeles%2C+Chihuahua%2C+Chih.&sf=true&output=xml"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-[11px] font-subheading-caps tracking-[0.25em] text-sage hover:text-ink border-b border-sage/45 hover:border-ink pb-1 transition-all"
-                  >
-                    AGREGAR A GOOGLE CALENDAR
-                    <span className="material-symbols-outlined text-xs">calendar_today</span>
-                  </a>
+
                 </div>
               </motion.div>
 
