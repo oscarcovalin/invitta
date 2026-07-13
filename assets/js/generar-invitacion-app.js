@@ -1044,20 +1044,33 @@ function openPreview() {
     
     const blob = new Blob([finalHTML], { type: "text/html;charset=utf-8" });
     previewBlobUrl = URL.createObjectURL(blob);
+    const currentUrl = previewBlobUrl;
     
-    const newWindow = window.open(previewBlobUrl, "_blank");
+    const newWindow = window.open(currentUrl, "_blank");
     const statusMsg = document.getElementById("previewStatusMsg");
+    
     if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
+        URL.revokeObjectURL(currentUrl);
+        if (previewBlobUrl === currentUrl) previewBlobUrl = null;
+        
         if (statusMsg) {
             statusMsg.textContent = "El navegador bloqueó la ventana emergente. Por favor, permite las ventanas emergentes e inténtalo de nuevo.";
             statusMsg.style.display = "block";
             statusMsg.style.color = "#d9534f";
         }
-    } else {
-        if (statusMsg) {
-             statusMsg.style.display = "none";
-        }
+        return;
+    } 
+    
+    if (statusMsg) {
+        statusMsg.style.display = "none";
     }
+    
+    setTimeout(() => {
+        URL.revokeObjectURL(currentUrl);
+        if (previewBlobUrl === currentUrl) {
+            previewBlobUrl = null;
+        }
+    }, 45000);
 }
 
 function generateInvitation() {
