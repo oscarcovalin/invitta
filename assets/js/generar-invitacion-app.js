@@ -576,6 +576,8 @@ function buildGalleryJS() {
       if(!galleryItems.length || !lightbox) return;
       
       let currentIndex = 0;
+      let lastFocusedElement = null;
+      
       const images = Array.from(galleryItems).map(btn => ({
          src: btn.querySelector('img').src,
          alt: btn.querySelector('img').alt
@@ -586,18 +588,28 @@ function buildGalleryJS() {
          lbNext.style.display = 'none';
       }
       
+      function getFocusableElements() {
+          return Array.from(lightbox.querySelectorAll('button')).filter(b => b.style.display !== 'none');
+      }
+      
       function openLightbox(index) {
+         lastFocusedElement = document.activeElement;
          currentIndex = index;
          lbImage.src = images[currentIndex].src;
          lbImage.alt = images[currentIndex].alt;
          lightbox.hidden = false;
          document.body.style.overflow = 'hidden';
+         lbClose.focus();
       }
       
       function closeLightbox() {
          lightbox.hidden = true;
          document.body.style.overflow = '';
          lbImage.src = '';
+         if(lastFocusedElement) {
+             lastFocusedElement.focus();
+             lastFocusedElement = null;
+         }
       }
       
       function showNext() {
@@ -624,9 +636,39 @@ function buildGalleryJS() {
       
       document.addEventListener('keydown', (e) => {
          if(!lightbox.hidden) {
-            if(e.key === 'Escape') closeLightbox();
-            if(e.key === 'ArrowRight' && images.length > 1) showNext();
-            if(e.key === 'ArrowLeft' && images.length > 1) showPrev();
+            if(e.key === 'Escape') {
+                closeLightbox();
+                return;
+            }
+            if(e.key === 'ArrowRight' && images.length > 1) {
+                showNext();
+                return;
+            }
+            if(e.key === 'ArrowLeft' && images.length > 1) {
+                showPrev();
+                return;
+            }
+            if(e.key === 'Tab') {
+                const focusable = getFocusableElements();
+                if(focusable.length === 0) {
+                    e.preventDefault();
+                    return;
+                }
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                
+                if(e.shiftKey) {
+                    if(document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    }
+                } else {
+                    if(document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+            }
          }
       });
     })();
