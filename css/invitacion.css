@@ -3532,8 +3532,9 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
   object-position: center;
   filter: blur(24px) brightness(0.56) saturate(0.88);
   opacity: 0.82;
-  transform: translate3d(0, var(--moment-backdrop-shift, 0px), 0) scale(1.08);
+  transform: translate3d(0, var(--moment-backdrop-shift, 0px), 0) scale(1.14);
   transform-origin: center;
+  transition: transform 100ms linear;
   will-change: transform;
   pointer-events: none;
 }
@@ -3561,8 +3562,9 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
   object-fit: contain;
   object-position: center;
   filter: none;
-  transform: translate3d(-50%, calc(-50% + var(--moment-foreground-shift, 0px)), 0) scale(1);
+  transform: translate3d(-50%, calc(-50% + var(--moment-foreground-shift, 0px)), 0) scale(var(--moment-foreground-scale, 1.02));
   transform-origin: center;
+  transition: transform 100ms linear;
   will-change: transform;
 }
 
@@ -3588,10 +3590,10 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
 
 @media (prefers-reduced-motion: reduce) {
   .inv-moment-image {
-    transform: translate3d(-50%, -50%, 0) scale(1) !important;
+    transform: translate3d(-50%, -50%, 0) scale(1.02) !important;
   }
 
   .inv-moment-backdrop {
-    transform: scale(1.08) !important;
+    transform: scale(1.14) !important;
   }
 }

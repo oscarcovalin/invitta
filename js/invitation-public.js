@@ -1335,8 +1335,8 @@ function renderDefaultTemplate(inv) {
     function updateParallax() {
       const viewportHeight = window.innerHeight;
       const isMobile = window.innerWidth <= 640;
-      const foregroundRange = isMobile ? 58 : 76;
-      const backdropRange = isMobile ? -104 : -136;
+      const foregroundRange = isMobile ? 160 : 210;
+      const backdropRange = isMobile ? -280 : -360;
 
       images.forEach((img) => {
         const frame = img.closest(".inv-moment-frame");
@@ -1348,12 +1348,16 @@ function renderDefaultTemplate(inv) {
 
         const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
         const clamped = Math.max(0, Math.min(1, progress));
+        const eased = clamped * clamped * (3 - 2 * clamped);
 
-        const foregroundTranslate = (clamped - 0.5) * foregroundRange;
-        const backdropTranslate = (clamped - 0.5) * backdropRange;
+        const foregroundTranslate = (eased - 0.5) * foregroundRange;
+        const backdropTranslate = (eased - 0.5) * backdropRange;
+        const distanceFromCenter = Math.abs(eased - 0.5) * 2;
+        const foregroundScale = 1.02 + distanceFromCenter * 0.02;
         const backdrop = frame.querySelector(".inv-moment-backdrop");
 
         img.style.setProperty("--moment-foreground-shift", `${foregroundTranslate}px`);
+        img.style.setProperty("--moment-foreground-scale", foregroundScale.toFixed(3));
         if (backdrop) {
           backdrop.style.setProperty("--moment-backdrop-shift", `${backdropTranslate}px`);
         }
