@@ -45,15 +45,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function formatInvitationDate(value) {
     if (!value) return "Sin fecha";
-    const parts = String(value).split("-");
-    if (parts.length !== 3) return "Sin fecha";
+    const strVal = String(value).trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(strVal)) return "Sin fecha";
     
+    const parts = strVal.split("-");
     const year = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
+    const month = parseInt(parts[1], 10);
     const day = parseInt(parts[2], 10);
     
-    const d = new Date(year, month, day);
+    if (year < 1900 || year > 2200) return "Sin fecha";
+    if (month < 1 || month > 12) return "Sin fecha";
+    if (day < 1 || day > 31) return "Sin fecha";
+    
+    const d = new Date(year, month - 1, day);
     if (isNaN(d.getTime())) return "Sin fecha";
+    
+    if (d.getFullYear() !== year || d.getMonth() !== month - 1 || d.getDate() !== day) {
+      return "Sin fecha";
+    }
     
     return d.toLocaleDateString("es-MX");
   }
