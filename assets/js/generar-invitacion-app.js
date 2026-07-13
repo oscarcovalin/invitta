@@ -1,5 +1,6 @@
 /**
- * Fase 7F — Generador de invitación publicable desde invitta-configuracion.json.
+ * Fase 7F/7G — Generador de invitación publicable desde invitta-configuracion.json.
+ * 7G: Conecta template.id con estilos/layouts/ornamentos específicos por plantilla.
  * 100% local en el navegador. Sin Supabase. Sin APIs externas.
  */
 
@@ -127,6 +128,91 @@ function getTypography(typoName, handName) {
 }
 
 // ─────────────────────────────────────────────
+// TEMPLATE DESIGN MAP (Fase 7G)
+// ─────────────────────────────────────────────
+function getTemplateDesign(templateId, visual) {
+    // Sanitize id for CSS class name
+    const safeId = (templateId || "generic").replace(/[^a-z0-9-]/g, "-").toLowerCase();
+
+    const designs = {
+        "xv-elegance-basic": {
+            layout: "classic-xv",
+            mood: "elegante limpio juvenil",
+            heroStyle: "light",
+            sectionStyle: "clean",
+            ornaments: ["divider"],
+            buttonStyle: "classic",
+            animationLevel: "none",
+            notes: "Élégance XV — básica, detalles finos"
+        },
+        "xv-rose-gold-premium": {
+            layout: "rose-premium",
+            mood: "romántico rose-gold femenino",
+            heroStyle: "gradient",
+            sectionStyle: "soft",
+            ornaments: ["divider", "floral"],
+            buttonStyle: "soft",
+            animationLevel: "subtle",
+            notes: "Rose Gold XV — premium, flores CSS, bordes suaves"
+        },
+        "xv-champagne-rose-vip": {
+            layout: "champagne-vip",
+            mood: "luxury quinceañera champagne",
+            heroStyle: "shimmer",
+            sectionStyle: "prestige",
+            ornaments: ["divider", "sparkle", "gold-frame"],
+            buttonStyle: "gold",
+            animationLevel: "medium",
+            notes: "Champagne Rose VIP — editorial, detalles dorados"
+        },
+        "boda-classic-basic": {
+            layout: "classic-wedding",
+            mood: "clásico limpio elegante boda",
+            heroStyle: "light",
+            sectionStyle: "clean",
+            ornaments: ["divider"],
+            buttonStyle: "classic",
+            animationLevel: "none",
+            notes: "Classic Wedding — tradicional, tipografía sobria"
+        },
+        "boda-golden-romance-premium": {
+            layout: "golden-romance",
+            mood: "romántico dorado cálido",
+            heroStyle: "warm",
+            sectionStyle: "romantic",
+            ornaments: ["divider", "gold-frame"],
+            buttonStyle: "gold",
+            animationLevel: "subtle",
+            notes: "Golden Romance — líneas doradas, cálido"
+        },
+        "boda-midnight-gold-vip": {
+            layout: "midnight-luxury",
+            mood: "oscuro dorado luxury vip",
+            heroStyle: "dark",
+            sectionStyle: "luxury",
+            ornaments: ["divider", "sparkle", "gold-frame"],
+            buttonStyle: "luxury",
+            animationLevel: "medium",
+            notes: "Midnight Gold — VIP oscuro con acentos dorados"
+        }
+    };
+
+    // Fallback genérico si el id no está registrado
+    const base = designs[templateId] || {
+        layout: "generic",
+        mood: "neutro",
+        heroStyle: "light",
+        sectionStyle: "clean",
+        ornaments: [],
+        buttonStyle: "classic",
+        animationLevel: "none",
+        notes: "Diseño genérico"
+    };
+
+    return { ...base, safeId };
+}
+
+// ─────────────────────────────────────────────
 // GOOGLE FONTS URL BUILDER
 // ─────────────────────────────────────────────
 function buildGoogleFontsUrl(typoName, handName) {
@@ -157,15 +243,21 @@ function buildGoogleFontsUrl(typoName, handName) {
 // ─────────────────────────────────────────────
 // HTML BUILDER — SECTIONS
 // ─────────────────────────────────────────────
-function buildSections(d, p, t) {
+function buildSections(d, p, t, design) {
+    const hasDivider = design && design.ornaments && design.ornaments.includes("divider");
+    const sectionTagHTML = hasDivider
+        ? (label) => `<div class="ornament-line"></div><div class="section-tag">${label}</div><div class="ornament-line"></div>`
+        : (label) => `<div class="section-tag">${label}</div>`;
     const isBoda = d.event.type === "boda";
     const waText = encodeURIComponent(`Hola, confirmo mi asistencia al evento de ${d.event.primaryName}`);
     let s = "";
 
+    const heroClass = `hero hero-${design ? design.heroStyle : "light"}`;
+
     // A · Hero / Portada
     s += `
   <!-- HERO -->
-  <section class="hero">
+  <section class="${heroClass}">
     <div class="hero-inner">
       <div class="eyebrow">${isBoda ? "Nuestra Boda" : "Mis XV Años"}</div>
       <div class="hero-names">
@@ -205,10 +297,10 @@ function buildSections(d, p, t) {
         s += `
   <!-- FAMILIA -->
   <section class="section surface">
-    <div class="section-tag">Con la bendición de Dios y nuestros padres</div>
+    ${sectionTagHTML("Con la bendición de Dios y nuestros padres")}
     ${hp.mother || hp.father ? `<div class="family-block">${[hp.mother, hp.father].filter(Boolean).map(n => `<p class="family-name">${n}</p>`).join("")}</div>` : ""}
     ${(sp.mother || sp.father) ? `<div class="divider-line"></div><div class="family-block">${[sp.mother, sp.father].filter(Boolean).map(n => `<p class="family-name">${n}</p>`).join("")}</div>` : ""}
-    ${d.family?.godparents ? `<div class="godparents"><span class="section-tag">Padrinos</span><p class="family-name">${d.family.godparents}</p></div>` : ""}
+    ${d.family?.godparents ? `<div class="godparents">${sectionTagHTML("Padrinos")}<p class="family-name">${d.family.godparents}</p></div>` : ""}
   </section>`;
     }
 
@@ -219,7 +311,7 @@ function buildSections(d, p, t) {
         s += `
   <!-- CEREMONIA -->
   <section class="section">
-    <div class="section-tag">${cer.title}</div>
+    ${sectionTagHTML(cer.title)}
     <div class="event-time">${cer.time}</div>
     <div class="event-place">${cer.place}</div>
     <div class="event-address">${cer.address}</div>
@@ -234,7 +326,7 @@ function buildSections(d, p, t) {
         s += `
   <!-- RECEPCION -->
   <section class="section surface">
-    <div class="section-tag">${rec.title}</div>
+    ${sectionTagHTML(rec.title)}
     <div class="event-time">${rec.time}</div>
     <div class="event-place">${rec.place}</div>
     <div class="event-address">${rec.address}</div>
@@ -248,7 +340,8 @@ function buildSections(d, p, t) {
         s += `
   <!-- ITINERARIO -->
   <section class="section">
-    <div class="section-tag">Itinerario</div>
+    ${sectionTagHTML("Itinerario")}`;
+    s += `
     <div class="iti-list">
       ${iti.map(item => `
       <div class="iti-item">
@@ -268,7 +361,8 @@ function buildSections(d, p, t) {
         s += `
   <!-- DRESS CODE -->
   <section class="section surface">
-    <div class="section-tag">${dc.title}</div>
+    ${sectionTagHTML(dc.title)}`;
+    s += `
     ${dc.women?.desc ? `<div class="dress-group"><b>${dc.women.title || "Mujeres"}:</b> ${dc.women.desc}${dc.women.note ? `<br><em style="font-size:0.85em;">${dc.women.note}</em>` : ""}</div>` : ""}
     ${dc.men?.desc ? `<div class="dress-group"><b>${dc.men.title || "Hombres"}:</b> ${dc.men.desc}</div>` : ""}
   </section>`;
@@ -281,7 +375,8 @@ function buildSections(d, p, t) {
         s += `
   <!-- MESA REGALOS -->
   <section class="section">
-    <div class="section-tag">Mesa de Regalos</div>
+    ${sectionTagHTML("Mesa de Regalos")}`;
+    s += `
     ${reg.description ? `<p class="section-desc">${reg.description}</p>` : ""}
     ${reg.lluviaSobres ? `<div class="lluvia"><i class="fa-solid fa-envelope-open-text"></i><p>Lluvia de Sobres</p></div>` : ""}
     ${(reg.options || []).map(o => `<a href="${o.url || "#"}" target="_blank" class="btn-map">${o.name}</a>`).join("")}
@@ -294,7 +389,7 @@ function buildSections(d, p, t) {
         s += `
   <!-- HOSPEDAJE -->
   <section class="section surface">
-    <div class="section-tag">Hospedaje sugerido</div>
+    ${sectionTagHTML("Hospedaje sugerido")}
     ${lod.description ? `<p class="section-desc">${lod.description}</p>` : ""}
     ${lod.options.map(h => `
     <div class="hotel-card">
@@ -312,7 +407,8 @@ function buildSections(d, p, t) {
         s += `
   <!-- RSVP -->
   <section class="section">
-    <div class="section-tag">${rsvp.title}</div>
+    ${sectionTagHTML(rsvp.title)}`;
+    s += `
     ${rsvp.description ? `<p class="section-desc">${rsvp.description}</p>` : ""}
     ${(rsvp.whatsappNumbers || []).map(n => `<a href="https://wa.me/${n}?text=${waText}" target="_blank" class="btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> Confirmar al ${n}</a>`).join("")}
   </section>`;
@@ -329,7 +425,161 @@ function buildSections(d, p, t) {
 // ─────────────────────────────────────────────
 // CSS BUILDER
 // ─────────────────────────────────────────────
-function buildCSS(p, t) {
+function buildTemplateCSS(p, t, design) {
+    if (!design) return "";
+
+    const { layout, ornaments, buttonStyle, heroStyle, sectionStyle, safeId } = design;
+    const hasSparkle   = ornaments.includes("sparkle");
+    const hasFloral    = ornaments.includes("floral");
+    const hasGoldFrame = ornaments.includes("gold-frame");
+    const hasDivider   = ornaments.includes("divider");
+
+    let css = `/* ── Template: ${safeId} / Layout: ${layout} ── */`;
+
+    // Ornament divider line
+    if (hasDivider) {
+        css += `
+    .ornament-line {
+      width: 60px; height: 1px;
+      background: ${p.accent};
+      margin: 8px auto;
+      opacity: 0.6;
+    }`;
+    }
+
+    // Hero variants
+    if (heroStyle === "gradient") {
+        css += `
+    .hero-gradient {
+      background: linear-gradient(160deg, ${p.bg} 0%, ${p.surface} 100%) !important;
+    }`;
+    }
+    if (heroStyle === "warm") {
+        css += `
+    .hero-warm {
+      background: linear-gradient(180deg, ${p.bg} 0%, ${p.surface} 100%) !important;
+    }
+    .hero-warm::after {
+      content: "";
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, ${p.accent}, transparent);
+    }`;
+    }
+    if (heroStyle === "dark") {
+        // Only darken if palette is already dark (bg luminosity heuristic)
+        css += `
+    .hero-dark {
+      background: linear-gradient(160deg, ${p.bg} 0%, ${p.surface} 100%) !important;
+    }
+    .hero-dark::before {
+      background: radial-gradient(ellipse at center, rgba(212,175,55,0.12) 0%, transparent 65%) !important;
+    }`;
+    }
+    if (heroStyle === "shimmer") {
+        css += `
+    .hero-shimmer::after {
+      content: "";
+      position: absolute;
+      top: 20%; left: 10%; right: 10%;
+      height: 60%;
+      background: radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }`;
+    }
+
+    // Gold frame on hero
+    if (hasGoldFrame) {
+        css += `
+    .hero-inner::after {
+      content: "";
+      display: block;
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, ${p.accent}, transparent);
+      margin: 28px auto 0;
+    }
+    .hero-inner::before {
+      content: "";
+      display: block;
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, ${p.accent}, transparent);
+      margin: 0 auto 28px;
+    }`;
+    }
+
+    // Sparkle (subtle shimmer dots via CSS)
+    if (hasSparkle) {
+        css += `
+    .hero::after {
+      content: "✦  ✦  ✦";
+      position: absolute;
+      bottom: 28px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 0.6rem;
+      letter-spacing: 8px;
+      color: ${p.accent};
+      opacity: 0.5;
+    }`;
+    }
+
+    // Floral (decorative CSS rings, no images)
+    if (hasFloral) {
+        css += `
+    .section::before {
+      content: "";
+      display: block;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid ${p.accent};
+      margin: 0 auto 24px;
+      opacity: 0.3;
+    }`;
+    }
+
+    // Button style overrides
+    const btnStyles = {
+        soft:    `border-radius: 50px !important; border: 1px solid ${p.accent} !important; background: transparent !important; color: ${p.accent} !important;`,
+        gold:    `background: linear-gradient(135deg, ${p.accent}, color-mix(in srgb, ${p.accent} 80%, #fff)) !important; letter-spacing: 2px !important;`,
+        luxury:  `background: transparent !important; border: 1px solid ${p.accent} !important; color: ${p.accent} !important; letter-spacing: 3px !important; padding: 14px 32px !important;`,
+        classic: ""
+    };
+    const btnOverride = btnStyles[buttonStyle] || "";
+    if (btnOverride) {
+        css += `
+    .btn-map { ${btnOverride} }`;
+    }
+
+    // Section style overrides
+    if (sectionStyle === "soft") {
+        css += `
+    .section { border-radius: 0; }
+    .section.surface { background: linear-gradient(180deg, ${p.surface} 0%, ${p.bg} 100%); }`;
+    }
+    if (sectionStyle === "prestige") {
+        css += `
+    .section-tag { letter-spacing: 5px; font-size: 0.65rem; }
+    .event-time { font-size: 2rem; }`;
+    }
+    if (sectionStyle === "romantic") {
+        css += `
+    .family-name { font-style: italic; }
+    .divider-line { width: 60px; background: ${p.accent}; }`;
+    }
+    if (sectionStyle === "luxury") {
+        css += `
+    .section-tag { letter-spacing: 6px; font-size: 0.62rem; }
+    .credits { background: linear-gradient(135deg, ${p.surface}, ${p.bg}); color: ${p.accent}; font-weight: 500; letter-spacing: 3px; }`;
+    }
+
+    return css;
+}
+
+function buildCSS(p, t, design) {
     return `
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -523,7 +773,10 @@ function buildCSS(p, t) {
 
     @media (max-width: 480px) {
       .section { padding: 50px 20px; }
-    }`;
+    }
+
+    ${buildTemplateCSS(p, t, design)}
+    `;
 }
 
 // ─────────────────────────────────────────────
@@ -569,14 +822,18 @@ function generateInvitation() {
 
     const p = getPaletteColors(d.visual.palette, d.visual.customPalette);
     const t = getTypography(d.visual.typography, d.visual.handwritten);
+    const design = getTemplateDesign(d.template?.id, d.visual);
     const fontUrl = buildGoogleFontsUrl(d.visual.typography, d.visual.handwritten);
     const isBoda = d.event.type === "boda";
     const titleName = isBoda
         ? `${d.event.primaryName} & ${d.event.secondaryName || ""}`.trim()
         : `XV Años de ${d.event.primaryName}`;
 
-    const css = buildCSS(p, t);
-    const sections = buildSections(d, p, t);
+    // Sanitized body classes for template/layout identification
+    const bodyClass = `template-${design.safeId} layout-${design.layout.replace(/[^a-z0-9-]/g, "-")}`;
+
+    const css = buildCSS(p, t, design);
+    const sections = buildSections(d, p, t, design);
     const countdownJS = d.event.countdownDateTime ? buildCountdownJS(d.event.countdownDateTime) : "";
     const customNote = p.customNote ? `<div style="background:#fff3cd;color:#856404;padding:8px 14px;font-size:0.8rem;text-align:center;">Colores solicitados: ${p.customNote}</div>` : "";
 
@@ -594,7 +851,7 @@ function generateInvitation() {
 ${css}
   </style>
 </head>
-<body>
+<body class="${bodyClass}">
 ${customNote}
 ${sections}
 ${countdownJS}
