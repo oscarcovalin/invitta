@@ -495,6 +495,8 @@ function validateDraftPublishReadiness() {
     if (!currentPublicationSlug) errors.push("No se ha generado un slug de publicación.");
     if (createdStudioDraft && currentPublicationSlug !== createdStudioDraft.slug) errors.push("El slug actual es diferente al del borrador original.");
     if (currentStudioPayload && createdStudioDraft && currentStudioPayload.slug !== createdStudioDraft.slug) errors.push("El slug del payload no coincide con el del borrador original.");
+    if (!knownDraftUpdatedAt) errors.push("No fue posible verificar la versión actual del borrador.");
+    if (draftConflictDetected) errors.push("Esta invitación fue modificada desde otra sesión.");
     if (draftPayloadDirty) errors.push("El borrador tiene cambios pendientes de guardar.");
     if (!lastSavedDraftPayloadFingerprint) errors.push("No existe fingerprint del último borrador guardado.");
     if (publishedStudioInvitation) errors.push("La invitación ya está publicada localmente.");
@@ -924,7 +926,7 @@ async function createStudioInvitationDraft() {
         const validUpdatedAt = normalizeDraftUpdatedAt(data.updated_at);
         if (!validUpdatedAt) {
             if (msgEl) {
-                msgEl.innerHTML = "";
+                msgEl.replaceChildren();
                 msgEl.textContent = "El borrador fue creado, pero no fue posible establecer su control de versión.";
                 msgEl.style.color = "var(--warning)";
                 msgEl.setAttribute("role", "alert");
@@ -1254,6 +1256,8 @@ async function updateStudioInvitationDraft() {
                 uiMsg = "No se encontró el borrador asociado.";
             } else if (err.code === "DRAFT_ALREADY_PUBLISHED") {
                 uiMsg = "La invitación ya está publicada y no puede modificarse desde este generador.";
+            } else if (err.code === "DRAFT_VERSION_CONFLICT") {
+                uiMsg = "Este borrador fue modificado desde otra sesión. No se sobrescribieron los cambios.";
             }
             msgEl.textContent = uiMsg;
             msgEl.style.color = "var(--danger)";
@@ -1460,6 +1464,8 @@ async function publishStudioInvitation() {
                 uiMsg = "No se encontró el borrador asociado.";
             } else if (err.code === "ALREADY_PUBLISHED") {
                 uiMsg = "La invitación ya se encuentra publicada.";
+            } else if (err.code === "PUBLISH_VERSION_CONFLICT") {
+                uiMsg = "Esta invitación cambió desde que la abriste. No fue publicada.";
             }
             msgEl.textContent = uiMsg;
             if (err.code === "ALREADY_PUBLISHED") {
