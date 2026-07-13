@@ -1328,13 +1328,22 @@ function renderDefaultTemplate(inv) {
     console.error("Invitation render error:", error);
 
     const root = document.getElementById("invitationRoot") || document.body;
+    const errorMessage = error instanceof Error ? error.message : String(error || "");
+    let publicMessage = "No se pudo cargar la invitaci\u00f3n. Intenta de nuevo m\u00e1s tarde.";
+
+    if (errorMessage === "La vista previa requiere una sesion activa de Invitta Studio.") {
+      publicMessage = "Inicia sesi\u00f3n en Invitta Studio y vuelve a abrir la vista previa.";
+    } else if (errorMessage === "No se pudo cargar este borrador con la sesion actual.") {
+      publicMessage = "Este borrador no est\u00e1 disponible para la sesi\u00f3n actual.";
+    } else if (errorMessage === "Invitacion no encontrada o no publicada.") {
+      publicMessage = "Esta invitaci\u00f3n a\u00fan no est\u00e1 publicada o el enlace no es correcto.";
+    }
 
     root.innerHTML = `
       <main class="inv-error-shell">
         <section class="inv-error-card">
-          <h1>Oops</h1>
-          <p>No se pudo cargar la invitaci\u00f3n.</p>
-          <p>Revisa la consola para m\u00e1s detalles.</p>
+          <h1>No pudimos abrirla</h1>
+          <p>${escapeHtml(publicMessage)}</p>
         </section>
       </main>
     `;
