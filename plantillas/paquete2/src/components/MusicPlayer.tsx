@@ -5,10 +5,14 @@ export function MusicPlayer({ autoPlay }: { autoPlay?: boolean }) {
   const [volume, setVolume] = useState(0.5);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const invData = (typeof window !== "undefined" && (window as any).INVITATION_DATA) ? (window as any).INVITATION_DATA : {};
+  const audioSrc = invData.musicUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3";
+  const musicTitle = invData.musicTitle || "Música de Gala";
+
 
   useEffect(() => {
     // Elegant royalty-free soft piano/orchestra music for celebration
-    const audio = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3");
+    const audio = new Audio(audioSrc);
     audio.loop = true;
     audio.volume = volume;
     audioRef.current = audio;

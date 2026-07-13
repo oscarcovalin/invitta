@@ -334,6 +334,91 @@ function renderInvitation(inv) {
     }
 }
 
+function cleanString(val, maxLength) {
+    if (!val || typeof val !== 'string') return "";
+    var clean = val.trim();
+    if (maxLength && clean.length > maxLength) {
+        clean = clean.substring(0, maxLength);
+    }
+    return clean;
+}
+
+function normalizeStringArray(val) {
+    if (!val) return [];
+    if (Array.isArray(val)) return val.map(function(v) { return cleanString(v, 120); }).filter(Boolean);
+    if (typeof val === 'string') {
+        try {
+            var parsed = JSON.parse(val);
+            if (Array.isArray(parsed)) return parsed.map(function(v) { return cleanString(v, 120); }).filter(Boolean);
+        } catch(e) {}
+        return [cleanString(val, 120)].filter(Boolean);
+    }
+    return [];
+}
+
+function normalizeGodparents(val) {
+    if (!val) return [];
+    if (Array.isArray(val)) {
+        return val.map(function(item) {
+            if (typeof item === 'string') return { role: "Padrinos", name: cleanString(item, 120) };
+            if (typeof item === 'object' && item !== null) {
+                return { 
+                    role: cleanString(item.role || "Padrinos", 60), 
+                    name: cleanString(item.name || "", 120) 
+                };
+            }
+            return null;
+        }).filter(function(item) { return item && item.name; });
+    }
+    if (typeof val === 'string') {
+        try {
+            var parsed = JSON.parse(val);
+            return normalizeGodparents(parsed);
+        } catch(e) {
+            return [{ role: "Padrinos", name: cleanString(val, 120) }];
+        }
+    }
+    return [];
+}
+
+function safeHttpsUrl(val) {
+    if (!val || typeof val !== 'string') return "";
+    var clean = val.trim();
+    if (clean.startsWith('https://')) return clean;
+    if (clean.startsWith('http://')) return clean.replace('http://', 'https://');
+    return "";
+}
+
+function normalizeGalleryUrls(val) {
+    var arr = normalizeStringArray(val);
+    return arr.map(safeHttpsUrl).filter(Boolean);
+}
+
+function normalizeItineraryData(val) {
+    if (!val) return [];
+    var arr = [];
+    if (Array.isArray(val)) arr = val;
+    else if (typeof val === 'string') {
+        try { arr = JSON.parse(val); } catch(e) { return []; }
+    }
+    if (!Array.isArray(arr)) return [];
+    return arr.map(function(item) {
+        if (typeof item !== 'object' || !item) return null;
+        return {
+            time: cleanString(item.time, 60),
+            title: cleanString(item.title, 120),
+            description: cleanString(item.description, 200),
+            iconName: cleanString(item.iconName || item.icon || "", 60)
+        };
+    }).filter(function(item) { return item && item.title; });
+}
+
+function cleanWhatsApp(val) {
+    if (!val) return "";
+    var digits = String(val).replace(/\D/g, '');
+    return (digits.length >= 10 && digits.length <= 15) ? digits : "";
+}
+
 function renderRoseGoldPremium(inv) {
     // 1. Ocultar loader y el default layout
     var loader = document.getElementById("inv-loader");
@@ -357,46 +442,36 @@ function renderRoseGoldPremium(inv) {
 
     // 4. Preparar window.INVITATION_DATA con la estructura que el app parcheada espera
     window.INVITATION_DATA = {
-        eventTitle: inv.event_title || inv.title || "Mis XV Años",
-        celebrantName: inv.celebrant_name || "Nombre",
+        eventTitle: cleanString(inv.event_title || inv.title, 120) || "Mis XV Años",
+        celebrantName: cleanString(inv.honoree_name || inv.celebrant_name, 120) || "Nombre",
         celebrantLastName: "",
-        eventDate: inv.event_date || "",
-        parents: inv.parents || [],
-        godparents: inv.godparents || [],
-        quote: inv.quote || "",
+        eventDate: cleanString(inv.event_date, 60) || "",
+        parents: (inv.father_name || inv.mother_name) 
+            ? [cleanString(inv.father_name, 120), cleanString(inv.mother_name, 120)].filter(Boolean)
+            : normalizeStringArray(inv.parents),
+        godparents: normalizeGodparents(inv.godparents),
+        quote: cleanString(inv.quote, 500) || "",
         ceremony: {
-            name: inv.ceremony_name || "",
-            time: inv.ceremony_time ? formatHeroTimeFromRaw(inv.ceremony_time) : "",
-            address: inv.ceremony_address || "",
-            mapUrl: inv.ceremony_url || "#"
+            name: cleanString(inv.ceremony_name, 120) || "",
+            time: inv.ceremony_time ? cleanString(formatHeroTimeFromRaw(inv.ceremony_time), 60) : "",
+            address: cleanString(inv.ceremony_address, 255) || "",
+            mapUrl: safeHttpsUrl(inv.ceremony_map_url || inv.ceremony_url) || "#"
         },
         reception: {
-            name: inv.reception_name || "",
-            time: inv.reception_time ? formatHeroTimeFromRaw(inv.reception_time) : "",
-            address: inv.reception_address || "",
-            mapUrl: inv.reception_url || "#"
+            name: cleanString(inv.reception_name, 120) || "",
+            time: inv.reception_time ? cleanString(formatHeroTimeFromRaw(inv.reception_time), 60) : "",
+            address: cleanString(inv.reception_address, 255) || "",
+            mapUrl: safeHttpsUrl(inv.reception_map_url || inv.reception_url) || "#"
         },
-        itinerary: (function() {
-            try {
-                if (typeof inv.itinerary === "string") return JSON.parse(inv.itinerary);
-                if (Array.isArray(inv.itinerary)) return inv.itinerary;
-                return [];
-            } catch(e) { return []; }
-        })(),
-        whatsapp: inv.studio_whatsapp || "526142525050",
-        guestName: guestName,
+        itinerary: normalizeItineraryData(inv.itinerary),
+        whatsapp: cleanWhatsApp(inv.whatsapp_number) || cleanWhatsApp(inv.studio_whatsapp) || "",
+        guestName: cleanString(guestName, 120),
         passes: maxPasses,
-        table: tableNum,
-        mainPhotoUrl: inv.main_photo_url || "",
-        galleryUrls: (function() {
-            try {
-                if (typeof inv.gallery_urls === "string") return JSON.parse(inv.gallery_urls);
-                if (Array.isArray(inv.gallery_urls)) return inv.gallery_urls;
-                return [];
-            } catch(e) { return []; }
-        })(),
-        musicUrl: inv.music_url || "",
-        musicTitle: inv.music_title || ""
+        table: cleanString(tableNum, 30),
+        mainPhotoUrl: safeHttpsUrl(inv.main_photo_url) || "",
+        galleryUrls: normalizeGalleryUrls(inv.gallery_urls),
+        musicUrl: safeHttpsUrl(inv.music_url) || "",
+        musicTitle: cleanString(inv.music_title, 120) || ""
     };
 
     // 4. Inyectar CSS de la build de React
