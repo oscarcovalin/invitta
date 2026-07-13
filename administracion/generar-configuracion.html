@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Configuración - Invitta Studio</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #FAF8F5;
+            --card-bg: #FFFFFF;
+            --border-color: #EAE4DD;
+            --text-main: #111111;
+            --text-muted: #6B6560;
+            --accent: #D4AF37;
+            --danger: #E53935;
+            --warning: #FF9800;
+            --sans: 'Inter', sans-serif;
+            --serif: 'Playfair Display', serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--sans); background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
+        
+        .container { max-width: 900px; margin: 40px auto; padding: 0 24px; }
+        
+        /* HEADER BÁSICO */
+        header { margin-bottom: 30px; text-align: center; }
+        header h1 { font-family: var(--serif); font-weight: 500; font-size: 2rem; color: var(--text-main); margin-bottom: 10px; }
+        header p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* CARDS */
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .card-title { font-family: var(--serif); font-size: 1.3rem; font-weight: 500; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+
+        /* UPLOAD ZONE */
+        .upload-zone { border: 2px dashed var(--border-color); border-radius: 8px; padding: 40px 20px; text-align: center; background: #fafafa; transition: 0.3s; cursor: pointer; }
+        .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: #fdfaf5; }
+        .upload-zone i { font-size: 2.5rem; color: var(--accent); margin-bottom: 12px; }
+        .upload-zone h3 { font-size: 1.1rem; margin-bottom: 8px; font-weight: 500; }
+        .upload-zone p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+        .file-input { display: none; }
+        
+        /* BUTTONS */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: 6px; font-family: var(--sans); font-size: 0.95rem; font-weight: 500; cursor: pointer; border: none; transition: 0.2s; text-decoration: none; }
+        .btn-primary { background: var(--text-main); color: #fff; }
+        .btn-primary:hover { background: #333; }
+        .btn-accent { background: var(--accent); color: #fff; }
+        .btn-accent:hover { background: #c29f30; }
+
+        /* SUMMARY GRID */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+        .summary-item { background: var(--bg-color); padding: 12px; border-radius: 6px; border: 1px solid var(--border-color); }
+        .summary-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+        .summary-value { font-size: 1rem; color: var(--text-main); font-weight: 500; }
+
+        /* WARNINGS */
+        .warnings-container { display: none; margin-bottom: 24px; }
+        .warning-alert { background: #fff8e1; border-left: 4px solid var(--warning); padding: 12px 16px; border-radius: 4px; margin-bottom: 10px; font-size: 0.9rem; color: #5d4000; display: flex; gap: 12px; align-items: center; }
+        
+        /* PREVIEW */
+        .preview-container { display: none; }
+        pre { background: #282a36; color: #f8f8f2; padding: 16px; border-radius: 8px; overflow-x: auto; font-family: monospace; font-size: 0.85rem; line-height: 1.4; }
+        
+        /* FOOTER ACTIONS */
+        .actions-footer { display: flex; justify-content: flex-end; gap: 16px; margin-top: 24px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Generar Configuración</h1>
+            <p>Sube el archivo <code>datos_evento.json</code> generado por el cliente para normalizarlo.</p>
+        </header>
+
+        <div class="card" id="uploadCard">
+            <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <h3>Cargar JSON del cuestionario</h3>
+                <p>Haz clic o arrastra el archivo aquí</p>
+                <input type="file" id="fileInput" class="file-input" accept=".json">
+                <button class="btn btn-primary">Seleccionar archivo</button>
+            </div>
+        </div>
+
+        <div class="warnings-container" id="warningsContainer">
+            <!-- Warnings go here -->
+        </div>
+
+        <div class="card preview-container" id="summaryCard">
+            <h2 class="card-title">Resumen de Datos Extraídos</h2>
+            <div class="summary-grid" id="summaryGrid">
+                <!-- Summary items injected via JS -->
+            </div>
+        </div>
+
+        <div class="card preview-container" id="jsonCard">
+            <h2 class="card-title">Vista Previa <code>invitationConfig</code></h2>
+            <pre id="jsonPreview"></pre>
+            
+            <div class="actions-footer" id="actionsFooter">
+                <button class="btn btn-primary" onclick="location.reload()">Cargar otro archivo</button>
+                <button class="btn btn-accent" id="btnDownload" onclick="downloadConfig()"><i class="fa-solid fa-download"></i> Descargar Configuración</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts locales requeridos -->
+    <script src="../assets/js/generar-configuracion-app.js"></script>
+</body>
+</html>
