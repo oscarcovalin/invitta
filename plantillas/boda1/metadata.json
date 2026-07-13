@@ -1,0 +1,6 @@
+{
+  "name": "Invitta - Boda",
+  "description": "Exclusiva invitación digital interactiva de Boda para Ana Camila y Carlos, con cuenta regresiva, detalles de locación, mesa de regalos y confirmación RSVP.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
