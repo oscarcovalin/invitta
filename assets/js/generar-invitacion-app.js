@@ -21,6 +21,14 @@ function isStudioGeneratorReady() {
     return !!(currentStudioSession && currentStudioContext && currentStudioContext.id && studioContextReady);
 }
 
+function updateGeneratorActionState() {
+    const btnGenerate = document.getElementById("btnGenerate");
+    if (btnGenerate) {
+        const canGenerate = isStudioGeneratorReady() && !!loadedConfig;
+        btnGenerate.disabled = !canGenerate;
+    }
+}
+
 function enforceStudioReady() {
     if (!isStudioGeneratorReady()) {
         const msgEl = document.getElementById("authStatusMsg");
@@ -43,7 +51,7 @@ async function initializeStudioGeneratorContext() {
     
     if (dropZone) dropZone.style.pointerEvents = "none";
     if (fileInput) fileInput.disabled = true;
-    if (btnGenerate) btnGenerate.disabled = true;
+    updateGeneratorActionState();
     
     if (!window.studioAuth) {
         if (authStatusMsg) {
@@ -84,7 +92,7 @@ async function initializeStudioGeneratorContext() {
         
         currentStudioContext = {
             id: String(studio.id),
-            name: escapeHTML(studio.name || "")
+            name: String(studio.name || "").trim().substring(0, 120)
         };
         studioContextReady = true;
         
@@ -98,6 +106,8 @@ async function initializeStudioGeneratorContext() {
         if (dropZone) dropZone.style.pointerEvents = "auto";
         if (fileInput) fileInput.disabled = false;
         
+        updateGeneratorActionState();
+        
     } catch (err) {
         console.error("Error validando el estudio:", err);
         if (authStatusMsg) {
@@ -106,6 +116,7 @@ async function initializeStudioGeneratorContext() {
             authStatusMsg.setAttribute("role", "alert");
             authStatusMsg.setAttribute("aria-live", "assertive");
         }
+        updateGeneratorActionState();
     }
 }
 
@@ -129,18 +140,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function handleFile(file) {
     if (!enforceStudioReady()) return;
-    if (!file.name.endsWith(".json")) { showError("Selecciona un archivo .json válido."); return; }
+    if (!file.name.endsWith(".json")) { 
+        loadedConfig = null;
+        showError("Selecciona un archivo .json válido."); 
+        updateGeneratorActionState();
+        return; 
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
         try {
             const data = JSON.parse(e.target.result);
             if (!data.meta || !data.template || !data.event || !data.visual) {
+                loadedConfig = null;
                 showError("El archivo no parece ser una configuración Invitta válida.");
+                updateGeneratorActionState();
                 return;
             }
             loadedConfig = data;
             renderSummary(data);
-        } catch { showError("Error al parsear el archivo JSON. Verifica que el archivo no esté corrupto."); }
+            updateGeneratorActionState();
+        } catch { 
+            loadedConfig = null;
+            showError("Error al parsear el archivo JSON. Verifica que el archivo no esté corrupto."); 
+            updateGeneratorActionState();
+        }
     };
     reader.readAsText(file);
 }
