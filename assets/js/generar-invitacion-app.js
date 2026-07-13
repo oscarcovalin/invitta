@@ -31,6 +31,146 @@ let requestedDraftId = null;
 let recoveredStudioDraft = null;
 let draftRecoveryInProgress = false;
 let draftRecoveryReady = false;
+let configurationBackupInProgress = false;
+
+function cloneConfigurationForBackup(source) {
+    if (!source || typeof source !== "object" || Array.isArray(source)) {
+        return null;
+    }
+    try {
+        return JSON.parse(JSON.stringify(source));
+    } catch (e) {
+        console.error("Error al clonar configuración para respaldo:", e);
+        return null;
+    }
+}
+
+function removeInternalBackupFields(value) {
+    if (!value || typeof value !== "object") return value;
+
+    if (Array.isArray(value)) {
+        for (let i = 0; i < value.length; i++) {
+            value[i] = removeInternalBackupFields(value[i]);
+        }
+        return value;
+    }
+
+    const forbidden = [
+        "id", "studio_id", "user_id", "owner_id", "created_at", "updated_at",
+        "published", "link_builder_pin", "access_token", "refresh_token", "token", "session",
+        "requestedDraftId", "recoveredStudioDraft", "draftRecoveryReady",
+        "createdStudioDraft", "publishedStudioInvitation", "lastSavedDraftPayloadFingerprint",
+        "draftPayloadDirty", "currentStudioContext", "currentStudioSession"
+    ];
+
+    for (const key of Object.keys(value)) {
+        if (forbidden.includes(key)) {
+            delete value[key];
+        } else if (typeof value[key] === "object") {
+            value[key] = removeInternalBackupFields(value[key]);
+        }
+    }
+
+    return value;
+}
+
+function buildConfigurationBackup() {
+    if (!loadedConfig) return null;
+
+    let copy = cloneConfigurationForBackup(loadedConfig);
+    if (!copy) return null;
+
+    copy = removeInternalBackupFields(copy);
+
+    copy._backup = {
+        format: "invitta-configuracion",
+        version: 1
+    };
+
+    return copy;
+}
+
+function createConfigurationBackupFilename() {
+    if (currentPublicationSlug) {
+        return `invitta-configuracion-${currentPublicationSlug}.json`;
+    }
+    return "invitta-configuracion-respaldo.json";
+}
+
+function downloadConfigurationBackup() {
+    if (!enforceStudioReady()) return;
+    if (configurationBackupInProgress) return;
+    if (!loadedConfig) return;
+
+    configurationBackupInProgress = true;
+    updateConfigurationBackupButtonState();
+
+    let backup;
+    try {
+        backup = buildConfigurationBackup();
+        if (!backup) throw new Error("buildConfigurationBackup returned null");
+        
+        const jsonStr = JSON.stringify(backup, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = createConfigurationBackupFilename();
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        const msgEl = document.getElementById("configurationBackupStatusMsg") || document.getElementById("previewStatusMsg");
+        if (msgEl) {
+            msgEl.textContent = "Respaldo de configuración descargado correctamente.";
+            msgEl.style.color = "var(--success)";
+            msgEl.style.display = "block";
+            msgEl.setAttribute("role", "status");
+            msgEl.setAttribute("aria-live", "polite");
+        }
+    } catch (err) {
+        console.error("Error al generar respaldo:", err);
+        const msgEl = document.getElementById("configurationBackupStatusMsg") || document.getElementById("previewStatusMsg");
+        if (msgEl) {
+            msgEl.textContent = "No fue posible preparar el respaldo de configuración.";
+            msgEl.style.color = "var(--danger)";
+            msgEl.style.display = "block";
+            msgEl.setAttribute("role", "alert");
+            msgEl.setAttribute("aria-live", "assertive");
+        }
+    } finally {
+        configurationBackupInProgress = false;
+        updateConfigurationBackupButtonState();
+    }
+}
+
+function updateConfigurationBackupButtonState() {
+    const btn = document.getElementById("btnDownloadConfigurationBackup");
+    if (!btn) return;
+
+    if (!loadedConfig) {
+        btn.disabled = true;
+        btn.textContent = "Respaldo no disponible";
+        return;
+    }
+
+    if (draftCreationInProgress || draftUpdateInProgress || draftPublishInProgress) {
+        btn.disabled = true;
+        btn.textContent = "Preparando invitación...";
+        return;
+    }
+
+    if (configurationBackupInProgress) {
+        btn.disabled = true;
+        btn.textContent = "Preparando respaldo...";
+        return;
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Descargar respaldo de configuración";
+}
 
 function readRequestedDraftId() {
     const params = new URLSearchParams(window.location.search);
@@ -255,6 +395,7 @@ function cancelDraftRecovery() {
     updateDraftCreationButtonState();
     updateDraftUpdateButtonState();
     updateDraftPublishButtonState();
+    updateConfigurationBackupButtonState();
 
     const btnCancel = document.getElementById("btnCancelDraftRecovery");
     if (btnCancel) btnCancel.style.display = "none";
@@ -437,6 +578,7 @@ function preparePublishConfirmation() {
     
     publishConfirmationArmed = true;
     updateDraftPublishButtonState();
+    updateConfigurationBackupButtonState();
     
     const panel = document.getElementById("publishConfirmationPanel");
     if (panel) panel.style.display = "block";
@@ -445,6 +587,7 @@ function preparePublishConfirmation() {
 function cancelPublishConfirmation() {
     publishConfirmationArmed = false;
     updateDraftPublishButtonState();
+    updateConfigurationBackupButtonState();
     const panel = document.getElementById("publishConfirmationPanel");
     if (panel) panel.style.display = "none";
 }
@@ -733,6 +876,7 @@ async function updateStudioInvitationDraft() {
         updateDraftUpdateButtonState();
         updateDraftCreationButtonState();
         updateDraftPublishButtonState();
+    updateConfigurationBackupButtonState();
     }
 }
 
@@ -757,6 +901,7 @@ async function publishStudioInvitation() {
     updateDraftCreationButtonState();
     updateDraftUpdateButtonState();
     updateDraftPublishButtonState();
+    updateConfigurationBackupButtonState();
     
     if (msgEl) {
         msgEl.textContent = "Publicando invitación...";
@@ -912,6 +1057,7 @@ async function publishStudioInvitation() {
         updateDraftCreationButtonState();
         updateDraftUpdateButtonState();
         updateDraftPublishButtonState();
+    updateConfigurationBackupButtonState();
     }
 }
 
@@ -924,6 +1070,7 @@ async function recoverStudioDraftContext() {
     updateDraftCreationButtonState();
     updateDraftUpdateButtonState();
     updateDraftPublishButtonState();
+    updateConfigurationBackupButtonState();
 
     const msgEl = document.getElementById("authStatusMsg");
     if (msgEl) {
@@ -1006,6 +1153,7 @@ async function recoverStudioDraftContext() {
         updateDraftCreationButtonState();
         updateDraftUpdateButtonState();
         updateDraftPublishButtonState();
+    updateConfigurationBackupButtonState();
     }
 }
 
@@ -2723,14 +2871,33 @@ ${musicJS}
         downloadManifestBtn.ariaLabel = "Descargar el manifiesto de publicación del evento";
         downloadManifestBtn.addEventListener("click", downloadPublicationManifest);
         
+        const downloadConfigBackupBtn = document.createElement("button");
+        downloadConfigBackupBtn.type = "button";
+        downloadConfigBackupBtn.id = "btnDownloadConfigurationBackup";
+        downloadConfigBackupBtn.className = "btn";
+        downloadConfigBackupBtn.style.marginTop = "10px";
+        downloadConfigBackupBtn.style.marginLeft = "10px";
+        downloadConfigBackupBtn.textContent = "Descargar respaldo de configuración";
+        downloadConfigBackupBtn.ariaLabel = "Descargar respaldo de la configuración de esta invitación";
+        downloadConfigBackupBtn.addEventListener("click", downloadConfigurationBackup);
+        
         const statusMsg = document.createElement("div");
         statusMsg.id = "previewStatusMsg";
         statusMsg.style.marginTop = "10px";
         statusMsg.style.fontSize = "0.9rem";
         statusMsg.style.display = "none";
         
+        const configBackupStatusMsg = document.createElement("div");
+        configBackupStatusMsg.id = "configurationBackupStatusMsg";
+        configBackupStatusMsg.style.marginTop = "10px";
+        configBackupStatusMsg.style.fontSize = "0.9rem";
+        configBackupStatusMsg.style.display = "none";
+        
         controlsContainer.appendChild(previewBtn);
         controlsContainer.appendChild(downloadManifestBtn);
+        controlsContainer.appendChild(downloadConfigBackupBtn);
+        
+        updateConfigurationBackupButtonState();
         
         if (studioValidation.errors.length > 0) {
             const stuErrDiv = document.createElement("div");
@@ -2870,6 +3037,7 @@ ${musicJS}
                     updateDraftCreationButtonState();
                     updateDraftUpdateButtonState();
                     updateDraftPublishButtonState();
+    updateConfigurationBackupButtonState();
                 }
             }
             
@@ -2885,6 +3053,7 @@ ${musicJS}
         }
         
         controlsContainer.appendChild(statusMsg);
+        controlsContainer.appendChild(configBackupStatusMsg);
         
         const filesInfo = document.createElement("div");
         filesInfo.style.marginTop = "15px";
