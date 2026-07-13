@@ -1131,6 +1131,29 @@ function downloadPublicationManifest() {
     URL.revokeObjectURL(url);
 }
 
+function normalizeISODate(value) {
+    if (typeof value !== "string") return null;
+    const trimmed = value.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return null;
+    const date = new Date(`${trimmed}T00:00:00Z`);
+    if (isNaN(date.getTime())) return null;
+    const parts = trimmed.split("-").map(Number);
+    if (date.getUTCFullYear() !== parts[0] || (date.getUTCMonth() + 1) !== parts[1] || date.getUTCDate() !== parts[2]) return null;
+    return trimmed;
+}
+
+function normalizeTime(value) {
+    if (typeof value !== "string") return null;
+    const trimmed = value.trim();
+    if (!/^\d{2}:\d{2}(:\d{2})?$/.test(trimmed)) return null;
+    const parts = trimmed.split(":");
+    const h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    const s = parts[2] ? parseInt(parts[2], 10) : 0;
+    if (h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59) return null;
+    return trimmed;
+}
+
 function buildStudioInvitationPayload(data, media, studio, slug) {
     const isBoda = data.event?.type === "boda";
     const pName = data.event?.primaryName || "";
@@ -1188,8 +1211,8 @@ function buildStudioInvitationPayload(data, media, studio, slug) {
         slug: slug,
         event_type: isBoda ? "boda" : "xv",
         honoree_name: honoree_name,
-        event_date: data.event?.date || null,
-        event_time: data.event?.time || null,
+        event_date: normalizeISODate(data.event?.date),
+        event_time: normalizeTime(data.event?.time),
         welcome_text: data.event?.welcomeText || data.event?.quote || "",
         father_name: data.family?.father || null,
         mother_name: data.family?.mother || null,
@@ -1246,6 +1269,13 @@ function validateStudioInvitationPayload(payload) {
     if (!payload.honoree_name) errors.push("Falta el nombre del festejado.");
     if (payload.published !== false) errors.push("El payload no puede estar marcado como publicado.");
     if (Array.isArray(payload.gallery_urls) && payload.gallery_urls.length > 10) errors.push("La galería excede 10 elementos.");
+    
+    if (payload.event_date !== null && normalizeISODate(payload.event_date) === null) {
+        errors.push("event_date debe ser una fecha ISO válida (YYYY-MM-DD) o null.");
+    }
+    if (payload.event_time !== null && normalizeTime(payload.event_time) === null) {
+        errors.push("event_time debe ser una hora válida (HH:MM o HH:MM:SS) o null.");
+    }
     
     const mediaKeys = ['main_photo_url', 'music_url', 'studio_logo_url', 'ceremony_map_url', 'reception_map_url', 'gift_table_url'];
     mediaKeys.forEach(k => {
