@@ -356,7 +356,7 @@
                 </div>
                 <div class="form-group">
                     <label for="paqueteInteres">Paquete de interés</label>
-                    <select id="paqueteInteres" required>
+                    <select id="paqueteInteres" required onchange="toggleEventFields()">
                         <option value="" disabled selected>Selecciona un paquete</option>
                         <option value="esencial">Paquete Esencial</option>
                         <option value="premium">Paquete Premium</option>
@@ -659,6 +659,19 @@
                 <h2>9. Personalización visual de tu invitación</h2>
                 
                 <div class="form-group">
+                    <label>Plantilla de invitación</label>
+                    <p id="templateSelectorMsg" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">Selecciona Boda o XV años para ver plantillas recomendadas.</p>
+                    <div id="templateContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
+                        <!-- Cards will be injected here -->
+                    </div>
+                    <input type="hidden" id="templateId">
+                    <input type="hidden" id="templateName">
+                    <input type="hidden" id="templateDemoUrl">
+                    <input type="hidden" id="templateType">
+                    <input type="hidden" id="templateLevel">
+                </div>
+                
+                <div class="form-group">
                     <label for="visualPalette">Paleta de color preferida</label>
                     <select id="visualPalette" onchange="toggleCustomPalette()">
                         <option value="Rosa Champagne">Rosa Champagne</option>
@@ -841,6 +854,7 @@
         </form>
     </div>
 
+    <script src="../assets/js/invitta-templates.js"></script>
     <script>
         function toggleEventFields() {
             const eventType = document.getElementById("eventType").value;
@@ -862,6 +876,112 @@
             document.querySelectorAll('.typo-dyn-main').forEach(el => el.innerText = mainText);
             document.querySelectorAll('.typo-dyn-sub').forEach(el => el.innerText = subText);
             document.querySelectorAll('.typo-dyn-detail').forEach(el => el.innerText = detailText);
+            
+            if (typeof renderTemplates === 'function') renderTemplates();
+        }
+
+        function renderTemplates() {
+            const eventType = document.getElementById("eventType").value;
+            const paquete = document.getElementById("paqueteInteres").value;
+            const container = document.getElementById("templateContainer");
+            const msg = document.getElementById("templateSelectorMsg");
+            
+            if (!container || !msg) return;
+            container.innerHTML = "";
+            
+            let levelMap = { "esencial": "basica", "premium": "premium", "vip": "vip" };
+            let mappedLevel = levelMap[paquete];
+            let mappedType = (eventType === "boda" || eventType === "xv") ? eventType : null;
+            
+            let templates = window.InvittaTemplateCatalog ? window.InvittaTemplateCatalog.getActive() : [];
+            
+            if (mappedType && mappedLevel) {
+                templates = templates.filter(t => t.type === mappedType && t.level === mappedLevel);
+                msg.style.display = "none";
+            } else if (mappedType) {
+                templates = templates.filter(t => t.type === mappedType);
+                msg.style.display = "none";
+            } else {
+                msg.innerText = "Selecciona Boda o XV años para ver plantillas recomendadas.";
+                msg.style.display = "block";
+            }
+            
+            if (templates.length === 0 && mappedType) {
+                msg.innerText = "No hay plantillas disponibles para esta combinación.";
+                msg.style.display = "block";
+            }
+            
+            const currentSelected = document.getElementById("templateId").value;
+            let stillValid = false;
+
+            templates.forEach(t => {
+                if (t.id === currentSelected) stillValid = true;
+                const isSelected = (t.id === currentSelected);
+                
+                const div = document.createElement('div');
+                div.className = `typo-card ${isSelected ? 'selected' : ''}`;
+                div.style.padding = "15px";
+                div.style.border = "1px solid var(--border-color)";
+                div.style.borderRadius = "8px";
+                div.style.cursor = "pointer";
+                div.style.display = "flex";
+                div.style.flexDirection = "column";
+                div.onclick = () => selectTemplate(div, t.id, t.name, t.demoUrl, t.type, t.level);
+                
+                div.innerHTML = `
+                    <div style="font-family: var(--serif); font-weight: 600; margin-bottom: 5px; color: var(--text-main); font-size: 1.2rem;">${t.name}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: 500;">
+                        ${t.type} • ${t.level}
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-main); margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 6px;">
+                        ${t.features.music ? '<span style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px;">Música</span>' : ''}
+                        ${t.features.gallery ? '<span style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px;">Galería</span>' : ''}
+                        ${t.features.rsvp ? '<span style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px;">RSVP</span>' : ''}
+                        ${t.features.qr ? '<span style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px;">QR</span>' : ''}
+                        ${t.features.personalizedPass ? '<span style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px;">Pase Personalizado</span>' : ''}
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: auto;">
+                        <a href="../${t.demoUrl}" target="_blank" onclick="event.stopPropagation()" style="flex: 1; text-align: center; padding: 8px; font-size: 0.85rem; border: 1px solid var(--text-main); color: var(--text-main); background: transparent; border-radius: 4px; text-decoration: none; transition: 0.2s;">Demo</a>
+                        <div class="btn-select-template" style="flex: 1; text-align: center; padding: 8px; font-size: 0.85rem; background: ${isSelected ? 'var(--text-main)' : 'var(--border-color)'}; color: ${isSelected ? '#fff' : 'var(--text-main)'}; border-radius: 4px; font-weight: 500; transition: 0.2s;">${isSelected ? 'Seleccionado' : 'Seleccionar'}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            
+            if (!stillValid && currentSelected !== "") {
+                document.getElementById("templateId").value = "";
+                document.getElementById("templateName").value = "";
+                document.getElementById("templateDemoUrl").value = "";
+                document.getElementById("templateType").value = "";
+                document.getElementById("templateLevel").value = "";
+            }
+        }
+        
+        function selectTemplate(card, id, name, demo, type, level) {
+            const container = document.getElementById("templateContainer");
+            container.querySelectorAll('.typo-card').forEach(c => {
+                c.classList.remove('selected');
+                const btn = c.querySelector('.btn-select-template');
+                if (btn) {
+                    btn.style.background = "var(--border-color)";
+                    btn.style.color = "var(--text-main)";
+                    btn.innerText = "Seleccionar";
+                }
+            });
+            
+            card.classList.add('selected');
+            const selBtn = card.querySelector('.btn-select-template');
+            if (selBtn) {
+                selBtn.style.background = "var(--text-main)";
+                selBtn.style.color = "#fff";
+                selBtn.innerText = "Seleccionado";
+            }
+            
+            document.getElementById("templateId").value = id;
+            document.getElementById("templateName").value = name;
+            document.getElementById("templateDemoUrl").value = demo;
+            document.getElementById("templateType").value = type;
+            document.getElementById("templateLevel").value = level;
         }
 
         function toggleCustomPalette() {
@@ -986,6 +1106,13 @@
                 },
 
                 visual: {
+                    template: {
+                        id: document.getElementById("templateId").value,
+                        name: document.getElementById("templateName").value,
+                        demoUrl: document.getElementById("templateDemoUrl").value,
+                        type: document.getElementById("templateType").value,
+                        level: document.getElementById("templateLevel").value
+                    },
                     palette: document.getElementById("visualPalette").value,
                     customPalette: document.getElementById("customPalette").value,
                     typography: document.getElementById("visualTypography").value,
