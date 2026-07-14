@@ -456,7 +456,7 @@ function renderRoseGoldPremium(inv) {
     if (musicPlayer) musicPlayer.style.display = "none";
 
     // 2. Setear title y limpiar CSS conflictivos
-    document.title = (inv.event_title || inv.title || "Invitación Digital") + " · Invitta";
+    setInvitationDocumentTitle(inv);
     var oldCss = document.querySelector('link[href="css/invitacion.css"]');
     if (oldCss) oldCss.disabled = true;
 
@@ -686,6 +686,8 @@ function renderDefaultTemplate(inv) {
     /* 13. TÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­tulo de pestaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±a */
     document.title = (inv.title || "InvitaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n Digital") + " ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Invitta";
 
+    setInvitationDocumentTitle(inv);
+
     /* 14. Foto principal (hero) */
     renderMainPhoto(inv.main_photo_url);
 
@@ -912,6 +914,18 @@ function renderDefaultTemplate(inv) {
     }
 
     return repaired;
+  }
+
+  function setInvitationDocumentTitle(invitation) {
+    const eventTitle = repairMojibake(invitation.event_title || invitation.title || "");
+    const honoreeName = repairMojibake(invitation.honoree_name || invitation.celebrant_name || "");
+    const heading = resolveHeroHeading(eventTitle, honoreeName, invitation.event_type);
+    const cleanParts = [heading.title, heading.honoree]
+      .map((part) => repairMojibake(part).replace(/\s+/g, " ").trim())
+      .filter(Boolean);
+    const pageTitle = cleanParts.join(" - ") || "Invitaci\u00f3n Digital";
+
+    document.title = pageTitle + " - Invitta";
   }
 
   function cleanMusicTitle(value) {
