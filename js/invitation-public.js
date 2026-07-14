@@ -620,14 +620,13 @@ function renderDefaultTemplate(inv) {
       if (gpList) {
         gpList.innerHTML = "";
         inv.godparents.forEach(function(gp) {
+          var godparentName = typeof gp === "string" ? gp : (gp && gp.name);
+          if (!godparentName) return;
+
           var li = document.createElement("li");
-          var roleDiv = document.createElement("div");
-          roleDiv.className = "inv-godparent-role";
-          roleDiv.textContent = gp.role || "Padrinos";
           var nameDiv = document.createElement("div");
           nameDiv.className = "inv-godparent-name";
-          nameDiv.textContent = gp.name;
-          li.appendChild(roleDiv);
+          nameDiv.textContent = godparentName;
           li.appendChild(nameDiv);
           gpList.appendChild(li);
         });
