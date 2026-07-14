@@ -3532,9 +3532,14 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
   object-position: center;
   filter: blur(24px) brightness(0.56) saturate(0.88);
   opacity: 0.82;
-  transform: translate3d(0, var(--moment-backdrop-shift, 0px), 0) scale(1.14);
+  transform: translate3d(
+    var(--moment-backdrop-x, 0px),
+    var(--moment-backdrop-y, 0px),
+    0
+  ) scale(1.18);
   transform-origin: center;
-  transition: transform 100ms linear;
+  transition: none;
+  backface-visibility: hidden;
   will-change: transform;
   pointer-events: none;
 }
@@ -3562,9 +3567,14 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
   object-fit: contain;
   object-position: center;
   filter: none;
-  transform: translate3d(-50%, calc(-50% + var(--moment-foreground-shift, 0px)), 0) scale(var(--moment-foreground-scale, 1.02));
+  transform: translate3d(
+    calc(-50% + var(--moment-foreground-x, 0px)),
+    calc(-50% + var(--moment-foreground-y, 0px)),
+    0
+  ) scale(var(--moment-foreground-scale, 1.025));
   transform-origin: center;
-  transition: transform 100ms linear;
+  transition: none;
+  backface-visibility: hidden;
   will-change: transform;
 }
 
@@ -3655,10 +3665,27 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
 
 @media (prefers-reduced-motion: reduce) {
   .inv-moment-image {
-    transform: translate3d(-50%, -50%, 0) scale(1.02) !important;
+    transform: translate3d(-50%, -50%, 0) scale(1.025) !important;
   }
 
   .inv-moment-backdrop {
-    transform: scale(1.14) !important;
+    transform: scale(1.18) !important;
   }
+}
+
+/* Stable gallery reveal: motion belongs to the Ken Burns image layers. */
+
+.inv-moment-frame.inv-scroll-fade {
+  transform: none !important;
+  transition: opacity 900ms ease !important;
+}
+
+body.inv-reveal-ready .inv-moment-frame.inv-scroll-fade:not(.inv-scroll-visible) {
+  opacity: 0 !important;
+  transform: none !important;
+}
+
+.inv-moment-frame.inv-scroll-fade.inv-scroll-visible {
+  opacity: 1 !important;
+  transform: none !important;
 }
