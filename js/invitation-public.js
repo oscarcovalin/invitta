@@ -1896,19 +1896,23 @@ function setupSectionIconReveal() {
 }
 function getSafeRevealSections() {
   const selectors = [
-    ".inv-parents-card",
-    ".inv-welcome-block",
-    ".inv-event-card",
-    ".inv-section-card",
-    ".inv-pass-card",
-    ".inv-rsvp-card",
-    ".inv-thanks-card",
-    ".inv-thank-you-card",
-    ".inv-share-section",
-    ".inv-timeline-alt-section"
+    "#inv-countdown-section",
+    "#inv-parents-block",
+    "#inv-welcome-block",
+    ".inv-moments-header",
+    "#inv-ceremony-block",
+    "#inv-reception-block",
+    "#inv-itinerary-section",
+    "#inv-dresscode-block",
+    "#inv-gifts-block",
+    "#inv-pass-section",
+    "#inv-wa-block",
+    "#inv-thank-you-section",
+    "#inv-hashtag-block",
+    ".inv-section-card:not(.inv-moment-frame):not(.inv-gallery-item)"
   ];
 
-  return Array.from(document.querySelectorAll(selectors.join(","))).filter((element) => {
+  return Array.from(new Set(document.querySelectorAll(selectors.join(",")))).filter((element) => {
     if (!element) return false;
     if (element.closest(".inv-hero")) return false;
     if (element.closest(".inv-music-player")) return false;
@@ -1923,6 +1927,7 @@ function setupSafeSectionReveal() {
   if (!sections.length) return;
 
   sections.forEach((section) => {
+    section.removeAttribute("data-safe-reveal-complete");
     section.classList.remove("inv-safe-visible");
     section.classList.add("inv-safe-reveal");
   });
@@ -1938,6 +1943,7 @@ function setupSafeSectionReveal() {
         if (!entry.isIntersecting) return;
 
         entry.target.classList.add("inv-safe-visible");
+        entry.target.setAttribute("data-safe-reveal-complete", "true");
         observer.unobserve(entry.target);
       });
     },

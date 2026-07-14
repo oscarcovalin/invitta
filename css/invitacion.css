@@ -3455,19 +3455,21 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
     filter: none !important;
   }
 }
-/* Safe section reveal: only full cards, no child animations */
+/* Unified section reveal: same soft motion as the thank-you section. */
 .inv-safe-reveal {
-  opacity: 0;
-  transform: translate3d(0, 34px, 0) scale(0.965);
+  opacity: 0 !important;
+  transform: translate3d(0, 28px, 0) scale(0.985) !important;
+  filter: none !important;
   transition:
     opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1) !important;
   will-change: opacity, transform;
 }
 
 .inv-safe-reveal.inv-safe-visible {
-  opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) scale(1) !important;
+  filter: none !important;
   will-change: auto;
 }
 
