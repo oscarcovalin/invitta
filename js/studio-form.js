@@ -21,6 +21,36 @@ let isEditMode = false;
 let originalTemplateId = null;
 let originalEventType = null;
 
+function splitLegacyXvHeading(title, honoreeName, eventType) {
+  let eventTitle = String(title || "").trim();
+  let honoree = String(honoreeName || "").trim();
+
+  if (String(eventType || "").toLowerCase() !== "xv") {
+    return { title: eventTitle, honoree };
+  }
+
+  if (!honoree) {
+    const legacyTitle = eventTitle.match(/^(.*?\b(?:XV|15)\s+A(?:\u00f1|n)os)(?:\s+de)?\s+(.+)$/i);
+
+    if (legacyTitle) {
+      eventTitle = legacyTitle[1].trim();
+      honoree = legacyTitle[2].trim();
+    }
+  } else {
+    const escapedName = honoree.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    eventTitle = eventTitle
+      .replace(new RegExp("\\s+(de|para)\\s+" + escapedName + "\\s*$", "i"), "")
+      .replace(new RegExp("\\s+" + escapedName + "\\s*$", "i"), "")
+      .trim();
+  }
+
+  if (/^xv\s+a(?:\u00f1|n)os$/i.test(eventTitle)) {
+    eventTitle = "Mis XV Años";
+  }
+
+  return { title: eventTitle || "Mis XV Años", honoree };
+}
+
 function updateTemplateOptions(options = { preserveLegacyNull: false, preferredTemplateId: null }) {
   const eventType = document.getElementById("event_type").value;
   const templateSelect = document.getElementById("template_id");
@@ -659,7 +689,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentSlug = data.slug || "";
 
     // Llenar formulario
-    document.getElementById("title").value = data.title || "";
+    const heroFields = splitLegacyXvHeading(data.title, data.honoree_name, data.event_type);
+    document.getElementById("title").value = heroFields.title;
     document.getElementById("slug").value = data.slug || "";
     document.getElementById("event_type").value = data.event_type || "boda";
     
@@ -671,7 +702,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         preserveLegacyNull: originalTemplateId === null,
         preferredTemplateId: originalTemplateId 
     });
-    document.getElementById("honoree_name").value = data.honoree_name || "";
+    document.getElementById("honoree_name").value = heroFields.honoree;
     document.getElementById("event_date").value = data.event_date || "";
     document.getElementById("event_time").value = data.event_time || "";
     document.getElementById("welcome_text").value = data.welcome_text || "";
@@ -987,12 +1018,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
+    const heroFields = splitLegacyXvHeading(
+      document.getElementById("title").value,
+      document.getElementById("honoree_name").value,
+      eventType
+    );
+
     const payload = {
-      title: document.getElementById("title").value,
+      title: heroFields.title,
       slug: slugToUse,
       event_type: eventType,
       template_id: validTemplateId || null,
-      honoree_name: document.getElementById("honoree_name").value,
+      honoree_name: heroFields.honoree,
       event_date: document.getElementById("event_date").value || null,
       event_time: document.getElementById("event_time").value || null,
       welcome_text: document.getElementById("welcome_text").value,

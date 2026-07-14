@@ -555,9 +555,9 @@ function renderDefaultTemplate(inv) {
 
 
     /* 3. Hero: tÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­tulo, honoree, fecha */
-    var heroHonoree = String(inv.honoree_name || "").trim();
-    setText("inv-title", buildHeroEventTitle(inv.title, heroHonoree));
-    setText("inv-honoree", heroHonoree);
+    var heroHeading = resolveHeroHeading(inv.title, inv.honoree_name, inv.event_type);
+    setText("inv-title", heroHeading.title);
+    setText("inv-honoree", heroHeading.honoree);
     fitHeroTitleSingleLine();
     fitHeroHonoreeSingleLine();
 
@@ -2056,6 +2056,12 @@ function fitHeroTitleSingleLine() {
   }
 
   title.style.fontSize = low + "px";
+
+  if (title.scrollWidth > content.clientWidth + 1) {
+    title.style.whiteSpace = "normal";
+    title.style.overflowWrap = "anywhere";
+    title.style.textWrap = "balance";
+  }
 }
 
 function fitHeroHonoreeSingleLine() {
@@ -2084,10 +2090,36 @@ function fitHeroHonoreeSingleLine() {
   }
 
   honoree.style.fontSize = low + "px";
+
+  if (honoree.scrollWidth > content.clientWidth + 1) {
+    honoree.style.whiteSpace = "normal";
+    honoree.style.overflowWrap = "anywhere";
+    honoree.style.textWrap = "balance";
+  }
+}
+
+function resolveHeroHeading(title, honoreeName, eventType) {
+  const rawTitle = String(title || "").trim();
+  let honoree = String(honoreeName || "").trim();
+  let eventTitle = rawTitle;
+
+  if (!honoree && (!eventType || String(eventType).toLowerCase() === "xv")) {
+    const legacyTitle = rawTitle.match(/^(.*?\b(?:XV|15)\s+A(?:\u00f1|n)os)(?:\s+de)?\s+(.+)$/i);
+
+    if (legacyTitle) {
+      eventTitle = legacyTitle[1].trim();
+      honoree = legacyTitle[2].trim();
+    }
+  }
+
+  return {
+    title: buildHeroEventTitle(eventTitle, honoree),
+    honoree
+  };
 }
 
 function buildHeroEventTitle(title, honoreeName) {
-  const fallback = "XV Aniversario";
+  const fallback = "Mis XV Años";
   const rawTitle = String(title || "").trim();
   const honoree = String(honoreeName || "").trim();
 
@@ -2101,7 +2133,7 @@ function buildHeroEventTitle(title, honoreeName) {
     .trim();
 
   if (/^xv\s+a(?:\u00f1|n)os$/i.test(cleanTitle)) {
-    cleanTitle = fallback;
+    cleanTitle = "Mis XV Años";
   }
 
   return cleanTitle || fallback;

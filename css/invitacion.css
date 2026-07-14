@@ -3588,6 +3588,71 @@ body.inv-reveal-ready .inv-scroll-fade:not(.inv-scroll-visible):not(.inv-moment-
   }
 }
 
+/* Responsive split hero heading */
+
+.inv-hero-title {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-inline: auto;
+  text-align: center;
+  overflow: hidden;
+}
+
+.inv-hero-title-main,
+.inv-hero-title-name {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.inv-hero-title-main {
+  font-family: var(--font-title, "Cormorant Garamond", serif);
+  font-size: clamp(2.25rem, 10vw, 4.8rem);
+  line-height: 0.96;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.inv-hero-title-name {
+  font-family: var(--font-script, "Great Vibes", cursive);
+  font-size: clamp(2.45rem, 11vw, 4.6rem);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.inv-hero-title-name:empty {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .inv-hero-content {
+    width: min(calc(100vw - 2rem), 560px);
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .inv-hero-title {
+    gap: 0.35rem;
+  }
+
+  .inv-hero-title-main {
+    font-size: clamp(2rem, 10.5vw, 3.15rem);
+  }
+
+  .inv-hero-title-name {
+    font-size: clamp(2.35rem, 12vw, 3.55rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .inv-moment-image {
     transform: translate3d(-50%, -50%, 0) scale(1.02) !important;
