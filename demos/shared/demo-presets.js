@@ -105,6 +105,10 @@
       palette: "sage-editorial",
       typography: "editorial-modern",
       motion: "editorial-fade",
+      media: {
+        hero: "assets/hero_bg.jpg",
+        gallery: ["assets/hero_bg.jpg", "assets/grid_2.jpg", "assets/grid_4.jpg", "assets/grid_3.jpg"]
+      },
       allowedPalettes: ["sage-editorial", "rose-champagne", "ivory-sage"],
       allowedTypography: ["editorial-modern", "romantic-script", "classic-wedding"]
     },
@@ -115,6 +119,10 @@
       palette: "rose-champagne",
       typography: "romantic-script",
       motion: "soft-rise",
+      media: {
+        hero: "assets/hero_bg.jpg",
+        gallery: ["assets/hero_bg.jpg", "assets/galeria_1.jpg", "assets/grid_2.jpg", "assets/grid_4.jpg", "assets/gallery_2.png"]
+      },
       allowedPalettes: ["rose-champagne", "sage-editorial", "ivory-sage"],
       allowedTypography: ["romantic-script", "editorial-modern", "garden-romance"]
     },
@@ -125,6 +133,10 @@
       palette: "emerald-gold",
       typography: "regal-editorial",
       motion: "cinematic-fade",
+      media: {
+        hero: "assets/hero_bg.jpg",
+        gallery: ["assets/hero_bg.jpg", "assets/galeria_1.jpg", "assets/grid_2.jpg", "assets/grid_3.jpg", "assets/grid_4.jpg"]
+      },
       allowedPalettes: ["emerald-gold", "plum-noir", "rose-champagne"],
       allowedTypography: ["regal-editorial", "noir-luxury", "romantic-script"]
     },
@@ -135,6 +147,10 @@
       palette: "ivory-sage",
       typography: "classic-wedding",
       motion: "editorial-fade",
+      media: {
+        hero: "assets/hero_bg.jpg",
+        gallery: ["assets/hero_bg.jpg", "assets/gallery_1.png", "assets/gallery_2.png", "assets/gallery_3.png"]
+      },
       allowedPalettes: ["ivory-sage", "sage-editorial", "olive-romance"],
       allowedTypography: ["classic-wedding", "editorial-modern", "garden-romance"]
     },
@@ -145,6 +161,10 @@
       palette: "olive-romance",
       typography: "garden-romance",
       motion: "soft-rise",
+      media: {
+        hero: "assets/hero_bg.jpg",
+        gallery: ["assets/hero_bg.jpg", "assets/galeria_1.jpg", "assets/gallery_1.png", "assets/gallery_2.png", "assets/grid_3.jpg"]
+      },
       allowedPalettes: ["olive-romance", "ivory-sage", "plum-noir"],
       allowedTypography: ["garden-romance", "classic-wedding", "noir-luxury"]
     },
@@ -155,6 +175,10 @@
       palette: "plum-noir",
       typography: "noir-luxury",
       motion: "cinematic-fade",
+      media: {
+        hero: "assets/hero_bg.jpg",
+        gallery: ["assets/hero_bg.jpg", "assets/galeria_1.jpg", "assets/gallery_3.png", "assets/gallery_1.png", "assets/grid_3.jpg"]
+      },
       allowedPalettes: ["plum-noir", "emerald-gold", "olive-romance"],
       allowedTypography: ["noir-luxury", "regal-editorial", "garden-romance"]
     }
@@ -247,6 +271,22 @@
     }
   }
 
+  function applyEssentialMedia(templateId, media) {
+    if (!media) return;
+
+    if (templateId === "xv-essential") {
+      const externalImages = Array.from(document.querySelectorAll('img[src*="googleusercontent.com"]'));
+      const sequence = [media.hero].concat(media.gallery || []);
+
+      externalImages.forEach((image, index) => {
+        image.src = sequence[index % sequence.length];
+        image.removeAttribute("srcset");
+        image.loading = index === 0 ? "eager" : "lazy";
+        image.decoding = "async";
+      });
+    }
+  }
+
   function applyConfigTheme(config, templateId, template, palette, fonts) {
     if (!config || typeof config !== "object") return;
 
@@ -256,6 +296,22 @@
     config.theme = config.theme || {};
     config.theme.colors = clone(palette);
     config.theme.typography = clone(fonts);
+    if (template.media) {
+      const gallery = clone(template.media.gallery || []);
+      config.theme.images = {
+        hero: template.media.hero,
+        ogImage: template.media.hero,
+        gallery: gallery
+      };
+      config.images = config.images || {};
+      config.images.hero = template.media.hero;
+      config.images.parallax1 = gallery[0] || template.media.hero;
+      config.images.parallax2 = gallery[1] || gallery[0] || template.media.hero;
+      config.images.parallax3 = gallery[2] || gallery[0] || template.media.hero;
+      gallery.forEach((image, index) => {
+        config.images[`grid${index + 1}`] = image;
+      });
+    }
     config.theme.primaryColor = palette.primary;
     config.theme.secondaryColor = palette.secondary;
     config.theme.bgColor = palette.background;
@@ -353,6 +409,7 @@
 
   applyRootTheme(palette, fonts);
   applyEssentialAliases(templateId, palette, fonts);
+  applyEssentialMedia(templateId, template.media);
   installOpeningMotion(template.motion);
 
   if (typeof WEDDING_CONFIG !== "undefined") {
