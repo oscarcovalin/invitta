@@ -7,9 +7,34 @@
     <meta name="description" content="Invitta: Invitaciones digitales premium para bodas, XV años, bautizos, cumpleaños y más. Diseño personalizado con música, RSVP, pase QR y sobre animado. Entrega en 24 hrs.">
     <meta property="og:title" content="Invitta — Invitaciones Digitales Premium">
     <meta property="og:description" content="Diseño personalizado con música, RSVP automático, pase QR y sobre animado. Entrega en 24 hrs.">
-    <meta property="og:image" content="assets/og-preview.jpg">
-    <meta property="og:url" content="https://invitta.mx">
+    <meta property="og:image" content="https://invitta.vercel.app/assets/og-preview.jpg">
+    <meta property="og:image:alt" content="Invitación digital premium creada por Invitta">
+    <meta property="og:url" content="https://invitta.vercel.app/">
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_MX">
+    <meta property="og:site_name" content="Invitta">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Invitta — Invitaciones Digitales Premium">
+    <meta name="twitter:description" content="Invitaciones digitales personalizadas para bodas, XV años y eventos especiales.">
+    <meta name="twitter:image" content="https://invitta.vercel.app/assets/og-preview.jpg">
+    <meta name="theme-color" content="#FAF7F2">
+    <link rel="canonical" href="https://invitta.vercel.app/">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Invitta",
+      "url": "https://invitta.vercel.app/",
+      "description": "Invitaciones digitales personalizadas para bodas, XV años y eventos especiales.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+52 55 6679 0073",
+        "contactType": "sales",
+        "availableLanguage": "Spanish"
+      }
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -42,6 +67,20 @@
             color: var(--charcoal);
             overflow-x: hidden;
         }
+        .skip-link {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 1000;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: var(--charcoal);
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-160%);
+            transition: transform 0.2s ease;
+        }
+        .skip-link:focus { transform: translateY(0); }
 
         /* UTILITIES */
         .container { max-width: 1160px; margin: 0 auto; padding: 0 28px; }
@@ -1183,8 +1222,24 @@
         .delay-5 { animation-delay: 0.7s; }
 
         /* Scroll reveal */
-        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
-        .reveal.visible { opacity: 1; transform: none; }
+        .reveal { opacity: 1; transform: none; }
+        .reveal-ready .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal-ready .reveal.visible { opacity: 1; transform: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .reveal-ready .reveal,
+            .reveal-ready .reveal.visible {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+            .wa-float { animation: none; }
+        }
 
         /* RESPONSIVE */
         @media (max-width: 920px) {
@@ -1203,16 +1258,55 @@
             .footer-inner { flex-direction: column; gap: 24px; }
         }
         @media (max-width: 600px) {
-            html { font-size: 20px; }
+            html { font-size: 16px; }
+            .container { padding-left: 20px; padding-right: 20px; }
+            header { padding: 12px 0; }
             .nav-links { display: none; }
             .nav-hamburger { display: flex; }
+            .nav-hamburger { width: 44px; height: 44px; align-items: center; justify-content: center; }
             .benefits-grid { grid-template-columns: 1fr; }
             .cta-box { padding: 40px 24px; }
             .wa-float span { display: none; }
-            .wa-float { padding: 16px; border-radius: 50%; }
+            .wa-float {
+                width: 50px;
+                height: 50px;
+                right: 16px;
+                bottom: calc(16px + env(safe-area-inset-bottom));
+                padding: 0;
+                justify-content: center;
+                border-radius: 50%;
+                animation: none;
+                box-shadow: 0 8px 24px rgba(37,211,102,0.28);
+            }
+
+            .hero { padding: 38px 0 52px; }
+            .platform-section,
+            .benefits,
+            .catalog,
+            .testimonios,
+            .pricing,
+            .how,
+            .cta { padding: 64px 0; }
+            .platform-header,
+            .benefits-header,
+            .testimonios-header,
+            .how-header { margin-bottom: 40px; }
+            .catalog-tabs {
+                width: 100%;
+                max-width: 350px;
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 4px;
+            }
+            .catalog-tab {
+                min-width: 0;
+                justify-content: center;
+                padding: 10px 6px;
+                font-size: 0.78rem;
+            }
 
             /* Logo más grande */
-            .logo { font-size: 2.2rem; }
+            .logo { font-size: 1.9rem; }
 
             /* Tipografía legible en móvil */
             body { font-size: 1rem; }
@@ -1240,9 +1334,10 @@
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
 
     <!-- MENÚ MÓVIL -->
-    <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menú principal" aria-modal="true" aria-hidden="true">
         <button class="mobile-close" id="mobileClose" aria-label="Cerrar menú"><i class="fa-solid fa-xmark"></i></button>
         <div class="mobile-menu-inner">
             <a href="#modelos" onclick="closeMobileMenu()">Ver ejemplos</a>
@@ -1258,6 +1353,7 @@
     <header>
         <div class="container nav-wrapper">
             <a href="#" class="logo">Inv<em>itta</em></a>
+            <nav aria-label="Navegación principal">
             <ul class="nav-links">
                 <li><a href="#modelos">Ver Ejemplos</a></li>
                 <li><a href="administracion/formulario-cliente.html">Solicitar Propuesta</a></li>
@@ -1267,11 +1363,14 @@
                     </a>
                 </li>
             </ul>
-            <button class="nav-hamburger" id="navHamburger" aria-label="Abrir menú">
+            </nav>
+            <button class="nav-hamburger" id="navHamburger" aria-label="Abrir menú" aria-controls="mobileMenu" aria-expanded="false">
                 <span></span><span></span><span></span>
             </button>
         </div>
     </header>
+
+    <main id="main-content">
 
     <!-- HERO -->
     <section class="hero">
@@ -1927,6 +2026,8 @@
         </div>
     </section>
 
+    </main>
+
     <!-- FOOTER -->
     <footer>
         <div class="container">
@@ -1967,11 +2068,17 @@
         function openMobileMenu() {
             mobileMenu.classList.add('open');
             document.body.classList.add('mobile-menu-open');
+            mobileMenu.setAttribute('aria-hidden', 'false');
+            hamburger.setAttribute('aria-expanded', 'true');
+            setTimeout(() => mobileClose.focus(), 0);
         }
 
         function closeMobileMenu() {
             mobileMenu.classList.remove('open');
             document.body.classList.remove('mobile-menu-open');
+            mobileMenu.setAttribute('aria-hidden', 'true');
+            hamburger.setAttribute('aria-expanded', 'false');
+            hamburger.focus();
         }
 
         hamburger.addEventListener('click', openMobileMenu);
@@ -1982,15 +2089,21 @@
 
         // Scroll reveal
         const revealEls = document.querySelectorAll('.reveal');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, i) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => entry.target.classList.add('visible'), i * 80);
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.12 });
-        revealEls.forEach(el => observer.observe(el));
+        document.documentElement.classList.add('reveal-ready');
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, i) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.08, rootMargin: '0px 0px 80px' });
+            revealEls.forEach(el => observer.observe(el));
+        } else {
+            revealEls.forEach(el => el.classList.add('visible'));
+        }
+        setTimeout(() => revealEls.forEach(el => el.classList.add('visible')), 2500);
 
         // Header shadow on scroll
         const header = document.querySelector('header');
