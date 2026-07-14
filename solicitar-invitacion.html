@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicita tu invitación digital | Invitta</title>
+  <meta name="description" content="Cuéntanos lo esencial de tu evento y recibe atención personalizada para crear tu invitación digital Invitta.">
+  <meta property="og:title" content="Solicita tu invitación digital | Invitta">
+  <meta property="og:description" content="Cuéntanos lo esencial de tu evento y continúa con atención personalizada por WhatsApp.">
+  <meta property="og:image" content="https://invitta.vercel.app/assets/og-preview.jpg">
+  <meta property="og:url" content="https://invitta.vercel.app/solicitar-invitacion.html">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#FAF7F2">
+  <link rel="canonical" href="https://invitta.vercel.app/solicitar-invitacion.html">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #faf7f2;
+      --paper: #fffdf9;
+      --sand: #e8ddd0;
+      --rose: #c9877d;
+      --rose-deep: #a86860;
+      --rose-pale: #f5e6e3;
+      --sage: #7f9272;
+      --charcoal: #2e2e2e;
+      --muted: #746b65;
+      --serif: "Cormorant Garamond", Georgia, serif;
+      --sans: "Jost", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--cream);
+      color: var(--charcoal);
+      font-family: var(--sans);
+    }
+    a { color: inherit; }
+    .request-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--sand);
+      background: rgba(250, 247, 242, 0.94);
+      backdrop-filter: blur(14px);
+    }
+    .request-nav {
+      width: min(1120px, calc(100% - 40px));
+      min-height: 68px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .request-logo {
+      font: 600 1.75rem var(--serif);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .request-logo em { color: var(--rose); font-weight: 500; }
+    .back-link {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .back-link:hover { color: var(--rose-deep); }
+    .request-shell {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 64px 0 80px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.85fr) minmax(520px, 1.15fr);
+      gap: 72px;
+      align-items: start;
+    }
+    .request-intro { position: sticky; top: 116px; }
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--rose-deep);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 560px;
+      margin: 0;
+      font: 500 clamp(2.7rem, 5vw, 4.8rem)/0.95 var(--serif);
+      letter-spacing: 0;
+    }
+    h1 em { color: var(--rose); font-weight: 400; }
+    .intro-copy {
+      max-width: 520px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+    .trust-list {
+      margin: 28px 0;
+      padding: 0;
+      display: grid;
+      gap: 12px;
+      list-style: none;
+      color: #514943;
+      font-size: 0.88rem;
+    }
+    .trust-list li { display: flex; align-items: center; gap: 10px; }
+    .trust-list li::before {
+      content: "✓";
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(127, 146, 114, 0.14);
+      color: var(--sage);
+      font-weight: 600;
+    }
+    .design-preview {
+      position: relative;
+      width: min(100%, 390px);
+      height: 240px;
+      margin: 32px 0 0;
+      overflow: hidden;
+      border: 1px solid var(--sand);
+      border-radius: 8px;
+      background: #eee6dc;
+      box-shadow: 0 18px 45px rgba(67, 49, 41, 0.1);
+    }
+    .design-preview img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center top;
+    }
+    .design-preview figcaption {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 253, 249, 0.92);
+      color: #514943;
+      font-size: 0.72rem;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .request-card {
+      padding: 38px;
+      border: 1px solid var(--sand);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 22px 60px rgba(67, 49, 41, 0.09);
+    }
+    .request-card h2 {
+      margin: 0;
+      font: 500 clamp(2rem, 4vw, 2.8rem)/1 var(--serif);
+    }
+    .form-lead {
+      margin: 12px 0 28px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .field { min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #514943;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid #d9cec2;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--charcoal);
+      font: 400 0.92rem var(--sans);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    input, select { padding: 0 14px; }
+    textarea { min-height: 104px; padding: 13px 14px; resize: vertical; line-height: 1.55; }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--rose);
+      box-shadow: 0 0 0 3px rgba(201, 135, 125, 0.14);
+    }
+    .field-help { display: block; margin-top: 6px; color: #8b817a; font-size: 0.72rem; }
+    .submit-row { margin-top: 28px; }
+    .submit-button {
+      width: 100%;
+      min-height: 52px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--charcoal);
+      color: #fff;
+      font: 600 0.9rem var(--sans);
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .submit-button:hover { background: #181818; transform: translateY(-1px); }
+    .submit-button:focus-visible { outline: 3px solid rgba(201, 135, 125, 0.45); outline-offset: 3px; }
+    .form-note {
+      margin: 12px 0 0;
+      color: #8b817a;
+      text-align: center;
+      font-size: 0.74rem;
+      line-height: 1.5;
+    }
+    .form-status {
+      min-height: 22px;
+      margin-top: 12px;
+      color: var(--sage);
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .request-footer {
+      padding: 24px 20px 36px;
+      border-top: 1px solid var(--sand);
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.78rem;
+    }
+    .request-footer a { color: var(--rose-deep); font-weight: 600; }
+    @media (max-width: 860px) {
+      .request-shell { grid-template-columns: 1fr; gap: 40px; padding-top: 42px; }
+      .request-intro { position: static; }
+      .design-preview { width: 100%; max-width: none; height: 220px; }
+    }
+    @media (max-width: 600px) {
+      .request-nav,
+      .request-shell { width: min(100% - 32px, 560px); }
+      .request-shell { padding: 34px 0 56px; gap: 32px; }
+      h1 { font-size: clamp(2.65rem, 14vw, 3.8rem); }
+      .intro-copy { margin-top: 18px; }
+      .trust-list { margin: 22px 0; }
+      .design-preview { height: 190px; margin-top: 24px; }
+      .request-card { padding: 28px 20px; }
+      .form-grid { grid-template-columns: 1fr; gap: 18px; }
+      .field.full { grid-column: auto; }
+      .back-link span { display: none; }
+      .back-link::after { content: "Volver"; }
+    }
+  </style>
+</head>
+<body>
+  <header class="request-header">
+    <nav class="request-nav" aria-label="Navegación de solicitud">
+      <a class="request-logo" href="index.html">Inv<em>itta</em></a>
+      <a class="back-link" href="index.html#modelos"><span>Volver a los diseños</span></a>
+    </nav>
+  </header>
+
+  <main class="request-shell">
+    <section class="request-intro" aria-labelledby="request-title">
+      <p class="eyebrow">Solicitud personalizada</p>
+      <h1 id="request-title">Empecemos por <em>lo esencial</em></h1>
+      <p class="intro-copy">Cuéntanos qué estás celebrando. No necesitas tener todos los detalles resueltos; una persona de Invitta continuará contigo por WhatsApp.</p>
+      <ul class="trust-list">
+        <li>Atención personalizada</li>
+        <li>Respuesta directa por WhatsApp</li>
+        <li>Tu borrador se conserva en este dispositivo</li>
+      </ul>
+      <figure class="design-preview">
+        <img id="designPreviewImage" src="assets/catalog/xv-elegance.jpg" alt="Vista previa del diseño seleccionado" width="390" height="844">
+        <figcaption id="designPreviewCaption">Diseño Élégance</figcaption>
+      </figure>
+    </section>
+
+    <section class="request-card" aria-labelledby="form-title">
+      <h2 id="form-title">Cuéntanos sobre tu evento</h2>
+      <p class="form-lead">Completarlo toma aproximadamente dos minutos. Los campos marcados con * son indispensables.</p>
+
+      <form id="requestForm">
+        <div class="form-grid">
+          <div class="field full">
+            <label for="clientName">Tu nombre *</label>
+            <input id="clientName" name="clientName" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="clientPhone">WhatsApp de contacto *</label>
+            <input id="clientPhone" name="clientPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="55 1234 5678" required>
+          </div>
+          <div class="field">
+            <label for="eventType">Tipo de evento *</label>
+            <select id="eventType" name="eventType" required>
+              <option value="">Selecciona</option>
+              <option value="XV años">XV años</option>
+              <option value="Boda">Boda</option>
+              <option value="Bautizo">Bautizo</option>
+              <option value="Cumpleaños">Cumpleaños</option>
+              <option value="Otro evento">Otro evento</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="design">Diseño que te gustó</label>
+            <select id="design" name="design">
+              <option value="Aún no lo decido">Aún no lo decido</option>
+              <option value="Élégance">Élégance</option>
+              <option value="Rose Gold">Rose Gold</option>
+              <option value="Champagne Rose">Champagne Rose</option>
+              <option value="Midnight Gold">Midnight Gold</option>
+              <option value="Classic Wedding">Classic Wedding</option>
+              <option value="Golden Romance">Golden Romance</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="eventDate">Fecha del evento</label>
+            <input id="eventDate" name="eventDate" type="date">
+          </div>
+          <div class="field">
+            <label for="eventCity">Ciudad</label>
+            <input id="eventCity" name="eventCity" type="text" autocomplete="address-level2" placeholder="Ej. Ciudad de México">
+          </div>
+          <div class="field full">
+            <label for="packageName">Paquete de interés</label>
+            <select id="packageName" name="packageName">
+              <option value="Quiero asesoría para elegir">Quiero asesoría para elegir</option>
+              <option value="Esencial - $399 MXN">Esencial — $399 MXN</option>
+              <option value="Premium - $699 MXN">Premium — $699 MXN</option>
+              <option value="VIP Experience - $999 MXN">VIP Experience — $999 MXN</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="eventNotes">¿Qué te gustaría personalizar?</label>
+            <textarea id="eventNotes" name="eventNotes" placeholder="Colores, estilo, canción o cualquier idea que ya tengas."></textarea>
+            <span class="field-help">Puedes dejar este campo vacío y definirlo después.</span>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <button class="submit-button" type="submit">Continuar por WhatsApp</button>
+          <p class="form-note">Al continuar se abrirá WhatsApp con estos datos listos para enviar. Invitta no los publica.</p>
+          <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="request-footer">
+    ¿Ya contrataste tu invitación? <a href="administracion/formulario-cliente.html">Completa aquí todos los datos del evento</a>.
+  </footer>
+
+  <script>
+    const STORAGE_KEY = 'invitta-request-draft-v1';
+    const SALES_PHONE = '525566790073';
+    const form = document.getElementById('requestForm');
+    const status = document.getElementById('formStatus');
+    const designSelect = document.getElementById('design');
+    const previewImage = document.getElementById('designPreviewImage');
+    const previewCaption = document.getElementById('designPreviewCaption');
+    const designImages = {
+      'Élégance': 'assets/catalog/xv-elegance.jpg',
+      'Rose Gold': 'assets/catalog/xv-rose-gold.jpg',
+      'Champagne Rose': 'assets/catalog/xv-champagne-rose.jpg',
+      'Midnight Gold': 'assets/catalog/boda-midnight-gold.jpg',
+      'Classic Wedding': 'assets/catalog/boda-classic-wedding.jpg',
+      'Golden Romance': 'assets/catalog/boda-golden-romance.jpg'
+    };
+
+    function readDraft() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+      catch (_) { return {}; }
+    }
+
+    function saveDraft() {
+      const values = Object.fromEntries(new FormData(form).entries());
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+      status.textContent = 'Borrador guardado en este dispositivo.';
+      clearTimeout(saveDraft.statusTimer);
+      saveDraft.statusTimer = setTimeout(() => { status.textContent = ''; }, 1800);
+    }
+
+    function setSelectValue(select, value) {
+      if ([...select.options].some(option => option.value === value)) select.value = value;
+    }
+
+    function updatePreview() {
+      const selected = designSelect.value;
+      const image = designImages[selected] || designImages['Élégance'];
+      previewImage.src = image;
+      previewImage.style.objectPosition = ['Rose Gold', 'Champagne Rose', 'Midnight Gold', 'Golden Romance'].includes(selected)
+        ? 'center 47%'
+        : 'center top';
+      previewCaption.textContent = selected === 'Aún no lo decido' ? 'Explora nuestros diseños' : `Diseño ${selected}`;
+    }
+
+    const draft = readDraft();
+    for (const [name, value] of Object.entries(draft)) {
+      const field = form.elements.namedItem(name);
+      if (field && typeof value === 'string') field.value = value;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const designAliases = {
+      elegance: 'Élégance',
+      'rose-gold': 'Rose Gold',
+      'champagne-rose': 'Champagne Rose',
+      'midnight-gold': 'Midnight Gold',
+      'classic-wedding': 'Classic Wedding',
+      'golden-romance': 'Golden Romance'
+    };
+    if (params.get('diseno')) setSelectValue(designSelect, designAliases[params.get('diseno')] || params.get('diseno'));
+    if (params.get('tipo') === 'xv') setSelectValue(document.getElementById('eventType'), 'XV años');
+    if (params.get('tipo') === 'boda') setSelectValue(document.getElementById('eventType'), 'Boda');
+    if (params.get('paquete')) setSelectValue(document.getElementById('packageName'), params.get('paquete'));
+    updatePreview();
+
+    form.addEventListener('input', saveDraft);
+    form.addEventListener('change', event => {
+      saveDraft();
+      if (event.target === designSelect) updatePreview();
+    });
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const data = Object.fromEntries(new FormData(form).entries());
+      const lines = [
+        'Hola Invitta, quiero solicitar una invitación digital.',
+        '',
+        `Nombre: ${data.clientName}`,
+        `WhatsApp: ${data.clientPhone}`,
+        `Evento: ${data.eventType}`,
+        `Diseño: ${data.design}`,
+        `Fecha: ${data.eventDate || 'Por definir'}`,
+        `Ciudad: ${data.eventCity || 'Por definir'}`,
+        `Paquete: ${data.packageName}`,
+        `Detalles: ${data.eventNotes || 'Los definiremos después'}`
+      ];
+      saveDraft();
+      status.textContent = 'Abriendo WhatsApp…';
+      window.open(`https://wa.me/${SALES_PHONE}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener');
+    });
+  </script>
+</body>
+</html>

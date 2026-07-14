@@ -746,9 +746,35 @@
             position: relative;
             height: 240px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; padding: 24px;
+            text-align: center;
             overflow: hidden;
+            background: #e9e2d9;
         }
+
+        .catalog-card-preview-link {
+            position: absolute;
+            inset: 0;
+            display: block;
+        }
+        .catalog-card-preview-image {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center top;
+            transform: scale(1.01);
+            transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .catalog-card-preview-image.focus-center { object-position: center 47%; }
+        .catalog-card-preview-link::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(20,15,10,0.12), transparent 42%, rgba(20,15,10,0.14));
+            pointer-events: none;
+        }
+        .catalog-card:hover .catalog-card-preview-image { transform: scale(1.055); }
+        .catalog-card-meta { pointer-events: none; }
 
         .catalog-preview-screen {
             background: rgba(255, 255, 255, 0.65);
@@ -852,6 +878,8 @@
             margin-top: 20px;
             padding-top: 18px;
             border-top: 1px solid var(--sand);
+            display: grid;
+            gap: 10px;
         }
         .catalog-demo-btns { display: flex; gap: 10px; }
         .demo-btn {
@@ -1341,7 +1369,7 @@
         <button class="mobile-close" id="mobileClose" aria-label="Cerrar menú"><i class="fa-solid fa-xmark"></i></button>
         <div class="mobile-menu-inner">
             <a href="#modelos" onclick="closeMobileMenu()">Ver ejemplos</a>
-            <a href="administracion/formulario-cliente.html" onclick="closeMobileMenu()">Solicitar propuesta</a>
+            <a href="solicitar-invitacion.html" onclick="closeMobileMenu()">Solicitar invitación</a>
             <a href="administracion/dashboard.html" class="mobile-access">Acceder</a>
             <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20quiero%20solicitar%20una%20invitaci%C3%B3n" target="_blank" class="btn-primary mobile-wa" onclick="closeMobileMenu()">
                 <i class="fa-brands fa-whatsapp"></i> Hablar por WhatsApp
@@ -1356,7 +1384,7 @@
             <nav aria-label="Navegación principal">
             <ul class="nav-links">
                 <li><a href="#modelos">Ver Ejemplos</a></li>
-                <li><a href="administracion/formulario-cliente.html">Solicitar Propuesta</a></li>
+                <li><a href="solicitar-invitacion.html">Solicitar Invitación</a></li>
                 <li>
                     <a href="administracion/dashboard.html" class="btn-nav" style="background: var(--charcoal); color: #fff; border: none; padding: 10px 24px; border-radius: 8px;">
                         Acceder
@@ -1388,8 +1416,8 @@
                         Invitaciones digitales premium, confirmaciones automáticas, pases QR y gestión inteligente de invitados.
                     </p>
                     <div class="hero-buttons fade-up delay-4">
-                        <a href="administracion/formulario-cliente.html" class="btn-primary">
-                            <i class="fa-solid fa-file-pen"></i> Solicitar propuesta
+                        <a href="solicitar-invitacion.html" class="btn-primary">
+                            <i class="fa-solid fa-file-pen"></i> Solicitar invitación
                         </a>
                         <a href="#modelos" class="btn-outline">
                             <i class="fa-regular fa-eye"></i> Ver ejemplos
@@ -1606,15 +1634,13 @@
                 <!-- XV AÑOS 11 — Élégance Esencial -->
                 <div class="catalog-card reveal" data-cat="xv">
                     <div class="catalog-card-accent esencial"></div>
-                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#faf9f7 0%,#dadad8 50%,#7a8471 100%);">
+                    <div class="catalog-card-preview">
+                        <a href="demos/xv-elegance/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Élégance">
+                            <img src="assets/catalog/xv-elegance.jpg" alt="Portada real de la invitación Élégance para XV años" class="catalog-card-preview-image" width="390" height="844" loading="lazy">
+                        </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill"><i class="fa-solid fa-crown"></i> XV Años</span>
                             <span class="catalog-level-badge esencial"><i class="fa-solid fa-leaf"></i> Esencial</span>
-                        </div>
-                        <div class="catalog-preview-screen">
-                            <div class="catalog-preview-ornament">✦ Mis XV Años ✦</div>
-                            <div class="catalog-preview-title">Élégance</div>
-                            <div class="catalog-preview-subtitle">Quiet luxury, salvia y oro</div>
                         </div>
                     </div>
                     <div class="catalog-card-body">
@@ -1635,22 +1661,21 @@
                         </div>
                         
                         <div class="catalog-card-actions">
-                            <a href="demos/xv-elegance/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                            <a href="solicitar-invitacion.html?diseno=elegance&amp;tipo=xv" class="demo-btn demo-btn-rose">Elegir este diseño</a>
+                            <a href="demos/xv-elegance/index.html" target="_blank" class="demo-btn demo-btn-outline"><i class="fa-regular fa-eye"></i> Ver demo</a>
                         </div>
                     </div>
                 </div>
                 <!-- XV AÑOS 12 — Rose Gold Premium -->
                 <div class="catalog-card reveal" data-cat="xv">
                     <div class="catalog-card-accent premium"></div>
-                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#fdfaf8 0%,#f0e2de 50%,#ab8478 100%);">
+                    <div class="catalog-card-preview">
+                        <a href="demos/xv-premium-2/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Rose Gold">
+                            <img src="assets/catalog/xv-rose-gold.jpg" alt="Portada real de la invitación Rose Gold para XV años" class="catalog-card-preview-image focus-center" width="390" height="844" loading="lazy">
+                        </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill"><i class="fa-solid fa-crown"></i> XV Años</span>
                             <span class="catalog-level-badge premium"><i class="fa-solid fa-gem"></i> Premium</span>
-                        </div>
-                        <div class="catalog-preview-screen">
-                            <div class="catalog-preview-ornament">✦ Mis XV Años ✦</div>
-                            <div class="catalog-preview-title">Rose Gold</div>
-                            <div class="catalog-preview-subtitle">Elegancia clásica y cálida</div>
                         </div>
                     </div>
                     <div class="catalog-card-body">
@@ -1671,22 +1696,21 @@
                         </div>
                         
                         <div class="catalog-card-actions">
-                            <a href="demos/xv-premium-2/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                            <a href="solicitar-invitacion.html?diseno=rose-gold&amp;tipo=xv" class="demo-btn demo-btn-rose">Elegir este diseño</a>
+                            <a href="demos/xv-premium-2/index.html" target="_blank" class="demo-btn demo-btn-outline"><i class="fa-regular fa-eye"></i> Ver demo</a>
                         </div>
                     </div>
                 </div>
                 <!-- XV AÑOS 13 — Champagne Rose VIP -->
                 <div class="catalog-card card-vip reveal" data-cat="xv">
                     <div class="catalog-card-accent vip"></div>
-                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#fdfaf8 0%,#f0e2de 50%,#ab8478 100%);">
+                    <div class="catalog-card-preview">
+                        <a href="demos/xv-vip-3/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Champagne Rose">
+                            <img src="assets/catalog/xv-champagne-rose.jpg" alt="Portada real de la invitación Champagne Rose para XV años" class="catalog-card-preview-image focus-center" width="390" height="844" loading="lazy">
+                        </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill" style="background:rgba(255,255,255,0.12);color:#fff8ef;"><i class="fa-solid fa-crown"></i> XV Años</span>
                             <span class="catalog-level-badge vip"><i class="fa-solid fa-crown"></i> VIP</span>
-                        </div>
-                        <div class="catalog-preview-screen" style="background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.15);">
-                            <div class="catalog-preview-ornament" style="color:rgba(212,175,55,0.6);">✦ Experiencia VIP ✦</div>
-                            <div class="catalog-preview-title" style="color:#fff8ef;">Champagne Rose</div>
-                            <div class="catalog-preview-subtitle" style="color:#fdfaf8;">La máxima exclusividad</div>
                         </div>
                     </div>
                     <div class="catalog-card-body">
@@ -1707,22 +1731,21 @@
                         </div>
                         
                         <div class="catalog-card-actions">
-                            <a href="demos/xv-vip-3/index.html" target="_blank" class="demo-btn demo-btn-vip"><i class="fa-solid fa-crown"></i> Ver demo VIP</a>
+                            <a href="solicitar-invitacion.html?diseno=champagne-rose&amp;tipo=xv" class="demo-btn demo-btn-vip">Elegir este diseño</a>
+                            <a href="demos/xv-vip-3/index.html" target="_blank" class="demo-btn demo-btn-outline"><i class="fa-regular fa-eye"></i> Ver demo</a>
                         </div>
                     </div>
                 </div>
                 <!-- BODA 1 — Midnight Gold Premium -->
                 <div class="catalog-card reveal" data-cat="boda">
                     <div class="catalog-card-accent premium"></div>
-                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#10121e 0%,#181b2c 50%,#eac88b 100%);">
+                    <div class="catalog-card-preview">
+                        <a href="demos/boda-premium-1/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Midnight Gold">
+                            <img src="assets/catalog/boda-midnight-gold.jpg" alt="Portada real de la invitación Midnight Gold para boda" class="catalog-card-preview-image focus-center" width="390" height="844" loading="lazy">
+                        </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
                             <span class="catalog-level-badge premium"><i class="fa-solid fa-gem"></i> Premium</span>
-                        </div>
-                        <div class="catalog-preview-screen" style="border-color:rgba(255,255,255,0.15);">
-                            <div class="catalog-preview-ornament" style="color:rgba(234, 200, 139, 0.8);">✦ Invitación Digital ✦</div>
-                            <div class="catalog-preview-title" style="color:#fbfaf7;">Midnight Gold</div>
-                            <div class="catalog-preview-subtitle" style="color:#d5ced0;">Elegancia azul real y oro</div>
                         </div>
                     </div>
                     <div class="catalog-card-body">
@@ -1743,22 +1766,21 @@
                         </div>
                         
                         <div class="catalog-card-actions">
-                            <a href="demos/boda-premium-1/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                            <a href="solicitar-invitacion.html?diseno=midnight-gold&amp;tipo=boda" class="demo-btn demo-btn-rose">Elegir este diseño</a>
+                            <a href="demos/boda-premium-1/index.html" target="_blank" class="demo-btn demo-btn-outline"><i class="fa-regular fa-eye"></i> Ver demo</a>
                         </div>
                     </div>
                 </div>
                 <!-- BODA 2 — Classic Wedding (Esencial) -->
                 <div class="catalog-card reveal" data-cat="boda">
                     <div class="catalog-card-accent esencial"></div>
-                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#faf8f5 0%,#f0eade 50%,#d4c4a0 100%);">
+                    <div class="catalog-card-preview">
+                        <a href="demos/boda-classic-basic/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Classic Wedding">
+                            <img src="assets/catalog/boda-classic-wedding.jpg" alt="Portada real de la invitación Classic Wedding para boda" class="catalog-card-preview-image" width="390" height="844" loading="lazy">
+                        </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
                             <span class="catalog-level-badge esencial"><i class="fa-solid fa-leaf"></i> Básica</span>
-                        </div>
-                        <div class="catalog-preview-screen">
-                            <div class="catalog-preview-ornament">✦ Invitación Digital ✦</div>
-                            <div class="catalog-preview-title">Classic Wedding</div>
-                            <div class="catalog-preview-subtitle">Elegante y atemporal</div>
                         </div>
                     </div>
                     <div class="catalog-card-body">
@@ -1777,22 +1799,21 @@
                             <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
                         </div>
                         <div class="catalog-card-actions">
-                            <a href="demos/boda-classic-basic/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                            <a href="solicitar-invitacion.html?diseno=classic-wedding&amp;tipo=boda" class="demo-btn demo-btn-rose">Elegir este diseño</a>
+                            <a href="demos/boda-classic-basic/index.html" target="_blank" class="demo-btn demo-btn-outline"><i class="fa-regular fa-eye"></i> Ver demo</a>
                         </div>
                     </div>
                 </div>
                 <!-- BODA 3 — Golden Romance (Premium) -->
                 <div class="catalog-card reveal" data-cat="boda">
                     <div class="catalog-card-accent premium"></div>
-                    <div class="catalog-card-preview" style="background:linear-gradient(145deg,#1a1514 0%,#2a2019 60%,#dfba6b 100%);">
+                    <div class="catalog-card-preview">
+                        <a href="demos/boda-golden-romance-premium/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Golden Romance">
+                            <img src="assets/catalog/boda-golden-romance.jpg" alt="Portada real de la invitación Golden Romance para boda" class="catalog-card-preview-image focus-center" width="390" height="844" loading="lazy">
+                        </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
                             <span class="catalog-level-badge premium"><i class="fa-solid fa-gem"></i> Premium</span>
-                        </div>
-                        <div class="catalog-preview-screen" style="border-color:rgba(255,255,255,0.15);">
-                            <div class="catalog-preview-ornament" style="color:rgba(223,186,107,0.85);">✦ Invitación de Gala ✦</div>
-                            <div class="catalog-preview-title" style="color:#fbfaf7;">Golden Romance</div>
-                            <div class="catalog-preview-subtitle" style="color:#d5ced0;">Romántico editorial</div>
                         </div>
                     </div>
                     <div class="catalog-card-body">
@@ -1811,7 +1832,8 @@
                             <span class="personalizable-text">Colores, fotos y tipografía personalizables</span>
                         </div>
                         <div class="catalog-card-actions">
-                            <a href="demos/boda-golden-romance-premium/index.html" target="_blank" class="demo-btn demo-btn-rose"><i class="fa-regular fa-eye"></i> Ver demo</a>
+                            <a href="solicitar-invitacion.html?diseno=golden-romance&amp;tipo=boda" class="demo-btn demo-btn-rose">Elegir este diseño</a>
+                            <a href="demos/boda-golden-romance-premium/index.html" target="_blank" class="demo-btn demo-btn-outline"><i class="fa-regular fa-eye"></i> Ver demo</a>
                         </div>
                     </div>
                 </div>
@@ -1885,8 +1907,8 @@
                     <p class="section-lead">Tres niveles de personalización con precios claros. Todos incluyen atención personalizada y entrega en 24 horas.</p>
                 </div>
                 <div class="pricing-intro-right">
-                    <a href="administracion/formulario-cliente.html" class="btn-outline" style="white-space:nowrap;">
-                        <i class="fa-solid fa-file-pen"></i> Llenar cuestionario
+                    <a href="solicitar-invitacion.html" class="btn-outline" style="white-space:nowrap;">
+                        <i class="fa-solid fa-file-pen"></i> Solicitar invitación
                     </a>
                 </div>
             </div>
@@ -2018,8 +2040,8 @@
                     <a href="https://wa.me/525566790073?text=Hola%20Invitta,%20me%20interesa%20pedir%20informes%20sobre%20las%20invitaciones%20digitales" target="_blank" class="btn-primary">
                         <i class="fa-brands fa-whatsapp"></i> Hablar por WhatsApp
                     </a>
-                    <a href="administracion/formulario-cliente.html" class="btn-outline">
-                        <i class="fa-solid fa-file-pen"></i> Llenar cuestionario
+                    <a href="solicitar-invitacion.html" class="btn-outline">
+                        <i class="fa-solid fa-file-pen"></i> Solicitar invitación
                     </a>
                 </div>
             </div>
