@@ -321,11 +321,11 @@
             <select id="design" name="design">
               <option value="Aún no lo decido">Aún no lo decido</option>
               <option value="Élégance">Élégance</option>
-              <option value="Rose Gold">Rose Gold</option>
-              <option value="Champagne Rose">Champagne Rose</option>
-              <option value="Midnight Gold">Midnight Gold</option>
+              <option value="Rose Champagne">Rose Champagne</option>
+              <option value="Emerald Gala">Emerald Gala</option>
               <option value="Classic Wedding">Classic Wedding</option>
-              <option value="Golden Romance">Golden Romance</option>
+              <option value="Olive Romance">Olive Romance</option>
+              <option value="Plum Noir">Plum Noir</option>
             </select>
           </div>
           <div class="field">
@@ -375,11 +375,11 @@
     const previewCaption = document.getElementById('designPreviewCaption');
     const designImages = {
       'Élégance': 'assets/catalog/xv-elegance.jpg',
-      'Rose Gold': 'assets/catalog/xv-rose-gold.jpg',
-      'Champagne Rose': 'assets/catalog/xv-champagne-rose.jpg',
-      'Midnight Gold': 'assets/catalog/boda-midnight-gold.jpg',
+      'Rose Champagne': 'assets/catalog/xv-rose-gold.jpg',
+      'Emerald Gala': 'assets/catalog/xv-champagne-rose.jpg',
       'Classic Wedding': 'assets/catalog/boda-classic-wedding.jpg',
-      'Golden Romance': 'assets/catalog/boda-golden-romance.jpg'
+      'Olive Romance': 'assets/catalog/boda-midnight-gold.jpg',
+      'Plum Noir': 'assets/catalog/boda-golden-romance.jpg'
     };
 
     function readDraft() {
@@ -403,7 +403,7 @@
       const selected = designSelect.value;
       const image = designImages[selected] || designImages['Élégance'];
       previewImage.src = image;
-      previewImage.style.objectPosition = ['Rose Gold', 'Champagne Rose', 'Midnight Gold', 'Golden Romance'].includes(selected)
+      previewImage.style.objectPosition = ['Rose Champagne', 'Emerald Gala', 'Olive Romance', 'Plum Noir'].includes(selected)
         ? 'center 47%'
         : 'center top';
       previewCaption.textContent = selected === 'Aún no lo decido' ? 'Explora nuestros diseños' : `Diseño ${selected}`;
@@ -418,11 +418,15 @@
     const params = new URLSearchParams(window.location.search);
     const designAliases = {
       elegance: 'Élégance',
-      'rose-gold': 'Rose Gold',
-      'champagne-rose': 'Champagne Rose',
-      'midnight-gold': 'Midnight Gold',
+      'rose-gold': 'Rose Champagne',
+      'rose-champagne': 'Rose Champagne',
+      'champagne-rose': 'Emerald Gala',
+      'emerald-gala': 'Emerald Gala',
+      'midnight-gold': 'Olive Romance',
       'classic-wedding': 'Classic Wedding',
-      'golden-romance': 'Golden Romance'
+      'golden-romance': 'Plum Noir',
+      'olive-romance': 'Olive Romance',
+      'plum-noir': 'Plum Noir'
     };
     if (params.get('diseno')) setSelectValue(designSelect, designAliases[params.get('diseno')] || params.get('diseno'));
     if (params.get('tipo') === 'xv') setSelectValue(document.getElementById('eventType'), 'XV años');
