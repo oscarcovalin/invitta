@@ -73,12 +73,13 @@
     /* ── Galería thumbnails ── */
     .gallery-thumb-wrap {
       position: relative;
-      width: 78px;
-      height: 78px;
+      width: 118px;
+      min-height: 135px;
       border-radius: 6px;
       overflow: hidden;
       border: 1px solid var(--border-color);
       cursor: grab;
+      background: #fff;
       user-select: none;
       transition: opacity 160ms ease, transform 160ms ease, box-shadow 160ms ease;
     }
@@ -90,7 +91,7 @@
     }
     .gallery-thumb-wrap img {
       width: 100%;
-      height: 100%;
+      height: 90px;
       object-fit: cover;
       display: block;
       pointer-events: none;
@@ -125,7 +126,8 @@
     .gallery-order-badge {
       position: absolute;
       left: 5px;
-      bottom: 5px;
+      top: 63px;
+      bottom: auto;
       min-width: 22px;
       height: 22px;
       display: grid;
@@ -143,6 +145,40 @@
       margin: 10px 0 0;
       color: #52667a;
       font-size: 12px;
+    }
+    .gallery-thumb-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 44px;
+      border-top: 1px solid var(--border-color);
+    }
+    .gallery-thumb-action {
+      min-width: 0;
+      padding: 8px 4px;
+      border: 0;
+      background: #fff;
+      color: #243b53;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .gallery-thumb-action + .gallery-thumb-action {
+      border-left: 1px solid var(--border-color);
+    }
+    .gallery-replace-button:hover,
+    .gallery-replace-button:focus-visible {
+      background: #eef6ff;
+      color: #0969da;
+    }
+    .gallery-delete-button {
+      color: #b42318;
+    }
+    .gallery-delete-button:hover,
+    .gallery-delete-button:focus-visible {
+      background: #fff1f0;
+      color: #912018;
     }
     #gallery-thumbnails {
       margin-top: 12px;
@@ -292,9 +328,9 @@
           <input type="file" id="galleryFiles" accept="image/jpeg,image/jpg,image/png,image/webp" multiple>
           <div class="upload-progress" id="gallery-progress">⏳ Subiendo galería...</div>
           <div class="media-error" id="gallery-error"></div>
-          <!-- Advertencia de reemplazo (visible cuando hay galería existente) -->
+          <!-- Acciones disponibles para la galería -->
           <div class="media-current" id="gallery-replace-warning" style="background:#fff8e1;border-color:#ffe082;color:#7a5c00;display:none;">
-            ⚠️ Si subes nuevas fotos, reemplazarán la galería anterior.
+            Agrega fotos nuevas o usa Cambiar y Eliminar en cada miniatura. Los cambios se aplican al guardar.
           </div>
           <!-- Estado actual de la galería -->
           <div class="media-current" id="gallery-current" style="display:none;">

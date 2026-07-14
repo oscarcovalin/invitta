@@ -213,8 +213,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let existingMusicUrl = null;
   let existingBackgroundUrl = null;
   let existingGalleryUrls = [];
-  let selectedGalleryFiles = [];
-  let selectedGalleryPreviewUrls = [];
+  let galleryDraftItems = [];
 
   let currentStudioId = localStorage.getItem("invitta_studio_id");
   let currentSlug = "";
@@ -468,22 +467,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  function revokeGalleryPreview(item) {
+    if (item?.kind === "file" && item.previewUrl) {
+      URL.revokeObjectURL(item.previewUrl);
+    }
+  }
+
   function clearSelectedGalleryPreviews() {
-    selectedGalleryPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
-    selectedGalleryPreviewUrls = [];
+    galleryDraftItems.forEach(revokeGalleryPreview);
+  }
+
+  function createGalleryFileItem(file) {
+    return {
+      kind: "file",
+      file,
+      previewUrl: URL.createObjectURL(file)
+    };
   }
 
   function getActiveGalleryItems() {
-    if (selectedGalleryFiles.length > 0) {
-      return selectedGalleryFiles.map((file, index) => ({
-        src: selectedGalleryPreviewUrls[index],
-        alt: file.name || `Foto ${index + 1}`
-      }));
-    }
-
-    return existingGalleryUrls.map((url, index) => ({
-      src: url,
-      alt: `Foto ${index + 1}`
+    return galleryDraftItems.map((item, index) => ({
+      src: item.kind === "file" ? item.previewUrl : item.url,
+      alt: item.kind === "file" ? (item.file.name || `Foto ${index + 1}`) : `Foto ${index + 1}`
     }));
   }
 
@@ -492,13 +497,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const galCount = document.getElementById("gallery-count-label");
     const galThumbs = document.getElementById("gallery-thumbnails");
     const galHint = document.getElementById("gallery-order-hint");
+    const galNotice = document.getElementById("gallery-replace-warning");
     const items = getActiveGalleryItems();
 
     if (galCurrent) galCurrent.style.display = items.length ? "block" : "none";
     if (galHint) galHint.hidden = items.length < 2;
+    if (galNotice) galNotice.style.display = items.length ? "block" : "none";
     if (galCount) {
-      const label = selectedGalleryFiles.length > 0 ? "Fotos seleccionadas" : "Galer\u00eda actual";
-      galCount.textContent = `${label}: ${items.length} foto${items.length !== 1 ? "s" : ""}`;
+      galCount.textContent = `Galer\u00eda: ${items.length} foto${items.length !== 1 ? "s" : ""}`;
     }
     if (!galThumbs) return;
 
@@ -529,23 +535,61 @@ document.addEventListener("DOMContentLoaded", async () => {
       grip.className = "gallery-drag-grip";
       grip.setAttribute("aria-hidden", "true");
 
+      const actions = document.createElement("div");
+      actions.className = "gallery-thumb-actions";
+
+      const replaceButton = document.createElement("button");
+      replaceButton.type = "button";
+      replaceButton.className = "gallery-thumb-action gallery-replace-button";
+      replaceButton.textContent = "Cambiar";
+      replaceButton.setAttribute("aria-label", `Sustituir foto ${index + 1}`);
+
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "gallery-thumb-action gallery-delete-button";
+      deleteButton.textContent = "Eliminar";
+      deleteButton.setAttribute("aria-label", `Eliminar foto ${index + 1}`);
+
+      const replaceInput = document.createElement("input");
+      replaceInput.type = "file";
+      replaceInput.accept = "image/jpeg,image/jpg,image/png,image/webp";
+      replaceInput.hidden = true;
+
+      replaceButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        replaceInput.click();
+      });
+
+      replaceInput.addEventListener("change", () => {
+        const file = replaceInput.files?.[0];
+        if (!file || !validateFile(file, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "gallery")) return;
+        clearMediaError("gallery");
+        revokeGalleryPreview(galleryDraftItems[index]);
+        galleryDraftItems[index] = createGalleryFileItem(file);
+        renderGalleryThumbnails();
+      });
+
+      deleteButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if (!window.confirm(`\u00bfEliminar la foto ${index + 1} de la galer\u00eda?`)) return;
+        const [removed] = galleryDraftItems.splice(index, 1);
+        revokeGalleryPreview(removed);
+        renderGalleryThumbnails();
+      });
+
       handle.appendChild(grip);
-      wrap.append(img, order, handle);
+      actions.append(replaceButton, deleteButton);
+      wrap.append(img, order, handle, actions, replaceInput);
       galThumbs.appendChild(wrap);
     });
   }
 
   function moveGalleryItem(fromIndex, toIndex) {
-    const items = selectedGalleryFiles.length > 0 ? selectedGalleryFiles : existingGalleryUrls;
+    const items = galleryDraftItems;
     if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= items.length || toIndex >= items.length) return;
 
     const [moved] = items.splice(fromIndex, 1);
     items.splice(toIndex, 0, moved);
-
-    if (selectedGalleryFiles.length > 0) {
-      const [movedPreview] = selectedGalleryPreviewUrls.splice(fromIndex, 1);
-      selectedGalleryPreviewUrls.splice(toIndex, 0, movedPreview);
-    }
 
     renderGalleryThumbnails();
   }
@@ -658,9 +702,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     galleryInput.addEventListener("change", () => {
-      clearSelectedGalleryPreviews();
-      selectedGalleryFiles = Array.from(galleryInput.files || []);
-      selectedGalleryPreviewUrls = selectedGalleryFiles.map((file) => URL.createObjectURL(file));
+      clearMediaError("gallery");
+      const files = Array.from(galleryInput.files || []);
+
+      if (galleryDraftItems.length + files.length > 10) {
+        showMediaError("gallery", `La galer\u00eda admite m\u00e1ximo 10 fotos. Actualmente hay ${galleryDraftItems.length}.`);
+        galleryInput.value = "";
+        return;
+      }
+
+      if (!files.every((file) => validateFile(file, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "gallery"))) {
+        galleryInput.value = "";
+        return;
+      }
+
+      galleryDraftItems.push(...files.map(createGalleryFileItem));
+      galleryInput.value = "";
       renderGalleryThumbnails();
     });
 
@@ -823,29 +880,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Mostrar galería existente
     existingGalleryUrls = normalizeGalleryUrls(data.gallery_urls);
-    if (existingGalleryUrls.length > 0) {
-      const galCurrent   = document.getElementById("gallery-current");
-      const galCount     = document.getElementById("gallery-count-label");
-      const galThumbs    = document.getElementById("gallery-thumbnails");
-      const galWarning   = document.getElementById("gallery-replace-warning");
-      if (galCurrent) galCurrent.style.display = "block";
-      if (galCount)   galCount.textContent = `Galería actual: ${existingGalleryUrls.length} foto${existingGalleryUrls.length !== 1 ? "s" : ""}`;
-      if (galWarning) galWarning.style.display = "block";
-      if (galThumbs) {
-        galThumbs.innerHTML = "";
-        existingGalleryUrls.forEach((url) => {
-          const wrap = document.createElement("div");
-          wrap.className = "gallery-thumb-wrap";
-          const img = document.createElement("img");
-          img.src = url;
-          img.alt = "Foto de galería";
-          img.loading = "lazy";
-          wrap.appendChild(img);
-          galThumbs.appendChild(wrap);
-        });
-      }
-      renderGalleryThumbnails();
-    }
+    galleryDraftItems = existingGalleryUrls.map((url) => ({ kind: "existing", url }));
+    const galWarning = document.getElementById("gallery-replace-warning");
+    if (galWarning) galWarning.style.display = "block";
+    renderGalleryThumbnails();
 
     form.style.display = "block";
   }
@@ -927,47 +965,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // ── Subida de galería ──
-    let finalGalleryUrls = existingGalleryUrls;
-    const galleryFiles   = selectedGalleryFiles;
+    let finalGalleryUrls = [];
+    const newGalleryItems = galleryDraftItems.filter((item) => item.kind === "file");
 
-    if (galleryFiles.length > 0) {
-      clearMediaError("gallery");
+    if (newGalleryItems.length > 0) showProgress("gallery");
 
-      if (galleryFiles.length > 10) {
-        showMediaError("gallery", `Solo puedes subir máximo 10 fotos. Seleccionaste ${galleryFiles.length}.`);
+    let uploadedCount = 0;
+    for (let i = 0; i < galleryDraftItems.length; i++) {
+      const item = galleryDraftItems[i];
+
+      if (item.kind === "existing") {
+        finalGalleryUrls.push(item.url);
+        continue;
+      }
+
+      const el = document.getElementById("gallery-progress");
+      if (el) el.textContent = `Subiendo foto ${uploadedCount + 1} de ${newGalleryItems.length}...`;
+      const url = await uploadFileToStorage(item.file, "gallery", slugToUse);
+
+      if (!url) {
+        hideProgress("gallery");
+        showMediaError("gallery", `Error al subir la foto ${i + 1}. Intenta de nuevo.`);
         saveBtn.disabled = false;
         saveBtn.textContent = "Guardar cambios";
         return;
       }
 
-      // Validar cada archivo
-      for (let i = 0; i < galleryFiles.length; i++) {
-        if (!validateFile(galleryFiles[i], ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "gallery")) {
-          saveBtn.disabled = false;
-          saveBtn.textContent = "Guardar cambios";
-          return;
-        }
-      }
-
-      // Subir cada archivo secuencialmente
-      showProgress("gallery");
-      const uploadedUrls = [];
-      for (let i = 0; i < galleryFiles.length; i++) {
-        const el = document.getElementById("gallery-progress");
-        if (el) el.textContent = `⏳ Subiendo foto ${i + 1} de ${galleryFiles.length}...`;
-        const url = await uploadFileToStorage(galleryFiles[i], "gallery", slugToUse);
-        if (!url) {
-          hideProgress("gallery");
-          showMediaError("gallery", `Error al subir la foto ${i + 1}. Intenta de nuevo.`);
-          saveBtn.disabled = false;
-          saveBtn.textContent = "Guardar cambios";
-          return;
-        }
-        uploadedUrls.push(url);
-      }
-      hideProgress("gallery");
-      finalGalleryUrls = uploadedUrls;
+      finalGalleryUrls.push(url);
+      uploadedCount += 1;
     }
+
+    hideProgress("gallery");
 
     // Parse godparents
     const godparentsLines = document.getElementById("godparents_text").value.split("\n").filter(l => l.trim().length > 0);
@@ -1107,6 +1135,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       saveBtn.textContent = "Guardar cambios";
     } else {
       currentSlug = slugToUse;
+      clearSelectedGalleryPreviews();
+      existingGalleryUrls = finalGalleryUrls.slice();
+      galleryDraftItems = existingGalleryUrls.map((url) => ({ kind: "existing", url }));
+      renderGalleryThumbnails();
       if (!isEditMode && result.data?.id) {
         inviteId = result.data.id;
         isEditMode = true;
