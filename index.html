@@ -402,21 +402,11 @@
         .hero-visual { position: relative; display: flex; justify-content: center; align-items: center; }
         .hero-mockup {
             width: 100%;
-            max-width: 400px;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 40px 80px rgba(46,46,46,0.15), 0 0 0 1px rgba(232,221,208,0.8);
-            background: linear-gradient(160deg, #f5ede4 0%, #fdf8f3 40%, #ece5da 100%);
-            aspect-ratio: 9/14;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 30px;
-            text-align: center;
+            max-width: 380px;
             position: relative;
             animation: floatCard 6s ease-in-out infinite;
         }
+        .hero-phone-image { display: block; width: 100%; height: auto; }
         @keyframes floatCard { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
         .mockup-svg-tl { position: absolute; top: 0; left: 0; width: 120px; opacity: 0.6; }
         .mockup-svg-br { position: absolute; bottom: 0; right: 0; width: 120px; opacity: 0.6; transform: rotate(180deg); }
@@ -1443,25 +1433,7 @@
 
                 <div class="hero-visual fade-up delay-3">
                     <div class="hero-mockup">
-                        <svg class="mockup-svg-tl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 0 Q60 40 40 100 Q70 60 120 80 Q80 120 100 180" stroke="#8A9E7B" stroke-width="1.5" fill="none" opacity="0.5"/>
-                            <circle cx="40" cy="100" r="6" fill="#C9877D" opacity="0.4"/>
-                            <circle cx="120" cy="80" r="4" fill="#C9877D" opacity="0.35"/>
-                            <ellipse cx="30" cy="70" rx="12" ry="6" fill="#C4D4BA" opacity="0.5" transform="rotate(-30 30 70)"/>
-                            <ellipse cx="90" cy="45" rx="10" ry="5" fill="#C4D4BA" opacity="0.45" transform="rotate(20 90 45)"/>
-                        </svg>
-                        <svg class="mockup-svg-br" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 0 Q60 40 40 100 Q70 60 120 80 Q80 120 100 180" stroke="#8A9E7B" stroke-width="1.5" fill="none" opacity="0.5"/>
-                            <circle cx="40" cy="100" r="6" fill="#C9877D" opacity="0.4"/>
-                            <ellipse cx="30" cy="70" rx="12" ry="6" fill="#C4D4BA" opacity="0.5" transform="rotate(-30 30 70)"/>
-                        </svg>
-                        <div class="mockup-subtitle">Boda &middot; 2026</div>
-                        <img src="assets/pareja_1.jpg" alt="Foto Novios" style="width:130px;height:130px;border-radius:50%;object-fit:cover;margin:10px 0 20px;border:3px solid #fff;box-shadow:0 10px 25px rgba(0,0,0,0.08);z-index:2;position:relative;">
-                        <div class="mockup-names">Ana &amp; Carlos</div>
-                        <div class="mockup-ornament"></div>
-                        <div class="mockup-date">28 &middot; Septiembre &middot; 2026</div>
-                        <div class="mockup-seal"><i class="fa-solid fa-envelope"></i></div>
-                        <div class="mockup-hint">Toca el sello para abrir ✨</div>
+                        <img class="hero-phone-image" src="assets/hero-phone-invitation.png" alt="Telefono premium mostrando una invitacion digital de boda">
                     </div>
 
                     <div class="float-badge float-badge-1">
