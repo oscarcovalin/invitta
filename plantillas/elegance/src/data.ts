@@ -1,9 +1,11 @@
 import { LocationInfo, GalleryImage, RegistryOption } from './types';
-import natasha005 from './assets/natasha-005.jpg';
-import natasha008 from './assets/natasha-008.jpg';
-import natasha012 from './assets/natasha-012.jpg';
-import natasha015 from './assets/natasha-015.jpg';
-import natasha021 from './assets/natasha-021.jpg';
+import royalHero from './assets/royal-hero.png';
+import royalGallery01 from './assets/royal-gallery-01.png';
+import royalGallery02 from './assets/royal-gallery-02.png';
+import royalGallery03 from './assets/royal-gallery-03.png';
+import royalGallery04 from './assets/royal-gallery-04.png';
+import royalGallery05 from './assets/royal-gallery-05.png';
+import royalGallery06 from './assets/royal-gallery-06.png';
 
 export const EVENT_DATE = '2026-12-12T15:00:00'; // Dec 12, 2026 at 3:00 PM (Ceremony time)
 
@@ -30,9 +32,9 @@ export const EVENT_DETAILS = {
 };
 
 export const IMAGES = {
-  hero: natasha012,
-  countdownBg: natasha005,
-  dressCodeBg: natasha015,
+  hero: royalHero,
+  countdownBg: royalGallery05,
+  dressCodeBg: royalGallery04,
 };
 
 export const LOCATIONS: LocationInfo[] = [
@@ -61,23 +63,33 @@ export const LOCATIONS: LocationInfo[] = [
 export const GALLERY_IMAGES: GalleryImage[] = [
   {
     id: 'gal-1',
-    url: natasha008,
-    alt: 'Retrato editorial al atardecer',
+    url: royalGallery01,
+    alt: 'Quinceañera en vestido azul real',
   },
   {
     id: 'gal-2',
-    url: natasha005,
-    alt: 'Retrato urbano con luz dorada',
+    url: royalGallery02,
+    alt: 'Retrato de gala bajo el vitral',
   },
   {
     id: 'gal-3',
-    url: natasha015,
-    alt: 'Detalle editorial entre la luz del jardín',
+    url: royalGallery03,
+    alt: 'Retrato editorial junto a la lámpara',
   },
   {
     id: 'gal-4',
-    url: natasha021,
-    alt: 'Amigas celebrando al aire libre',
+    url: royalGallery04,
+    alt: 'Vestido azul real sobre la escalera',
+  },
+  {
+    id: 'gal-5',
+    url: royalGallery05,
+    alt: 'Quinceañera en el salón de columnas',
+  },
+  {
+    id: 'gal-6',
+    url: royalGallery06,
+    alt: 'Retrato de gala con cauda azul',
   },
 ];
 
