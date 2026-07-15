@@ -477,6 +477,13 @@
         }
         .float-badge-1 { top: 15%; right: -10%; animation-delay: 0s; }
         .float-badge-2 { bottom: 20%; left: -12%; animation-delay: 2.5s; }
+        .float-badge-3 { top: 38%; left: -14%; animation-delay: 1.25s; }
+        .float-badge-4 { right: -13%; bottom: 38%; animation-delay: 3.75s; }
+        .float-badge-3,
+        .float-badge-4 {
+            padding: 10px 15px;
+            box-shadow: 0 8px 26px rgba(46,46,46,0.1);
+        }
         @keyframes floatBadge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
         .float-badge i { color: var(--rose); font-size: 1.15rem; }
         .float-badge-text strong { display: block; font-size: 0.8rem; font-weight: 600; color: var(--charcoal); }
@@ -1396,9 +1403,38 @@
         /* RESPONSIVE */
         @media (max-width: 920px) {
             .hero-inner { grid-template-columns: 1fr; gap: 50px; }
-            .hero-visual { order: -1; }
-            .hero-mockup { max-width: 280px; margin: 0 auto; animation: none; }
-            .float-badge-1, .float-badge-2 { display: none; }
+            .hero-visual {
+                order: -1;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                width: min(100%, 480px);
+                margin: 0 auto;
+            }
+            .hero-mockup {
+                grid-column: 1 / -1;
+                max-width: 280px;
+                margin: 0 auto 6px;
+                animation: none;
+            }
+            .float-badge,
+            .float-badge-3,
+            .float-badge-4 {
+                position: static;
+                min-width: 0;
+                padding: 10px 12px;
+                border: 1px solid rgba(223,209,192,0.72);
+                border-radius: 12px;
+                box-shadow: 0 6px 18px rgba(46,46,46,0.07);
+                animation: none;
+            }
+            .float-badge-text { min-width: 0; }
+            .float-badge-text strong,
+            .float-badge-text span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
             .pricing-intro { grid-template-columns: 1fr; }
             .pricing-intro-right { justify-content: flex-start; margin-top: -20px; }
             .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
@@ -1432,6 +1468,11 @@
             }
 
             .hero { padding: 38px 0 52px; }
+            .hero-visual { gap: 8px; }
+            .float-badge { gap: 8px; padding: 9px 10px; }
+            .float-badge i { font-size: 1rem; }
+            .float-badge-text strong { font-size: 0.72rem; }
+            .float-badge-text span { display: none; }
             .platform-section,
             .benefits,
             .catalog,
@@ -1582,6 +1623,20 @@
                         <div class="float-badge-text">
                             <strong>Pase con QR</strong>
                             <span>Control de invitados</span>
+                        </div>
+                    </div>
+                    <div class="float-badge float-badge-3">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div class="float-badge-text">
+                            <strong>Confirmación RSVP</strong>
+                            <span>Respuestas en tiempo real</span>
+                        </div>
+                    </div>
+                    <div class="float-badge float-badge-4">
+                        <i class="fa-solid fa-images"></i>
+                        <div class="float-badge-text">
+                            <strong>Galería interactiva</strong>
+                            <span>Recuerdos en un solo lugar</span>
                         </div>
                     </div>
                 </div>
