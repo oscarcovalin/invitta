@@ -306,10 +306,10 @@
         <li>Tu borrador se conserva en este dispositivo</li>
       </ul>
       <figure class="design-preview">
-        <img id="designPreviewImage" src="demos/xv-esencial/assets/hero-showcase-v2.png" alt="Vista previa del diseño seleccionado" width="390" height="844">
+        <img id="designPreviewImage" src="assets/catalog/xv-elegance.jpg" alt="Vista previa del diseño seleccionado" width="390" height="844">
         <figcaption id="designPreviewCaption">Diseño Élégance</figcaption>
       </figure>
-      <a class="preview-demo-link" id="previewDemoLink" href="demos/xv-esencial/index.html" target="_blank" rel="noopener">Ver muestra personalizada</a>
+      <a class="preview-demo-link" id="previewDemoLink" href="demos/xv-elegance/index.html" target="_blank" rel="noopener">Ver muestra personalizada</a>
     </section>
 
     <section class="request-card" aria-labelledby="form-title">
@@ -422,20 +422,20 @@
     const palettePreference = document.getElementById('palettePreference');
     const typographyPreference = document.getElementById('typographyPreference');
     const designImages = {
-      'Élégance': 'demos/xv-esencial/assets/hero-showcase-v2.png',
-      'Rose Champagne': 'demos/xv-premium/assets/hero-showcase-v2.png',
-      'Emerald Gala': 'demos/xv-vip/assets/hero-showcase-v2.png',
-      'Classic Wedding': 'demos/boda-esencial/assets/hero-showcase-v2.png',
-      'Olive Romance': 'demos/boda-premium/assets/hero-showcase-v2.png',
-      'Plum Noir': 'demos/boda-vip/assets/hero-showcase-v2.png'
+      'Élégance': 'assets/catalog/xv-elegance.jpg',
+      'Rose Champagne': 'assets/catalog/xv-rose-gold.jpg',
+      'Emerald Gala': 'assets/catalog/xv-champagne-rose.jpg',
+      'Classic Wedding': 'assets/catalog/boda-classic-wedding.jpg',
+      'Olive Romance': 'assets/catalog/boda-golden-romance.jpg',
+      'Plum Noir': 'assets/catalog/boda-midnight-gold.jpg'
     };
 
     const designDemoPaths = {
-      'Rose Champagne': 'demos/xv-premium/index.html',
-      'Emerald Gala': 'demos/xv-vip/index.html',
-      'Classic Wedding': 'demos/boda-esencial/index.html',
-      'Olive Romance': 'demos/boda-premium/index.html',
-      'Plum Noir': 'demos/boda-vip/index.html'
+      'Rose Champagne': 'demos/xv-premium-2/index.html',
+      'Emerald Gala': 'demos/xv-vip-3/index.html',
+      'Classic Wedding': 'demos/boda-classic-basic/index.html',
+      'Olive Romance': 'demos/boda-golden-romance-premium/index.html',
+      'Plum Noir': 'demos/boda-premium-1/index.html'
     };
     const palettePresets = {
       'Rosa y champagne': 'rose-champagne',
@@ -546,7 +546,7 @@
 
     function updateDemoPreviewLink() {
       const hasSelectedDesign = designSelect.selectedIndex > 0;
-      const path = designDemoPaths[designSelect.value] || 'demos/xv-esencial/index.html';
+      const path = designDemoPaths[designSelect.value] || 'demos/xv-elegance/index.html';
       const query = new URLSearchParams();
       const palette = palettePresets[palettePreference.value];
       const typography = typographyPresets[typographyPreference.value];
