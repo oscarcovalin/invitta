@@ -12,6 +12,16 @@ import { DigitalEnvelope } from "./components/DigitalEnvelope";
 import { CollaborativeAlbum } from "./components/CollaborativeAlbum";
 import { LodgingSuggestions } from "./components/LodgingSuggestions";
 import { Camera, Church, GlassWater, Sparkles, Heart, Music, ShoppingBag, Gift, Landmark, Mail } from "lucide-react";
+import champagneHero from "./assets/champagne-hero.png";
+import champagneGallery02 from "./assets/champagne-gallery-02.png";
+import champagneGallery03 from "./assets/champagne-gallery-03.png";
+import champagneGallery04 from "./assets/champagne-gallery-04.png";
+import champagneGallery05 from "./assets/champagne-gallery-05.png";
+import champagneGallery06 from "./assets/champagne-gallery-06.png";
+import champagneGallery07 from "./assets/champagne-gallery-07.png";
+import champagneGallery08 from "./assets/champagne-gallery-08.png";
+import champagneGallery09 from "./assets/champagne-gallery-09.png";
+import champagneGallery10 from "./assets/champagne-gallery-10.png";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -364,24 +374,44 @@ export default function App() {
   // Gallery Editorial Assets
   const galleryImages = [
     {
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuAGp8n5Ng6p1-hEL10ct7BPcL1m3RfIvLKaMbyAEEUhf0mZykSbOM1O2qochoiZoWMcnoGY5yT7r7uPd_GNUiqLkz9GIbEltfS1FlhgdmPo4vFvMAZKA72nu9ggR-4R5NefFXF8E--mszs4t-TxbKXy2uTqma3Kik5UKHnkJ6DFOi40Hu0Vk4gRoGrkzi_kiwKO4ECZWd_yfNrWRDmcyHWlKiQKQ_jGzVn04aBvq-nyeFtg1ew41eMxAGVkVjjq1CqlbjwrlfVai_c",
-      caption: "Retrato principal de gala de Ana Camila, Sesión de Quince Años"
+      src: champagneHero,
+      caption: "Retrato editorial entre el bosque y la luz natural"
     },
     {
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuBp1UneYNO0MeP74YJFv-y9jJMLb985CltX4HNGUUjNDtuuArrnBazRw1y8JY4ocNSSVB7thJbUs5Y0JsrKLhP36U2RTf2ajfuSB1cTYJBzzH2k7JPU3Yqc3bnne6vmtM_IzZz3xspY9RSNyK6_Jiem3qMPI3VTxxyPbODjaU5hNZg3j1N72UYjYvO28CCyHom3thNtdCxb2_b2_Cpx8tXXLwhAOCASX3WFLByQzjmluZMgoupI8EMQKbBXz5RGHjHrvYgnV8CWW3k",
-      caption: "Retrato clásico con auto vintage, Hacienda del Fresno"
+      src: champagneGallery02,
+      caption: "Un encuentro de ensueño junto al caballo blanco"
     },
     {
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuAmkBAwKY_AcELlMqiUh3i3ymA0rcSEoI4fPk7xt_kZ4fqeOvtwD1KaHbKYYRhDxUiNMxD_u_GaE2klTDpVGup_mwgPOPZvPK8SCycbyRxVUQhEc74tR96p35pp3PFESVADJ6JFQI7MZBEmxnpchGx16isgrBQW4H0vXjQohQ7VYQRysI8hfyiD9jaurOdTCYJ_hhjgukTYHtgEqiC_HtxaQfW9MtpMl92RxEVUF4_UryVzP2Lq_A-mwaG_WKGdzeLx0mH0Q5gP1MI",
-      caption: "Detalle de guantes de gala y ramo de rosas blancas"
+      src: champagneGallery03,
+      caption: "Una escena cinematográfica al atardecer"
     },
     {
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuA63u7Nf29k4YUsMPLvfbG2-fwaDaSW4PfhRApXk4bXsn8nSyNp6FBZwg512EtyMt8xgd_-TvEGPh10Dm-eTFvOL3TAxXGrLjPa_GFtcn19pn5-ZT0vG3rJlZnw_oyQy3oT3wyHOniIh9QwlP23FpGtx5DSdr4lZW4ir6NFdvTHIZmQRBcrpJjh194DffPlSO2J2RYFZ_w0J4AwPRVx9UUWPtfnPDV0P7spgv2V5Ie9G9IgQ9aes8-kaRjlRPf6u1uaX_A8XbLBCtQ",
-      caption: "Diseño contemporáneo en tonos celestes, Bosque Silvestre"
+      src: champagneGallery04,
+      caption: "Un momento sereno entre la niebla y el paisaje"
     },
     {
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuBszB4aYMznOR1Sn24ktvDMGgQVfXwA5I_jSBjJcU6Vw5_Fs7Qh-7Zab4VQaZXKdBS7RsEieC15SxSu_FqqASjNN-Yu1OOOT2LRyi_sl51feM8a5SU8B_0i6egw3xMAAtuVqTm-hnUGKTT4EN2VwOQvtcVlqA_U5cQqXeRt_K4XO6OC5LzB1FDbulSXN17zix91rrkx5ut8BhetyQtncA-w5ocLEvVKpkyrYyVpwZYtDsIiE1q0CL2WTmtDJMUuZFevsHONsbRncic",
-      caption: "Arcadas históricas y arquitectura de la recepción"
+      src: champagneGallery05,
+      caption: "Una mirada elegante en movimiento"
+    },
+    {
+      src: champagneGallery06,
+      caption: "Detalle íntimo de una tarde inolvidable"
+    },
+    {
+      src: champagneGallery07,
+      caption: "Horizonte, vestido azul y libertad"
+    },
+    {
+      src: champagneGallery08,
+      caption: "La celebración encuentra su propio ritmo"
+    },
+    {
+      src: champagneGallery09,
+      caption: "Una conexión que hace especial el momento"
+    },
+    {
+      src: champagneGallery10,
+      caption: "Un cierre luminoso para esta historia"
     }
   ];
 
@@ -602,9 +632,8 @@ export default function App() {
             >
               <img 
                 className="w-full h-full object-cover breathe-animation object-center md:object-right select-none" 
-                alt="Editorial portait of Ana Camila in a stunning red ball gown" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGp8n5Ng6p1-hEL10ct7BPcL1m3RfIvLKaMbyAEEUhf0mZykSbOM1O2qochoiZoWMcnoGY5yT7r7uPd_GNUiqLkz9GIbEltfS1FlhgdmPo4vFvMAZKA72nu9ggR-4R5NefFXF8E--mszs4t-TxbKXy2uTqma3Kik5UKHnkJ6DFOi40Hu0Vk4gRoGrkzi_kiwKO4ECZWd_yfNrWRDmcyHWlKiQKQ_jGzVn04aBvq-nyeFtg1ew41eMxAGVkVjjq1CqlbjwrlfVai_c"
-                referrerPolicy="no-referrer"
+                alt="Quinceañera en un vestido azul cielo entre el bosque"
+                src={champagneHero}
               />
             </motion.div>
             {/* Elegant soft fade-in masks */}
@@ -712,9 +741,8 @@ export default function App() {
             >
               <img 
                 className="w-full h-full object-cover" 
-                alt="Cinematic evening forest background" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3mOR_AUaFh8Ii8Pi74QfwogxFgaEfY6NBPu3HV-B49kW3bvm3CCiXH3rReh6eQ2d57aBy1Efm-pJI6vJ06spX0kZhECc7oTfe8rrNCbM-HBLSgoBHEt5a4KF9a-guS8vhoHnvUofD1fxUMXjBtiZqu2krG6klmu0jPt_UhiJKHFw4-wW4OPG-3Y3L1fspyY3VJDlptycuhxe2Ro30xj7JBelicUduJMbyJoCSlbup68AmstNYHEULlCBfePC7PH4jY1Oqg0dOe1E"
-                referrerPolicy="no-referrer"
+                alt="Quinceañera y caballo blanco al atardecer"
+                src={champagneGallery08}
               />
             </motion.div>
           </div>
@@ -892,9 +920,8 @@ export default function App() {
           >
             <img 
               className="w-full h-full object-cover object-center breathe-animation select-none" 
-              alt="Macro photograph of premium evening dress fabrics" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvfHbfCANp8YxxIdVEmZJngRGQSp-9M8vWN1OohatnPdIWdOkT93PZbucEfGNcnS2FuFcfBW2BK20c2-hswKclndmWPnxHKN46GVvI2hL1Vnh0rD4Q3yg6uKCeb3xlQVdLvSgHhuPdL6WLz1KcPz2rgSnYKyY1Y_tbF0mUWvuNaFxHkXQ6wiIUD1ltoO4LspVjLARNJtmMMh0iklFsPJM-dBOl8oNmb73Ge3VQSncHQJ7dg7zfZO9qvljtJdRE_2Dy3ncMmB-X_lE"
-              referrerPolicy="no-referrer"
+              alt="Quinceañera junto a un caballo blanco"
+              src={champagneGallery06}
             />
           </motion.div>
 
