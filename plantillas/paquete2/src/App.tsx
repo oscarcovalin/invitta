@@ -9,6 +9,13 @@ import { MusicPlayer } from "./components/MusicPlayer";
 import { ParallaxImage } from "./components/ParallaxImage";
 import { FloatingParticles } from "./components/FloatingParticles";
 import { Camera, Church, GlassWater, Sparkles, Heart, Music } from "lucide-react";
+import royalHero from "./assets/royal-hero.png";
+import royalGallery01 from "./assets/royal-gallery-01.png";
+import royalGallery02 from "./assets/royal-gallery-02.png";
+import royalGallery03 from "./assets/royal-gallery-03.png";
+import royalGallery04 from "./assets/royal-gallery-04.png";
+import royalGallery05 from "./assets/royal-gallery-05.png";
+import royalGallery06 from "./assets/royal-gallery-06.png";
 
 
 const invData = (typeof window !== "undefined" && (window as any).INVITATION_DATA) ? (window as any).INVITATION_DATA : {
@@ -43,9 +50,14 @@ const invData = (typeof window !== "undefined" && (window as any).INVITATION_DAT
   guestName: "Familia Zavala Almazán",
   passes: 2,
   table: "",
-  mainPhotoUrl: "https://images.unsplash.com/photo-1549471013-3364d7220b75?q=80&w=2070&auto=format&fit=crop",
+  mainPhotoUrl: royalHero,
   galleryUrls: [
-    "https://images.unsplash.com/photo-1549471013-3364d7220b75?q=80&w=2070&auto=format&fit=crop"
+    royalGallery01,
+    royalGallery02,
+    royalGallery03,
+    royalGallery04,
+    royalGallery05,
+    royalGallery06,
   ],
   musicUrl: "",
   musicTitle: ""
@@ -370,7 +382,7 @@ export default function App() {
   // Gallery Editorial Assets
   
 const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? invData.galleryUrls.map(url => ({ src: url, alt: "Gallery Image" })) : [
-  { src: "https://images.unsplash.com/photo-1549471013-3364d7220b75?q=80&w=2070&auto=format&fit=crop", alt: "1" }
+  { src: royalGallery01, alt: "Quinceañera en vestido azul real" }
 ];
 
 
@@ -683,8 +695,8 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
             >
               <img 
                 className="w-full h-full object-cover breathe-animation object-center md:object-right select-none" 
-                alt="Editorial portait of ${invData.celebrantName} in a stunning red ball gown" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGp8n5Ng6p1-hEL10ct7BPcL1m3RfIvLKaMbyAEEUhf0mZykSbOM1O2qochoiZoWMcnoGY5yT7r7uPd_GNUiqLkz9GIbEltfS1FlhgdmPo4vFvMAZKA72nu9ggR-4R5NefFXF8E--mszs4t-TxbKXy2uTqma3Kik5UKHnkJ6DFOi40Hu0Vk4gRoGrkzi_kiwKO4ECZWd_yfNrWRDmcyHWlKiQKQ_jGzVn04aBvq-nyeFtg1ew41eMxAGVkVjjq1CqlbjwrlfVai_c"
+                alt={`Retrato editorial de ${invData.celebrantName} en vestido azul real`}
+                src={invData.mainPhotoUrl}
                 referrerPolicy="no-referrer"
               />
             </motion.div>
@@ -798,7 +810,7 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
               <img 
                 className="w-full h-full object-cover" 
                 alt="Cinematic evening forest background" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3mOR_AUaFh8Ii8Pi74QfwogxFgaEfY6NBPu3HV-B49kW3bvm3CCiXH3rReh6eQ2d57aBy1Efm-pJI6vJ06spX0kZhECc7oTfe8rrNCbM-HBLSgoBHEt5a4KF9a-guS8vhoHnvUofD1fxUMXjBtiZqu2krG6klmu0jPt_UhiJKHFw4-wW4OPG-3Y3L1fspyY3VJDlptycuhxe2Ro30xj7JBelicUduJMbyJoCSlbup68AmstNYHEULlCBfePC7PH4jY1Oqg0dOe1E"
+                src={royalGallery05}
                 referrerPolicy="no-referrer"
               />
             </motion.div>
@@ -978,7 +990,7 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
             <img 
               className="w-full h-full object-cover object-center breathe-animation select-none" 
               alt="Macro photograph of premium evening dress fabrics" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvfHbfCANp8YxxIdVEmZJngRGQSp-9M8vWN1OohatnPdIWdOkT93PZbucEfGNcnS2FuFcfBW2BK20c2-hswKclndmWPnxHKN46GVvI2hL1Vnh0rD4Q3yg6uKCeb3xlQVdLvSgHhuPdL6WLz1KcPz2rgSnYKyY1Y_tbF0mUWvuNaFxHkXQ6wiIUD1ltoO4LspVjLARNJtmMMh0iklFsPJM-dBOl8oNmb73Ge3VQSncHQJ7dg7zfZO9qvljtJdRE_2Dy3ncMmB-X_lE"
+                src={royalGallery04}
               referrerPolicy="no-referrer"
             />
           </motion.div>
