@@ -107,7 +107,7 @@
       motion: "editorial-fade",
       media: {
         hero: "assets/hero-showcase-v2.png",
-        gallery: ["assets/hero-showcase-v2.png", "assets/grid_2.jpg", "assets/grid_4.jpg", "assets/grid_3.jpg"]
+        gallery: ["assets/hero-showcase-v2.png", "assets/gallery-showcase-v2.png", "assets/grid_4.jpg", "assets/grid_3.jpg"]
       },
       allowedPalettes: ["sage-editorial", "rose-champagne", "ivory-sage"],
       allowedTypography: ["editorial-modern", "romantic-script", "classic-wedding"]
@@ -121,7 +121,7 @@
       motion: "soft-rise",
       media: {
         hero: "assets/hero-showcase-v2.png",
-        gallery: ["assets/hero-showcase-v2.png", "assets/galeria_1.jpg", "assets/grid_2.jpg", "assets/grid_4.jpg", "assets/gallery_2.png"]
+        gallery: ["assets/hero-showcase-v2.png", "assets/gallery-showcase-v2.png", "assets/grid_2.jpg", "assets/grid_4.jpg", "assets/gallery_2.png"]
       },
       allowedPalettes: ["rose-champagne", "sage-editorial", "ivory-sage"],
       allowedTypography: ["romantic-script", "editorial-modern", "garden-romance"]
@@ -135,7 +135,7 @@
       motion: "cinematic-fade",
       media: {
         hero: "assets/hero-showcase-v2.png",
-        gallery: ["assets/hero-showcase-v2.png", "assets/galeria_1.jpg", "assets/grid_2.jpg", "assets/grid_3.jpg", "assets/grid_4.jpg"]
+        gallery: ["assets/hero-showcase-v2.png", "assets/gallery-showcase-v2.png", "assets/grid_2.jpg", "assets/grid_3.jpg", "assets/grid_4.jpg"]
       },
       allowedPalettes: ["emerald-gold", "plum-noir", "rose-champagne"],
       allowedTypography: ["regal-editorial", "noir-luxury", "romantic-script"]
@@ -149,7 +149,7 @@
       motion: "editorial-fade",
       media: {
         hero: "assets/hero-showcase-v2.png",
-        gallery: ["assets/hero-showcase-v2.png", "assets/gallery_1.png", "assets/gallery_2.png", "assets/gallery_3.png"]
+        gallery: ["assets/hero-showcase-v2.png", "assets/gallery-showcase-v2.png", "assets/gallery_2.png", "assets/gallery_3.png"]
       },
       allowedPalettes: ["ivory-sage", "sage-editorial", "olive-romance"],
       allowedTypography: ["classic-wedding", "editorial-modern", "garden-romance"]
@@ -163,7 +163,7 @@
       motion: "soft-rise",
       media: {
         hero: "assets/hero-showcase-v2.png",
-        gallery: ["assets/hero-showcase-v2.png", "assets/galeria_1.jpg", "assets/gallery_1.png", "assets/gallery_2.png", "assets/grid_3.jpg"]
+        gallery: ["assets/hero-showcase-v2.png", "assets/gallery-showcase-v2.png", "assets/gallery_1.png", "assets/gallery_2.png", "assets/grid_3.jpg"]
       },
       allowedPalettes: ["olive-romance", "ivory-sage", "plum-noir"],
       allowedTypography: ["garden-romance", "classic-wedding", "noir-luxury"]
@@ -177,7 +177,7 @@
       motion: "cinematic-fade",
       media: {
         hero: "assets/hero-showcase-v2.png",
-        gallery: ["assets/hero-showcase-v2.png", "assets/galeria_1.jpg", "assets/gallery_3.png", "assets/gallery_1.png", "assets/grid_3.jpg"]
+        gallery: ["assets/hero-showcase-v2.png", "assets/gallery-showcase-v2.png", "assets/gallery_3.png", "assets/gallery_1.png", "assets/grid_3.jpg"]
       },
       allowedPalettes: ["plum-noir", "emerald-gold", "olive-romance"],
       allowedTypography: ["noir-luxury", "regal-editorial", "garden-romance"]
