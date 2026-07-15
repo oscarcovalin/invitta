@@ -39,6 +39,8 @@
         .login-btn { width: 100%; padding: 14px; border: none; border-radius: 8px; background: var(--text-main); color: #fff; font: inherit; font-weight: 500; cursor: pointer; transition: background 0.2s; }
         .login-btn:hover { background: #333; }
         .login-btn:disabled { cursor: not-allowed; opacity: 0.65; }
+        .forgot-password { display: block; width: fit-content; margin: 18px auto 0; color: var(--text-muted); font-size: 0.9rem; text-decoration: underline; text-underline-offset: 3px; }
+        .forgot-password:hover { color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -59,6 +61,7 @@
                 </div>
                 <button class="login-btn" id="loginButton" type="submit">Entrar al dashboard</button>
             </form>
+            <a class="forgot-password" href="restablecer-contrasena.html">Olvide mi contrasena</a>
         </section>
     </main>
     <script src="../assets/js/login.js"></script>

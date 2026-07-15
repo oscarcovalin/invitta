@@ -15,6 +15,7 @@
 6. En Supabase Authentication, configurar Site URL con el dominio de produccion.
 7. En Supabase Authentication, agregar Redirect URLs:
    - `https://TU-DOMINIO.vercel.app/administracion/login.html`
+   - `https://TU-DOMINIO.vercel.app/administracion/restablecer-contrasena.html`
    - `https://TU-DOMINIO.vercel.app/administracion/dashboard.html`
    - `https://TU-DOMINIO.vercel.app/administracion/checkin.html`
 8. Revisar que `assets/js/env.js` tenga solo valores publicos:
@@ -39,6 +40,7 @@
 - La camara para escaneo QR requiere HTTPS; debe probarse en Vercel o un dominio con TLS.
 - Mantener RLS activo en Supabase.
 - Si se cambia el dominio, revisar Redirect URLs en Supabase Auth.
+- Los enlaces de recuperacion deben dirigir a `/administracion/restablecer-contrasena.html`; el enlace mas reciente invalida los anteriores.
 
 ## Solicitudes comerciales
 
