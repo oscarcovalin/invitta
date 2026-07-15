@@ -40,6 +40,15 @@
 - Mantener RLS activo en Supabase.
 - Si se cambia el dominio, revisar Redirect URLs en Supabase Auth.
 
+## Solicitudes comerciales
+
+1. Aplicar `supabase/migrations/004_invitation_requests.sql` desde el SQL Editor de Supabase.
+2. Marcar la cuenta que atiende ventas con App Metadata: `{ "invitta_sales_operator": true }`.
+3. Iniciar sesion con esa cuenta y abrir `/administracion/studio-solicitudes.html`.
+4. Desde cada solicitud, usar `Crear invitacion` para asignarla al estudio activo y precargar paquete, plantilla, paleta y tipografia.
+
+Las solicitudes publicas solo pueden insertarse. La lectura y asignacion requieren el rol comercial, por lo que otros estudios no pueden ver los datos de clientes.
+
 ## Variables Publicas
 
 El frontend usa `assets/js/env.js` para configuracion publica del navegador:

@@ -196,6 +196,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const db = window.studioAuth.db;
   const urlParams = new URLSearchParams(window.location.search);
   let inviteId = urlParams.get("id");
+  const requestId = urlParams.get("request");
   let isEditMode = !!inviteId;
   
   // Elementos del DOM
@@ -217,6 +218,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let currentStudioId = localStorage.getItem("invitta_studio_id");
   let currentSlug = "";
+  let sourceRequestId = requestId || null;
 
   function getCurrentSlugValue() {
     return (document.getElementById("slug")?.value || currentSlug || "").trim();
@@ -271,6 +273,91 @@ document.addEventListener("DOMContentLoaded", async () => {
   function showSuccessMessage(message) {
     successAlert.textContent = message;
     successAlert.style.display = "block";
+  }
+
+  function applySalesRequestStyles(request) {
+    const paletteStyles = {
+      "Rosa y champagne": { theme: "rose-floral", primary: "#B97D88", secondary: "#F4DADD" },
+      "Marfil y salvia": { theme: "classic-champagne", primary: "#7A9068", secondary: "#F2E7D6" },
+      "Esmeralda y oro": { theme: "gold-marble", primary: "#2E7D52", secondary: "#D4AF37" },
+      "Olivo y arena": { theme: "classic-champagne", primary: "#68765A", secondary: "#B87C55" },
+      "Ciruela, negro y oro": { theme: "black-luxury", primary: "#5A203E", secondary: "#D4AF37" }
+    };
+    const typographyStyles = {
+      "Editorial serif": "editorial",
+      "Romantico con script": "romantic",
+      "Clasico y atemporal": "classic",
+      "Moderno y limpio": "minimal",
+      "Noir de gala": "luxury"
+    };
+    const palette = paletteStyles[request.palette_preference];
+
+    if (palette) {
+      document.getElementById("visual_theme").value = palette.theme;
+      document.getElementById("color_primary").value = palette.primary;
+      document.getElementById("color_secondary").value = palette.secondary;
+    }
+
+    const fontPreset = typographyStyles[request.typography_preference];
+    if (fontPreset) document.getElementById("font_preset").value = fontPreset;
+  }
+
+  async function loadSalesRequest(id) {
+    const { data: request, error } = await db
+      .from("invitation_requests")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error || !request) {
+      errorAlert.textContent = "No se pudo abrir la solicitud comercial.";
+      errorAlert.style.display = "block";
+      sourceRequestId = null;
+      return;
+    }
+
+    if (request.assigned_studio_id && request.assigned_studio_id !== currentStudioId) {
+      errorAlert.textContent = "Esta solicitud ya fue asignada a otro estudio.";
+      errorAlert.style.display = "block";
+      sourceRequestId = null;
+      return;
+    }
+
+    if (!request.assigned_studio_id) {
+      const { data: claimedRequest, error: claimError } = await db
+        .from("invitation_requests")
+        .update({
+          assigned_studio_id: currentStudioId,
+          claimed_by: session.user.id,
+          claimed_at: new Date().toISOString(),
+          status: request.status === "new" ? "in_progress" : request.status
+        })
+        .eq("id", request.id)
+        .is("assigned_studio_id", null)
+        .select("*")
+        .single();
+
+      if (claimError || !claimedRequest) {
+        errorAlert.textContent = "No se pudo asignar la solicitud a este estudio.";
+        errorAlert.style.display = "block";
+        sourceRequestId = null;
+        return;
+      }
+
+      Object.assign(request, claimedRequest);
+    }
+
+    const requestEventType = VALID_TEMPLATES[request.event_type] ? request.event_type : "xv";
+    document.getElementById("event_type").value = requestEventType;
+    updateTemplateOptions({
+      preserveLegacyNull: false,
+      preferredTemplateId: request.requested_template_id
+    });
+    document.getElementById("title").value = requestEventType === "xv" ? "Mis XV A\u00f1os" : "Nuestra Boda";
+    document.getElementById("event_date").value = request.event_date || "";
+    applySalesRequestStyles(request);
+    pageTitle.textContent = "Crear invitacion desde solicitud";
+    showSuccessMessage("Solicitud precargada. Completa los nombres y los detalles del evento antes de guardar.");
   }
 
   previewBtn?.addEventListener("click", () => {
@@ -348,6 +435,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   } else {
     // Modo creación
     updateTemplateOptions({ preserveLegacyNull: false });
+    if (sourceRequestId) await loadSalesRequest(sourceRequestId);
     loading.style.display = "none";
     form.style.display = "block";
   }
@@ -1103,7 +1191,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       background_image_url: finalBackgroundUrl,
       music_title: musicFile ? cleanMusicFileName(musicFile.name) : (document.getElementById("music_title").value || null),
       music_artist: document.getElementById("music_artist").value || null,
-      template_id: null,
       main_photo_url: finalPhotoUrl,
       music_url: finalMusicUrl,
       updated_at: new Date().toISOString()
@@ -1139,6 +1226,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       existingGalleryUrls = finalGalleryUrls.slice();
       galleryDraftItems = existingGalleryUrls.map((url) => ({ kind: "existing", url }));
       renderGalleryThumbnails();
+      if (sourceRequestId && result.data?.id) {
+        const { error: requestError } = await db
+          .from("invitation_requests")
+          .update({
+            status: "in_progress",
+            assigned_studio_id: currentStudioId,
+            converted_invitation_id: result.data.id
+          })
+          .eq("id", sourceRequestId);
+        if (requestError) console.error("No se pudo vincular la solicitud:", requestError);
+        sourceRequestId = null;
+      }
       if (!isEditMode && result.data?.id) {
         inviteId = result.data.id;
         isEditMode = true;

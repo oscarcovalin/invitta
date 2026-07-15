@@ -408,6 +408,8 @@
     ¿Ya contrataste tu invitación? <a href="administracion/formulario-cliente.html">Completa aquí todos los datos del evento</a>.
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/env.js"></script>
   <script>
     const STORAGE_KEY = 'invitta-request-draft-v1';
     const SALES_PHONE = '525566790073';
@@ -449,6 +451,71 @@
       'Moderno y limpio': 'garden-romance',
       'Noir de gala': 'noir-luxury'
     };
+    const requestTemplateIds = {
+      'Rose Champagne': 'xv-rose-gold-premium',
+      'Emerald Gala': 'xv-champagne-rose-vip',
+      'Classic Wedding': 'boda-classic-basic',
+      'Olive Romance': 'boda-golden-romance-premium',
+      'Plum Noir': 'boda-midnight-gold-vip'
+    };
+    const requestPackageTiers = {
+      'Esencial - $399 MXN': 'essential',
+      'Premium - $699 MXN': 'premium',
+      'VIP Experience - $999 MXN': 'vip'
+    };
+
+    function getSalesRequestClient() {
+      const env = window.INVITTIA_ENV || {};
+      if (!window.supabase?.createClient || !env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return null;
+      return window.supabase.createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false }
+      });
+    }
+
+    function normalizeRequestEventType(value) {
+      const raw = String(value || '').trim().toLowerCase();
+      if (raw.includes('xv')) return 'xv';
+      if (raw.includes('boda')) return 'boda';
+      if (raw.includes('bautizo')) return 'bautizo';
+      if (raw.includes('cumple')) return 'cumpleanos';
+      return 'otro';
+    }
+
+    function resolveRequestedTemplate(data) {
+      if (requestTemplateIds[data.design]) return requestTemplateIds[data.design];
+      return normalizeRequestEventType(data.eventType) === 'boda'
+        ? 'boda-classic-basic'
+        : 'xv-elegance-basic';
+    }
+
+    async function registerSalesRequest(data) {
+      const client = getSalesRequestClient();
+      if (!client) return null;
+
+      const payload = {
+        client_name: String(data.clientName || '').trim().slice(0, 160),
+        client_phone: String(data.clientPhone || '').trim().slice(0, 50),
+        event_type: normalizeRequestEventType(data.eventType),
+        design_name: String(data.design || '').trim().slice(0, 120),
+        requested_template_id: resolveRequestedTemplate(data),
+        package_tier: requestPackageTiers[data.packageName] || 'undecided',
+        palette_preference: String(data.palettePreference || '').trim().slice(0, 120) || null,
+        typography_preference: String(data.typographyPreference || '').trim().slice(0, 120) || null,
+        event_date: data.eventDate || null,
+        event_city: String(data.eventCity || '').trim().slice(0, 160) || null,
+        notes: String(data.eventNotes || '').trim().slice(0, 2000) || null,
+        source: 'landing'
+      };
+
+      const { data: request, error } = await client
+        .from('invitation_requests')
+        .insert(payload)
+        .select('id')
+        .single();
+
+      if (error) throw error;
+      return request?.id || null;
+    }
 
     function readDraft() {
       try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
@@ -526,10 +593,23 @@
       if (event.target === designSelect || event.target === palettePreference || event.target === typographyPreference) updateDemoPreviewLink();
     });
 
-    form.addEventListener('submit', event => {
+    form.addEventListener('submit', async event => {
       event.preventDefault();
       if (!form.reportValidity()) return;
       const data = Object.fromEntries(new FormData(form).entries());
+      const submitButton = form.querySelector('button[type="submit"]');
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Registrando solicitud...';
+      }
+      status.textContent = 'Guardando tu solicitud...';
+
+      let requestId = null;
+      try {
+        requestId = await registerSalesRequest(data);
+      } catch (error) {
+        console.error('No se pudo registrar la solicitud:', error);
+      }
       const lines = [
         'Hola Invitta, quiero solicitar una invitación digital.',
         '',
@@ -544,9 +624,14 @@
         `Paquete: ${data.packageName}`,
         `Detalles: ${data.eventNotes || 'Los definiremos después'}`
       ];
+      if (requestId) lines.push(`Solicitud: ${requestId}`);
       saveDraft();
       status.textContent = 'Abriendo WhatsApp…';
       window.open(`https://wa.me/${SALES_PHONE}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener');
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Continuar por WhatsApp';
+      }
     });
   </script>
 </body>

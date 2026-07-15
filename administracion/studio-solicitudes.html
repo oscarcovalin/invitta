@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitudes comerciales · Invitta Studio</title>
+  <link rel="stylesheet" href="/css/studio.css">
+  <style>
+    .request-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 18px 0; flex-wrap: wrap; }
+    .request-toolbar select { min-width: 175px; }
+    .sales-request-list { display: grid; gap: 12px; }
+    .sales-request-item { border: 1px solid var(--border-color); border-radius: 8px; padding: 18px; background: #fff; }
+    .sales-request-top { display: flex; gap: 14px; justify-content: space-between; align-items: flex-start; }
+    .sales-request-top h3 { margin: 0; color: var(--primary-color); }
+    .sales-request-meta { margin: 7px 0 0; color: #5e6d7d; font-size: 13px; }
+    .sales-request-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 18px; margin: 16px 0; }
+    .sales-request-field { min-width: 0; }
+    .sales-request-label { display: block; color: #66788a; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .sales-request-value { display: block; margin-top: 3px; color: #243b53; font-size: 14px; overflow-wrap: anywhere; }
+    .sales-request-notes { margin: 0 0 16px; color: #425466; font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
+    .sales-request-actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+    .sales-request-actions select { min-width: 150px; }
+    .sales-empty { display: none; text-align: center; padding: 30px; color: #66788a; }
+    @media (max-width: 720px) {
+      .sales-request-grid { grid-template-columns: 1fr 1fr; }
+      .sales-request-top { flex-direction: column; }
+      .sales-request-actions { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Solicitudes comerciales</h1>
+        <p id="sales-studio-name">Cargando...</p>
+      </div>
+      <div class="header-actions">
+        <a href="/administracion/studio-dashboard.html" class="btn btn-secondary">Volver al panel</a>
+        <button id="sales-logout-btn" class="btn btn-secondary" type="button">Cerrar sesion</button>
+      </div>
+    </div>
+
+    <section class="card" aria-labelledby="sales-title">
+      <h2 id="sales-title">Clientes interesados</h2>
+      <p style="color:#66788a; margin:6px 0 0;">Abre una solicitud para iniciar la invitacion con el paquete y estilo elegidos.</p>
+      <div class="request-toolbar">
+        <div id="sales-status" role="status" aria-live="polite">Cargando solicitudes...</div>
+        <select id="sales-filter" class="form-control" aria-label="Filtrar solicitudes">
+          <option value="all">Todas las solicitudes</option>
+          <option value="new">Nuevas</option>
+          <option value="contacted">Contactadas</option>
+          <option value="in_progress">En proceso</option>
+          <option value="won">Ganadas</option>
+          <option value="lost">Descartadas</option>
+        </select>
+      </div>
+      <div id="sales-request-list" class="sales-request-list"></div>
+      <div id="sales-empty" class="sales-empty">No hay solicitudes para este filtro.</div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/env.js"></script>
+  <script src="/js/studio-auth.js"></script>
+  <script src="/js/studio-sales-requests.js"></script>
+</body>
+</html>
