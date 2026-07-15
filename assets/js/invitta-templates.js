@@ -22,10 +22,10 @@ window.InvittaTemplates = [
     customizable: true,
     status: "active",
     features: {
-      music: true,
+      music: false,
       gallery: true,
       rsvp: true,
-      qr: true,
+      qr: false,
       personalizedPass: false
     }
   },
@@ -46,8 +46,8 @@ window.InvittaTemplates = [
       music: true,
       gallery: true,
       rsvp: true,
-      qr: true,
-      personalizedPass: true
+      qr: false,
+      personalizedPass: false
     }
   },
   {
@@ -85,10 +85,10 @@ window.InvittaTemplates = [
     customizable: true,
     status: "active",
     features: {
-      music: true,
+      music: false,
       gallery: true,
       rsvp: true,
-      qr: true,
+      qr: false,
       personalizedPass: false
     }
   },
@@ -109,8 +109,8 @@ window.InvittaTemplates = [
       music: true,
       gallery: true,
       rsvp: true,
-      qr: true,
-      personalizedPass: true
+      qr: false,
+      personalizedPass: false
     }
   },
   {

@@ -64,10 +64,13 @@
       font-family: var(--sans);
       font-size: .68rem;
       font-weight: 500;
-      letter-spacing: .22em;
+      letter-spacing: .16em;
       text-transform: uppercase;
       color: rgba(255,255,255,0.9);
       margin-bottom: 28px;
+      max-width: min(100%, 280px);
+      line-height: 1.55;
+      text-wrap: balance;
       animation: fadeDown .9s ease both;
     }
 
@@ -116,6 +119,9 @@
       letter-spacing: .12em;
       color: var(--warm);
       text-transform: uppercase;
+      max-width: min(100%, 280px);
+      line-height: 1.5;
+      text-wrap: balance;
       animation: fadeDown .9s .45s ease both;
     }
 
@@ -645,6 +651,17 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 480px) {
+      .cover-label {
+        font-size: .62rem;
+        letter-spacing: .12em;
+      }
+      .demo-badge {
+        right: 12px;
+        max-width: calc(100vw - 24px);
+        font-size: .6rem;
+        letter-spacing: .06em;
+        padding: 6px 10px;
+      }
       .loc-grid { grid-template-columns: 1fr; }
       .cd-box { padding: 16px 20px; min-width: 64px; }
       .cd-num { font-size: 2.2rem; }
