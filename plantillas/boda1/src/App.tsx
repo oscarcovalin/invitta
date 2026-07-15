@@ -13,6 +13,18 @@ import { CollaborativeAlbum } from "./components/CollaborativeAlbum";
 import { LodgingSuggestions } from "./components/LodgingSuggestions";
 import { ImageReveal } from "./components/ImageReveal";
 import { Camera, Church, GlassWater, Sparkles, Heart, Music, ShoppingBag, Gift, Landmark, Mail } from "lucide-react";
+import midnightHero from "./assets/midnight-hero.jpg";
+import midnightGallery02 from "./assets/midnight-gallery-02.jpg";
+import midnightGallery03 from "./assets/midnight-gallery-03.jpg";
+import midnightGallery04 from "./assets/midnight-gallery-04.jpg";
+import midnightGallery05 from "./assets/midnight-gallery-05.jpg";
+import midnightGallery06 from "./assets/midnight-gallery-06.jpg";
+import midnightGallery07 from "./assets/midnight-gallery-07.jpg";
+import midnightGallery08 from "./assets/midnight-gallery-08.jpg";
+import midnightGallery09 from "./assets/midnight-gallery-09.jpg";
+import midnightGallery10 from "./assets/midnight-gallery-10.jpg";
+import midnightGallery11 from "./assets/midnight-gallery-11.jpg";
+import midnightGallery12 from "./assets/midnight-gallery-12.jpg";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -366,24 +378,52 @@ export default function App() {
   // Gallery Editorial Assets
   const galleryImages = [
     {
-      src: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1200",
+      src: midnightHero,
       caption: "Retrato principal de gala, Sesión de Boda"
     },
     {
-      src: "https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&q=80&w=1200",
+      src: midnightGallery02,
       caption: "Retrato clásico con auto vintage, Hacienda del Fresno"
     },
     {
-      src: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80&w=1200",
+      src: midnightGallery03,
       caption: "Detalle de ramo de novia y anillos de boda"
     },
     {
-      src: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&q=80&w=1200",
+      src: midnightGallery04,
       caption: "Detalle romántico, Bosque Silvestre"
     },
     {
-      src: "https://images.unsplash.com/photo-1519225495810-7512c696505a?auto=format&fit=crop&q=80&w=1200",
+      src: midnightGallery05,
       caption: "Arcadas históricas y arquitectura de la recepción"
+    },
+    {
+      src: midnightGallery06,
+      caption: "Una historia bajo la lluvia"
+    },
+    {
+      src: midnightGallery07,
+      caption: "Arquitectura y complicidad"
+    },
+    {
+      src: midnightGallery08,
+      caption: "La alegria de encontrarnos"
+    },
+    {
+      src: midnightGallery09,
+      caption: "Un abrazo que lo dice todo"
+    },
+    {
+      src: midnightGallery10,
+      caption: "Color para nuestra historia"
+    },
+    {
+      src: midnightGallery11,
+      caption: "Entre cupulas y promesas"
+    },
+    {
+      src: midnightGallery12,
+      caption: "Una noche para siempre"
     }
   ];
 
@@ -593,7 +633,7 @@ export default function App() {
 
           {/* Large Beautiful Cover Photo Side */}
           <ImageReveal
-            src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1200"
+            src={midnightHero}
             alt="Retrato editorial elegante de Ana Camila y Carlos en su sesión de bodas"
             className="w-full md:w-7/12 h-[65vh] md:h-screen mt-12 md:mt-0 group"
             imageClassName="object-center md:object-right"
@@ -699,7 +739,7 @@ export default function App() {
           {/* Cinematic Background Image Overlay */}
           <div className="absolute inset-0 overflow-hidden">
             <ImageReveal
-              src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&q=80&w=1600"
+              src={midnightGallery07}
               alt="Cinematic evening forest background"
               className="absolute inset-0 w-full h-full"
               yParallax={yCountdown}
@@ -860,7 +900,7 @@ export default function App() {
         <section className="relative py-section-gap bg-surface-container-low text-ink flex flex-col md:flex-row items-center min-h-[70vh]">
           {/* Visual Fabric Texture Side */}
           <ImageReveal
-            src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=1200"
+            src={midnightGallery12}
             alt="Fotografía premium de detalles de vestidos de boda elegantes"
             className="w-full md:w-1/2 h-[50vh] md:h-full absolute md:relative top-0 left-0 opacity-20 md:opacity-100 overflow-hidden"
             imageClassName="object-center"
