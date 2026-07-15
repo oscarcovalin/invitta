@@ -689,9 +689,11 @@ export default function App() {
                     </p>
                   </div>
 
-                  <button className="font-sans text-[10px] tracking-[0.2em] text-sage border-b border-sage/20 group-hover:border-sage transition-all pb-0.5 uppercase font-bold">
-                    {option.id === 'bank' || option.id === 'envelope' ? 'VER DATOS' : 'VER ENLACE'}
-                  </button>
+                  {option.id !== 'envelope' && (
+                    <button className="font-sans text-[10px] tracking-[0.2em] text-sage border-b border-sage/20 group-hover:border-sage transition-all pb-0.5 uppercase font-bold">
+                      {option.id === 'bank' ? 'VER DATOS' : 'VER ENLACE'}
+                    </button>
+                  )}
                 </motion.div>
               ))}
             </div>

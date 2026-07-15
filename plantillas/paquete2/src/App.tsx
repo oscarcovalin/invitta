@@ -1075,9 +1075,11 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                     </p>
                   </div>
 
-                  <span className="text-subheading-caps text-[10px] text-sage tracking-[0.2em] font-semibold border-b border-sage/20 group-hover:border-sage pb-0.5 mt-4 inline-block">
-                    {reg.clabe ? "VER DATOS BANCARIOS" : reg.link ? "VER MESA" : "VER DETALLES"}
-                  </span>
+                  {reg.id !== "envelopes" && (
+                    <span className="text-subheading-caps text-[10px] text-sage tracking-[0.2em] font-semibold border-b border-sage/20 group-hover:border-sage pb-0.5 mt-4 inline-block">
+                      {reg.clabe ? "VER DATOS BANCARIOS" : reg.link ? "VER MESA" : "VER DETALLES"}
+                    </span>
+                  )}
                 </motion.div>
               ))}
             </div>
