@@ -507,14 +507,14 @@
         source: 'landing'
       };
 
-      const { data: request, error } = await client
+      // La solicitud es privada: se registra sin solicitar una representación
+      // que requeriría permiso de lectura para visitantes anónimos.
+      const { error } = await client
         .from('invitation_requests')
-        .insert(payload)
-        .select('id')
-        .single();
+        .insert(payload);
 
       if (error) throw error;
-      return request?.id || null;
+      return null;
     }
 
     function readDraft() {
