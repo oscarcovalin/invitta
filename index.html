@@ -766,6 +766,117 @@
         .catalog-card:hover .catalog-card-preview-image { transform: scale(1.055); }
         .catalog-card-meta { pointer-events: none; }
 
+        /* Premium phone mockups for the live demo gallery */
+        .catalog-card-preview {
+            isolation: isolate;
+            background: radial-gradient(circle at 50% 34%, rgba(255,255,255,0.88), transparent 52%), #e9e2d9;
+        }
+        .catalog-card-preview--elegance { background-color: #dfe5d8; }
+        .catalog-card-preview--rose-gold { background-color: #f0dcd6; }
+        .catalog-card-preview--champagne { background-color: #16231d; }
+        .catalog-card-preview--classic { background-color: #e8e1d4; }
+        .catalog-card-preview--golden { background-color: #d9d8c5; }
+        .catalog-card-preview--midnight { background-color: #191419; }
+
+        .catalog-card-preview-link {
+            display: grid;
+            place-items: center;
+            padding: 10px;
+            z-index: 1;
+        }
+        .catalog-card-preview-link::after { display: none; }
+        .catalog-phone-mockup {
+            position: relative;
+            width: 126px;
+            height: 220px;
+            padding: 5px;
+            border: 1px solid rgba(255,255,255,0.45);
+            border-radius: 29px;
+            background: linear-gradient(145deg, #555a5e 0%, #111416 18%, #32383c 55%, #101214 100%);
+            box-shadow: 0 19px 30px rgba(22, 17, 14, 0.26), 0 4px 7px rgba(255,255,255,0.28) inset, -2px 0 3px rgba(255,255,255,0.2) inset;
+            transform: perspective(760px) rotateY(-8deg) rotateX(2deg);
+            transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 800ms cubic-bezier(0.22, 1, 0.36, 1);
+            overflow: hidden;
+        }
+        .catalog-phone-mockup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 17%;
+            width: 35%;
+            height: 100%;
+            background: linear-gradient(108deg, rgba(255,255,255,0.25), transparent 35%);
+            opacity: 0.58;
+            pointer-events: none;
+            z-index: 3;
+        }
+        .catalog-phone-screen {
+            position: relative;
+            display: block;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 24px;
+            background: #171717;
+        }
+        .catalog-phone-screen img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+            transform: scale(1.04);
+            transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .catalog-phone-island {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            width: 43px;
+            height: 12px;
+            border-radius: 99px;
+            background: #080909;
+            box-shadow: 0 1px 1px rgba(255,255,255,0.14) inset;
+            transform: translateX(-50%);
+            z-index: 4;
+        }
+        .catalog-phone-section {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            padding: 30px 12px 12px;
+            color: #fffdf8;
+            text-align: center;
+            background: linear-gradient(to top, rgba(10,9,8,0.86), rgba(10,9,8,0.06));
+            z-index: 2;
+        }
+        .catalog-phone-section span,
+        .catalog-phone-section strong {
+            display: block;
+        }
+        .catalog-phone-section span {
+            margin-bottom: 4px;
+            font-size: 0.42rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            opacity: 0.82;
+        }
+        .catalog-phone-section strong {
+            font-family: var(--serif);
+            font-size: 0.88rem;
+            font-weight: 400;
+            line-height: 1.05;
+        }
+        .catalog-card:hover .catalog-phone-mockup {
+            box-shadow: 0 27px 42px rgba(22, 17, 14, 0.32), 0 4px 7px rgba(255,255,255,0.28) inset, -2px 0 3px rgba(255,255,255,0.2) inset;
+            transform: perspective(760px) rotateY(-2deg) rotateX(0) translateY(-5px);
+        }
+        .catalog-card:hover .catalog-phone-screen img { transform: scale(1.1); }
+        .catalog-card-preview--champagne .catalog-phone-section { background: linear-gradient(to top, rgba(7,23,16,0.92), rgba(7,23,16,0.08)); }
+        .catalog-card-preview--golden .catalog-phone-section { background: linear-gradient(to top, rgba(41,43,30,0.88), rgba(41,43,30,0.05)); }
+        .catalog-card-preview--midnight .catalog-phone-section { background: linear-gradient(to top, rgba(18,11,17,0.92), rgba(18,11,17,0.04)); }
+
         .catalog-preview-screen {
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(10px);
@@ -1606,9 +1717,15 @@
                 <!-- XV AÑOS 11 — Élégance Esencial -->
                 <div class="catalog-card reveal" data-cat="xv">
                     <div class="catalog-card-accent esencial"></div>
-                    <div class="catalog-card-preview">
+                    <div class="catalog-card-preview catalog-card-preview--elegance">
                         <a href="demos/xv-elegance/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Élégance">
-                            <img src="assets/catalog/xv-elegance.jpg" alt="Portada real de la invitación Élégance para XV años" class="catalog-card-preview-image" width="390" height="844" loading="lazy">
+                            <span class="catalog-phone-mockup">
+                                <span class="catalog-phone-screen">
+                                    <img src="demos/xv-elegance/assets/natasha-008-BOBQvAkq.jpg" alt="Sección interior de la invitación Élégance" loading="lazy">
+                                    <span class="catalog-phone-island"></span>
+                                    <span class="catalog-phone-section"><span>GALERÍA EDITORIAL</span><strong>Momentos especiales</strong></span>
+                                </span>
+                            </span>
                         </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill"><i class="fa-solid fa-crown"></i> XV Años</span>
@@ -1641,9 +1758,15 @@
                 <!-- XV AÑOS 12 — Rose Champagne Premium -->
                 <div class="catalog-card reveal" data-cat="xv">
                     <div class="catalog-card-accent premium"></div>
-                    <div class="catalog-card-preview">
+                    <div class="catalog-card-preview catalog-card-preview--rose-gold">
                         <a href="demos/xv-premium-2/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Rose Gold">
-                            <img src="assets/catalog/xv-rose-gold.jpg" alt="Portada real de la invitación Rose Gold para XV años" class="catalog-card-preview-image focus-center" width="390" height="844" loading="lazy">
+                            <span class="catalog-phone-mockup">
+                                <span class="catalog-phone-screen">
+                                    <img src="demos/xv-premium-2/assets/royal-gallery-03-CrmQ_6O-.png" alt="Sección interior de la invitación Rose Gold" loading="lazy">
+                                    <span class="catalog-phone-island"></span>
+                                    <span class="catalog-phone-section"><span>XV AÑOS</span><strong>Momentos para recordar</strong></span>
+                                </span>
+                            </span>
                         </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill"><i class="fa-solid fa-crown"></i> XV Años</span>
@@ -1676,9 +1799,15 @@
                 <!-- XV AÑOS 13 — Emerald Gala VIP -->
                 <div class="catalog-card card-vip reveal" data-cat="xv">
                     <div class="catalog-card-accent vip"></div>
-                    <div class="catalog-card-preview">
+                    <div class="catalog-card-preview catalog-card-preview--champagne">
                         <a href="demos/xv-vip-3/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Champagne Rose">
-                            <img src="assets/catalog/xv-champagne-rose.jpg" alt="Portada real de la invitación Champagne Rose para XV años" class="catalog-card-preview-image focus-center" width="390" height="844" loading="lazy">
+                            <span class="catalog-phone-mockup">
+                                <span class="catalog-phone-screen">
+                                    <img src="demos/xv-vip-3/assets/champagne-gallery-07-B6iyNwwT.png" alt="Sección interior de la invitación Champagne Rose" loading="lazy">
+                                    <span class="catalog-phone-island"></span>
+                                    <span class="catalog-phone-section"><span>CELEBRACIÓN</span><strong>Una noche inolvidable</strong></span>
+                                </span>
+                            </span>
                         </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill" style="background:rgba(255,255,255,0.12);color:#fff8ef;"><i class="fa-solid fa-crown"></i> XV Años</span>
@@ -1711,9 +1840,15 @@
                 <!-- BODA 1 — Classic Wedding Esencial -->
                 <div class="catalog-card reveal" data-cat="boda">
                     <div class="catalog-card-accent esencial"></div>
-                    <div class="catalog-card-preview">
+                    <div class="catalog-card-preview catalog-card-preview--classic">
                         <a href="demos/boda-classic-basic/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Classic Wedding">
-                            <img src="assets/catalog/boda-classic-wedding.jpg" alt="Portada real de la invitación Classic Wedding para boda" class="catalog-card-preview-image" width="390" height="844" loading="lazy">
+                            <span class="catalog-phone-mockup">
+                                <span class="catalog-phone-screen">
+                                    <img src="demos/boda-classic-basic/assets/classic-wedding-gallery-03.png" alt="Sección interior de la invitación Classic Wedding" loading="lazy">
+                                    <span class="catalog-phone-island"></span>
+                                    <span class="catalog-phone-section"><span>NUESTRA HISTORIA</span><strong>Detalles que perduran</strong></span>
+                                </span>
+                            </span>
                         </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
@@ -1746,9 +1881,15 @@
                 <!-- BODA 2 — Olive Romance Premium -->
                 <div class="catalog-card reveal" data-cat="boda">
                     <div class="catalog-card-accent premium"></div>
-                    <div class="catalog-card-preview">
+                    <div class="catalog-card-preview catalog-card-preview--golden">
                         <a href="demos/boda-golden-romance-premium/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Golden Romance">
-                            <img src="assets/catalog/boda-golden-romance.jpg" alt="Portada real de la invitación Golden Romance para boda" class="catalog-card-preview-image focus-center" width="390" height="844" loading="lazy">
+                            <span class="catalog-phone-mockup">
+                                <span class="catalog-phone-screen">
+                                    <img src="demos/boda-golden-romance-premium/assets/golden-romance-gallery-07.png" alt="Sección interior de la invitación Golden Romance" loading="lazy">
+                                    <span class="catalog-phone-island"></span>
+                                    <span class="catalog-phone-section"><span>NUESTRA CELEBRACIÓN</span><strong>Un sí para siempre</strong></span>
+                                </span>
+                            </span>
                         </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
@@ -1779,9 +1920,15 @@
                 <!-- BODA 3 — Plum Noir VIP -->
                 <div class="catalog-card card-vip reveal" data-cat="boda">
                     <div class="catalog-card-accent vip"></div>
-                    <div class="catalog-card-preview">
+                    <div class="catalog-card-preview catalog-card-preview--midnight">
                         <a href="demos/boda-premium-1/index.html" target="_blank" class="catalog-card-preview-link" aria-label="Abrir demo Midnight Gold">
-                            <img src="assets/catalog/boda-midnight-gold.jpg" alt="Portada real de la invitación Midnight Gold para boda" class="catalog-card-preview-image focus-center" width="390" height="844" loading="lazy">
+                            <span class="catalog-phone-mockup">
+                                <span class="catalog-phone-screen">
+                                    <img src="demos/boda-premium-1/assets/midnight-gallery-09-r6OYXtZ8.jpg" alt="Sección interior de la invitación Midnight Gold" loading="lazy">
+                                    <span class="catalog-phone-island"></span>
+                                    <span class="catalog-phone-section"><span>EDICIÓN DE GALA</span><strong>Momentos que iluminan</strong></span>
+                                </span>
+                            </span>
                         </a>
                         <div class="catalog-card-meta">
                             <span class="catalog-card-pill"><i class="fa-solid fa-rings-wedding"></i> Boda</span>
