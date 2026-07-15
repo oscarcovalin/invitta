@@ -329,6 +329,28 @@
             </select>
           </div>
           <div class="field">
+            <label for="palettePreference">Paleta de color preferida</label>
+            <select id="palettePreference" name="palettePreference">
+              <option value="Que me asesoren">Que me asesoren</option>
+              <option value="Rosa y champagne">Rosa y champagne</option>
+              <option value="Marfil y salvia">Marfil y salvia</option>
+              <option value="Esmeralda y oro">Esmeralda y oro</option>
+              <option value="Olivo y arena">Olivo y arena</option>
+              <option value="Ciruela, negro y oro">Ciruela, negro y oro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="typographyPreference">Estilo tipografico</label>
+            <select id="typographyPreference" name="typographyPreference">
+              <option value="Que me asesoren">Que me asesoren</option>
+              <option value="Editorial serif">Editorial serif</option>
+              <option value="Romantico con script">Romantico con script</option>
+              <option value="Clasico y atemporal">Clasico y atemporal</option>
+              <option value="Moderno y limpio">Moderno y limpio</option>
+              <option value="Noir de gala">Noir de gala</option>
+            </select>
+          </div>
+          <div class="field">
             <label for="eventDate">Fecha del evento</label>
             <input id="eventDate" name="eventDate" type="date">
           </div>
@@ -432,6 +454,8 @@
     if (params.get('tipo') === 'xv') setSelectValue(document.getElementById('eventType'), 'XV años');
     if (params.get('tipo') === 'boda') setSelectValue(document.getElementById('eventType'), 'Boda');
     if (params.get('paquete')) setSelectValue(document.getElementById('packageName'), params.get('paquete'));
+    if (params.get('paleta')) setSelectValue(document.getElementById('palettePreference'), params.get('paleta'));
+    if (params.get('tipografia')) setSelectValue(document.getElementById('typographyPreference'), params.get('tipografia'));
     updatePreview();
 
     form.addEventListener('input', saveDraft);
@@ -451,6 +475,8 @@
         `WhatsApp: ${data.clientPhone}`,
         `Evento: ${data.eventType}`,
         `Diseño: ${data.design}`,
+        `Paleta: ${data.palettePreference}`,
+        `Tipografia: ${data.typographyPreference}`,
         `Fecha: ${data.eventDate || 'Por definir'}`,
         `Ciudad: ${data.eventCity || 'Por definir'}`,
         `Paquete: ${data.packageName}`,
