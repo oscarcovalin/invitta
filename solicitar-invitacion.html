@@ -156,6 +156,26 @@
       font-weight: 600;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
+    .preview-demo-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      margin-top: 14px;
+      padding: 0 18px;
+      border: 1px solid var(--sand);
+      border-radius: 999px;
+      color: var(--rose-deep);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .preview-demo-link:hover {
+      border-color: var(--rose);
+      background: var(--rose-pale);
+      color: var(--charcoal);
+    }
     .request-card {
       padding: 38px;
       border: 1px solid var(--sand);
@@ -289,6 +309,7 @@
         <img id="designPreviewImage" src="demos/xv-esencial/assets/hero-showcase-v2.png" alt="Vista previa del diseño seleccionado" width="390" height="844">
         <figcaption id="designPreviewCaption">Diseño Élégance</figcaption>
       </figure>
+      <a class="preview-demo-link" id="previewDemoLink" href="demos/xv-esencial/index.html" target="_blank" rel="noopener">Ver muestra personalizada</a>
     </section>
 
     <section class="request-card" aria-labelledby="form-title">
@@ -395,6 +416,9 @@
     const designSelect = document.getElementById('design');
     const previewImage = document.getElementById('designPreviewImage');
     const previewCaption = document.getElementById('designPreviewCaption');
+    const previewDemoLink = document.getElementById('previewDemoLink');
+    const palettePreference = document.getElementById('palettePreference');
+    const typographyPreference = document.getElementById('typographyPreference');
     const designImages = {
       'Élégance': 'demos/xv-esencial/assets/hero-showcase-v2.png',
       'Rose Champagne': 'demos/xv-premium/assets/hero-showcase-v2.png',
@@ -402,6 +426,28 @@
       'Classic Wedding': 'demos/boda-esencial/assets/hero-showcase-v2.png',
       'Olive Romance': 'demos/boda-premium/assets/hero-showcase-v2.png',
       'Plum Noir': 'demos/boda-vip/assets/hero-showcase-v2.png'
+    };
+
+    const designDemoPaths = {
+      'Rose Champagne': 'demos/xv-premium/index.html',
+      'Emerald Gala': 'demos/xv-vip/index.html',
+      'Classic Wedding': 'demos/boda-esencial/index.html',
+      'Olive Romance': 'demos/boda-premium/index.html',
+      'Plum Noir': 'demos/boda-vip/index.html'
+    };
+    const palettePresets = {
+      'Rosa y champagne': 'rose-champagne',
+      'Marfil y salvia': 'ivory-sage',
+      'Esmeralda y oro': 'emerald-gold',
+      'Olivo y arena': 'olive-romance',
+      'Ciruela, negro y oro': 'plum-noir'
+    };
+    const typographyPresets = {
+      'Editorial serif': 'editorial-modern',
+      'Romantico con script': 'romantic-script',
+      'Clasico y atemporal': 'classic-wedding',
+      'Moderno y limpio': 'garden-romance',
+      'Noir de gala': 'noir-luxury'
     };
 
     function readDraft() {
@@ -431,6 +477,20 @@
       previewCaption.textContent = selected === 'Aún no lo decido' ? 'Explora nuestros diseños' : `Diseño ${selected}`;
     }
 
+    function updateDemoPreviewLink() {
+      const hasSelectedDesign = designSelect.selectedIndex > 0;
+      const path = designDemoPaths[designSelect.value] || 'demos/xv-esencial/index.html';
+      const query = new URLSearchParams();
+      const palette = palettePresets[palettePreference.value];
+      const typography = typographyPresets[typographyPreference.value];
+
+      if (palette) query.set('palette', palette);
+      if (typography) query.set('type', typography);
+
+      previewDemoLink.href = query.size ? `${path}?${query.toString()}` : path;
+      previewDemoLink.hidden = !hasSelectedDesign;
+    }
+
     const draft = readDraft();
     for (const [name, value] of Object.entries(draft)) {
       const field = form.elements.namedItem(name);
@@ -457,11 +517,13 @@
     if (params.get('paleta')) setSelectValue(document.getElementById('palettePreference'), params.get('paleta'));
     if (params.get('tipografia')) setSelectValue(document.getElementById('typographyPreference'), params.get('tipografia'));
     updatePreview();
+    updateDemoPreviewLink();
 
     form.addEventListener('input', saveDraft);
     form.addEventListener('change', event => {
       saveDraft();
       if (event.target === designSelect) updatePreview();
+      if (event.target === designSelect || event.target === palettePreference || event.target === typographyPreference) updateDemoPreviewLink();
     });
 
     form.addEventListener('submit', event => {
