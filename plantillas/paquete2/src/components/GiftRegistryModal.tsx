@@ -45,7 +45,6 @@ export function GiftRegistryModal({ registry, onClose }: GiftRegistryModalProps)
         </button>
 
         <div className="text-center space-y-4">
-          <span className="material-symbols-outlined text-4xl text-sage">{registry.icon}</span>
           <h3 className="font-display text-2xl md:text-3xl text-ink tracking-tight">{registry.name}</h3>
           <div className="w-12 h-[1px] bg-sage/30 mx-auto"></div>
         </div>
