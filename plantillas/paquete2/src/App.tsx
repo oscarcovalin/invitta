@@ -19,35 +19,36 @@ import royalGallery06 from "./assets/royal-gallery-06.png";
 
 
 const invData = (typeof window !== "undefined" && (window as any).INVITATION_DATA) ? (window as any).INVITATION_DATA : {
-  eventTitle: "ÉLÉGANCE | Ana Camila Zavala - XV Años",
-  celebrantName: "Ana Camila",
-  celebrantLastName: "Zavala",
-  eventDate: "2026-12-12",
-  parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-  godparents: ["Isabela Zavala", "Diego Bernal"],
+  eventTitle: "Rose Gold | Mary Carmen Arevalo - XV Años",
+  celebrantName: "Mary Carmen",
+  celebrantLastName: "Arevalo",
+  eventDate: "2026-11-28",
+  parents: ["José Ángel Arévalo G.", "Luisa María Saavedra D."],
+  godparents: ["Julio Arévalo G.", "Martha Caballero H."],
+  chamberlain: "Juan Carlos Arévalo S.",
   quote: "Hay momentos en la vida que imaginamos desde niñas, y hoy, uno de mis sueños más hermosos se hace realidad.",
   ceremony: {
-    name: "Parroquia Sagrado Corazón de Jesús",
-    time: "3:00 P.M.",
-    address: "Blv. Calle 20 de Noviembre y Av. Melchor Ocampo, Col. Pacífico, Chihuahua, Chih.",
-    mapUrl: "#"
+    name: "Santuario Nuestra Señora de los Remedios",
+    time: "6:00 P.M.",
+    address: "Ferrocarril, San Miguel, Zona Arqueológica San Andrés Cholula, 72810 San Andrés Cholula, Pue.",
+    mapUrl: "https://maps.app.goo.gl/h1Bwh1Nox2bDM8KW9"
   },
   reception: {
-    name: "Cantabria Salón de Eventos",
-    time: "9:00 P.M.",
-    address: "Blv. Col. Sierra Magisterial #6103, Col. Los Ángeles, Chihuahua, Chih.",
-    mapUrl: "#"
+    name: "Quinta Aidel - La Quinta de Cholula",
+    time: "8:00 P.M.",
+    address: "C. 16 Pte. 107, San Juan Aquiahuac, 72810 San Andrés Cholula, Pue.",
+    mapUrl: "https://maps.app.goo.gl/SyRfSQewMh4ditvQ6"
   },
   itinerary: [
-    { time: "16:00 P.M.", title: "Sesión Fotográfica de Gala", description: "Capturando recuerdos eternos", iconName: "Camera" },
-    { time: "17:00 P.M.", title: "Ceremonia de Acción de Gracias", description: "Santuario del Sagrado Corazón", iconName: "Church" },
-    { time: "19:00 P.M.", title: "Bienvenida y Cóctel", description: "Recibimiento de los invitados en el salón", iconName: "GlassWater" },
-    { time: "20:30 P.M.", title: "Vals de Gala & Brindis", description: "Momento estelar junto a mis seres queridos", iconName: "Sparkles" },
-    { time: "21:00 P.M.", title: "Banquete de Honor", description: "Cena de gala en el salón principal", iconName: "Heart" },
-    { time: "22:30 P.M.", title: "Gran Apertura de Pista", description: "Música, baile y diversión inolvidable", iconName: "Music" }
+    { time: "17:00 P.M.", title: "Sesión Fotográfica de Gala", description: "Capturando recuerdos eternos", iconName: "Camera" },
+    { time: "18:00 P.M.", title: "Ceremonia de Acción de Gracias", description: "Santuario Nuestra Señora de los Remedios", iconName: "Church" },
+    { time: "20:00 P.M.", title: "Bienvenida y Cóctel", description: "Recibimiento de los invitados en Quinta Aidel", iconName: "GlassWater" },
+    { time: "21:30 P.M.", title: "Vals de Gala & Brindis", description: "Momento estelar junto a mis seres queridos", iconName: "Sparkles" },
+    { time: "22:00 P.M.", title: "Banquete de Honor", description: "Cena de gala en el salón principal", iconName: "Heart" },
+    { time: "23:30 P.M.", title: "Gran Apertura de Pista", description: "Música, baile y diversión inolvidable", iconName: "Music" }
   ],
-  whatsapp: "526142525050",
-  guestName: "Familia Zavala Almazán",
+  whatsapp: "",
+  guestName: "Familia Arévalo Saavedra",
   passes: 2,
   table: "",
   mainPhotoUrl: royalHero,
@@ -231,7 +232,7 @@ export default function App() {
       attending,
       guestsCount: attending ? guestsCount : 0,
       dietaryNotes: dietaryNotes.trim() || undefined,
-      timestamp: new Date().toLocaleString("es-MX", { timeZone: "America/Chihuahua" }),
+      timestamp: new Date().toLocaleString("es-MX", { timeZone: "America/Mexico_City" }),
       message: message.trim() || undefined,
     };
 
@@ -263,7 +264,7 @@ export default function App() {
     dietaryVal?: string,
     msgVal?: string
   ) => {
-    const phone = invData.whatsapp || "526142525050"; // Chihuahua, MX standard number (Susana Almazán Bernal / Madre)
+    const phone = invData.whatsapp || "";
     let text = `¡Hola ${invData.celebrantName}! ✨ Quiero confirmar mi asistencia a tu fiesta de Quince Años. 🌸`;
     if (nameVal) {
       text = `¡Hola ${invData.celebrantName}! ✨ Soy *${nameVal}*.\n\n`;
@@ -301,7 +302,7 @@ export default function App() {
       attending,
       guestsCount: attending ? guestsCount : 0,
       dietaryNotes: dietaryNotes.trim() || undefined,
-      timestamp: new Date().toLocaleString("es-MX", { timeZone: "America/Chihuahua" }),
+      timestamp: new Date().toLocaleString("es-MX", { timeZone: "America/Mexico_City" }),
       message: message.trim() || undefined,
     };
 
@@ -349,13 +350,6 @@ export default function App() {
   // Gift Registry Database
   const registries: GiftRegistryOption[] = [
     {
-      id: "amazon",
-      name: "Amazon",
-      icon: "featured_seasonal",
-      details: "Hemos seleccionado algunos artículos ideales para equipar mis nuevas etapas de vida. Puedes acceder directamente a mi mesa de regalos de Amazon aquí.",
-      link: "https://www.amazon.com.mx/baby-reg" // Simulated premium mesa
-    },
-    {
       id: "liverpool",
       name: "Liverpool",
       icon: "card_giftcard",
@@ -368,7 +362,7 @@ export default function App() {
       icon: "account_balance",
       details: "Si prefieres realizar una aportación por transferencia o depósito bancario directo, ponemos a tu disposición los siguientes datos de confianza:",
       bank: "Banco Santander",
-      beneficiary: "Susana Almazán Bernal (Madre)",
+      beneficiary: "Luisa María Saavedra D. (Madre)",
       clabe: "0141 5065 5047 8820 12"
     },
     {
@@ -445,10 +439,10 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
               <div className="space-y-3">
                 <span className="font-serif italic text-3xl md:text-4xl text-sage block">Mis Quince Años</span>
                 <h2 className="font-serif text-4xl md:text-5xl text-paper tracking-wide font-light mt-1">
-                  ${invData.celebrantName}
+                  {invData.celebrantName}
                 </h2>
                 <p className="font-sans text-[11px] uppercase tracking-[0.3em] text-sage/80 mt-2">
-                  Zavala Zavala
+                  {invData.celebrantLastName}
                 </p>
               </div>
 
@@ -467,9 +461,9 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                 <div className="w-24 h-24 rounded-full bg-radial from-[#dfba6b] via-[#cfa653] to-[#b88e3a] shadow-[0_12px_24px_rgba(0,0,0,0.5),inset_0_2px_4px_rgba(255,255,255,0.4),inset_0_-2px_4px_rgba(0,0,0,0.4)] flex items-center justify-center relative border border-champagne-gold/40">
                   {/* Outer indented circle */}
                   <div className="absolute inset-2 rounded-full border-2 border-[#f1db9c]/30"></div>
-                  {/* Monogram "AC" */}
+                  {/* Monogram */}
                   <span className="font-serif text-3xl text-[#fffbf0] font-normal tracking-wide drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)] select-none">
-                    AC
+                    MC
                   </span>
                 </div>
 
@@ -634,7 +628,7 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
             {/* Footer Signoff */}
             <div className="text-center">
               <p className="text-[9px] text-on-surface-variant/40 tracking-[0.3em] uppercase">
-                © 2026 ÉLÉGANCE DIGITAL ATELIER
+                © 2026 ROSE GOLD DIGITAL ATELIER
               </p>
             </div>
           </div>
@@ -659,8 +653,8 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
             <span className="text-subheading-caps text-sage tracking-[0.4em] font-medium">Mis Quince Años</span>
             
             <h2 className="font-display text-ink uppercase flex flex-col select-none">
-              <span className="block text-5xl md:text-7xl font-light leading-none tracking-tight">Ana</span>
-              <span className="block md:ml-12 italic text-sage text-6xl md:text-8xl font-normal leading-none my-1">Camila</span>
+              <span className="block text-5xl md:text-7xl font-light leading-none tracking-tight">Mary</span>
+              <span className="block md:ml-12 italic text-sage text-6xl md:text-8xl font-normal leading-none my-1">Carmen</span>
               <span className="block md:ml-24 text-5xl md:text-7xl font-light leading-none tracking-tight">{invData.celebrantLastName}</span>
             </h2>
 
@@ -753,9 +747,9 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                   <div className="flex flex-col gap-4">
                     {(invData.godparents || []).map((gp: any, idx: number) => (
                       <div key={idx} className="flex flex-col mb-4">
-                        {gp.role && gp.role !== 'Padrinos' && <span className="text-xs text-sage tracking-widest uppercase mb-1">{gp.role}</span>}
+                        {typeof gp !== 'string' && gp.role && gp.role !== 'Padrinos' && <span className="text-xs text-sage tracking-widest uppercase mb-1">{gp.role}</span>}
                         <span className={`font-display font-light text-2xl md:text-3.5xl text-ink leading-tight ${idx % 2 !== 0 ? 'pl-16' : ''}`}>
-                          {gp.name}
+                          {typeof gp === 'string' ? gp : gp.name}
                         </span>
                       </div>
                     ))}
@@ -782,7 +776,7 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                   </h3>
                   
                   <span className="font-display text-2xl md:text-3xl text-ink block font-light tracking-tight mt-4">
-                    Carlos González Farrera
+                    {invData.chamberlain}
                   </span>
                   
                   <div className="w-12 h-[1px] bg-sage/40 mt-6"></div>
@@ -829,11 +823,11 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                 Guarda la Fecha Especial
               </h3>
               <span className="font-display font-light text-5xl md:text-7xl block leading-tight tracking-tight">
-                12 Diciembre <br/>
+                28 Noviembre <br/>
                 <span className="italic text-sage font-normal">2026</span>
               </span>
               <p className="font-sans text-xs text-paper/60 uppercase tracking-widest">
-                Chihuahua, Chihuahua, México
+                San Andrés Cholula, Puebla, México
               </p>
             </motion.div>
 
@@ -889,19 +883,18 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                   <div className="space-y-3 text-sm md:text-base leading-relaxed text-on-surface-variant font-light">
                     <p className="font-semibold text-ink text-base">{invData.ceremony.name}</p>
                     <p className="text-sage font-semibold tracking-[0.2em] uppercase text-xs">
-                      Sábado 12 de Diciembre • 3:00 P.M.
+                      Sábado 28 de Noviembre • 6:00 P.M.
                     </p>
                     <p className="opacity-80 pt-2 font-sans text-xs md:text-sm">
-                      Blv. Calle 20 de Noviembre y Av. Melchor Ocampo<br/>
-                      Col. Pacífico, C.P. 31030<br/>
-                      Chihuahua, Chihuahua.
+                      Ferrocarril, San Miguel, Zona Arqueológica San Andrés Cholula<br/>
+                      C.P. 72810, San Andrés Cholula, Puebla.
                     </p>
                   </div>
                 </div>
 
                 <div className="pt-8 mt-4 flex flex-wrap gap-4 items-center">
                   <a 
-                    href="https://maps.google.com/?q=Parroquia+Sagrado+Corazon+de+Jesus+Chihuahua+Calle+20+de+Noviembre"
+                    href={invData.ceremony.mapUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-[11px] font-subheading-caps tracking-[0.25em] text-ink hover:text-sage border-b border-ink/45 hover:border-sage pb-1 transition-all"
@@ -910,7 +903,7 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                     <span className="material-symbols-outlined text-xs">open_in_new</span>
                   </a>
                   <a 
-                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Ceremonia+Religiosa+-+XV+A%C3%B1os+Ana+Camila+Zavala&dates=20261212T210000Z/20261212T223000Z&details=Ceremonia+Religiosa+de+los+Quince+A%C3%B1os+de+Ana+Camila+Zavala+en+la+Parroquia+Sagrado+Coraz%C3%B3n+de+Jes%C3%BAs.&location=Parroquia+Sagrado+Coraz%C3%B3n+de+Jes%C3%BAs%2C+Blv.+Calle+20+de+Noviembre+y+Av.+Melchor+Ocampo%2C+Col.+Pac%C3%ADfico%2C+Chihuahua%2C+Chih.&sf=true&output=xml"
+                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Ceremonia+Religiosa+-+XV+A%C3%B1os+Mary+Carmen+Arevalo&dates=20261129T000000Z/20261129T013000Z&details=Ceremonia+Religiosa+de+los+Quince+A%C3%B1os+de+Mary+Carmen+Arevalo.&location=Santuario+Nuestra+Se%C3%B1ora+de+los+Remedios%2C+San+Andr%C3%A9s+Cholula%2C+Puebla.&sf=true&output=xml"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-[11px] font-subheading-caps tracking-[0.25em] text-sage hover:text-ink border-b border-sage/45 hover:border-ink pb-1 transition-all"
@@ -941,19 +934,18 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                   <div className="space-y-3 text-sm md:text-base leading-relaxed text-on-surface-variant font-light">
                     <p className="font-semibold text-ink text-base">{invData.reception.name}</p>
                     <p className="text-sage font-semibold tracking-[0.2em] uppercase text-xs">
-                      Sábado 12 de Diciembre • 9:00 P.M.
+                      Sábado 28 de Noviembre • 8:00 P.M.
                     </p>
                     <p className="opacity-80 pt-2 font-sans text-xs md:text-sm">
-                      Blv. Col. Sierra Magisterial #6103 esq. con Tejas<br/>
-                      Col. Los Ángeles, C.P. 31380<br/>
-                      Chihuahua, Chihuahua.
+                      C. 16 Pte. 107, San Juan Aquiahuac<br/>
+                      C.P. 72810, San Andrés Cholula, Puebla.
                     </p>
                   </div>
                 </div>
 
                 <div className="pt-8 mt-4 flex flex-wrap gap-4 items-center">
                   <a 
-                    href="https://maps.google.com/?q=Cantabria+Salon+de+Eventos+Chihuahua+Sierra+Magisterial"
+                    href={invData.reception.mapUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-[11px] font-subheading-caps tracking-[0.25em] text-ink hover:text-sage border-b border-ink/45 hover:border-sage pb-1 transition-all"
@@ -962,7 +954,7 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                     <span className="material-symbols-outlined text-xs">open_in_new</span>
                   </a>
                   <a 
-                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Recepci%C3%B3n+-+XV+A%C3%B1os+Ana+Camila+Zavala&dates=20261213T030000Z/20261213T090000Z&details=Recepci%C3%B3n+de+los+Quince+A%C3%B1os+de+Ana+Camila+Zavala+en+Cantabria+Sal%C3%B3n+de+Eventos.&location=Cantabria+Sal%C3%B3n+de+Eventos%2C+Blv.+Col.+Sierra+Magisterial+%236103%2C+Col.+Los+%C3%81ngeles%2C+Chihuahua%2C+Chih.&sf=true&output=xml"
+                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Recepci%C3%B3n+-+XV+A%C3%B1os+Mary+Carmen+Arevalo&dates=20261129T020000Z/20261129T090000Z&details=Recepci%C3%B3n+de+los+Quince+A%C3%B1os+de+Mary+Carmen+Arevalo.&location=Quinta+Aidel+-+La+Quinta+de+Cholula%2C+San+Andr%C3%A9s+Cholula%2C+Puebla.&sf=true&output=xml"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-[11px] font-subheading-caps tracking-[0.25em] text-sage hover:text-ink border-b border-sage/45 hover:border-ink pb-1 transition-all"
@@ -1265,7 +1257,7 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                 Confirmar Asistencia
               </h2>
               <p className="text-xs tracking-widest uppercase text-sage">
-                Agradecemos confirmar antes del 20 de Noviembre, 2026
+                Agradecemos confirmar antes del 21 de Noviembre, 2026
               </p>
               <div className="w-12 h-[1px] bg-sage/30 mx-auto"></div>
             </motion.div>
@@ -1337,11 +1329,11 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <span className="text-[9px] tracking-widest uppercase font-semibold text-sage">Ceremonia</span>
-                        <p className="text-ink font-semibold pt-1">3:00 P.M. • Sdo. Corazón</p>
+                        <p className="text-ink font-semibold pt-1">6:00 P.M. • Los Remedios</p>
                       </div>
                       <div>
                         <span className="text-[9px] tracking-widest uppercase font-semibold text-sage">Recepción</span>
-                        <p className="text-ink font-semibold pt-1">9:00 P.M. • Cantabria</p>
+                        <p className="text-ink font-semibold pt-1">8:00 P.M. • Quinta Aidel</p>
                       </div>
                     </div>
 
@@ -1371,7 +1363,7 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                      <button 
+                      {invData.whatsapp && (<button
                         type="button"
                         onClick={() => {
                           const url = getWhatsAppUrl(
@@ -1389,7 +1381,7 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                         </svg>
                         ENVIAR COMPROBANTE POR WHATSAPP
-                      </button>
+                      </button>)}
                       <button 
                         onClick={() => setRsvpSubmitted(null)}
                         className="px-6 py-2.5 border border-outline-variant/40 hover:border-sage hover:text-sage text-[10px] font-semibold tracking-widest uppercase transition-colors rounded-xs cursor-pointer select-none"
@@ -1443,7 +1435,7 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                     </label>
                     <input 
                       type="text" 
-                      placeholder="Ej. Familia Zavala Almazán o Sr. Alberto Bernal"
+                      placeholder="Ej. Familia Arévalo Saavedra"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full bg-transparent border-none p-0 focus:ring-0 text-ink placeholder:opacity-30 font-sans text-sm md:text-base tracking-wide"
@@ -1534,18 +1526,20 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
                     CONFIRMAR EN ESTE SITIO
                   </button>
 
-                  <div className="relative flex py-2 items-center">
-                    <div className="flex-grow border-t border-outline-variant/15"></div>
-                    <span className="flex-shrink mx-4 text-[9px] tracking-[0.25em] text-sage font-semibold uppercase">O TAMBIÉN</span>
-                    <div className="flex-grow border-t border-outline-variant/15"></div>
-                  </div>
+                  {invData.whatsapp && (<>
+                    <div className="relative flex py-2 items-center">
+                      <div className="flex-grow border-t border-outline-variant/15"></div>
+                      <span className="flex-shrink mx-4 text-[9px] tracking-[0.25em] text-sage font-semibold uppercase">O TAMBIÉN</span>
+                      <div className="flex-grow border-t border-outline-variant/15"></div>
+                    </div>
 
-                  {invData.whatsapp && (<button type="button" onClick={handleWhatsAppRsvp} className="w-full h-14 bg-sage text-paper flex items-center justify-center gap-3 font-sans font-medium tracking-wider hover:bg-sage/90 transition-colors">
+                    <button type="button" onClick={handleWhatsAppRsvp} className="w-full h-14 bg-sage text-paper flex items-center justify-center gap-3 font-sans font-medium tracking-wider hover:bg-sage/90 transition-colors">
                       <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a5.8 5.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.81 11.81 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.88 11.88 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 0 0-3.48-8.413z" />
                       </svg>
                       Confirmar vía WhatsApp
-                    </button>)}
+                    </button>
+                  </>)}
                 </div>
               </form>
             )}

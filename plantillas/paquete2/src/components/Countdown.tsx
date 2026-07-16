@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export function Countdown() {
-  const targetDate = new Date("2026-12-12T15:00:00-06:00").getTime(); // Chihuahua/Mexico time
+  const targetDate = new Date("2026-11-28T18:00:00-06:00").getTime();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -35,11 +35,11 @@ export function Countdown() {
 
   const downloadIcs = () => {
     const event = {
-      title: "XV Años Ana Camila Zavala",
-      description: "Acompáñanos a celebrar los quince años de Ana Camila. Ceremonia: Parroquia Sagrado Corazón de Jesús. Recepción: Cantabria Salón de Eventos.",
-      location: "Cantabria Salón de Eventos, Chihuahua, Chih.",
-      start: "20261212T150000",
-      end: "20261213T020000",
+      title: "XV Años Mary Carmen Arevalo",
+      description: "Acompáñanos a celebrar los quince años de Mary Carmen. Ceremonia: Santuario Nuestra Señora de los Remedios. Recepción: Quinta Aidel - La Quinta de Cholula.",
+      location: "Quinta Aidel - La Quinta de Cholula, San Andrés Cholula, Pue.",
+      start: "20261128T180000",
+      end: "20261129T030000",
     };
 
     const icsContent = [
@@ -59,7 +59,7 @@ export function Countdown() {
     const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "XV_Anos_Ana_Camila.ics";
+    link.download = "XV_Anos_Mary_Carmen.ics";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

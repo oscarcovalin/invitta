@@ -79,7 +79,7 @@ export function RsvpAdmin({ isOpen, onClose, rsvps, onDeleteRsvp, onClearAll }: 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `RSVP_Ana_Camila_2026.csv`);
+    link.setAttribute("download", `RSVP_Mary_Carmen_2026.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -90,13 +90,13 @@ export function RsvpAdmin({ isOpen, onClose, rsvps, onDeleteRsvp, onClearAll }: 
       const samples: RSVP[] = [
         {
           id: "1",
-          name: "Alejandro Zavala Almazán",
+          name: "Alejandro Arévalo Saavedra",
           email: "alejandro@gmail.com",
           attending: true,
           guestsCount: 4,
           dietaryNotes: "1 Vegetariano",
           timestamp: new Date().toLocaleString(),
-          message: "¡Muchas felicidades Camila, nos vemos pronto!"
+          message: "¡Muchas felicidades Mary Carmen, nos vemos pronto!"
         },
         {
           id: "2",
@@ -109,7 +109,7 @@ export function RsvpAdmin({ isOpen, onClose, rsvps, onDeleteRsvp, onClearAll }: 
         },
         {
           id: "3",
-          name: "Roberto Bernal O'Farrill",
+          name: "Roberto Caballero O'Farrill",
           email: "roberto@bernal.com",
           attending: false,
           guestsCount: 0,
@@ -180,7 +180,7 @@ export function RsvpAdmin({ isOpen, onClose, rsvps, onDeleteRsvp, onClearAll }: 
               <span className="material-symbols-outlined text-4xl text-sage">lock</span>
               <h3 className="font-display text-2xl md:text-3xl text-ink">Buzón RSVP Administrador</h3>
               <p className="font-sans text-xs text-on-surface-variant tracking-[0.1em] uppercase">
-                Área reservada para Ana Camila y familia
+                Área reservada para Mary Carmen y familia
               </p>
               <div className="w-12 h-[1px] bg-sage/30 mx-auto"></div>
             </div>
@@ -215,7 +215,7 @@ export function RsvpAdmin({ isOpen, onClose, rsvps, onDeleteRsvp, onClearAll }: 
               <div className="space-y-1">
                 <h3 className="font-display text-2xl md:text-3xl text-ink">Registro de Invitados</h3>
                 <p className="font-sans text-xs text-sage tracking-[0.15em] uppercase">
-                  Ana Camila Zavala — 12.Dic.2026
+                  Mary Carmen Arevalo — 28.Nov.2026
                 </p>
               </div>
 
