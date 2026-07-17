@@ -4,17 +4,34 @@
  */
 
 
-const VALID_TEMPLATES = {
+const TEMPLATE_FALLBACKS = {
   xv: [
-    "xv-elegance-basic",
-    "xv-rose-gold-premium",
-    "xv-champagne-rose-vip"
+    { id: "xv-elegance-basic", name: "Élégance XV", packageLabel: "Esencial" },
+    { id: "xv-rose-gold-premium", name: "Rose Gold XV", packageLabel: "Premium" },
+    { id: "xv-champagne-rose-vip", name: "Champagne Rose", packageLabel: "VIP Experience" }
   ],
   boda: [
-    "boda-classic-basic",
-    "boda-golden-romance-premium",
-    "boda-midnight-gold-vip"
+    { id: "boda-classic-basic", name: "Classic Wedding", packageLabel: "Esencial" },
+    { id: "boda-golden-romance-premium", name: "Golden Romance", packageLabel: "Premium" },
+    { id: "boda-midnight-gold-vip", name: "Midnight Gold Wedding", packageLabel: "VIP Experience" }
   ]
+};
+
+function getTemplatesByType(eventType) {
+  if (window.InvittaTemplateCatalog) {
+    const templates = window.InvittaTemplateCatalog
+      .getByType(eventType)
+      .filter(template => template.status === "active");
+
+    if (templates.length) return templates;
+  }
+
+  return TEMPLATE_FALLBACKS[eventType] || [];
+}
+
+const VALID_TEMPLATES = {
+  xv: getTemplatesByType("xv").map(template => template.id),
+  boda: getTemplatesByType("boda").map(template => template.id)
 };
 
 let isEditMode = false;
@@ -67,19 +84,10 @@ function updateTemplateOptions(options = { preserveLegacyNull: false, preferredT
     templateSelect.appendChild(opt);
   }
   
-  const optsXV = [
-    {val: "xv-elegance-basic", text: "Élégance XV — Básica"},
-    {val: "xv-rose-gold-premium", text: "Rose Gold XV — Premium"},
-    {val: "xv-champagne-rose-vip", text: "Champagne Rose VIP"}
-  ];
-  
-  const optsBoda = [
-    {val: "boda-classic-basic", text: "Classic Boda — Básica"},
-    {val: "boda-golden-romance-premium", text: "Golden Romance — Premium"},
-    {val: "boda-midnight-gold-vip", text: "Midnight Gold — VIP"}
-  ];
-
-  const opts = eventType === "xv" ? optsXV : optsBoda;
+  const opts = getTemplatesByType(eventType).map(template => ({
+    val: template.id,
+    text: `${template.name} — ${template.packageLabel || template.level || "Plantilla"}`
+  }));
   const validArray = VALID_TEMPLATES[eventType] || [];
 
   opts.forEach(o => {

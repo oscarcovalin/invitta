@@ -138,6 +138,10 @@ window.InvittaTemplates = [
 
 // Helper functions that return unmutated copies
 window.InvittaTemplateCatalog = {
+  TEMPLATE_NAMES: window.InvittaTemplates.reduce(function(names, template) {
+    names[template.id] = template.name;
+    return names;
+  }, {}),
   getAll: function() {
     return JSON.parse(JSON.stringify(window.InvittaTemplates));
   },
@@ -153,5 +157,10 @@ window.InvittaTemplateCatalog = {
   },
   getActive: function() {
     return JSON.parse(JSON.stringify(window.InvittaTemplates.filter(t => t.status === "active")));
+  },
+  getIdsByType: function(type) {
+    return window.InvittaTemplates
+      .filter(t => t.type === type && t.status === "active")
+      .map(t => t.id);
   }
 };
