@@ -367,6 +367,78 @@
     });
   }
 
+  function ensureVipAccessStyles() {
+    if (document.getElementById("invitta-vip-access-styles")) return;
+    var style = document.createElement("style");
+    style.id = "invitta-vip-access-styles";
+    style.textContent = [
+      ".invitta-vip-access{width:min(92%,560px);margin:72px auto;padding:0 20px;box-sizing:border-box;text-align:center}",
+      ".invitta-vip-access-card{position:relative;overflow:hidden;padding:42px 28px;border:1px solid rgba(155,118,83,.32);background:#fffdf9;box-shadow:0 20px 55px rgba(45,34,28,.1)}",
+      ".invitta-vip-access-card:before{content:'';position:absolute;inset:12px;border:1px solid rgba(155,118,83,.15);pointer-events:none}",
+      ".invitta-vip-access-kicker{margin:0 0 12px;font:600 11px/1.2 var(--font-sans,Arial,sans-serif);letter-spacing:.24em;text-transform:uppercase;color:var(--invitta-primary,#9b7653)}",
+      ".invitta-vip-access-title{margin:0;font:400 clamp(30px,7vw,46px)/1.05 var(--font-display,Georgia,serif);color:var(--text-color,#2e2722)}",
+      ".invitta-vip-access-name{margin:12px 0 24px;font:400 18px/1.4 var(--font-display,Georgia,serif);color:var(--text-color,#2e2722)}",
+      ".invitta-vip-access-qr{display:flex;width:210px;max-width:72vw;aspect-ratio:1;margin:0 auto;padding:12px;align-items:center;justify-content:center;background:#fff;border:1px solid rgba(64,49,38,.13);box-sizing:border-box}",
+      ".invitta-vip-access-qr img,.invitta-vip-access-qr canvas{display:block!important;width:100%!important;height:100%!important}",
+      ".invitta-vip-access-meta{display:flex;justify-content:center;gap:28px;margin:24px 0 0;font:600 12px/1.4 var(--font-sans,Arial,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--text-color,#2e2722)}",
+      ".invitta-vip-access-note{margin:18px auto 0;max-width:320px;font:400 12px/1.7 var(--font-sans,Arial,sans-serif);letter-spacing:.04em;color:var(--text-muted,#756b64)}",
+      ".invitta-vip-access.is-dark .invitta-vip-access-card{background:#171214;border-color:rgba(214,178,86,.42);box-shadow:0 24px 60px rgba(0,0,0,.32)}",
+      ".invitta-vip-access.is-dark .invitta-vip-access-title,.invitta-vip-access.is-dark .invitta-vip-access-name,.invitta-vip-access.is-dark .invitta-vip-access-meta{color:#f7f0e6}",
+      ".invitta-vip-access.is-dark .invitta-vip-access-note{color:#c9bfb5}",
+      "@media(max-width:640px){.invitta-vip-access{margin:54px auto;padding:0 14px}.invitta-vip-access-card{padding:36px 20px}.invitta-vip-access-meta{gap:18px}}"
+    ].join("");
+    document.head.appendChild(style);
+  }
+
+  function applyVipAccessPass() {
+    var isVip = data.qrAccessEnabled === true || String(templateId || "").endsWith("-vip");
+    if (!isVip || !data.guestToken || !data.guestName || typeof window.QRCode !== "function") return;
+    if (document.querySelector("[data-invitta-vip-access]")) return;
+
+    ensureVipAccessStyles();
+    var checkinUrl = new URL("/administracion/checkin.html", window.location.origin);
+    checkinUrl.searchParams.set("token", data.guestToken);
+
+    var section = document.createElement("section");
+    section.className = "invitta-vip-access" + (String(templateId).includes("midnight") ? " is-dark" : "");
+    section.dataset.invittaVipAccess = "true";
+    section.setAttribute("aria-label", "Pase de acceso VIP");
+    section.innerHTML = '<div class="invitta-vip-access-card">' +
+      '<p class="invitta-vip-access-kicker">Acceso exclusivo</p>' +
+      '<h2 class="invitta-vip-access-title">Pase VIP</h2>' +
+      '<p class="invitta-vip-access-name"></p>' +
+      '<div class="invitta-vip-access-qr" aria-label="Codigo QR personal de acceso"></div>' +
+      '<div class="invitta-vip-access-meta"><span class="invitta-vip-passes"></span><span class="invitta-vip-table"></span></div>' +
+      '<p class="invitta-vip-access-note">Presenta este codigo en la entrada. Es personal y solo puede validarse una vez.</p>' +
+      '</div>';
+
+    section.querySelector(".invitta-vip-access-name").textContent = data.guestName;
+    section.querySelector(".invitta-vip-passes").textContent = (data.passes || 1) + " pase(s)";
+    section.querySelector(".invitta-vip-table").textContent = data.table ? "Mesa " + data.table : "Mesa por asignar";
+    new window.QRCode(section.querySelector(".invitta-vip-access-qr"), {
+      text: checkinUrl.toString(),
+      width: 186,
+      height: 186,
+      colorDark: "#171411",
+      colorLight: "#ffffff",
+      correctLevel: window.QRCode.CorrectLevel.H
+    });
+
+    var anchor = document.querySelector("section#rsvp, section[id*='rsvp'], section[id*='confirm']");
+    if (!anchor) {
+      var rsvpAction = Array.from(document.querySelectorAll("a, button")).find(function (element) {
+        return /CONFIRMAR|WHATSAPP|RSVP/i.test(element.textContent || "") && element.closest("section");
+      });
+      anchor = rsvpAction && rsvpAction.closest("section");
+    }
+    if (anchor && anchor.parentNode) {
+      anchor.parentNode.insertBefore(section, anchor);
+    } else {
+      var footer = document.querySelector("footer");
+      (footer && footer.parentNode ? footer.parentNode : document.body).insertBefore(section, footer || null);
+    }
+  }
+
   function applyConfirmationContacts() {
     var phones = Array.isArray(data.confirmationPhones)
       ? data.confirmationPhones.filter(Boolean).slice(0, 2)
@@ -518,6 +590,7 @@
     applyOptionalContent();
     applyLinks();
     applyGuestData();
+    applyVipAccessPass();
     applyConfirmationContacts();
     hideLegacyGuestAdmin();
     applying = false;

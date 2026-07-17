@@ -372,12 +372,12 @@ function renderInvitation(inv) {
 }
 
 var PUBLIC_TEMPLATE_MANIFEST = {
-    "xv-elegance-basic": { path: "/demos/xv-elegance/index.html", kind: "xv" },
-    "xv-rose-gold-premium": { path: "/demos/xv-premium-2/index.html", kind: "xv" },
-    "xv-champagne-rose-vip": { path: "/demos/xv-vip-3/index.html", kind: "xv" },
-    "boda-classic-basic": { path: "/demos/boda-classic-basic/index.html", kind: "boda" },
-    "boda-golden-romance-premium": { path: "/demos/boda-golden-romance-premium/index.html", kind: "boda" },
-    "boda-midnight-gold-vip": { path: "/demos/boda-premium-1/index.html", kind: "boda" }
+    "xv-elegance-basic": { id: "xv-elegance-basic", path: "/demos/xv-elegance/index.html", kind: "xv" },
+    "xv-rose-gold-premium": { id: "xv-rose-gold-premium", path: "/demos/xv-premium-2/index.html", kind: "xv" },
+    "xv-champagne-rose-vip": { id: "xv-champagne-rose-vip", path: "/demos/xv-vip-3/index.html", kind: "xv" },
+    "boda-classic-basic": { id: "boda-classic-basic", path: "/demos/boda-classic-basic/index.html", kind: "boda" },
+    "boda-golden-romance-premium": { id: "boda-golden-romance-premium", path: "/demos/boda-golden-romance-premium/index.html", kind: "boda" },
+    "boda-midnight-gold-vip": { id: "boda-midnight-gold-vip", path: "/demos/boda-premium-1/index.html", kind: "boda" }
 };
 
 function cleanString(val, maxLength) {
@@ -495,7 +495,7 @@ function buildPublicTemplateData(inv, template) {
     var confirmationPhones = normalizeConfirmationPhones(inv.whatsapp_number);
 
     return {
-        templateId: cleanString(inv.template_id, 80),
+        templateId: template.id,
         eventType: cleanString(inv.event_type, 30) || template.kind,
         eventTitle: cleanString(inv.title || inv.event_title, 120) || (template.kind === "boda" ? "Nuestra Boda" : "Mis Quince Años"),
         celebrantName: cleanString(inv.honoree_name || inv.celebrant_name, 160) || "Nombre",
@@ -524,6 +524,7 @@ function buildPublicTemplateData(inv, template) {
         table: cleanString(tableNum, 30),
         invitationSlug: slug,
         guestToken: guestToken,
+        qrAccessEnabled: template.id.endsWith("-vip"),
         mainPhotoUrl: safeHttpsUrl(inv.main_photo_url),
         galleryUrls: normalizeGalleryUrls(inv.gallery_urls),
         musicUrl: safeHttpsUrl(inv.music_url),
@@ -563,8 +564,13 @@ function addTemplateBridge(html, templatePath) {
         "window.INVITTA_TEMPLATE_ID = parent.INVITATION_DATA.templateId;";
     doc.head.insertBefore(bootstrap, doc.head.children[1] || null);
 
+    var qrLibrary = doc.createElement("script");
+    qrLibrary.src = "/assets/vendor/qrcode.min.js";
+    qrLibrary.defer = true;
+    doc.body.appendChild(qrLibrary);
+
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js";
+    bridge.src = "/demos/shared/public-personalization.js?v=vip-access-20260716";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

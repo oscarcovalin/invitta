@@ -55,6 +55,22 @@
     return String(guest.qrToken || guest.qr_token || '').trim();
   }
 
+  function isVipEvent() {
+    const config = activeEvent?.config || {};
+    return config.qrAccessEnabled === true
+      || config.packageTier === 'vip'
+      || String(config.templateId || '').endsWith('-vip');
+  }
+
+  function updateVipAccessControls() {
+    const button = $('vipCheckinButton');
+    if (!button) return;
+    button.hidden = !isVipEvent();
+    if (isVipEvent() && activeEvent?.id) {
+      button.href = `/administracion/checkin.html?event_id=${encodeURIComponent(activeEvent.id)}`;
+    }
+  }
+
   function getGuestInvitationUrl(guest) {
     const token = getGuestToken(guest);
     if (!activeEvent?.slug || !token) return '';
@@ -128,6 +144,7 @@
     setText('eventDate', formatEventDate(activeEvent.fecha_evento) || 'Fecha por definir');
     const inviteUrl = $('inviteUrl');
     if (inviteUrl) inviteUrl.value = window.InvittiaDashboardData.getInviteUrl(activeEvent);
+    updateVipAccessControls();
   }
 
   function getStats() {
@@ -193,7 +210,9 @@
           <td><span class="status-badge ${getStatusClass(g)}"><i class="fa-solid ${getStatusIcon(g)}"></i> ${escapeHtml(status)}</span></td>
           <td>${escapeHtml(getGuestCompanions(g))}</td>
           <td>${escapeHtml(getGuestTable(g))}</td>
-          <td>${isConfirmed(g) ? `<button class="qr-btn" type="button" data-action="view-qr" data-guest-id="${escapeHtml(g.id)}">Ver QR</button>` : '<span style="color:#A09A94;font-size:0.85rem;">No disp.</span>'}</td>
+          <td>${isVipEvent()
+            ? (isConfirmed(g) ? `<button class="qr-btn" type="button" data-action="view-qr" data-guest-id="${escapeHtml(g.id)}">Ver QR</button>` : '<span style="color:#A09A94;font-size:0.85rem;">No disp.</span>')
+            : '<span style="color:#A09A94;font-size:0.85rem;">Solo VIP</span>'}</td>
         </tr>`;
     }).join('');
 
@@ -377,20 +396,15 @@
   }
 
   function getQrImageUrl(guest) {
+    if (!isVipEvent()) return null;
     const token = getGuestToken(guest);
     if (!token) {
       console.error('[Invitta QR] Invitado sin qr_token', guest);
       return null;
     }
 
-    const checkinUrl = `${window.location.origin}/administracion/checkin.html?token=${encodeURIComponent(token)}`;
-    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(checkinUrl)}`;
-
-    console.log('[Invitta QR] token:', token);
-    console.log('[Invitta QR] checkinUrl:', checkinUrl);
-    console.log('[Invitta QR] qrImageUrl:', qrImageUrl);
-
-    return { token, qrImageUrl };
+    const checkinUrl = `${window.location.origin}/administracion/checkin.html?event_id=${encodeURIComponent(activeEvent.id)}&token=${encodeURIComponent(token)}`;
+    return { token, checkinUrl };
   }
 
   function renderQrImage(guest, imageId, tokenId = null) {
@@ -413,8 +427,23 @@
 
     const imageEl = $(imageId);
     if (imageEl) {
-      imageEl.style.backgroundImage = `url("${qr.qrImageUrl}")`;
+      imageEl.style.backgroundImage = '';
+      imageEl.innerHTML = '';
       imageEl.style.display = 'block';
+      if (typeof window.QRCode !== 'function') {
+        console.error('[Invitta QR] La libreria local de QR no esta disponible.');
+        imageEl.style.display = 'none';
+        return null;
+      }
+      const qrSize = Math.max(120, Math.min(220, imageEl.clientWidth || 220));
+      new window.QRCode(imageEl, {
+        text: qr.checkinUrl,
+        width: qrSize,
+        height: qrSize,
+        colorDark: '#171411',
+        colorLight: '#ffffff',
+        correctLevel: window.QRCode.CorrectLevel.H
+      });
     }
 
     if (tokenId) {
@@ -429,6 +458,10 @@
   }
 
   function openQrModal(guest) {
+    if (!isVipEvent()) {
+      alert('El pase QR y el control de acceso estan disponibles solo en invitaciones VIP.');
+      return;
+    }
     const qr = renderQrImage(guest, 'qrImage');
     if (!qr) {
       showQrUnavailable(guest);
@@ -454,7 +487,9 @@
     setText('dwPhone', getGuestPhone(g));
     setText('dwEmail', getGuestEmail(g));
     setText('dwNotes', getGuestNotes(g));
-    renderQrImage(g, 'dwQrImg', 'dwQrId');
+    const drawerQr = document.querySelector('.drawer-qr');
+    if (drawerQr) drawerQr.hidden = !isVipEvent();
+    if (isVipEvent()) renderQrImage(g, 'dwQrImg', 'dwQrId');
     const dwStatus = $('dwStatus');
     if (dwStatus) {
       dwStatus.innerHTML = `<span class="status-badge ${getStatusClass(g)}"><i class="fa-solid ${getStatusIcon(g)}"></i> ${escapeHtml(getGuestStatus(g))}</span>`;
