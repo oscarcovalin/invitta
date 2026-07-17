@@ -1222,6 +1222,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       saveBtn.textContent = "Guardar cambios";
     } else {
       currentSlug = slugToUse;
+      const savedInvitationId = result.data?.id || inviteId;
+      if (savedInvitationId) {
+        const { error: eventSyncError } = await db.rpc("sync_studio_invitation_event", {
+          target_invitation_id: savedInvitationId
+        });
+        if (eventSyncError) {
+          console.error("No se pudo vincular el panel de invitados:", eventSyncError);
+          errorAlert.textContent = "La invitacion se guardo, pero no se pudo vincular el panel de invitados.";
+          errorAlert.style.display = "block";
+        }
+      }
       clearSelectedGalleryPreviews();
       existingGalleryUrls = finalGalleryUrls.slice();
       galleryDraftItems = existingGalleryUrls.map((url) => ({ kind: "existing", url }));

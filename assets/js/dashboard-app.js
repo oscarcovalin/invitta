@@ -55,6 +55,31 @@
     return String(guest.qrToken || guest.qr_token || '').trim();
   }
 
+  function getGuestInvitationUrl(guest) {
+    const token = getGuestToken(guest);
+    if (!activeEvent?.slug || !token) return '';
+    const url = new URL('/invitacion.html', window.location.origin);
+    url.searchParams.set('slug', activeEvent.slug);
+    url.searchParams.set('g', token);
+    return url.toString();
+  }
+
+  async function copyGuestInvitation() {
+    if (!selectedGuest) return;
+    const url = getGuestInvitationUrl(selectedGuest);
+    if (!url) {
+      alert('No hay un enlace personalizado disponible para este invitado.');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      alert('Enlace personalizado copiado.');
+    } catch (error) {
+      console.error('[Invitta] No se pudo copiar el enlace:', error);
+      alert('No se pudo copiar el enlace personalizado.');
+    }
+  }
+
   async function attachGuestQrTokens() {
     if (!activeEvent?.id || !guests.length) return;
 
@@ -623,6 +648,7 @@
       staffRedirect: "/administracion/checkin.html",
       signOutOnMissingRole: true
     });
+    $('copyGuestInvitationBtn')?.addEventListener('click', copyGuestInvitation);
     if (!access) return;
 
     const dashboard = await window.InvittiaDashboardData.loadDashboard();

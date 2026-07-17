@@ -252,6 +252,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     actionsDiv.appendChild(demoBtn);
     actionsDiv.appendChild(document.createTextNode(" "));
 
+    if (inv.evento_id) {
+      const guestsBtn = document.createElement("a");
+      guestsBtn.className = "btn btn-secondary btn-small";
+      guestsBtn.textContent = "Invitados";
+      guestsBtn.href = `/administracion/dashboard.html?event_id=${encodeURIComponent(String(inv.evento_id))}`;
+      actionsDiv.appendChild(guestsBtn);
+      actionsDiv.appendChild(document.createTextNode(" "));
+    }
+
     if (inv.id) {
       const editBtn = document.createElement("a");
       editBtn.className = "btn btn-primary btn-small";
@@ -319,7 +328,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const { data: invitations, error } = await db
       .from("studio_invitations")
-      .select("id, title, slug, event_type, event_date, published, main_photo_url, music_url, gallery_urls, font_preset, itinerary")
+      .select("id, title, slug, event_type, event_date, published, main_photo_url, music_url, gallery_urls, font_preset, itinerary, template_id, evento_id")
       .eq("studio_id", currentStudioId)
       .order("created_at", { ascending: false });
 
@@ -343,6 +352,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       emptyMsg.setAttribute("aria-live", "polite");
       return;
     }
+
+    await Promise.all(invitations.map(async (inv) => {
+      if (inv.evento_id || !inv.id) return;
+      const { data: eventId, error: syncError } = await db.rpc("sync_studio_invitation_event", {
+        target_invitation_id: inv.id
+      });
+      if (syncError) {
+        console.error(`No se pudo vincular el panel de invitados para ${inv.slug}:`, syncError);
+        return;
+      }
+      inv.evento_id = eventId;
+    }));
 
     // Renderizar
     invitations.forEach(inv => {

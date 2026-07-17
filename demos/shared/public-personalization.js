@@ -399,6 +399,42 @@
     return "Hola, confirmo mi asistencia.\nInvitado: " + guest + "\nPases asignados: " + (data.passes || 1) + table;
   }
 
+  function selectedPasses() {
+    var selected = Array.from(document.querySelectorAll("select")).find(function (select) {
+      return select.offsetParent !== null && /\d+/.test(String(select.value || ""));
+    });
+    var parsed = Number(selected && String(selected.value).match(/\d+/)?.[0]);
+    var limit = Math.max(1, Number(data.passes || 1));
+    return Math.max(1, Math.min(Number.isFinite(parsed) && parsed > 0 ? parsed : limit, limit));
+  }
+
+  function reportRsvp(attending) {
+    if (!data.guestToken || window.parent === window) return;
+    window.parent.postMessage({
+      type: "invitta:rsvp",
+      attending: attending,
+      confirmedPasses: attending ? selectedPasses() : 0,
+      message: ""
+    }, "*");
+  }
+
+  function hideLegacyGuestAdmin() {
+    try {
+      window.localStorage.removeItem("invitta_rsvps");
+      Object.keys(window.localStorage).forEach(function (key) {
+        if (/^rsvp_/i.test(key)) window.localStorage.removeItem(key);
+      });
+    } catch (error) {
+      // Storage can be unavailable in privacy mode.
+    }
+
+    document.querySelectorAll("a, button").forEach(function (element) {
+      if (/^(ADMIN|PANEL DE (CONTROL|INVITADOS)|BUZ[OÓ]N RSVP|BUZ[OÓ]N DE CONFIRMACIONES|INGRESAR AL PANEL)$/i.test((element.textContent || "").trim())) {
+        element.style.display = "none";
+      }
+    });
+  }
+
   function installClickBridge() {
     document.addEventListener("click", function (event) {
       var target = event.target.closest("a, button");
@@ -415,7 +451,13 @@
       if (/WHATSAPP|SEGUNDO CONTACTO/i.test(target.textContent || "") && confirmationPhone) {
         event.preventDefault();
         event.stopImmediatePropagation();
+        reportRsvp(true);
         window.open("https://wa.me/" + confirmationPhone + "?text=" + encodeURIComponent(confirmationMessage()), "_blank", "noopener");
+        return;
+      }
+
+      if (/NO ASISTIR|NO PODR|DECLINAR/i.test(target.textContent || "")) {
+        reportRsvp(false);
       }
     }, true);
   }
@@ -477,6 +519,7 @@
     applyLinks();
     applyGuestData();
     applyConfirmationContacts();
+    hideLegacyGuestAdmin();
     applying = false;
   }
 
