@@ -89,32 +89,18 @@
         if (button) button.hidden = false;
     }
 
-    async function insertCheckin(entry) {
-        const supabase = window.InvittiaSupabase.getClient();
-        const { error } = await supabase.from("checkins").insert(entry);
-        if (error) throw error;
-    }
-
-    async function tryInsertInvalidCheckin(token) {
-        try {
-            await insertCheckin({
-                qr_token: token,
-                scanned_by: session.user.id,
-                status: "invalid",
-                notes: "Token invalido desde pantalla manual"
-            });
-        } catch (error) {
-            console.error("[Invittia Check-in] No se pudo insertar checkin invalid sin evento_id:", error);
-        }
-    }
-
     async function loadGuestByToken(token) {
         const supabase = window.InvittiaSupabase.getClient();
-        const { data, error } = await supabase
+        let query = supabase
             .from("invitados")
             .select(GUEST_SELECT)
-            .eq("qr_token", token)
-            .maybeSingle();
+            .eq("qr_token", token);
+
+        if (activeEvent?.id) {
+            query = query.eq("evento_id", activeEvent.id);
+        }
+
+        const { data, error } = await query.maybeSingle();
 
         return { data, error };
     }
@@ -232,11 +218,16 @@
 
     async function loadGuestById(guestId) {
         const supabase = window.InvittiaSupabase.getClient();
-        const { data, error } = await supabase
+        let query = supabase
             .from("invitados")
             .select(GUEST_SELECT)
-            .eq("id", guestId)
-            .maybeSingle();
+            .eq("id", guestId);
+
+        if (activeEvent?.id) {
+            query = query.eq("evento_id", activeEvent.id);
+        }
+
+        const { data, error } = await query.maybeSingle();
 
         if (error) throw error;
         return data;
@@ -442,6 +433,12 @@
         currentGuest = guest;
         showGuest(guest);
 
+        if (activeEvent?.id && guest.evento_id !== activeEvent.id) {
+            setState("error", "QR de otro evento", "Este pase no corresponde al evento activo.");
+            hideConfirmButton();
+            return;
+        }
+
         if (guest.qr_status === "cancelled") {
             setState("error", "QR cancelado", "Este pase fue cancelado y no puede usarse.");
             hideConfirmButton();
@@ -450,6 +447,12 @@
 
         if (guest.checked_in === true || guest.qr_status === "used") {
             setState("warning", "QR ya utilizado", "Este pase ya fue registrado previamente.");
+            hideConfirmButton();
+            return;
+        }
+
+        if (!isConfirmedRsvp(guest)) {
+            setState("warning", "Asistencia sin confirmar", "Este pase no puede registrar entrada hasta confirmar asistencia.");
             hideConfirmButton();
             return;
         }
@@ -471,82 +474,55 @@
             setState("error", "Invitado invalido", "El invitado seleccionado no esta asociado a un evento.");
             return null;
         }
+        if (!activeEvent?.id || guest.evento_id !== activeEvent.id) {
+            setState("error", "Evento no valido", "El invitado no pertenece al evento activo.");
+            return null;
+        }
         if (!session?.user?.id) {
             setState("error", "Sesion no valida", "Inicia sesion de nuevo para confirmar entradas.");
             return null;
         }
 
         const supabase = window.InvittiaSupabase.getClient();
-        const { data: currentGuestRecord, error: currentError } = await supabase
-            .from("invitados")
-            .select("id, evento_id, qr_token, qr_status, checked_in, checked_in_at")
-            .eq("id", guest.id)
-            .maybeSingle();
+        const { data: result, error: checkinError } = await supabase.rpc("check_in_vip_guest", {
+            target_guest_id: guest.id,
+            scanned_token: checkinSource === "qr" ? currentToken : null,
+            checkin_method: checkinSource
+        });
 
-        if (currentError) {
-            console.error("[Invittia Check-in] Error releyendo invitado:", currentError);
-            setState("error", "Error de check-in", "No se pudo validar el estado actual del invitado.");
-            return null;
-        }
-
-        if (!currentGuestRecord) {
-            setState("error", "Invitado no encontrado", "Invitado no encontrado.");
-            return null;
-        }
-
-        if (currentGuestRecord.checked_in === true || currentGuestRecord.qr_status === "used") {
-            setState("warning", checkinSource === "qr" ? "QR ya utilizado" : "Ya ingreso", "Ya ingreso.");
-            hideConfirmButton();
-            await loadStaffGuests();
-            return currentGuestRecord;
-        }
-
-        const { data: updatedGuest, error: updateError } = await supabase
-            .from("invitados")
-            .update({
-                checked_in: true,
-                checked_in_at: new Date().toISOString(),
-                checked_in_by: session.user.id,
-                qr_status: "used"
-            })
-            .eq("id", currentGuestRecord.id)
-            .eq("evento_id", currentGuestRecord.evento_id)
-            .select(GUEST_SELECT)
-            .maybeSingle();
-
-        if (updateError) {
-            console.error("[Invittia Check-in] Error actualizando invitado:", updateError);
+        if (checkinError) {
+            console.error("[Invitta Check-in] Error confirmando entrada:", checkinError);
             setState("error", "Error de check-in", "No se pudo confirmar la entrada.");
             return null;
         }
 
-        if (!updatedGuest) {
-            setState("error", "Error de check-in", "No se pudo confirmar la entrada del invitado.");
+        if (!result?.ok) {
+            const outcomes = {
+                duplicate: ["warning", "QR ya utilizado", "Este pase ya fue registrado previamente."],
+                cancelled: ["error", "QR cancelado", "Este pase fue cancelado y no puede usarse."],
+                not_confirmed: ["warning", "Asistencia sin confirmar", "Este pase no puede registrar entrada hasta confirmar asistencia."],
+                invalid_token: ["error", "QR invalido", "El token no coincide con este invitado."],
+                vip_required: ["error", "Acceso no disponible", "El control QR solo esta disponible para invitaciones VIP."],
+                not_found: ["error", "Invitado no encontrado", "No encontramos un invitado asociado a este pase."]
+            };
+            const [kind, title, message] = outcomes[result?.code] || ["error", "Entrada no confirmada", "No se pudo confirmar la entrada."];
+            setState(kind, title, message);
+            hideConfirmButton();
+            await loadStaffGuests();
             return null;
         }
 
-        try {
-            await insertCheckin({
-                evento_id: updatedGuest.evento_id,
-                invitado_id: updatedGuest.id,
-                qr_token: updatedGuest.qr_token,
-                scanned_by: session.user.id,
-                status: "valid",
-                notes: checkinSource === "qr" ? "Check-in confirmado desde QR" : "Check-in confirmado desde busqueda manual"
-            });
-        } catch (checkinError) {
-            console.error("[Invittia Check-in] Entrada actualizada, pero fallo el registro en checkins:", checkinError);
-            setState("warning", "Entrada confirmada", "La entrada quedo confirmada, pero no se pudo guardar el registro de auditoria.");
-            currentGuest = updatedGuest;
-            showGuest(updatedGuest);
+        const updatedGuest = await loadGuestById(guest.id);
+        if (!updatedGuest) {
+            setState("warning", "Entrada confirmada", "La entrada fue registrada, pero no se pudo actualizar la vista.");
             hideConfirmButton();
             await loadStaffGuests();
-            return updatedGuest;
+            return null;
         }
 
         currentGuest = updatedGuest;
         showGuest(updatedGuest);
-        setState("valid", "Ya ingreso", "Ya ingreso.");
+        setState("valid", "Ya ingreso", "Entrada confirmada correctamente.");
         hideConfirmButton();
         await loadStaffGuests();
         return updatedGuest;
