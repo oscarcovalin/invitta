@@ -404,7 +404,7 @@
     if (document.querySelector("[data-invitta-vip-access]")) return;
 
     ensureVipAccessStyles();
-    var checkinUrl = new URL("/administracion/checkin.html", window.location.origin);
+    var checkinUrl = new URL("/administracion/checkin.html", document.baseURI);
     checkinUrl.searchParams.set("token", data.guestToken);
 
     var section = document.createElement("section");
