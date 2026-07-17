@@ -128,33 +128,74 @@
     }
     .design-preview {
       position: relative;
-      width: min(100%, 390px);
-      height: 240px;
+      width: min(100%, 286px);
+      height: 560px;
       margin: 32px 0 0;
+      padding: 8px;
       overflow: hidden;
-      border: 1px solid var(--sand);
-      border-radius: 8px;
-      background: #eee6dc;
-      box-shadow: 0 18px 45px rgba(67, 49, 41, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 43px;
+      background: linear-gradient(145deg, #363432 0%, #111110 42%, #4c4945 100%);
+      box-shadow: 0 28px 56px rgba(45, 32, 27, 0.24), inset 0 0 0 1px rgba(0, 0, 0, 0.7);
     }
-    .design-preview img {
+    .design-preview::before {
+      content: "";
+      position: absolute;
+      z-index: 3;
+      top: 15px;
+      left: 50%;
+      width: 92px;
+      height: 23px;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      background: #090909;
+      box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+    .design-preview::after {
+      content: "";
+      position: absolute;
+      z-index: 3;
+      bottom: 13px;
+      left: 50%;
+      width: 88px;
+      height: 4px;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.82);
+      pointer-events: none;
+    }
+    .phone-screen {
+      position: relative;
       width: 100%;
       height: 100%;
-      display: block;
-      object-fit: cover;
-      object-position: center top;
+      overflow: hidden;
+      border-radius: 36px;
+      background: #f6f0e8;
     }
+    .phone-screen iframe {
+      width: 390px;
+      height: 900px;
+      display: block;
+      border: 0;
+      transform: scale(0.687);
+      transform-origin: top left;
+      background: #f6f0e8;
+    }
+    .design-preview > img { display: none; }
     .design-preview figcaption {
       position: absolute;
+      z-index: 4;
       left: 14px;
       bottom: 14px;
       padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(255, 253, 249, 0.92);
-      color: #514943;
+      background: rgba(16, 15, 14, 0.78);
+      color: #fff;
       font-size: 0.72rem;
       font-weight: 600;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.16);
+      backdrop-filter: blur(8px);
     }
     .preview-demo-link {
       display: inline-flex;
@@ -269,7 +310,7 @@
     @media (max-width: 860px) {
       .request-shell { grid-template-columns: 1fr; gap: 40px; padding-top: 42px; }
       .request-intro { position: static; }
-      .design-preview { width: 100%; max-width: none; height: 220px; }
+      .design-preview { margin-left: auto; margin-right: auto; }
     }
     @media (max-width: 600px) {
       .request-nav,
@@ -278,7 +319,8 @@
       h1 { font-size: clamp(2.65rem, 14vw, 3.8rem); }
       .intro-copy { margin-top: 18px; }
       .trust-list { margin: 22px 0; }
-      .design-preview { height: 190px; margin-top: 24px; }
+      .design-preview { width: min(100%, 270px); height: 528px; margin-top: 24px; }
+      .phone-screen iframe { transform: scale(0.651); }
       .request-card { padding: 28px 20px; }
       .form-grid { grid-template-columns: 1fr; gap: 18px; }
       .field.full { grid-column: auto; }
@@ -306,6 +348,9 @@
         <li>Tu borrador se conserva en este dispositivo</li>
       </ul>
       <figure class="design-preview">
+        <div class="phone-screen">
+          <iframe id="designPreviewFrame" src="demos/xv-elegance/index.html" title="Vista en vivo del diseño seleccionado" loading="eager"></iframe>
+        </div>
         <img id="designPreviewImage" src="assets/catalog/xv-elegance.jpg" alt="Vista previa del diseño seleccionado" width="390" height="844">
         <figcaption id="designPreviewCaption">Diseño Élégance</figcaption>
       </figure>
@@ -416,6 +461,7 @@
     const form = document.getElementById('requestForm');
     const status = document.getElementById('formStatus');
     const designSelect = document.getElementById('design');
+    const previewFrame = document.getElementById('designPreviewFrame');
     const previewImage = document.getElementById('designPreviewImage');
     const previewCaption = document.getElementById('designPreviewCaption');
     const previewDemoLink = document.getElementById('previewDemoLink');
@@ -562,8 +608,21 @@
       if ([...select.options].some(option => option.value === value)) select.value = value;
     }
 
+    function buildDemoPreviewUrl() {
+      const path = designDemoPaths[designSelect.value] || 'demos/xv-elegance/index.html';
+      const query = new URLSearchParams();
+      const palette = palettePresets[palettePreference.value];
+      const typography = typographyPresets[typographyPreference.value];
+
+      if (palette) query.set('palette', palette);
+      if (typography) query.set('type', typography);
+
+      return query.size ? `${path}?${query.toString()}` : path;
+    }
+
     function updatePreview() {
       const selected = designSelect.value;
+      if (previewFrame) previewFrame.src = buildDemoPreviewUrl();
       const image = designImages[selected] || designImages['Élégance'];
       previewImage.src = image;
       previewImage.style.objectPosition = ['Rose Champagne', 'Emerald Gala', 'Olive Romance', 'Plum Noir'].includes(selected)
@@ -626,7 +685,10 @@
           setSelectValue(document.getElementById('packageName'), designPackages[designSelect.value]);
         }
       }
-      if (event.target === designSelect || event.target === palettePreference || event.target === typographyPreference) updateDemoPreviewLink();
+      if (event.target === designSelect || event.target === palettePreference || event.target === typographyPreference) {
+        if (event.target !== designSelect) updatePreview();
+        updateDemoPreviewLink();
+      }
     });
 
     form.addEventListener('submit', async event => {
