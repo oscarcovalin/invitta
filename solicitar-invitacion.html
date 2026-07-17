@@ -431,6 +431,7 @@
     };
 
     const designDemoPaths = {
+      'Élégance': 'demos/xv-elegance/index.html',
       'Rose Champagne': 'demos/xv-premium-2/index.html',
       'Emerald Gala': 'demos/xv-vip-3/index.html',
       'Classic Wedding': 'demos/boda-classic-basic/index.html',
@@ -452,6 +453,7 @@
       'Noir de gala': 'noir-luxury'
     };
     const requestTemplateIds = {
+      'Élégance': 'xv-elegance-basic',
       'Rose Champagne': 'xv-rose-gold-premium',
       'Emerald Gala': 'xv-champagne-rose-vip',
       'Classic Wedding': 'boda-classic-basic',
@@ -462,6 +464,14 @@
       'Esencial - $399 MXN': 'essential',
       'Premium - $699 MXN': 'premium',
       'VIP Experience - $999 MXN': 'vip'
+    };
+    const designPackages = {
+      'Élégance': 'Esencial - $399 MXN',
+      'Rose Champagne': 'Premium - $699 MXN',
+      'Emerald Gala': 'VIP Experience - $999 MXN',
+      'Classic Wedding': 'Esencial - $399 MXN',
+      'Olive Romance': 'Premium - $699 MXN',
+      'Plum Noir': 'VIP Experience - $999 MXN'
     };
 
     function getSalesRequestClient() {
@@ -488,6 +498,16 @@
         : 'xv-elegance-basic';
     }
 
+    function resolveRequestedPackageTier(data) {
+      const templateId = requestTemplateIds[data.design];
+      if (templateId) {
+        if (templateId.endsWith('-vip')) return 'vip';
+        if (templateId.endsWith('-premium')) return 'premium';
+        return 'essential';
+      }
+      return requestPackageTiers[data.packageName] || 'undecided';
+    }
+
     async function registerSalesRequest(data) {
       const client = getSalesRequestClient();
       if (!client) return null;
@@ -498,7 +518,7 @@
         event_type: normalizeRequestEventType(data.eventType),
         design_name: String(data.design || '').trim().slice(0, 120),
         requested_template_id: resolveRequestedTemplate(data),
-        package_tier: requestPackageTiers[data.packageName] || 'undecided',
+        package_tier: resolveRequestedPackageTier(data),
         palette_preference: String(data.palettePreference || '').trim().slice(0, 120) || null,
         typography_preference: String(data.typographyPreference || '').trim().slice(0, 120) || null,
         event_date: data.eventDate || null,
@@ -571,9 +591,9 @@
       'rose-champagne': 'Rose Champagne',
       'champagne-rose': 'Emerald Gala',
       'emerald-gala': 'Emerald Gala',
-      'midnight-gold': 'Olive Romance',
+      'midnight-gold': 'Plum Noir',
       'classic-wedding': 'Classic Wedding',
-      'golden-romance': 'Plum Noir',
+      'golden-romance': 'Olive Romance',
       'olive-romance': 'Olive Romance',
       'plum-noir': 'Plum Noir'
     };
@@ -583,13 +603,21 @@
     if (params.get('paquete')) setSelectValue(document.getElementById('packageName'), params.get('paquete'));
     if (params.get('paleta')) setSelectValue(document.getElementById('palettePreference'), params.get('paleta'));
     if (params.get('tipografia')) setSelectValue(document.getElementById('typographyPreference'), params.get('tipografia'));
+    if (!params.get('paquete') && designPackages[designSelect.value]) {
+      setSelectValue(document.getElementById('packageName'), designPackages[designSelect.value]);
+    }
     updatePreview();
     updateDemoPreviewLink();
 
     form.addEventListener('input', saveDraft);
     form.addEventListener('change', event => {
       saveDraft();
-      if (event.target === designSelect) updatePreview();
+      if (event.target === designSelect) {
+        updatePreview();
+        if (designPackages[designSelect.value]) {
+          setSelectValue(document.getElementById('packageName'), designPackages[designSelect.value]);
+        }
+      }
       if (event.target === designSelect || event.target === palettePreference || event.target === typographyPreference) updateDemoPreviewLink();
     });
 
