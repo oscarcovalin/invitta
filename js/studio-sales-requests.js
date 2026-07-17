@@ -86,10 +86,10 @@
           buildField("Evento", request.event_type),
           buildField("Fecha", formatDate(request.event_date)),
           buildField("Ciudad", request.event_city),
-          buildField("Diseno", request.design_name),
+          buildField("Diseño", request.design_name),
           buildField("Paquete", request.package_tier),
           buildField("Paleta", request.palette_preference),
-          buildField("Tipografia", request.typography_preference)
+          buildField("Tipografía", request.typography_preference)
         );
 
         const notes = document.createElement("p");

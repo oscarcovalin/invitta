@@ -408,8 +408,6 @@
     ¿Ya contrataste tu invitación? <a href="administracion/formulario-cliente.html">Completa aquí todos los datos del evento</a>.
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/env.js"></script>
   <script>
     const STORAGE_KEY = 'invitta-request-draft-v1';
     const SALES_PHONE = '525566790073';
@@ -477,10 +475,9 @@
     };
 
     function getSalesRequestConfig() {
-      const env = window.INVITTIA_ENV || {};
       return {
-        url: env.SUPABASE_URL || PUBLIC_SUPABASE_URL,
-        key: env.SUPABASE_ANON_KEY || PUBLIC_SUPABASE_KEY
+        url: PUBLIC_SUPABASE_URL,
+        key: PUBLIC_SUPABASE_KEY
       };
     }
 
@@ -659,7 +656,7 @@
         `Evento: ${data.eventType}`,
         `Diseño: ${data.design}`,
         `Paleta: ${data.palettePreference}`,
-        `Tipografia: ${data.typographyPreference}`,
+        `Tipografía: ${data.typographyPreference}`,
         `Fecha: ${data.eventDate || 'Por definir'}`,
         `Ciudad: ${data.eventCity || 'Por definir'}`,
         `Paquete: ${data.packageName}`,
