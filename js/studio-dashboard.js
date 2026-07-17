@@ -159,6 +159,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       h3.appendChild(createBadge("🎨 " + TEMPLATE_NAMES[inv.template_id], "badge badge-media"));
       h3.appendChild(document.createTextNode(" "));
     }
+
+    if (inv.published && inv.expires_at) {
+      const expiration = new Date(inv.expires_at);
+      if (!Number.isNaN(expiration.getTime())) {
+        h3.appendChild(createBadge(
+          "Vigente hasta " + expiration.toLocaleDateString("es-MX", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          }),
+          "badge badge-media"
+        ));
+        h3.appendChild(document.createTextNode(" "));
+      }
+    }
     const galleryCount = countArrayValues(inv.gallery_urls, 10);
 
     if (galleryCount > 0) {
@@ -328,7 +343,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const { data: invitations, error } = await db
       .from("studio_invitations")
-      .select("id, title, slug, event_type, event_date, published, main_photo_url, music_url, gallery_urls, font_preset, itinerary, template_id, evento_id")
+      .select("id, title, slug, event_type, event_date, published, published_at, expires_at, main_photo_url, music_url, gallery_urls, font_preset, itinerary, template_id, evento_id")
       .eq("studio_id", currentStudioId)
       .order("created_at", { ascending: false });
 

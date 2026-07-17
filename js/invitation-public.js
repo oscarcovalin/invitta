@@ -89,6 +89,14 @@
         return;
       }
 
+      if (!studioPreview && data.expires_at) {
+        var expirationTime = Date.parse(data.expires_at);
+        if (Number.isFinite(expirationTime) && expirationTime <= Date.now()) {
+          showError("Esta invitacion ya no esta disponible.");
+          return;
+        }
+      }
+
       if (guestToken) {
         var guestResult = await db.rpc("get_public_invitation_guest", {
           invitation_slug: slug,
