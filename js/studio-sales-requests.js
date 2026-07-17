@@ -109,10 +109,24 @@
         });
         statusSelect.addEventListener("change", async () => {
           statusSelect.disabled = true;
-          const { error } = await db
+          const updates = { status: statusSelect.value };
+
+          if (!request.assigned_studio_id && studio?.id) {
+            updates.assigned_studio_id = studio.id;
+            updates.claimed_by = session.user.id;
+            updates.claimed_at = new Date().toISOString();
+          }
+
+          let updateQuery = db
             .from("invitation_requests")
-            .update({ status: statusSelect.value })
+            .update(updates)
             .eq("id", request.id);
+
+          if (!request.assigned_studio_id) updateQuery = updateQuery.is("assigned_studio_id", null);
+
+          const { data: updatedRequest, error } = await updateQuery
+            .select("assigned_studio_id, status")
+            .single();
           statusSelect.disabled = false;
           if (error) {
             console.error("No se pudo actualizar la solicitud:", error);
@@ -120,7 +134,8 @@
             statusSelect.value = request.status;
             return;
           }
-          request.status = statusSelect.value;
+          request.status = updatedRequest?.status || statusSelect.value;
+          request.assigned_studio_id = updatedRequest?.assigned_studio_id || request.assigned_studio_id;
           render();
         });
 
@@ -140,7 +155,7 @@
       status.textContent = "Cargando solicitudes...";
       const { data, error } = await db
         .from("invitation_requests")
-        .select("id, client_name, client_phone, event_type, design_name, requested_template_id, package_tier, palette_preference, typography_preference, event_date, event_city, notes, status, created_at, converted_invitation_id")
+        .select("id, client_name, client_phone, event_type, design_name, requested_template_id, package_tier, palette_preference, typography_preference, event_date, event_city, notes, status, assigned_studio_id, created_at, converted_invitation_id")
         .order("created_at", { ascending: false });
 
       if (error) {
