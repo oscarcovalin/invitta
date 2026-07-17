@@ -831,8 +831,8 @@
             height: 100%;
             display: block;
             object-fit: cover;
-            object-position: center;
-            transform: scale(1.04);
+            object-position: var(--catalog-phone-photo-position, 50% 50%);
+            transform: scale(1.01);
             transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .catalog-phone-island {
@@ -896,7 +896,14 @@
             box-shadow: 0 27px 42px rgba(22, 17, 14, 0.32), 0 4px 7px rgba(255,255,255,0.28) inset, -2px 0 3px rgba(255,255,255,0.2) inset;
             transform: perspective(760px) rotateY(-2deg) rotateX(0) translateY(-5px);
         }
-        .catalog-card:hover .catalog-phone-screen img { transform: scale(1.1); }
+        .catalog-card:hover .catalog-phone-screen img { transform: scale(1.035); }
+        /* Each preview keeps the people centered inside the narrow phone viewport. */
+        .catalog-card-preview--elegance { --catalog-phone-photo-position: 43% 48%; }
+        .catalog-card-preview--rose-gold { --catalog-phone-photo-position: 50% 50%; }
+        .catalog-card-preview--champagne { --catalog-phone-photo-position: 38% 52%; }
+        .catalog-card-preview--classic { --catalog-phone-photo-position: 72% 48%; }
+        .catalog-card-preview--golden { --catalog-phone-photo-position: 50% 50%; }
+        .catalog-card-preview--midnight { --catalog-phone-photo-position: 68% 50%; }
         .catalog-card-preview--champagne .catalog-phone-section { background: linear-gradient(to top, rgba(7,23,16,0.92), rgba(7,23,16,0.08)); }
         .catalog-card-preview--golden .catalog-phone-section { background: linear-gradient(to top, rgba(41,43,30,0.88), rgba(41,43,30,0.05)); }
         .catalog-card-preview--midnight .catalog-phone-section { background: linear-gradient(to top, rgba(18,11,17,0.92), rgba(18,11,17,0.04)); }
