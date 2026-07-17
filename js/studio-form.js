@@ -460,11 +460,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Si no tenemos el studio_id, lo buscamos
   if (!currentStudioId) {
-    const { data: studio } = await db
-      .from("studios")
-      .select("id")
-      .eq("user_id", session.user.id)
-      .single();
+    const { data: studios } = await db.rpc("current_invitta_studio");
+    const studio = Array.isArray(studios) ? studios[0] : null;
     if (studio) {
       currentStudioId = studio.id;
       localStorage.setItem("invitta_studio_id", currentStudioId);

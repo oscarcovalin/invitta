@@ -34,7 +34,21 @@
         loginButton.textContent = isLoading ? "Validando..." : "Entrar al dashboard";
     }
 
+    async function getStudioRedirectUrl() {
+        const supabase = window.InvittiaSupabase.getClient();
+        const { data, error } = await supabase.rpc("current_invitta_studio");
+
+        if (error || !Array.isArray(data) || !data.length) return null;
+        return "/administracion/studio-dashboard.html";
+    }
+
     async function redirectByRole() {
+        const studioRedirectUrl = await getStudioRedirectUrl();
+        if (studioRedirectUrl) {
+            window.location.href = studioRedirectUrl;
+            return;
+        }
+
         const roleInfo = await window.InvittiaAuth.getCurrentUserRole();
         const role = roleInfo.role;
 

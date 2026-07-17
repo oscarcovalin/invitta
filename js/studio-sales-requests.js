@@ -47,11 +47,8 @@
 
     document.getElementById("sales-logout-btn").addEventListener("click", () => window.studioAuth.logout());
 
-    const { data: studio } = await db
-      .from("studios")
-      .select("id, name")
-      .eq("user_id", session.user.id)
-      .single();
+    const { data: studios } = await db.rpc("current_invitta_studio");
+    const studio = Array.isArray(studios) ? studios[0] : null;
     studioName.textContent = studio?.name || "Invitta Studio";
 
     const { data: isSalesOperator, error: roleError } = await db

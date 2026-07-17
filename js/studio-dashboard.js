@@ -324,11 +324,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 1. Cargar datos del estudio
   async function loadStudioData() {
-    const { data: studio, error } = await db
-      .from("studios")
-      .select("*")
-      .eq("user_id", session.user.id)
-      .single();
+    const { data, error } = await db.rpc("current_invitta_studio");
+    const studio = Array.isArray(data) ? data[0] : null;
 
     if (error || !studio) {
       document.getElementById("studio-name").textContent = "Estudio no encontrado";

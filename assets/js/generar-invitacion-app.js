@@ -2031,11 +2031,8 @@ async function initializeStudioGeneratorContext() {
         const db = window.studioAuth.db;
         if (!db) throw new Error("No database client");
         
-        const { data: studio, error } = await db
-            .from("studios")
-            .select("id, name")
-            .eq("user_id", session.user.id)
-            .single();
+        const { data: studios, error } = await db.rpc("current_invitta_studio");
+        const studio = Array.isArray(studios) ? studios[0] : null;
             
         if (error) throw error;
         
