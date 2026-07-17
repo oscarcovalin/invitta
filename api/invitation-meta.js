@@ -31,9 +31,10 @@ async function getInvitation(slug) {
   if (!slug) return null;
 
   const query = new URLSearchParams({
-    select: "title,honoree_name,event_type,event_date,main_photo_url,gallery_urls",
+    select: "title,honoree_name,event_type,event_date,main_photo_url,gallery_urls,expires_at",
     slug: `eq.${slug}`,
     published: "eq.true",
+    or: `(expires_at.is.null,expires_at.gt.${new Date().toISOString()})`,
     limit: "1"
   });
   const response = await fetch(`${SUPABASE_URL}/rest/v1/studio_invitations?${query}`, {
@@ -107,6 +108,6 @@ module.exports = async function handler(request, response) {
   }
 
   response.setHeader("Content-Type", "text/html; charset=utf-8");
-  response.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=86400");
+  response.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
   response.status(200).send(injectSocialMetadata(html, invitation, slug));
 };

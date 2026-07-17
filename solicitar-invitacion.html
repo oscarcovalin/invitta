@@ -573,7 +573,7 @@
 
       // La solicitud es privada: se registra sin solicitar una representación
       // que requeriría permiso de lectura para visitantes anónimos.
-      const response = await fetch(`${config.url}/rest/v1/invitation_requests`, {
+      const response = await fetch(`${config.url}/rest/v1/rpc/submit_public_invitation_request`, {
         method: 'POST',
         headers: {
           apikey: config.key,
@@ -581,7 +581,7 @@
           'Content-Type': 'application/json',
           Prefer: 'return=minimal'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ request_payload: payload })
       });
 
       if (!response.ok) {

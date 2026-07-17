@@ -264,7 +264,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let existingGalleryUrls = [];
   let galleryDraftItems = [];
 
-  let currentStudioId = localStorage.getItem("invitta_studio_id");
+  let currentStudioId = null;
+  let isCurrentStudioManager = false;
   let currentSlug = "";
   let sourceRequestId = requestId || null;
 
@@ -458,18 +459,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Si no tenemos el studio_id, lo buscamos
-  if (!currentStudioId) {
-    const { data: studios } = await db.rpc("current_invitta_studio");
-    const studio = Array.isArray(studios) ? studios[0] : null;
-    if (studio) {
-      currentStudioId = studio.id;
-      localStorage.setItem("invitta_studio_id", currentStudioId);
-    } else {
+  // Resolve the saved Studio only after verifying that it still belongs to this user.
+  {
+    const { data: studios, error: studiosError } = await db.rpc("list_invitta_studios");
+    const studioList = Array.isArray(studios) ? studios : [];
+    const preferredStudioId = new URLSearchParams(window.location.search).get("studio_id")
+      || localStorage.getItem("invitta_studio_id");
+    const studio = studioList.find((item) => item.studio_id === preferredStudioId) || studioList[0] || null;
+    if (studiosError || !studio) {
       errorAlert.textContent = "No se pudo encontrar tu estudio.";
       errorAlert.style.display = "block";
       loading.style.display = "none";
       return;
+    }
+    currentStudioId = studio.studio_id;
+    isCurrentStudioManager = ["owner", "manager"].includes(studio.studio_role);
+    localStorage.setItem("invitta_studio_id", currentStudioId);
+
+    if (!isCurrentStudioManager) {
+      const publishedInput = document.getElementById("published");
+      if (publishedInput) {
+        publishedInput.disabled = true;
+        publishedInput.title = "Solo responsables del Studio pueden publicar invitaciones.";
+      }
     }
   }
 
@@ -1268,7 +1280,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       currentSlug = slugToUse;
       const savedInvitationId = result.data?.id || inviteId;
-      if (savedInvitationId) {
+      if (savedInvitationId && isCurrentStudioManager) {
         const { error: eventSyncError } = await db.rpc("sync_studio_invitation_event", {
           target_invitation_id: savedInvitationId
         });

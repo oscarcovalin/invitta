@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const db = window.studioAuth.db;
   let currentStudioId = null;
+  let isCurrentStudioManager = false;
   const salesRequestsLink = document.getElementById("sales-requests-link");
   const salesRequestCount = document.getElementById("sales-request-count");
 
@@ -301,6 +302,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       guestsBtn.href = `/administracion/dashboard.html?event_id=${encodeURIComponent(String(inv.evento_id))}`;
       actionsDiv.appendChild(guestsBtn);
       actionsDiv.appendChild(document.createTextNode(" "));
+    } else if (isCurrentStudioManager) {
+      const prepareGuestsBtn = document.createElement("button");
+      prepareGuestsBtn.type = "button";
+      prepareGuestsBtn.className = "btn btn-secondary btn-small";
+      prepareGuestsBtn.textContent = "Preparar invitados";
+      prepareGuestsBtn.addEventListener("click", async () => {
+        prepareGuestsBtn.disabled = true;
+        prepareGuestsBtn.textContent = "Preparando...";
+        const { error } = await db.rpc("sync_studio_invitation_event", {
+          target_invitation_id: inv.id
+        });
+        if (error) {
+          console.error("No se pudo preparar el panel de invitados:", error);
+          prepareGuestsBtn.disabled = false;
+          prepareGuestsBtn.textContent = "Preparar invitados";
+          return;
+        }
+        await loadInvitations();
+      });
+      actionsDiv.appendChild(prepareGuestsBtn);
+      actionsDiv.appendChild(document.createTextNode(" "));
     }
 
     if (inv.id) {
@@ -324,8 +346,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 1. Cargar datos del estudio
   async function loadStudioData() {
-    const { data, error } = await db.rpc("current_invitta_studio");
-    const studio = Array.isArray(data) ? data[0] : null;
+    const { data, error } = await db.rpc("list_invitta_studios");
+    const studios = Array.isArray(data) ? data : [];
+    const preferredStudioId = new URLSearchParams(window.location.search).get("studio_id")
+      || localStorage.getItem("invitta_studio_id");
+    const studio = studios.find((item) => item.studio_id === preferredStudioId) || studios[0] || null;
 
     if (error || !studio) {
       document.getElementById("studio-name").textContent = "Estudio no encontrado";
@@ -333,8 +358,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    currentStudioId = studio.id;
-    document.getElementById("studio-name").textContent = String(studio.name || "Mi Estudio").trim().slice(0, 120);
+    currentStudioId = studio.studio_id;
+    isCurrentStudioManager = ["owner", "manager"].includes(studio.studio_role);
+    document.getElementById("studio-name").textContent = String(studio.studio_name || "Mi Estudio").trim().slice(0, 120);
     
     // Guardar studio_id en localStorage para usarlo en el form más fácilmente
     localStorage.setItem("invitta_studio_id", currentStudioId);
@@ -383,18 +409,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       emptyMsg.setAttribute("aria-live", "polite");
       return;
     }
-
-    await Promise.all(invitations.map(async (inv) => {
-      if (inv.evento_id || !inv.id) return;
-      const { data: eventId, error: syncError } = await db.rpc("sync_studio_invitation_event", {
-        target_invitation_id: inv.id
-      });
-      if (syncError) {
-        console.error(`No se pudo vincular el panel de invitados para ${inv.slug}:`, syncError);
-        return;
-      }
-      inv.evento_id = eventId;
-    }));
 
     // Renderizar
     invitations.forEach(inv => {

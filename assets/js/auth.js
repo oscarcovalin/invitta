@@ -18,11 +18,13 @@
     }
 
     function pickHighestClienteUsuario(rows) {
-        const list = rows || [];
-        return list.find((row) => row.rol === "owner")
-            || list.find((row) => row.rol === "admin")
-            || list.find((row) => row.rol === "staff")
-            || null;
+        const rank = { owner: 0, admin: 1, staff: 2, cliente: 3 };
+        return [...(rows || [])]
+            .sort((left, right) => {
+                const roleDifference = (rank[left.rol] ?? 99) - (rank[right.rol] ?? 99);
+                if (roleDifference !== 0) return roleDifference;
+                return String(left.cliente_id || "").localeCompare(String(right.cliente_id || ""));
+            })[0] || null;
     }
 
     async function getCurrentUserRole() {
