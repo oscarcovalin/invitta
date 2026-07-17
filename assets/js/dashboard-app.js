@@ -545,6 +545,9 @@
   async function reloadDashboardData() {
     const dashboard = await window.InvittiaDashboardData.loadDashboard();
     activeEvent = dashboard?.event || null;
+    if (!activeEvent) {
+      throw new Error('No se encontro el evento solicitado o tu cuenta no tiene acceso.');
+    }
     guests = Array.isArray(dashboard?.guests) ? dashboard.guests : [];
     await attachGuestQrTokens();
     updateEventSummary();
@@ -653,6 +656,9 @@
 
     const dashboard = await window.InvittiaDashboardData.loadDashboard();
     activeEvent = dashboard?.event || null;
+    if (!activeEvent) {
+      throw new Error('No se encontro el evento solicitado o tu cuenta no tiene acceso.');
+    }
     guests = Array.isArray(dashboard?.guests) ? dashboard.guests : [];
     await attachGuestQrTokens();
     updateEventSummary();
