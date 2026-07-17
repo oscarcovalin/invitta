@@ -551,7 +551,7 @@ function buildPublicTemplateData(inv, template) {
     };
 }
 
-function addTemplateBridge(html, templatePath) {
+function addTemplateBridge(html, templatePath, templateData) {
     var parser = new DOMParser();
     var doc = parser.parseFromString(html, "text/html");
     var basePath = templatePath.slice(0, templatePath.lastIndexOf("/") + 1);
@@ -560,8 +560,9 @@ function addTemplateBridge(html, templatePath) {
     doc.head.insertBefore(base, doc.head.firstChild);
 
     var bootstrap = doc.createElement("script");
-    bootstrap.textContent = "window.INVITATION_DATA = parent.INVITATION_DATA;" +
-        "window.INVITTA_TEMPLATE_ID = parent.INVITATION_DATA.templateId;";
+    var serializedData = JSON.stringify(templateData || {}).replace(/</g, "\\u003c");
+    bootstrap.textContent = "window.INVITATION_DATA = " + serializedData + ";" +
+        "window.INVITTA_TEMPLATE_ID = window.INVITATION_DATA.templateId;";
     doc.head.insertBefore(bootstrap, doc.head.children[1] || null);
 
     var qrLibrary = doc.createElement("script");
@@ -592,7 +593,8 @@ function renderPublicDemoTemplate(inv, template) {
     document.documentElement.classList.add("inv-demo-host");
     document.body.style.margin = "0";
     document.body.style.overflow = "hidden";
-    window.INVITATION_DATA = buildPublicTemplateData(inv, template);
+    var publicTemplateData = buildPublicTemplateData(inv, template);
+    window.INVITATION_DATA = publicTemplateData;
 
     var frame = document.createElement("iframe");
     frame.id = "inv-public-template-frame";
@@ -629,7 +631,7 @@ function renderPublicDemoTemplate(inv, template) {
             return response.text();
         })
         .then(function(html) {
-            frame.srcdoc = addTemplateBridge(html, template.path);
+            frame.srcdoc = addTemplateBridge(html, template.path, publicTemplateData);
         })
         .catch(function(err) {
             console.error("Error cargando el template público:", err);

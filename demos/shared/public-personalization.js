@@ -7,6 +7,7 @@
   var templateId = data.templateId;
   var isWedding = data.eventType === "boda" || templateId.indexOf("boda-") === 0;
   var applying = false;
+  var vipAccessRetryCount = 0;
   var imageSequence = 0;
 
   var defaults = {
@@ -392,7 +393,14 @@
 
   function applyVipAccessPass() {
     var isVip = data.qrAccessEnabled === true || String(templateId || "").endsWith("-vip");
-    if (!isVip || !data.guestToken || !data.guestName || typeof window.QRCode !== "function") return;
+    if (!isVip || !data.guestToken || !data.guestName) return;
+    if (typeof window.QRCode !== "function") {
+      if (vipAccessRetryCount < 30) {
+        vipAccessRetryCount += 1;
+        window.setTimeout(applyVipAccessPass, 100);
+      }
+      return;
+    }
     if (document.querySelector("[data-invitta-vip-access]")) return;
 
     ensureVipAccessStyles();
