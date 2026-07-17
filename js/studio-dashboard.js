@@ -23,6 +23,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function loadNewSalesRequestCount() {
     if (!salesRequestsLink || !salesRequestCount) return;
 
+    const { data: isSalesOperator, error: roleError } = await db
+      .rpc("is_invitta_sales_operator");
+
+    if (roleError || !isSalesOperator) {
+      salesRequestsLink.hidden = true;
+      return;
+    }
+
     const { count, error } = await db
       .from("invitation_requests")
       .select("id", { count: "exact", head: true })

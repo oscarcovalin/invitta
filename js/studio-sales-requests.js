@@ -54,6 +54,14 @@
       .single();
     studioName.textContent = studio?.name || "Invitta Studio";
 
+    const { data: isSalesOperator, error: roleError } = await db
+      .rpc("is_invitta_sales_operator");
+
+    if (roleError || !isSalesOperator) {
+      status.textContent = "Este panel está disponible únicamente para el equipo comercial de Invitta.";
+      return;
+    }
+
     function render() {
       const selectedStatus = filter.value;
       const visible = selectedStatus === "all"
