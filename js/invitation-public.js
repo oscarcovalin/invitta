@@ -344,12 +344,23 @@ function cleanHeroDateTimeFallback(value) {
 }
 
 function renderInvitation(inv) {
-    if (inv.template_id === "xv-rose-gold-premium") {
-        renderRoseGoldPremium(inv);
-    } else {
-        renderDefaultTemplate(inv);
+    var template = PUBLIC_TEMPLATE_MANIFEST[inv.template_id];
+    if (template) {
+        renderPublicDemoTemplate(inv, template);
+        return;
     }
+
+    renderDefaultTemplate(inv);
 }
+
+var PUBLIC_TEMPLATE_MANIFEST = {
+    "xv-elegance-basic": { path: "/demos/xv-elegance/index.html", kind: "xv" },
+    "xv-rose-gold-premium": { path: "/demos/xv-premium-2/index.html", kind: "xv" },
+    "xv-champagne-rose-vip": { path: "/demos/xv-vip-3/index.html", kind: "xv" },
+    "boda-classic-basic": { path: "/demos/boda-classic-basic/index.html", kind: "boda" },
+    "boda-golden-romance-premium": { path: "/demos/boda-golden-romance-premium/index.html", kind: "boda" },
+    "boda-midnight-gold-vip": { path: "/demos/boda-premium-1/index.html", kind: "boda" }
+};
 
 function cleanString(val, maxLength) {
     if (!val || typeof val !== 'string') return "";
@@ -436,12 +447,149 @@ function cleanWhatsApp(val) {
     return (digits.length >= 10 && digits.length <= 15) ? digits : "";
 }
 
+function normalizeHexColor(val) {
+    var color = cleanString(val, 20);
+    return /^#[0-9a-f]{6}$/i.test(color) ? color : "";
+}
+
 function normalizeConfirmationPhones(val) {
     return String(val || "")
         .split(/[|,;\n]+/)
         .map(cleanWhatsApp)
         .filter(Boolean)
         .slice(0, 2);
+}
+
+function findReceptionTime(inv) {
+    if (inv.reception_time) return cleanString(inv.reception_time, 60);
+
+    var itinerary = normalizeItineraryData(inv.itinerary);
+    var receptionItem = itinerary.find(function(item) {
+        return /recepci|bienvenida|c[oó]ctel|sal[oó]n/i.test(item.title || "");
+    });
+    return receptionItem ? receptionItem.time : "";
+}
+
+function buildPublicTemplateData(inv, template) {
+    var parents = (inv.father_name || inv.mother_name)
+        ? [cleanString(inv.father_name, 120), cleanString(inv.mother_name, 120)].filter(Boolean)
+        : normalizeStringArray(inv.parents);
+    var confirmationPhones = normalizeConfirmationPhones(inv.whatsapp_number);
+
+    return {
+        templateId: cleanString(inv.template_id, 80),
+        eventType: cleanString(inv.event_type, 30) || template.kind,
+        eventTitle: cleanString(inv.title || inv.event_title, 120) || (template.kind === "boda" ? "Nuestra Boda" : "Mis Quince Años"),
+        celebrantName: cleanString(inv.honoree_name || inv.celebrant_name, 160) || "Nombre",
+        eventDate: cleanString(inv.event_date, 60),
+        eventTime: cleanString(inv.event_time || inv.ceremony_time, 60),
+        quote: cleanString(inv.welcome_text || inv.quote, 800),
+        parents: parents,
+        godparents: normalizeGodparents(inv.godparents),
+        ceremony: {
+            name: cleanString(inv.ceremony_name, 160),
+            time: cleanString(inv.ceremony_time || inv.event_time, 60),
+            address: cleanString(inv.ceremony_address, 320),
+            mapUrl: safeHttpsUrl(inv.ceremony_map_url || inv.ceremony_url)
+        },
+        reception: {
+            name: cleanString(inv.reception_name, 160),
+            time: findReceptionTime(inv),
+            address: cleanString(inv.reception_address, 320),
+            mapUrl: safeHttpsUrl(inv.reception_map_url || inv.reception_url)
+        },
+        itinerary: normalizeItineraryData(inv.itinerary),
+        confirmationPhones: confirmationPhones,
+        whatsapp: confirmationPhones[0] || cleanWhatsApp(inv.studio_whatsapp),
+        guestName: cleanString(guestName, 120),
+        passes: maxPasses,
+        table: cleanString(tableNum, 30),
+        mainPhotoUrl: safeHttpsUrl(inv.main_photo_url),
+        galleryUrls: normalizeGalleryUrls(inv.gallery_urls),
+        musicUrl: safeHttpsUrl(inv.music_url),
+        musicTitle: cleanString(inv.music_title, 120),
+        musicArtist: cleanString(inv.music_artist, 120),
+        dressCode: cleanString(inv.dress_code, 120),
+        giftTableUrl: safeHttpsUrl(inv.gift_table_url),
+        instagramHashtag: cleanString(inv.instagram_hashtag, 120),
+        thankYouTitle: cleanString(inv.thank_you_title, 160),
+        thankYouMessage: cleanString(inv.thank_you_message, 600),
+        thankYouSignature: cleanString(inv.thank_you_signature, 160),
+        hashtagSectionTitle: cleanString(inv.hashtag_section_title, 160),
+        hashtagSectionMessage: cleanString(inv.hashtag_section_message, 600),
+        colorPrimary: normalizeHexColor(inv.color_primary),
+        colorSecondary: normalizeHexColor(inv.color_secondary),
+        fontPreset: cleanString(inv.font_preset, 40),
+        visualTheme: cleanString(inv.visual_theme, 60),
+        studioName: cleanString(inv.studio_name, 120),
+        studioLogoUrl: safeHttpsUrl(inv.studio_logo_url),
+        studioWhatsapp: cleanWhatsApp(inv.studio_whatsapp),
+        studioCtaEnabled: inv.studio_cta_enabled !== false,
+        studioCtaText: cleanString(inv.studio_cta_text, 120),
+        studioCtaMessage: cleanString(inv.studio_cta_message, 500)
+    };
+}
+
+function addTemplateBridge(html, templatePath) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, "text/html");
+    var basePath = templatePath.slice(0, templatePath.lastIndexOf("/") + 1);
+    var base = doc.createElement("base");
+    base.href = basePath;
+    doc.head.insertBefore(base, doc.head.firstChild);
+
+    var bootstrap = doc.createElement("script");
+    bootstrap.textContent = "window.INVITATION_DATA = parent.INVITATION_DATA;" +
+        "window.INVITTA_TEMPLATE_ID = parent.INVITATION_DATA.templateId;";
+    doc.head.insertBefore(bootstrap, doc.head.children[1] || null);
+
+    var bridge = doc.createElement("script");
+    bridge.src = "/demos/shared/public-personalization.js";
+    bridge.defer = true;
+    doc.body.appendChild(bridge);
+
+    return "<!doctype html>\n" + doc.documentElement.outerHTML;
+}
+
+function renderPublicDemoTemplate(inv, template) {
+    var loader = document.getElementById("inv-loader");
+    if (loader) loader.style.display = "none";
+    var content = document.getElementById("inv-content");
+    if (content) content.style.display = "none";
+    var musicPlayer = document.getElementById("inv-music-player");
+    if (musicPlayer) musicPlayer.style.display = "none";
+
+    setInvitationDocumentTitle(inv);
+    var oldCss = document.querySelector('link[href="css/invitacion.css"]');
+    if (oldCss) oldCss.disabled = true;
+
+    document.documentElement.classList.add("inv-demo-host");
+    document.body.style.margin = "0";
+    document.body.style.overflow = "hidden";
+    window.INVITATION_DATA = buildPublicTemplateData(inv, template);
+
+    var frame = document.createElement("iframe");
+    frame.id = "inv-public-template-frame";
+    frame.title = cleanString(inv.title, 120) || "Invitación digital";
+    frame.setAttribute("allow", "autoplay; clipboard-write; fullscreen");
+    frame.style.cssText = "display:block;width:100%;height:100dvh;border:0;background:#fff;";
+    document.body.appendChild(frame);
+
+    fetch(template.path, { cache: "no-store" })
+        .then(function(response) {
+            if (!response.ok) throw new Error("Template HTTP " + response.status);
+            return response.text();
+        })
+        .then(function(html) {
+            frame.srcdoc = addTemplateBridge(html, template.path);
+        })
+        .catch(function(err) {
+            console.error("Error cargando el template público:", err);
+            frame.remove();
+            if (oldCss) oldCss.disabled = false;
+            document.body.style.overflow = "";
+            showError("No se pudo cargar la plantilla.");
+        });
 }
 
 function renderRoseGoldPremium(inv) {
