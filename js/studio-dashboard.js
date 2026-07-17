@@ -10,11 +10,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const db = window.studioAuth.db;
   let currentStudioId = null;
+  const salesRequestsLink = document.getElementById("sales-requests-link");
+  const salesRequestCount = document.getElementById("sales-request-count");
+
+  loadNewSalesRequestCount();
 
   // Manejar Logout
   document.getElementById("logout-btn").addEventListener("click", async () => {
     await window.studioAuth.logout();
   });
+
+  async function loadNewSalesRequestCount() {
+    if (!salesRequestsLink || !salesRequestCount) return;
+
+    const { count, error } = await db
+      .from("invitation_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "new");
+
+    if (error || !count) return;
+
+    salesRequestCount.textContent = count > 99 ? "99+" : String(count);
+    salesRequestCount.hidden = false;
+    salesRequestsLink.setAttribute("aria-label", `Solicitudes (${count} nuevas)`);
+  }
 
   function createBadge(text, classNames, extraStyles = {}) {
     const span = document.createElement("span");
