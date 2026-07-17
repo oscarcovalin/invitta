@@ -234,6 +234,36 @@ body {
   align-items: center;
 }
 
+.studio-package-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -2px 0 22px;
+  padding: 12px 14px;
+  border: 1px solid rgba(184, 138, 61, 0.2);
+  border-radius: 8px;
+  background: #fffaf4;
+  color: #63564a;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.studio-package-summary strong {
+  color: var(--primary-color);
+}
+
+.studio-package-feature {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(184, 138, 61, 0.18);
+  white-space: nowrap;
+}
+
 .studio-action-button {
   min-height: 42px;
   border-radius: 999px;

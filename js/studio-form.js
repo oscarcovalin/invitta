@@ -29,6 +29,41 @@ function getTemplatesByType(eventType) {
   return TEMPLATE_FALLBACKS[eventType] || [];
 }
 
+function updatePackageSummary() {
+  const summary = document.getElementById("studio-package-summary");
+  const templateId = document.getElementById("template_id")?.value;
+  if (!summary) return;
+
+  const template = window.InvittaTemplateCatalog?.getById(templateId);
+  if (!template) {
+    summary.hidden = true;
+    summary.replaceChildren();
+    return;
+  }
+
+  const features = template.features || {};
+  const details = [
+    `Galería: hasta ${template.galleryLimit || 10} fotos`,
+    features.music ? "Música incluida" : "Sin música",
+    features.itinerary ? "Itinerario incluido" : "Sin itinerario",
+    features.qr ? "Pase QR y control de acceso" : "RSVP por WhatsApp",
+    `Vigencia: ${template.activeMonths || 2} meses`
+  ];
+
+  const heading = document.createElement("strong");
+  heading.textContent = `${template.packageLabel}:`;
+  summary.replaceChildren(heading);
+
+  details.forEach(detail => {
+    const item = document.createElement("span");
+    item.className = "studio-package-feature";
+    item.textContent = detail;
+    summary.appendChild(item);
+  });
+
+  summary.hidden = false;
+}
+
 const VALID_TEMPLATES = {
   xv: getTemplatesByType("xv").map(template => template.id),
   boda: getTemplatesByType("boda").map(template => template.id)
@@ -110,6 +145,8 @@ function updateTemplateOptions(options = { preserveLegacyNull: false, preferredT
   } else {
     templateSelect.value = eventType === "xv" ? "xv-rose-gold-premium" : "boda-classic-basic";
   }
+
+  updatePackageSummary();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -120,6 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
       updateTemplateOptions({ preserveLegacyNull: false });
     });
   }
+
+  const templateSelect = document.getElementById("template_id");
+  if (templateSelect) templateSelect.addEventListener("change", updatePackageSummary);
 });
 
 function parseItineraryText(text) {

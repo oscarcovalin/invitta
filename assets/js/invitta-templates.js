@@ -21,9 +21,12 @@ window.InvittaTemplates = [
     templatePath: "plantillas/elegance",
     customizable: true,
     status: "active",
+    galleryLimit: 4,
+    activeMonths: 2,
     features: {
       music: false,
       gallery: true,
+      itinerary: false,
       rsvp: true,
       qr: false,
       personalizedPass: false
@@ -42,9 +45,12 @@ window.InvittaTemplates = [
     templatePath: "plantillas/paquete2",
     customizable: true,
     status: "active",
+    galleryLimit: 10,
+    activeMonths: 4,
     features: {
       music: true,
       gallery: true,
+      itinerary: true,
       rsvp: true,
       qr: false,
       personalizedPass: false
@@ -63,9 +69,12 @@ window.InvittaTemplates = [
     templatePath: "plantillas/vip",
     customizable: true,
     status: "active",
+    galleryLimit: 10,
+    activeMonths: 12,
     features: {
       music: true,
       gallery: true,
+      itinerary: true,
       rsvp: true,
       qr: true,
       personalizedPass: true
@@ -84,9 +93,12 @@ window.InvittaTemplates = [
     templatePath: "plantillas/boda-classic-basic",
     customizable: true,
     status: "active",
+    galleryLimit: 4,
+    activeMonths: 2,
     features: {
       music: false,
       gallery: true,
+      itinerary: false,
       rsvp: true,
       qr: false,
       personalizedPass: false
@@ -105,9 +117,12 @@ window.InvittaTemplates = [
     templatePath: "plantillas/boda-golden-romance",
     customizable: true,
     status: "active",
+    galleryLimit: 10,
+    activeMonths: 4,
     features: {
       music: true,
       gallery: true,
+      itinerary: true,
       rsvp: true,
       qr: false,
       personalizedPass: false
@@ -126,9 +141,12 @@ window.InvittaTemplates = [
     templatePath: "plantillas/boda1",
     customizable: true,
     status: "active",
+    galleryLimit: 10,
+    activeMonths: 12,
     features: {
       music: true,
       gallery: true,
+      itinerary: true,
       rsvp: true,
       qr: true,
       personalizedPass: true
