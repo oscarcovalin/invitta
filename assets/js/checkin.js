@@ -90,11 +90,16 @@
 
     async function loadGuestByToken(token) {
         const supabase = window.InvittiaSupabase.getClient();
-        const { data, error } = await supabase
+        let query = supabase
             .from("invitados")
             .select(CHECKIN_GUEST_SELECT)
-            .eq("qr_token", token)
-            .limit(1);
+            .eq("qr_token", token);
+
+        if (activeEvent?.id) {
+            query = query.eq("evento_id", activeEvent.id);
+        }
+
+        const { data, error } = await query.limit(1);
 
         return { data: Array.isArray(data) ? data[0] : null, error };
     }
@@ -218,11 +223,16 @@
 
     async function loadGuestById(guestId) {
         const supabase = window.InvittiaSupabase.getClient();
-        const { data, error } = await supabase
+        let query = supabase
             .from("invitados")
             .select(CHECKIN_GUEST_SELECT)
-            .eq("id", guestId)
-            .limit(1);
+            .eq("id", guestId);
+
+        if (activeEvent?.id) {
+            query = query.eq("evento_id", activeEvent.id);
+        }
+
+        const { data, error } = await query.limit(1);
 
         if (error) throw error;
         return Array.isArray(data) ? data[0] : null;
@@ -455,6 +465,12 @@
         currentGuest = guest;
         showGuest(guest);
 
+        if (activeEvent?.id && guest.evento_id !== activeEvent.id) {
+            setState("error", "QR de otro evento", "Este pase no pertenece al evento seleccionado.");
+            hideConfirmButton();
+            return;
+        }
+
         if (guest.qr_status === "cancelled") {
             setState("error", "QR cancelado", "Este pase fue cancelado y no puede usarse.");
             hideConfirmButton();
@@ -480,6 +496,10 @@
     async function confirmGuestEntry(guest, method, token) {
         if (!guest) {
             setState("error", "Invitado invalido", "Selecciona un invitado valido para confirmar.");
+            return null;
+        }
+        if (!activeEvent?.id || guest.evento_id !== activeEvent.id) {
+            setState("error", "Evento no valido", "El invitado no pertenece al evento activo.");
             return null;
         }
 
@@ -567,6 +587,10 @@
         const params = new URLSearchParams(window.location.search);
         currentToken = params.get("token") || "";
         const requestedEventId = params.get("event_id") || "";
+        if (requestedEventId) {
+            activeEvent = await getEventById(requestedEventId);
+        }
+
         if (currentToken) {
             const { data: tokenGuest, error: tokenError } = await loadGuestByToken(currentToken);
             if (tokenError) throw tokenError;
@@ -575,9 +599,9 @@
                 hideConfirmButton();
                 return;
             }
-            activeEvent = await getEventById(tokenGuest.evento_id);
-        } else if (requestedEventId) {
-            activeEvent = await getEventById(requestedEventId);
+            if (!activeEvent) {
+                activeEvent = await getEventById(tokenGuest.evento_id);
+            }
         } else {
             activeEvent = await getActiveEvent();
         }
