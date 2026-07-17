@@ -413,6 +413,8 @@
   <script>
     const STORAGE_KEY = 'invitta-request-draft-v1';
     const SALES_PHONE = '525566790073';
+    const PUBLIC_SUPABASE_URL = 'https://zqnlvmafwcioizzxhnhz.supabase.co';
+    const PUBLIC_SUPABASE_KEY = 'sb_publishable_aGhY_wqkcuv0c2wLDMb-nw_wsjjfTcd';
     const form = document.getElementById('requestForm');
     const status = document.getElementById('formStatus');
     const designSelect = document.getElementById('design');
@@ -474,12 +476,12 @@
       'Plum Noir': 'VIP Experience - $999 MXN'
     };
 
-    function getSalesRequestClient() {
+    function getSalesRequestConfig() {
       const env = window.INVITTIA_ENV || {};
-      if (!window.supabase?.createClient || !env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return null;
-      return window.supabase.createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
-        auth: { persistSession: false, autoRefreshToken: false }
-      });
+      return {
+        url: env.SUPABASE_URL || PUBLIC_SUPABASE_URL,
+        key: env.SUPABASE_ANON_KEY || PUBLIC_SUPABASE_KEY
+      };
     }
 
     function normalizeRequestEventType(value) {
@@ -509,8 +511,7 @@
     }
 
     async function registerSalesRequest(data) {
-      const client = getSalesRequestClient();
-      if (!client) return null;
+      const config = getSalesRequestConfig();
 
       const payload = {
         client_name: String(data.clientName || '').trim().slice(0, 160),
@@ -529,11 +530,21 @@
 
       // La solicitud es privada: se registra sin solicitar una representación
       // que requeriría permiso de lectura para visitantes anónimos.
-      const { error } = await client
-        .from('invitation_requests')
-        .insert(payload);
+      const response = await fetch(`${config.url}/rest/v1/invitation_requests`, {
+        method: 'POST',
+        headers: {
+          apikey: config.key,
+          Authorization: `Bearer ${config.key}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const details = await response.text();
+        throw new Error(`Supabase ${response.status}: ${details}`);
+      }
       return null;
     }
 
@@ -633,8 +644,10 @@
       status.textContent = 'Guardando tu solicitud...';
 
       let requestId = null;
+      let requestSaved = false;
       try {
         requestId = await registerSalesRequest(data);
+        requestSaved = true;
       } catch (error) {
         console.error('No se pudo registrar la solicitud:', error);
       }
@@ -654,7 +667,9 @@
       ];
       if (requestId) lines.push(`Solicitud: ${requestId}`);
       saveDraft();
-      status.textContent = 'Abriendo WhatsApp…';
+      status.textContent = requestSaved
+        ? 'Solicitud guardada. Abriendo WhatsApp…'
+        : 'No pudimos guardar la solicitud, pero puedes continuar por WhatsApp.';
       window.open(`https://wa.me/${SALES_PHONE}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener');
       if (submitButton) {
         submitButton.disabled = false;
