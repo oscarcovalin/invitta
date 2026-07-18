@@ -243,6 +243,10 @@ function setupStudioVisualPreview() {
   const titleColorSelect = document.getElementById("title_color");
   const bodyColorSelect = document.getElementById("body_color");
   const accentColorSelect = document.getElementById("accent_color");
+  const customFontInput = document.getElementById("customFontFile");
+  const customFontNameInput = document.getElementById("customFontName");
+  const customFontUrlInput = document.getElementById("customFontUrl");
+  const removeCustomFontBtn = document.getElementById("removeCustomFontBtn");
   const fontOptions = document.getElementById("studio-font-options");
   const paletteOptions = document.getElementById("studio-palette-options");
   const previewPhone = document.getElementById("studio-preview-phone");
@@ -290,6 +294,12 @@ function setupStudioVisualPreview() {
       label: "Caligrafia couture",
       sample: "Amour",
       display: '"Parisienne", "Great Vibes", cursive',
+      body: '"Montserrat", Arial, sans-serif'
+    },
+    custom: {
+      label: "Tipografia personalizada",
+      sample: "Tu estilo",
+      display: '"InvittaCustomPreview", "Cormorant Garamond", Georgia, serif',
       body: '"Montserrat", Arial, sans-serif'
     }
   };
@@ -421,6 +431,10 @@ function setupStudioVisualPreview() {
 
     button.addEventListener("click", () => {
       const select = type === "font" ? fontSelect : paletteSelect;
+      if (type === "font" && value === "custom" && !customFontUrlInput?.value && !customFontInput?.files?.[0]) {
+        customFontInput?.click();
+        return;
+      }
       select.value = value;
       select.dispatchEvent(new Event("change", { bubbles: true }));
     });
@@ -437,6 +451,78 @@ function setupStudioVisualPreview() {
     .forEach(([value, definition]) => {
       paletteOptions.appendChild(createOptionButton(value, definition, "palette"));
     });
+
+  let customFontObjectUrl = "";
+
+  function clearCustomFontError() {
+    const errorElement = document.getElementById("custom-font-error");
+    if (!errorElement) return;
+    errorElement.textContent = "";
+    errorElement.classList.remove("visible");
+  }
+
+  function showCustomFontError(message) {
+    const errorElement = document.getElementById("custom-font-error");
+    if (!errorElement) return;
+    errorElement.textContent = message;
+    errorElement.classList.add("visible");
+  }
+
+  function updateCustomFontCard() {
+    const option = fontOptions.querySelector('[data-value="custom"]');
+    const label = option?.querySelector(".studio-option-label");
+    const sample = option?.querySelector(".studio-font-sample");
+    const name = customFontNameInput?.value.trim();
+    if (label) label.textContent = name || fonts.custom.label;
+    if (sample) sample.textContent = name || fonts.custom.sample;
+  }
+
+  async function loadCustomFontPreview(source) {
+    if (!source || typeof FontFace !== "function") return;
+    try {
+      const customFont = new FontFace("InvittaCustomPreview", `url(${JSON.stringify(source)})`);
+      await customFont.load();
+      document.fonts.add(customFont);
+      fontSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    } catch (error) {
+      console.error("No se pudo previsualizar la tipografia personalizada:", error);
+      showCustomFontError("No se pudo previsualizar este archivo de tipografía.");
+    }
+  }
+
+  customFontInput?.addEventListener("change", () => {
+    const file = customFontInput.files?.[0];
+    clearCustomFontError();
+    if (!file) return;
+
+    if (!customFontNameInput.value.trim()) {
+      customFontNameInput.value = file.name.replace(/\.(woff2?|ttf|otf)$/i, "");
+    }
+    if (customFontObjectUrl) URL.revokeObjectURL(customFontObjectUrl);
+    customFontObjectUrl = URL.createObjectURL(file);
+    updateCustomFontCard();
+    fontSelect.value = "custom";
+    loadCustomFontPreview(customFontObjectUrl);
+  });
+
+  customFontNameInput?.addEventListener("input", updateCustomFontCard);
+
+  removeCustomFontBtn?.addEventListener("click", () => {
+    if (customFontObjectUrl) URL.revokeObjectURL(customFontObjectUrl);
+    customFontObjectUrl = "";
+    if (customFontInput) customFontInput.value = "";
+    if (customFontUrlInput) customFontUrlInput.value = "";
+    if (customFontNameInput) customFontNameInput.value = "";
+    document.getElementById("custom-font-current")?.classList.remove("visible");
+    updateCustomFontCard();
+    if (fontSelect.value === "custom") {
+      fontSelect.value = "classic";
+      fontSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  });
+
+  updateCustomFontCard();
+  if (customFontUrlInput?.value) loadCustomFontPreview(customFontUrlInput.value);
 
   function formatPreviewDate(value) {
     if (!value) return "28 · NOVIEMBRE · 2026";
@@ -842,6 +928,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   ];
   const MAX_PHOTO_BYTES = 8 * 1024 * 1024;   // 8 MB
   const MAX_MUSIC_BYTES = 15 * 1024 * 1024;  // 15 MB
+  const ALLOWED_FONT_EXTENSIONS = ["woff2", "woff", "ttf", "otf"];
+  const MAX_FONT_BYTES = 3 * 1024 * 1024;
 
   function showMediaError(type, message) {
     const el = document.getElementById(`${type}-error`);
@@ -871,6 +959,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (file.size > maxBytes) {
       const mb = Math.round(maxBytes / 1024 / 1024);
       showMediaError(type, `El archivo excede el tamaño máximo de ${mb} MB.`);
+      return false;
+    }
+    return true;
+  }
+
+  function validateFontFile(file) {
+    const extension = file.name.split(".").pop()?.toLowerCase() || "";
+    if (!ALLOWED_FONT_EXTENSIONS.includes(extension)) {
+      showMediaError("custom-font", "Usa un archivo WOFF2, WOFF, TTF u OTF.");
+      return false;
+    }
+    if (file.size > MAX_FONT_BYTES) {
+      showMediaError("custom-font", "La tipografía excede el tamaño máximo de 3 MB.");
       return false;
     }
     return true;
@@ -1218,6 +1319,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (bodyColor) bodyColor.value = data.body_color || "";
     const accentColor = document.getElementById("accent_color");
     if (accentColor) accentColor.value = data.accent_color || "";
+    const customFontUrl = document.getElementById("customFontUrl");
+    const customFontName = document.getElementById("customFontName");
+    const customFontCurrent = document.getElementById("custom-font-current");
+    const customFontCurrentName = document.getElementById("custom-font-current-name");
+    if (customFontUrl) customFontUrl.value = data.custom_font_url || "";
+    if (customFontName) customFontName.value = data.custom_font_name || "";
+    if (data.custom_font_url) {
+      customFontCurrent?.classList.add("visible");
+      if (customFontCurrentName) customFontCurrentName.textContent = data.custom_font_name || "Tipografía personalizada cargada";
+    }
     document.getElementById("ceremony_name").value = data.ceremony_name || "";
     document.getElementById("ceremony_address").value = data.ceremony_address || "";
     document.getElementById("ceremony_map_url").value = data.ceremony_map_url || "";
@@ -1324,11 +1435,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     successAlert.style.display = "none";
     clearMediaError("photo");
     clearMediaError("music");
+    clearMediaError("custom-font");
     saveBtn.disabled = true;
     saveBtn.textContent = "Guardando...";
 
     const slugValue = document.getElementById("slug").value.trim();
     const slugToUse = slugValue || currentSlug;
+
+    // Tipografia personalizada
+    let finalCustomFontUrl = document.getElementById("customFontUrl")?.value || null;
+    const customFontFile = document.getElementById("customFontFile")?.files?.[0];
+    if (customFontFile) {
+      if (!validateFontFile(customFontFile)) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar cambios";
+        return;
+      }
+      showProgress("custom-font");
+      const uploadedUrl = await uploadFileToStorage(customFontFile, "fonts", slugToUse);
+      hideProgress("custom-font");
+      if (!uploadedUrl) {
+        showMediaError("custom-font", "Error al subir la tipografía. Intenta de nuevo.");
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar cambios";
+        return;
+      }
+      finalCustomFontUrl = uploadedUrl;
+      const customFontUrl = document.getElementById("customFontUrl");
+      if (customFontUrl) customFontUrl.value = uploadedUrl;
+    }
 
     // ── Subida de foto ──
     let finalPhotoUrl = existingPhotoUrl;
@@ -1500,6 +1635,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       hashtag_section_message: document.getElementById("hashtagSectionMessage").value || "Usa el hashtag en tus fotos y videos para que no se pierda ningún recuerdo.",
       godparents: godparentsJson,
       font_preset: document.getElementById("font_preset").value || "classic",
+      custom_font_url: finalCustomFontUrl,
+      custom_font_name: document.getElementById("customFontName")?.value.trim() || null,
       visual_theme: document.getElementById("visual_theme") ? document.getElementById("visual_theme").value : "rose-floral",
       color_primary: document.getElementById("color_primary").value,
       color_secondary: document.getElementById("color_secondary").value,

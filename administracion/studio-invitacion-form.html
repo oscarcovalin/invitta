@@ -455,6 +455,7 @@
             <option value="luxury">Luxury Dramática</option>
             <option value="signature">Firma Orgánica</option>
             <option value="couture">Caligrafía Couture</option>
+            <option value="custom">Tipografía Personalizada</option>
           </select>
         </div>
         <div class="form-group studio-legacy-visual-control" style="flex: 1;" aria-hidden="true">
@@ -494,6 +495,21 @@
             <fieldset class="studio-visual-choice-group">
               <legend>Estilo tipografico</legend>
               <div id="studio-font-options" class="studio-font-options" aria-label="Combinaciones tipograficas"></div>
+              <div class="studio-custom-font-upload">
+                <label for="customFontFile">Subir tipografía especial</label>
+                <p>Formatos WOFF2, WOFF, TTF u OTF. Máximo 3 MB. Se aplicará a títulos y nombres.</p>
+                <div class="studio-custom-font-fields">
+                  <input type="file" id="customFontFile" accept=".woff2,.woff,.ttf,.otf,font/woff2,font/woff,font/ttf,font/otf,application/font-woff,application/x-font-ttf,application/x-font-opentype">
+                  <input type="text" id="customFontName" maxlength="80" placeholder="Nombre de la tipografía">
+                </div>
+                <input type="hidden" id="customFontUrl" value="">
+                <div class="upload-progress" id="custom-font-progress">Subiendo tipografía...</div>
+                <div class="media-error" id="custom-font-error"></div>
+                <div class="media-current" id="custom-font-current">
+                  <span id="custom-font-current-name"></span>
+                  <button type="button" id="removeCustomFontBtn" class="studio-custom-font-remove">Quitar</button>
+                </div>
+              </div>
             </fieldset>
 
             <fieldset class="studio-visual-choice-group">
@@ -711,7 +727,7 @@
   <script src="/js/studio-auth.js?v=studio-recovery-20260718"></script>
   <!-- Lógica del Formulario -->
   <script src="/assets/js/invitta-templates.js"></script>
-  <script src="/js/studio-form.js?v=signature-fonts-20260718"></script>
+  <script src="/js/studio-form.js?v=custom-font-upload-20260718"></script>
 
 </body>
 </html>

@@ -941,3 +941,50 @@ body {
     display: block;
   }
 }
+.studio-custom-font-upload {
+  margin-top: 0.85rem;
+  padding: 0.9rem;
+  border: 1px dashed #d9c9bd;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.studio-custom-font-upload > label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: var(--secondary-color, #233b53);
+}
+
+.studio-custom-font-upload > p {
+  margin: 0 0 0.75rem;
+  color: var(--text-muted, #6f655e);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.studio-custom-font-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: 0.65rem;
+}
+
+.studio-custom-font-fields input {
+  min-width: 0;
+}
+
+.studio-custom-font-remove {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: #9d4b49;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .studio-custom-font-fields {
+    grid-template-columns: 1fr;
+  }
+}

@@ -676,6 +676,10 @@
       couture: {
         display: '"Parisienne", "Great Vibes", cursive',
         body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif'
+      },
+      custom: {
+        display: '"InvittaCustom", "Cormorant Garamond", Georgia, serif',
+        body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif'
       }
     };
     var fonts = fontPresets[data.fontPreset];
@@ -686,6 +690,17 @@
         fontLink.rel = "stylesheet";
         fontLink.href = "https://fonts.googleapis.com/css2?family=Allura&family=Parisienne&display=swap";
         document.head.appendChild(fontLink);
+      }
+      if (data.fontPreset === "custom" && data.customFontUrl) {
+        var customFontStyle = document.getElementById("invitta-custom-font-face");
+        if (!customFontStyle) {
+          customFontStyle = document.createElement("style");
+          customFontStyle.id = "invitta-custom-font-face";
+          document.head.appendChild(customFontStyle);
+        }
+        var extension = data.customFontUrl.split("?")[0].split(".").pop().toLowerCase();
+        var format = extension === "woff2" ? "woff2" : extension === "woff" ? "woff" : extension === "otf" ? "opentype" : "truetype";
+        customFontStyle.textContent = '@font-face{font-family:"InvittaCustom";src:url(' + JSON.stringify(data.customFontUrl) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
       }
       root.style.setProperty("--font-display", fonts.display);
       root.style.setProperty("--font-serif", fonts.display);

@@ -553,6 +553,8 @@ function buildPublicTemplateData(inv, template) {
         bodyColor: normalizeHexColor(inv.body_color),
         accentColor: normalizeHexColor(inv.accent_color),
         fontPreset: cleanString(inv.font_preset, 40),
+        customFontUrl: safeHttpsUrl(inv.custom_font_url),
+        customFontName: cleanString(inv.custom_font_name, 80),
         visualTheme: cleanString(inv.visual_theme, 60),
         studioName: cleanString(inv.studio_name, 120),
         studioLogoUrl: safeHttpsUrl(inv.studio_logo_url),
@@ -583,7 +585,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=signature-fonts-20260718";
+    bridge.src = "/demos/shared/public-personalization.js?v=custom-font-upload-20260718";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 
