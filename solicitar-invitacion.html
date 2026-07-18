@@ -82,7 +82,7 @@
       gap: 72px;
       align-items: start;
     }
-    .request-intro { position: sticky; top: 116px; }
+    .request-intro { position: sticky; top: 116px; min-width: 0; }
     .eyebrow {
       margin: 0 0 14px;
       color: var(--rose-deep);
@@ -218,6 +218,7 @@
       color: var(--charcoal);
     }
     .request-card {
+      min-width: 0;
       padding: 38px;
       border: 1px solid var(--sand);
       border-radius: 8px;
@@ -270,7 +271,7 @@
       box-shadow: 0 0 0 3px rgba(201, 135, 125, 0.14);
     }
     .field-help { display: block; margin-top: 6px; color: #8b817a; font-size: 0.72rem; }
-    .submit-row { margin-top: 28px; }
+    .submit-row { margin-top: 28px; display: grid; gap: 12px; }
     .submit-button {
       width: 100%;
       min-height: 52px;
@@ -284,6 +285,15 @@
     }
     .submit-button:hover { background: #181818; transform: translateY(-1px); }
     .submit-button:focus-visible { outline: 3px solid rgba(201, 135, 125, 0.45); outline-offset: 3px; }
+    .submit-button.payment-button { background: var(--rose-deep); }
+    .submit-button.payment-button:hover { background: #955950; }
+    .submit-button.whatsapp-button {
+      border: 1px solid #d9cec2;
+      background: transparent;
+      color: var(--charcoal);
+    }
+    .submit-button.whatsapp-button:hover { border-color: var(--rose); background: var(--rose-pale); }
+    .submit-button:disabled { cursor: wait; opacity: 0.62; transform: none; }
     .form-note {
       margin: 12px 0 0;
       color: #8b817a;
@@ -322,6 +332,8 @@
       .design-preview { width: min(100%, 270px); height: 528px; margin-top: 24px; }
       .phone-screen iframe { transform: scale(0.651); }
       .request-card { padding: 28px 20px; }
+      .request-intro,
+      .request-card { width: 100%; }
       .form-grid { grid-template-columns: 1fr; gap: 18px; }
       .field.full { grid-column: auto; }
       .back-link span { display: none; }
@@ -441,8 +453,9 @@
         </div>
 
         <div class="submit-row">
-          <button class="submit-button" type="submit">Continuar por WhatsApp</button>
-          <p class="form-note">Al continuar se abrirá WhatsApp con estos datos listos para enviar. Invitta no los publica.</p>
+          <button class="submit-button payment-button" type="submit" data-action="payment">Pagar con tarjeta u OXXO</button>
+          <button class="submit-button whatsapp-button" type="submit" data-action="whatsapp">Continuar por WhatsApp</button>
+          <p class="form-note">El pago se realiza de forma segura en Stripe. También puedes continuar con atención personal por WhatsApp.</p>
           <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
         </div>
       </form>
@@ -455,6 +468,7 @@
 
   <script>
     const STORAGE_KEY = 'invitta-request-draft-v1';
+    const REQUEST_REFERENCE_KEY = 'invitta-request-reference-v1';
     const SALES_PHONE = '525566790073';
     const PUBLIC_SUPABASE_URL = 'https://zqnlvmafwcioizzxhnhz.supabase.co';
     const PUBLIC_SUPABASE_KEY = 'sb_publishable_aGhY_wqkcuv0c2wLDMb-nw_wsjjfTcd';
@@ -578,8 +592,7 @@
         headers: {
           apikey: config.key,
           Authorization: `Bearer ${config.key}`,
-          'Content-Type': 'application/json',
-          Prefer: 'return=minimal'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ request_payload: payload })
       });
@@ -588,7 +601,52 @@
         const details = await response.text();
         throw new Error(`Supabase ${response.status}: ${details}`);
       }
-      return null;
+      return await response.json();
+    }
+
+    function requestFingerprint(data) {
+      return JSON.stringify({
+        clientName: String(data.clientName || '').trim(),
+        clientPhone: String(data.clientPhone || '').replace(/\D/g, ''),
+        eventType: data.eventType,
+        design: data.design,
+        packageName: data.packageName,
+        eventDate: data.eventDate
+      });
+    }
+
+    async function ensureSalesRequest(data) {
+      const fingerprint = requestFingerprint(data);
+      try {
+        const stored = JSON.parse(sessionStorage.getItem(REQUEST_REFERENCE_KEY) || 'null');
+        if (stored?.id && stored.fingerprint === fingerprint) return stored.id;
+      } catch (_) {}
+
+      const id = await registerSalesRequest(data);
+      sessionStorage.setItem(REQUEST_REFERENCE_KEY, JSON.stringify({ id, fingerprint }));
+      return id;
+    }
+
+    async function startCheckout(data, requestId) {
+      const packageTier = requestPackageTiers[data.packageName];
+      if (!packageTier) throw new Error('Selecciona un paquete Esencial, Premium o VIP antes de pagar.');
+
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          packageTier,
+          clientName: data.clientName,
+          clientPhone: data.clientPhone,
+          designName: data.design,
+          requestId
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.url) {
+        throw new Error(result.error || 'No pudimos iniciar el pago.');
+      }
+      window.location.assign(result.url);
     }
 
     function readDraft() {
@@ -675,6 +733,9 @@
     }
     updatePreview();
     updateDemoPreviewLink();
+    if (params.get('pago') === 'cancelado') {
+      status.textContent = 'El pago fue cancelado. Tu solicitud se conserva y puedes intentarlo nuevamente.';
+    }
 
     form.addEventListener('input', saveDraft);
     form.addEventListener('change', event => {
@@ -695,20 +756,40 @@
       event.preventDefault();
       if (!form.reportValidity()) return;
       const data = Object.fromEntries(new FormData(form).entries());
-      const submitButton = form.querySelector('button[type="submit"]');
-      if (submitButton) {
-        submitButton.disabled = true;
-        submitButton.textContent = 'Registrando solicitud...';
-      }
+      const action = event.submitter?.dataset.action || 'whatsapp';
+      const submitButtons = [...form.querySelectorAll('button[type="submit"]')];
+      const submitButton = event.submitter;
+      const originalLabel = submitButton?.textContent;
+      submitButtons.forEach(button => { button.disabled = true; });
+      if (submitButton) submitButton.textContent = action === 'payment' ? 'Preparando pago...' : 'Registrando solicitud...';
       status.textContent = 'Guardando tu solicitud...';
 
       let requestId = null;
       let requestSaved = false;
       try {
-        requestId = await registerSalesRequest(data);
+        requestId = await ensureSalesRequest(data);
         requestSaved = true;
       } catch (error) {
         console.error('No se pudo registrar la solicitud:', error);
+      }
+      if (action === 'payment') {
+        if (!requestSaved) {
+          status.textContent = 'No pudimos registrar la solicitud. Intenta de nuevo o continua por WhatsApp.';
+          submitButtons.forEach(button => { button.disabled = false; });
+          if (submitButton) submitButton.textContent = originalLabel;
+          return;
+        }
+        try {
+          status.textContent = 'Abriendo el pago seguro...';
+          await startCheckout(data, requestId);
+          return;
+        } catch (error) {
+          console.error('No se pudo iniciar el pago:', error);
+          status.textContent = error.message;
+          submitButtons.forEach(button => { button.disabled = false; });
+          if (submitButton) submitButton.textContent = originalLabel;
+          return;
+        }
       }
       const lines = [
         'Hola Invitta, quiero solicitar una invitación digital.',
@@ -730,10 +811,8 @@
         ? 'Solicitud guardada. Abriendo WhatsApp…'
         : 'No pudimos guardar la solicitud, pero puedes continuar por WhatsApp.';
       window.open(`https://wa.me/${SALES_PHONE}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener');
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Continuar por WhatsApp';
-      }
+      submitButtons.forEach(button => { button.disabled = false; });
+      if (submitButton) submitButton.textContent = originalLabel;
     });
   </script>
 </body>

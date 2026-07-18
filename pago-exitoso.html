@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estado de tu pago | Invitta</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --cream:#faf7f2; --paper:#fffdf9; --sand:#e8ddd0; --rose:#c9877d; --charcoal:#2e2e2e; --muted:#746b65; --sage:#718465; }
+    * { box-sizing:border-box; }
+    body { min-height:100vh; margin:0; display:grid; place-items:center; padding:24px; background:var(--cream); color:var(--charcoal); font-family:"Jost",sans-serif; }
+    main { width:min(100%,580px); padding:clamp(30px,6vw,54px); border:1px solid var(--sand); border-radius:8px; background:var(--paper); text-align:center; box-shadow:0 24px 64px rgba(67,49,41,.1); }
+    .mark { width:54px; height:54px; margin:0 auto 20px; display:grid; place-items:center; border-radius:50%; background:rgba(113,132,101,.12); color:var(--sage); font-size:1.35rem; }
+    h1 { margin:0; font:600 clamp(2.2rem,8vw,3.5rem)/1 "Cormorant Garamond",serif; }
+    p { margin:18px auto 0; max-width:430px; color:var(--muted); line-height:1.7; }
+    .actions { margin-top:28px; display:flex; flex-wrap:wrap; justify-content:center; gap:12px; }
+    a { min-height:46px; padding:0 22px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--sand); border-radius:999px; color:var(--charcoal); font-weight:600; text-decoration:none; }
+    a.primary { border-color:var(--charcoal); background:var(--charcoal); color:#fff; }
+    [hidden] { display:none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="mark" aria-hidden="true">&#10003;</div>
+    <h1 id="paymentTitle">Revisando tu pago</h1>
+    <p id="paymentMessage">Estamos consultando el estado de tu operacion.</p>
+    <div class="actions">
+      <a class="primary" id="voucherLink" href="#" target="_blank" rel="noopener" hidden>Abrir ficha OXXO</a>
+      <a href="index.html">Volver a Invitta</a>
+    </div>
+  </main>
+  <script>
+    const title = document.getElementById('paymentTitle');
+    const message = document.getElementById('paymentMessage');
+    const voucherLink = document.getElementById('voucherLink');
+    const sessionId = new URLSearchParams(location.search).get('session_id');
+
+    async function loadPaymentStatus() {
+      if (!sessionId) throw new Error('missing_session');
+      const response = await fetch(`/api/payment-status?session_id=${encodeURIComponent(sessionId)}`);
+      if (!response.ok) throw new Error('status_unavailable');
+      const payment = await response.json();
+
+      if (payment.paymentStatus === 'paid') {
+        title.textContent = 'Pago confirmado';
+        message.textContent = 'Gracias. Recibimos tu pago y el equipo de Invitta continuara con la personalizacion de tu invitacion.';
+      } else {
+        title.textContent = 'Referencia generada';
+        message.textContent = 'Tu pago en OXXO esta pendiente. Conserva la ficha y realiza el pago antes de su fecha de vencimiento.';
+        if (payment.voucherUrl) {
+          voucherLink.href = payment.voucherUrl;
+          voucherLink.hidden = false;
+        }
+      }
+    }
+
+    loadPaymentStatus().catch(() => {
+      title.textContent = 'Operacion recibida';
+      message.textContent = 'No pudimos consultar el estado en este momento. Tu operacion no se duplicara; el equipo de Invitta puede ayudarte a verificarla.';
+    });
+  </script>
+</body>
+</html>

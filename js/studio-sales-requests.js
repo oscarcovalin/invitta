@@ -8,6 +8,13 @@
     won: "Ganada",
     lost: "Descartada"
   };
+  const paymentLabels = {
+    not_started: "Sin iniciar",
+    pending: "Pendiente",
+    paid: "Pagado",
+    failed: "Fallido",
+    expired: "Vencido"
+  };
 
   function formatDate(value) {
     if (!value) return "Por definir";
@@ -93,6 +100,8 @@
           buildField("Ciudad", request.event_city),
           buildField("Diseño", request.design_name),
           buildField("Paquete", request.package_tier),
+          buildField("Pago", paymentLabels[request.payment_status] || "Sin iniciar"),
+          buildField("Importe", request.payment_amount_mxn ? `$${request.payment_amount_mxn} MXN` : "Por definir"),
           buildField("Paleta", request.palette_preference),
           buildField("Tipografía", request.typography_preference)
         );
@@ -160,7 +169,7 @@
       status.textContent = "Cargando solicitudes...";
       const { data, error } = await db
         .from("invitation_requests")
-        .select("id, client_name, client_phone, event_type, design_name, requested_template_id, package_tier, palette_preference, typography_preference, event_date, event_city, notes, status, assigned_studio_id, created_at, converted_invitation_id")
+        .select("id, client_name, client_phone, event_type, design_name, requested_template_id, package_tier, palette_preference, typography_preference, event_date, event_city, notes, status, assigned_studio_id, created_at, converted_invitation_id, payment_status, payment_method, payment_amount_mxn, payment_email, paid_at")
         .order("created_at", { ascending: false });
 
       if (error) {

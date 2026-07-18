@@ -1,0 +1,9 @@
+{
+  "name": "invitta",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Invitta digital invitations platform",
+  "dependencies": {
+    "stripe": "^18.5.0"
+  }
+}
