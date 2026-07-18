@@ -579,6 +579,41 @@
         title: "#F6EAD2",
         body: "#DDD2C5",
         accent: "#C5A355"
+      },
+      "terracotta-sand": {
+        surface: "#F4E6D8",
+        card: "#FFF8F0",
+        title: "#512F28",
+        body: "#74564A",
+        accent: "#D26345"
+      },
+      "plum-olive": {
+        surface: "#EEEBDD",
+        card: "#F8F5EC",
+        title: "#3D1831",
+        body: "#5F5C42",
+        accent: "#7A7D45"
+      },
+      "opal-blue": {
+        surface: "#EAF2F4",
+        card: "#F8FAFC",
+        title: "#263B5B",
+        body: "#59697B",
+        accent: "#8B79A8"
+      },
+      "emerald-jewel": {
+        surface: "#E8EFEA",
+        card: "#F8F7F0",
+        title: "#0E3B31",
+        body: "#3F5B52",
+        accent: "#C19A3C"
+      },
+      "celestial-navy": {
+        surface: "#0C1630",
+        card: "#142345",
+        title: "#F5EBD5",
+        body: "#C9D1E2",
+        accent: "#D6AF4B"
       }
     };
     var palette = palettePresets[data.palettePreset];

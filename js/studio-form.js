@@ -293,6 +293,7 @@ function setupStudioVisualPreview() {
     },
     champagne: {
       label: "Champagne suave",
+      legacy: true,
       surface: "#FBF6EE",
       card: "#FFFDF9",
       title: "#3B3028",
@@ -301,6 +302,7 @@ function setupStudioVisualPreview() {
     },
     rose: {
       label: "Rosa editorial",
+      legacy: true,
       surface: "#FFF5F4",
       card: "#FFFCFA",
       title: "#4A3236",
@@ -309,6 +311,7 @@ function setupStudioVisualPreview() {
     },
     sage: {
       label: "Salvia y marfil",
+      legacy: true,
       surface: "#F6F7F0",
       card: "#FFFEF8",
       title: "#344039",
@@ -317,6 +320,7 @@ function setupStudioVisualPreview() {
     },
     emerald: {
       label: "Esmeralda y oro",
+      legacy: true,
       surface: "#F3F4EF",
       card: "#FCFBF5",
       title: "#173B30",
@@ -325,11 +329,52 @@ function setupStudioVisualPreview() {
     },
     midnight: {
       label: "Noche y oro",
+      legacy: true,
       surface: "#17131A",
       card: "#251E27",
       title: "#F4EADF",
       body: "#CBBFC6",
       accent: "#D5AF54"
+    },
+    "terracotta-sand": {
+      label: "Terracota y arena",
+      surface: "#F4E6D8",
+      card: "#FFF8F0",
+      title: "#512F28",
+      body: "#74564A",
+      accent: "#D26345"
+    },
+    "plum-olive": {
+      label: "Ciruela y olivo",
+      surface: "#EEEBDD",
+      card: "#F8F5EC",
+      title: "#3D1831",
+      body: "#5F5C42",
+      accent: "#7A7D45"
+    },
+    "opal-blue": {
+      label: "Opalo azul",
+      surface: "#EAF2F4",
+      card: "#F8FAFC",
+      title: "#263B5B",
+      body: "#59697B",
+      accent: "#8B79A8"
+    },
+    "emerald-jewel": {
+      label: "Esmeralda joya",
+      surface: "#E8EFEA",
+      card: "#F8F7F0",
+      title: "#0E3B31",
+      body: "#3F5B52",
+      accent: "#C19A3C"
+    },
+    "celestial-navy": {
+      label: "Azul celestial",
+      surface: "#0C1630",
+      card: "#142345",
+      title: "#F5EBD5",
+      body: "#C9D1E2",
+      accent: "#D6AF4B"
     }
   };
 
@@ -375,9 +420,11 @@ function setupStudioVisualPreview() {
     fontOptions.appendChild(createOptionButton(value, definition, "font"));
   });
 
-  Object.entries(palettes).forEach(([value, definition]) => {
-    paletteOptions.appendChild(createOptionButton(value, definition, "palette"));
-  });
+  Object.entries(palettes)
+    .filter(([, definition]) => !definition.legacy)
+    .forEach(([value, definition]) => {
+      paletteOptions.appendChild(createOptionButton(value, definition, "palette"));
+    });
 
   function formatPreviewDate(value) {
     if (!value) return "28 · NOVIEMBRE · 2026";
@@ -555,11 +602,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const palettePreset = document.getElementById("palette_preset");
       if (palettePreset) {
         palettePreset.value = {
-          "Rosa y champagne": "rose",
-          "Marfil y salvia": "sage",
-          "Esmeralda y oro": "emerald",
-          "Olivo y arena": "sage",
-          "Ciruela, negro y oro": "midnight"
+          "Rosa y champagne": "terracotta-sand",
+          "Marfil y salvia": "plum-olive",
+          "Esmeralda y oro": "emerald-jewel",
+          "Olivo y arena": "plum-olive",
+          "Ciruela, negro y oro": "celestial-navy"
         }[request.palette_preference] || "original";
       }
     }
