@@ -116,6 +116,5 @@ export const REGISTRY_OPTIONS: RegistryOption[] = [
   },
 ];
 
-// Suggested ambient music track matching the "Quiet Luxury" classical romance aesthetic
-// (E.g. soft orchestral track)
-export const BACKGROUND_MUSIC_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; // A nice instrumental piano melody
+// Default audio for the Élégance XV demo. A personalized invitation can override it.
+export const BACKGROUND_MUSIC_URL = '/demos/xv-elegance/assets/elegance-million-to-one.mp3';

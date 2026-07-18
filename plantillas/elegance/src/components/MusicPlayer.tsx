@@ -10,21 +10,41 @@ export default function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Create audio element
-    const audio = new Audio(BACKGROUND_MUSIC_URL);
+    const invitationMusicUrl = (window as Window & typeof globalThis & {
+      INVITATION_DATA?: { musicUrl?: string };
+    }).INVITATION_DATA?.musicUrl || BACKGROUND_MUSIC_URL;
+    const audio = new Audio(invitationMusicUrl);
     audio.loop = true;
     audio.volume = 0.5;
     audioRef.current = audio;
 
-    // Autoplay attempts can fail, so we handle it gracefully
     const handleCanPlay = () => {
       setError(null);
+      void startPlayback();
+    };
+
+    const startPlayback = async () => {
+      try {
+        await audio.play();
+        setIsPlaying(true);
+        setHasStarted(true);
+        setError(null);
+      } catch (err) {
+        // Mobile browsers require a user gesture before allowing audible media.
+        setError('Toca para activar la música');
+      }
+    };
+
+    const retryFromFirstGesture = () => {
+      void startPlayback();
     };
 
     audio.addEventListener('canplay', handleCanPlay);
+    document.addEventListener('pointerdown', retryFromFirstGesture, { once: true, passive: true });
 
     return () => {
       audio.removeEventListener('canplay', handleCanPlay);
+      document.removeEventListener('pointerdown', retryFromFirstGesture);
       audio.pause();
       audioRef.current = null;
     };
