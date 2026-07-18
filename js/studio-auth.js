@@ -30,6 +30,31 @@
       return { data, error };
     },
 
+    // Register an account. The Studio is created only after email confirmation.
+    signUpStudio: async function({ studioName, fullName, email, password }) {
+      const emailRedirectTo = `${window.location.origin}/administracion/studio-confirmacion.html`;
+      const { data, error } = await db.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo: emailRedirectTo,
+          data: {
+            account_type: "studio",
+            studio_name: studioName,
+            full_name: fullName
+          }
+        }
+      });
+      return { data, error };
+    },
+
+    // Complete onboarding once Supabase has confirmed the email address.
+    provisionStudio: async function() {
+      const { data, error } = await db.rpc("provision_my_invitta_studio");
+      const studio = Array.isArray(data) ? data[0] : data;
+      return { studio, error };
+    },
+
     // Cerrar sesión
     logout: async function() {
       await db.auth.signOut();

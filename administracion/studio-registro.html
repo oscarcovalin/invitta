@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear cuenta | Invitta Studio</title>
+  <link rel="stylesheet" href="/css/studio.css?v=studio-onboarding-1">
+</head>
+<body class="studio-auth-page">
+  <main class="studio-auth-shell">
+    <a class="studio-auth-brand" href="/">Inv<span>itta</span></a>
+
+    <section class="card studio-auth-card" aria-labelledby="register-title">
+      <div class="login-header studio-auth-header">
+        <p class="studio-auth-eyebrow">Invitta Studio</p>
+        <h1 id="register-title">Crea tu cuenta</h1>
+        <p>Administra tus invitaciones desde un espacio propio y seguro.</p>
+      </div>
+
+      <div id="register-error" class="alert alert-error" role="alert"></div>
+      <div id="register-success" class="alert alert-success" role="status"></div>
+
+      <form id="register-form" novalidate>
+        <div class="form-group">
+          <label for="studio-name">Nombre del estudio</label>
+          <input type="text" id="studio-name" class="form-control" maxlength="120" autocomplete="organization" required placeholder="Ej. Estudio Luz">
+        </div>
+        <div class="form-group">
+          <label for="full-name">Tu nombre</label>
+          <input type="text" id="full-name" class="form-control" maxlength="120" autocomplete="name" required placeholder="Nombre completo">
+        </div>
+        <div class="form-group">
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" class="form-control" autocomplete="email" required placeholder="estudio@ejemplo.com">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" class="form-control" minlength="8" autocomplete="new-password" required placeholder="Mínimo 8 caracteres">
+          </div>
+          <div class="form-group">
+            <label for="password-confirmation">Confirmar contraseña</label>
+            <input type="password" id="password-confirmation" class="form-control" minlength="8" autocomplete="new-password" required placeholder="Repite tu contraseña">
+          </div>
+        </div>
+        <button type="submit" id="register-submit" class="btn btn-primary studio-auth-submit">Crear cuenta</button>
+      </form>
+
+      <p class="studio-auth-footer">¿Ya tienes cuenta? <a href="/administracion/studio-login.html">Inicia sesión</a></p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/env.js"></script>
+  <script src="/js/studio-auth.js?v=studio-onboarding-1"></script>
+  <script src="/js/studio-registro.js?v=studio-onboarding-1"></script>
+</body>
+</html>
+

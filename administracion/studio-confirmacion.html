@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmar cuenta | Invitta Studio</title>
+  <link rel="stylesheet" href="/css/studio.css?v=studio-onboarding-1">
+</head>
+<body class="studio-auth-page">
+  <main class="studio-auth-shell studio-confirmation-shell">
+    <a class="studio-auth-brand" href="/">Inv<span>itta</span></a>
+    <section class="card studio-auth-card studio-confirmation-card" aria-live="polite">
+      <div class="studio-confirmation-mark" aria-hidden="true">I</div>
+      <p class="studio-auth-eyebrow">Invitta Studio</p>
+      <h1 id="confirmation-title">Preparando tu Studio</h1>
+      <p id="confirmation-message">Estamos validando tu correo y creando tu espacio de trabajo.</p>
+      <div class="studio-confirmation-loader" id="confirmation-loader" aria-hidden="true"></div>
+      <a id="confirmation-action" class="btn btn-primary studio-auth-submit" href="/administracion/studio-login.html" hidden>Ir al acceso</a>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/env.js"></script>
+  <script src="/js/studio-auth.js?v=studio-onboarding-1"></script>
+  <script src="/js/studio-confirmacion.js?v=studio-onboarding-1"></script>
+</body>
+</html>
+

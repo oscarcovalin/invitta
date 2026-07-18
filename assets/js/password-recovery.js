@@ -80,7 +80,8 @@
         try {
             setLoading(requestButton, true, "Enviar enlace de recuperacion");
             const client = window.InvittiaSupabase.getClient();
-            const redirectTo = `${window.location.origin}/administracion/restablecer-contrasena.html`;
+            const returnToStudio = new URLSearchParams(window.location.search).get("return") === "studio";
+            const redirectTo = `${window.location.origin}/administracion/restablecer-contrasena.html${returnToStudio ? "?return=studio" : ""}`;
             const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
             if (error) throw error;
             setNotice("Revisa tu correo. Abre solo el enlace mas reciente para crear tu contrasena nueva.", "success");
@@ -119,7 +120,8 @@
             passwordPanel.hidden = true;
             requestPanel.hidden = false;
             setTimeout(() => {
-                window.location.href = "login.html";
+                const returnToStudio = new URLSearchParams(window.location.search).get("return") === "studio";
+                window.location.href = returnToStudio ? "studio-login.html" : "login.html";
             }, 900);
         } catch (error) {
             setNotice(error.message || "No fue posible actualizar la contrasena.", "error");
@@ -132,6 +134,13 @@
     client.auth.onAuthStateChange((event) => {
         if (event === "PASSWORD_RECOVERY") showPasswordForm();
     });
+
+    const returnToStudio = new URLSearchParams(window.location.search).get("return") === "studio";
+    const backLink = document.querySelector(".back");
+    if (returnToStudio && backLink) {
+        backLink.href = "studio-login.html";
+        backLink.textContent = "Volver a Invitta Studio";
+    }
 
     initialize().catch(() => {
         showRequestForm("No fue posible preparar la recuperacion. Solicita un enlace nuevo.");
