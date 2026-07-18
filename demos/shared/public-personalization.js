@@ -668,10 +668,25 @@
       luxury: {
         display: '"Playfair Display", "Cormorant Garamond", Georgia, serif',
         body: '"Hanken Grotesk", "Montserrat", Arial, sans-serif'
+      },
+      signature: {
+        display: '"Allura", "Great Vibes", cursive',
+        body: '"Cormorant Garamond", Georgia, serif'
+      },
+      couture: {
+        display: '"Parisienne", "Great Vibes", cursive',
+        body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif'
       }
     };
     var fonts = fontPresets[data.fontPreset];
     if (fonts) {
+      if ((data.fontPreset === "signature" || data.fontPreset === "couture") && !document.getElementById("invitta-signature-fonts")) {
+        var fontLink = document.createElement("link");
+        fontLink.id = "invitta-signature-fonts";
+        fontLink.rel = "stylesheet";
+        fontLink.href = "https://fonts.googleapis.com/css2?family=Allura&family=Parisienne&display=swap";
+        document.head.appendChild(fontLink);
+      }
       root.style.setProperty("--font-display", fonts.display);
       root.style.setProperty("--font-serif", fonts.display);
       root.style.setProperty("--font-primary", fonts.display);

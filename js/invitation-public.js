@@ -583,7 +583,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=trend-palettes-20260718";
+    bridge.src = "/demos/shared/public-personalization.js?v=signature-fonts-20260718";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

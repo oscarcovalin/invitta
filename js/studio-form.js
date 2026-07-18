@@ -279,6 +279,18 @@ function setupStudioVisualPreview() {
       sample: "Gala",
       display: '"Playfair Display", Georgia, serif',
       body: '"Montserrat", Arial, sans-serif'
+    },
+    signature: {
+      label: "Firma organica",
+      sample: "Siempre",
+      display: '"Allura", "Great Vibes", cursive',
+      body: '"Cormorant Garamond", Georgia, serif'
+    },
+    couture: {
+      label: "Caligrafia couture",
+      sample: "Amour",
+      display: '"Parisienne", "Great Vibes", cursive',
+      body: '"Montserrat", Arial, sans-serif'
     }
   };
 
