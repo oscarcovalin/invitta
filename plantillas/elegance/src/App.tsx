@@ -5,7 +5,6 @@ import {
   MapPin, 
   Gift, 
   Users, 
-  Calendar, 
   Heart, 
   ExternalLink, 
   ChevronRight, 
@@ -551,14 +550,6 @@ export default function App() {
                     >
                       COMO LLEGAR <ExternalLink size={10} />
                     </a>
-                    <a 
-                      href={getGoogleCalendarUrlForCeremony()} 
-                      target="_blank" 
-                      rel="noreferrer noopener"
-                      className="inline-flex items-center gap-2 text-[10px] font-sans tracking-[0.25em] text-sage hover:text-ink font-bold border-b border-sage/40 hover:border-ink transition-all pb-1 uppercase"
-                    >
-                      AGREGAR AL CALENDARIO <Calendar size={10} />
-                    </a>
                   </div>
                 </div>
               </motion.div>
@@ -593,14 +584,6 @@ export default function App() {
                       className="inline-flex items-center gap-2 text-[10px] font-sans tracking-[0.25em] text-ink hover:text-sage font-bold border-b border-ink/40 hover:border-sage transition-all pb-1 uppercase"
                     >
                       COMO LLEGAR <ExternalLink size={10} />
-                    </a>
-                    <a 
-                      href={getGoogleCalendarUrlForReception()} 
-                      target="_blank" 
-                      rel="noreferrer noopener"
-                      className="inline-flex items-center gap-2 text-[10px] font-sans tracking-[0.25em] text-sage hover:text-ink font-bold border-b border-sage/40 hover:border-ink transition-all pb-1 uppercase"
-                    >
-                      AGREGAR AL CALENDARIO <Calendar size={10} />
                     </a>
                   </div>
                 </div>
