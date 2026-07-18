@@ -523,7 +523,9 @@ body {
   --preview-title: #342d29;
   --preview-body: #756961;
   --preview-accent: #c9867a;
-  --preview-display: "Cormorant Garamond", Georgia, serif;
+  --preview-title-font: "Cormorant Garamond", Georgia, serif;
+  --preview-subtitle-font: "Cormorant Garamond", Georgia, serif;
+  --preview-name-font: "Cormorant Garamond", Georgia, serif;
   --preview-body-font: "Montserrat", Arial, sans-serif;
   position: relative;
   width: min(100%, 230px);
@@ -578,12 +580,13 @@ body {
   font-size: 0.48rem;
   font-weight: 600;
   letter-spacing: 0.2em;
+  font-family: var(--preview-subtitle-font);
 }
 
 .studio-preview-name {
   margin: 0.52rem 0 0.45rem;
   color: var(--preview-title);
-  font-family: var(--preview-display);
+  font-family: var(--preview-name-font);
   font-size: clamp(1.7rem, 4vw, 2.25rem);
   font-weight: 400;
   line-height: 0.95;
@@ -637,12 +640,13 @@ body {
   font-size: 0.43rem;
   font-weight: 600;
   letter-spacing: 0.18em;
+  font-family: var(--preview-subtitle-font);
 }
 
 .studio-preview-card h5 {
   margin: 0.32rem 0;
   color: var(--preview-title);
-  font-family: var(--preview-display);
+  font-family: var(--preview-title-font);
   font-size: 1.05rem;
   font-weight: 500;
 }
@@ -943,10 +947,45 @@ body {
 }
 .studio-custom-font-upload {
   margin-top: 0.85rem;
-  padding: 0.9rem;
+  padding: 1rem;
   border: 1px dashed #d9c9bd;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.58);
+}
+
+.studio-custom-font-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(217, 201, 189, 0.7);
+}
+
+.studio-custom-font-heading h4 {
+  margin: 0.08rem 0 0;
+  color: #302720;
+  font-family: var(--font-title, Georgia, serif);
+  font-size: 1.08rem;
+  font-weight: 500;
+}
+
+.studio-custom-font-heading > p {
+  max-width: 240px;
+  margin: 0;
+  color: #786b62;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.studio-custom-font-eyebrow {
+  color: #b16f64;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .studio-custom-font-upload > label {
@@ -973,6 +1012,65 @@ body {
   min-width: 0;
 }
 
+.studio-custom-font-targets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+}
+
+.studio-custom-font-targets-title {
+  grid-column: 1 / -1;
+  color: #594d44;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.studio-custom-font-target {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.68rem;
+  border: 1px solid #e5d9d0;
+  border-radius: 7px;
+  background: rgba(255, 253, 250, 0.85);
+  cursor: pointer;
+}
+
+.studio-custom-font-target:has(input:checked) {
+  border-color: rgba(201, 134, 122, 0.72);
+  background: rgba(201, 134, 122, 0.08);
+}
+
+.studio-custom-font-target input {
+  margin-top: 0.16rem;
+  accent-color: #b97569;
+}
+
+.studio-custom-font-target span {
+  min-width: 0;
+}
+
+.studio-custom-font-target strong,
+.studio-custom-font-target small {
+  display: block;
+}
+
+.studio-custom-font-target strong {
+  color: #463a32;
+  font-size: 0.76rem;
+}
+
+.studio-custom-font-target small {
+  margin-top: 0.15rem;
+  color: #85776e;
+  font-size: 0.66rem;
+  line-height: 1.35;
+}
+
 .studio-custom-font-remove {
   margin-left: auto;
   border: 0;
@@ -984,7 +1082,21 @@ body {
 }
 
 @media (max-width: 640px) {
+  .studio-custom-font-heading {
+    display: block;
+  }
+
+  .studio-custom-font-heading > p {
+    max-width: none;
+    margin-top: 0.35rem;
+    text-align: left;
+  }
+
   .studio-custom-font-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .studio-custom-font-targets {
     grid-template-columns: 1fr;
   }
 }

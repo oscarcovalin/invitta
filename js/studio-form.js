@@ -246,6 +246,7 @@ function setupStudioVisualPreview() {
   const customFontInput = document.getElementById("customFontFile");
   const customFontNameInput = document.getElementById("customFontName");
   const customFontUrlInput = document.getElementById("customFontUrl");
+  const customFontTargetInputs = Array.from(document.querySelectorAll('input[name="custom_font_target"]'));
   const removeCustomFontBtn = document.getElementById("removeCustomFontBtn");
   const fontOptions = document.getElementById("studio-font-options");
   const paletteOptions = document.getElementById("studio-palette-options");
@@ -454,6 +455,12 @@ function setupStudioVisualPreview() {
 
   let customFontObjectUrl = "";
 
+  function getSelectedCustomFontTargets() {
+    return customFontTargetInputs
+      .filter(input => input.checked)
+      .map(input => input.value);
+  }
+
   function clearCustomFontError() {
     const errorElement = document.getElementById("custom-font-error");
     if (!errorElement) return;
@@ -513,6 +520,9 @@ function setupStudioVisualPreview() {
     if (customFontInput) customFontInput.value = "";
     if (customFontUrlInput) customFontUrlInput.value = "";
     if (customFontNameInput) customFontNameInput.value = "";
+    customFontTargetInputs.forEach(input => {
+      input.checked = input.value !== "body";
+    });
     document.getElementById("custom-font-current")?.classList.remove("visible");
     updateCustomFontCard();
     if (fontSelect.value === "custom") {
@@ -536,6 +546,10 @@ function setupStudioVisualPreview() {
   function updatePreview() {
     const palette = palettes[paletteSelect.value] || palettes.original;
     const font = fonts[fontSelect.value] || fonts.classic;
+    const customTargets = new Set(getSelectedCustomFontTargets());
+    const isCustomFont = fontSelect.value === "custom";
+    const defaultDisplay = fonts.classic.display;
+    const defaultBody = fonts.classic.body;
     const selectedTitle = titleColorSelect?.value || palette.title;
     const selectedBody = bodyColorSelect?.value || palette.body;
     const selectedAccent = accentColorSelect?.value || palette.accent;
@@ -549,8 +563,10 @@ function setupStudioVisualPreview() {
     previewPhone.style.setProperty("--preview-title", selectedTitle);
     previewPhone.style.setProperty("--preview-body", selectedBody);
     previewPhone.style.setProperty("--preview-accent", selectedAccent);
-    previewPhone.style.setProperty("--preview-display", font.display);
-    previewPhone.style.setProperty("--preview-body-font", font.body);
+    previewPhone.style.setProperty("--preview-title-font", isCustomFont && !customTargets.has("titles") ? defaultDisplay : font.display);
+    previewPhone.style.setProperty("--preview-subtitle-font", isCustomFont && !customTargets.has("subtitles") ? defaultDisplay : font.display);
+    previewPhone.style.setProperty("--preview-name-font", isCustomFont && !customTargets.has("names") ? defaultDisplay : font.display);
+    previewPhone.style.setProperty("--preview-body-font", isCustomFont && !customTargets.has("body") ? defaultBody : (isCustomFont ? font.display : font.body));
     previewPhone.dataset.font = fontSelect.value;
 
     const previewEyebrow = document.getElementById("studio-preview-eyebrow");
@@ -579,6 +595,8 @@ function setupStudioVisualPreview() {
   [fontSelect, paletteSelect, titleColorSelect, bodyColorSelect, accentColorSelect]
     .filter(Boolean)
     .forEach(select => select.addEventListener("change", updatePreview));
+
+  customFontTargetInputs.forEach(input => input.addEventListener("change", updatePreview));
 
   ["title", "honoree_name", "event_date"]
     .map(id => document.getElementById(id))
@@ -1325,6 +1343,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const customFontCurrentName = document.getElementById("custom-font-current-name");
     if (customFontUrl) customFontUrl.value = data.custom_font_url || "";
     if (customFontName) customFontName.value = data.custom_font_name || "";
+    const savedCustomFontTargets = Array.isArray(data.custom_font_targets)
+      ? data.custom_font_targets
+      : ["titles", "subtitles", "names"];
+    document.querySelectorAll('input[name="custom_font_target"]').forEach(input => {
+      input.checked = savedCustomFontTargets.includes(input.value);
+    });
     if (data.custom_font_url) {
       customFontCurrent?.classList.add("visible");
       if (customFontCurrentName) customFontCurrentName.textContent = data.custom_font_name || "Tipografía personalizada cargada";
@@ -1445,6 +1469,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Tipografia personalizada
     let finalCustomFontUrl = document.getElementById("customFontUrl")?.value || null;
     const customFontFile = document.getElementById("customFontFile")?.files?.[0];
+    const selectedCustomFontTargets = Array.from(
+      document.querySelectorAll('input[name="custom_font_target"]:checked')
+    ).map(input => input.value);
+    if (document.getElementById("font_preset")?.value === "custom" && !selectedCustomFontTargets.length) {
+      showMediaError("custom-font", "Elige al menos una zona donde aplicar la tipografÃ­a.");
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Guardar cambios";
+      return;
+    }
     if (customFontFile) {
       if (!validateFontFile(customFontFile)) {
         saveBtn.disabled = false;
@@ -1637,6 +1670,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       font_preset: document.getElementById("font_preset").value || "classic",
       custom_font_url: finalCustomFontUrl,
       custom_font_name: document.getElementById("customFontName")?.value.trim() || null,
+      custom_font_targets: selectedCustomFontTargets,
       visual_theme: document.getElementById("visual_theme") ? document.getElementById("visual_theme").value : "rose-floral",
       color_primary: document.getElementById("color_primary").value,
       color_secondary: document.getElementById("color_secondary").value,

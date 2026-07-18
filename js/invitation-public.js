@@ -473,6 +473,14 @@ function cleanWhatsApp(val) {
     return (digits.length >= 10 && digits.length <= 15) ? digits : "";
 }
 
+function normalizeCustomFontTargets(val) {
+    var allowed = ["titles", "subtitles", "names", "body"];
+    var targets = normalizeStringArray(val).filter(function(target) {
+        return allowed.indexOf(target) !== -1;
+    });
+    return targets.length ? targets : ["titles", "subtitles", "names"];
+}
+
 function normalizeHexColor(val) {
     var color = cleanString(val, 20);
     return /^#[0-9a-f]{6}$/i.test(color) ? color : "";
@@ -555,6 +563,7 @@ function buildPublicTemplateData(inv, template) {
         fontPreset: cleanString(inv.font_preset, 40),
         customFontUrl: safeHttpsUrl(inv.custom_font_url),
         customFontName: cleanString(inv.custom_font_name, 80),
+        customFontTargets: normalizeCustomFontTargets(inv.custom_font_targets),
         visualTheme: cleanString(inv.visual_theme, 60),
         studioName: cleanString(inv.studio_name, 120),
         studioLogoUrl: safeHttpsUrl(inv.studio_logo_url),
@@ -585,7 +594,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=custom-font-upload-20260718";
+    bridge.src = "/demos/shared/public-personalization.js?v=custom-font-targets-20260718";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

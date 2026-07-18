@@ -691,6 +691,7 @@
         fontLink.href = "https://fonts.googleapis.com/css2?family=Allura&family=Parisienne&display=swap";
         document.head.appendChild(fontLink);
       }
+      var customFontTargetStyle = document.getElementById("invitta-custom-font-targets");
       if (data.fontPreset === "custom" && data.customFontUrl) {
         var customFontStyle = document.getElementById("invitta-custom-font-face");
         if (!customFontStyle) {
@@ -701,12 +702,38 @@
         var extension = data.customFontUrl.split("?")[0].split(".").pop().toLowerCase();
         var format = extension === "woff2" ? "woff2" : extension === "woff" ? "woff" : extension === "otf" ? "opentype" : "truetype";
         customFontStyle.textContent = '@font-face{font-family:"InvittaCustom";src:url(' + JSON.stringify(data.customFontUrl) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
+        var allowedTargets = ["titles", "subtitles", "names", "body"];
+        var customFontTargets = Array.isArray(data.customFontTargets)
+          ? data.customFontTargets.filter(function(target) { return allowedTargets.indexOf(target) !== -1; })
+          : [];
+        if (!customFontTargets.length) customFontTargets = ["titles", "subtitles", "names"];
+        if (!customFontTargetStyle) {
+          customFontTargetStyle = document.createElement("style");
+          customFontTargetStyle.id = "invitta-custom-font-targets";
+          document.head.appendChild(customFontTargetStyle);
+        }
+        var customFontSelectors = {
+          titles: "h1,.font-display,.hero-title,.inv-hero-title,.inv-main-title,.cover-title,.main-title,[data-invitta-font-role='title']",
+          subtitles: "h2,h3,h4,h5,h6,.inv-card-title,.inv-section-title,.inv-timeline-title,.section-title,.subtitle,[data-invitta-font-role='subtitle']",
+          names: "h1,.inv-hero-name,.inv-pass-name,.inv-thank-you-signature,.inv-title-script,.couple-names,.couple-name,.honoree-name,.guest-name,.signature,.font-script,[data-invitta-font-role='name']",
+          body: "p,li,blockquote,button,input,select,textarea,.font-body,.font-sans,.inv-card-copy,.inv-section-copy,[data-invitta-font-role='body']"
+        };
+        customFontTargetStyle.textContent = customFontTargets.map(function(target) {
+          var scopedSelectors = customFontSelectors[target].split(",").map(function(selector) {
+            return "html body " + selector;
+          }).join(",");
+          return scopedSelectors + '{font-family:"InvittaCustom","Cormorant Garamond",Georgia,serif!important;}';
+        }).join("");
+      } else if (customFontTargetStyle) {
+        customFontTargetStyle.remove();
       }
-      root.style.setProperty("--font-display", fonts.display);
-      root.style.setProperty("--font-serif", fonts.display);
-      root.style.setProperty("--font-primary", fonts.display);
-      root.style.setProperty("--font-sans", fonts.body);
-      root.style.setProperty("--font-secondary", fonts.body);
+      if (data.fontPreset !== "custom") {
+        root.style.setProperty("--font-display", fonts.display);
+        root.style.setProperty("--font-serif", fonts.display);
+        root.style.setProperty("--font-primary", fonts.display);
+        root.style.setProperty("--font-sans", fonts.body);
+        root.style.setProperty("--font-secondary", fonts.body);
+      }
     }
 
     if (data.titleColor) root.style.setProperty("--invitta-title", data.titleColor);

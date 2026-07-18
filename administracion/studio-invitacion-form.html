@@ -496,11 +496,37 @@
               <legend>Estilo tipografico</legend>
               <div id="studio-font-options" class="studio-font-options" aria-label="Combinaciones tipograficas"></div>
               <div class="studio-custom-font-upload">
-                <label for="customFontFile">Subir tipografía especial</label>
-                <p>Formatos WOFF2, WOFF, TTF u OTF. Máximo 3 MB. Se aplicará a títulos y nombres.</p>
+                <div class="studio-custom-font-heading">
+                  <div>
+                    <span class="studio-custom-font-eyebrow">Opcional</span>
+                    <h4>Tipografía especial</h4>
+                  </div>
+                  <p>Sube una fuente y decide exactamente dónde se utilizará.</p>
+                </div>
+                <label for="customFontFile">Archivo de tipografía</label>
+                <p>Formatos WOFF2, WOFF, TTF u OTF. Máximo 3 MB.</p>
                 <div class="studio-custom-font-fields">
                   <input type="file" id="customFontFile" accept=".woff2,.woff,.ttf,.otf,font/woff2,font/woff,font/ttf,font/otf,application/font-woff,application/x-font-ttf,application/x-font-opentype">
                   <input type="text" id="customFontName" maxlength="80" placeholder="Nombre de la tipografía">
+                </div>
+                <div class="studio-custom-font-targets" role="group" aria-labelledby="custom-font-targets-title">
+                  <span id="custom-font-targets-title" class="studio-custom-font-targets-title">Aplicar en</span>
+                  <label class="studio-custom-font-target">
+                    <input type="checkbox" name="custom_font_target" value="titles" checked>
+                    <span><strong>Títulos principales</strong><small>Portada y encabezados destacados</small></span>
+                  </label>
+                  <label class="studio-custom-font-target">
+                    <input type="checkbox" name="custom_font_target" value="subtitles" checked>
+                    <span><strong>Subtítulos</strong><small>Títulos de secciones y tarjetas</small></span>
+                  </label>
+                  <label class="studio-custom-font-target">
+                    <input type="checkbox" name="custom_font_target" value="names" checked>
+                    <span><strong>Nombres y firmas</strong><small>Festejada, pareja y agradecimiento</small></span>
+                  </label>
+                  <label class="studio-custom-font-target">
+                    <input type="checkbox" name="custom_font_target" value="body">
+                    <span><strong>Texto general</strong><small>Párrafos y descripciones</small></span>
+                  </label>
                 </div>
                 <input type="hidden" id="customFontUrl" value="">
                 <div class="upload-progress" id="custom-font-progress">Subiendo tipografía...</div>
@@ -727,7 +753,7 @@
   <script src="/js/studio-auth.js?v=studio-recovery-20260718"></script>
   <!-- Lógica del Formulario -->
   <script src="/assets/js/invitta-templates.js"></script>
-  <script src="/js/studio-form.js?v=custom-font-upload-20260718"></script>
+  <script src="/js/studio-form.js?v=custom-font-targets-20260718"></script>
 
 </body>
 </html>
