@@ -345,6 +345,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("visual_theme").value = palette.theme;
       document.getElementById("color_primary").value = palette.primary;
       document.getElementById("color_secondary").value = palette.secondary;
+      const palettePreset = document.getElementById("palette_preset");
+      if (palettePreset) {
+        palettePreset.value = {
+          "Rosa y champagne": "rose",
+          "Marfil y salvia": "sage",
+          "Esmeralda y oro": "emerald",
+          "Olivo y arena": "sage",
+          "Ciruela, negro y oro": "midnight"
+        }[request.palette_preference] || "original";
+      }
     }
 
     const fontPreset = typographyStyles[request.typography_preference];
@@ -932,6 +942,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     document.getElementById("color_primary").value = data.color_primary || "#C9A46A";
     document.getElementById("color_secondary").value = data.color_secondary || "#F7E7D7";
+    const palettePreset = document.getElementById("palette_preset");
+    if (palettePreset) palettePreset.value = data.palette_preset || "original";
+    const titleColor = document.getElementById("title_color");
+    if (titleColor) titleColor.value = data.title_color || "";
+    const bodyColor = document.getElementById("body_color");
+    if (bodyColor) bodyColor.value = data.body_color || "";
+    const accentColor = document.getElementById("accent_color");
+    if (accentColor) accentColor.value = data.accent_color || "";
     document.getElementById("ceremony_name").value = data.ceremony_name || "";
     document.getElementById("ceremony_address").value = data.ceremony_address || "";
     document.getElementById("ceremony_map_url").value = data.ceremony_map_url || "";
@@ -1217,6 +1235,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       visual_theme: document.getElementById("visual_theme") ? document.getElementById("visual_theme").value : "rose-floral",
       color_primary: document.getElementById("color_primary").value,
       color_secondary: document.getElementById("color_secondary").value,
+      palette_preset: document.getElementById("palette_preset") ? document.getElementById("palette_preset").value || "original" : "original",
+      title_color: document.getElementById("title_color") ? document.getElementById("title_color").value || null : null,
+      body_color: document.getElementById("body_color") ? document.getElementById("body_color").value || null : null,
+      accent_color: document.getElementById("accent_color") ? document.getElementById("accent_color").value || null : null,
       ceremony_name: document.getElementById("ceremony_name").value,
       ceremony_address: document.getElementById("ceremony_address").value,
       ceremony_map_url: document.getElementById("ceremony_map_url").value,

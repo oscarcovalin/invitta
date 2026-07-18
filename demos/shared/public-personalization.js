@@ -544,14 +544,70 @@
 
   function applyThemeHooks() {
     var root = document.documentElement;
-    if (data.colorPrimary) {
+    var palettePresets = {
+      champagne: {
+        surface: "#F7F0E7",
+        card: "#FFFDFC",
+        title: "#40362E",
+        body: "#66594F",
+        accent: "#B99654"
+      },
+      rose: {
+        surface: "#FAF0F0",
+        card: "#FFFDFD",
+        title: "#704853",
+        body: "#725C63",
+        accent: "#C88A97"
+      },
+      sage: {
+        surface: "#F1F3EC",
+        card: "#FEFEFC",
+        title: "#405144",
+        body: "#5D665B",
+        accent: "#718067"
+      },
+      emerald: {
+        surface: "#F0F4EF",
+        card: "#FCFDFC",
+        title: "#1F493B",
+        body: "#475C52",
+        accent: "#1E6A52"
+      },
+      midnight: {
+        surface: "#1C1920",
+        card: "#28232B",
+        title: "#F6EAD2",
+        body: "#DDD2C5",
+        accent: "#C5A355"
+      }
+    };
+    var palette = palettePresets[data.palettePreset];
+
+    if (palette) {
+      root.dataset.invittaPalette = data.palettePreset;
+      root.style.setProperty("--invitta-surface", palette.surface);
+      root.style.setProperty("--invitta-card", palette.card);
+      root.style.setProperty("--invitta-title", palette.title);
+      root.style.setProperty("--invitta-body", palette.body);
+      root.style.setProperty("--invitta-accent", palette.accent);
+      root.style.setProperty("--color-background", palette.surface);
+      root.style.setProperty("--color-paper", palette.surface);
+      root.style.setProperty("--color-surface", palette.card);
+      root.style.setProperty("--color-ink", palette.title);
+      root.style.setProperty("--color-primary", palette.accent);
+      root.style.setProperty("--color-sage", palette.accent);
+    } else {
+      delete root.dataset.invittaPalette;
+    }
+
+    if (data.colorPrimary && !palette) {
       root.style.setProperty("--invitta-primary", data.colorPrimary);
       root.style.setProperty("--color-primary", data.colorPrimary);
       root.style.setProperty("--color-sage", data.colorPrimary);
       root.style.setProperty("--primary-color", data.colorPrimary);
       root.style.setProperty("--accent-color", data.colorPrimary);
     }
-    if (data.colorSecondary) {
+    if (data.colorSecondary && !palette) {
       root.style.setProperty("--invitta-secondary", data.colorSecondary);
       root.style.setProperty("--secondary-color", data.colorSecondary);
       root.style.setProperty("--color-outline-variant", data.colorSecondary);
@@ -587,6 +643,37 @@
       root.style.setProperty("--font-sans", fonts.body);
       root.style.setProperty("--font-secondary", fonts.body);
     }
+
+    if (data.titleColor) root.style.setProperty("--invitta-title", data.titleColor);
+    if (data.bodyColor) root.style.setProperty("--invitta-body", data.bodyColor);
+    if (data.accentColor) {
+      root.style.setProperty("--invitta-accent", data.accentColor);
+      root.style.setProperty("--invitta-primary", data.accentColor);
+      root.style.setProperty("--color-primary", data.accentColor);
+      root.style.setProperty("--color-sage", data.accentColor);
+      root.style.setProperty("--primary-color", data.accentColor);
+      root.style.setProperty("--accent-color", data.accentColor);
+    }
+
+    var existingStyle = document.getElementById("invitta-visual-customization");
+    if (existingStyle) existingStyle.remove();
+
+    if (!palette && !data.titleColor && !data.bodyColor && !data.accentColor) return;
+
+    var style = document.createElement("style");
+    style.id = "invitta-visual-customization";
+    style.textContent = [
+      "html[data-invitta-palette] body{background:var(--invitta-surface)!important;color:var(--invitta-body)!important}",
+      "html[data-invitta-palette] [class*='bg-paper'],html[data-invitta-palette] [class*='bg-cream'],html[data-invitta-palette] [class*='bg-ivory']{background-color:var(--invitta-card)!important}",
+      "h1,h2,h3,.font-display,.font-serif{color:var(--invitta-title)!important}",
+      "p,.font-sans,.font-body{color:var(--invitta-body)!important}",
+      "[class*='text-sage'],[class*='text-gold'],[class*='text-accent']{color:var(--invitta-accent)!important}",
+      "[class*='border-sage'],[class*='border-gold'],[class*='border-accent']{border-color:var(--invitta-accent)!important}",
+      "[class*='bg-sage'],[class*='bg-gold'],[class*='bg-accent']{background-color:var(--invitta-accent)!important}",
+      "h1,h2,h3,.font-display,.font-serif{font-family:var(--font-display),var(--font-serif),Georgia,serif!important}",
+      "body,button,input,select,textarea,.font-sans,.font-body{font-family:var(--font-sans),var(--font-secondary),Arial,sans-serif}"
+    ].join("");
+    document.head.appendChild(style);
   }
 
   function applyAll() {

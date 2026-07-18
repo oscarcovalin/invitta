@@ -305,6 +305,58 @@ body {
   border-color: var(--accent-color);
 }
 
+/* Invitation visual customization */
+.studio-visual-customization {
+  margin: 1.5rem 0 1.8rem;
+  padding: 1.15rem;
+  border: 1px solid #e7ddd3;
+  border-radius: 8px;
+  background: #fffaf5;
+}
+
+.studio-visual-customization-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.studio-visual-customization-heading h3 {
+  margin: 0;
+  color: #3a302a;
+  font-size: 1rem;
+}
+
+.studio-visual-customization-heading > p {
+  max-width: 29rem;
+  margin: 0;
+  color: #756961;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.studio-visual-customization-eyebrow {
+  margin: 0 0 0.2rem;
+  color: #c9867a;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.studio-field-hint {
+  margin: 0.4rem 0 0;
+  color: #84766d;
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.studio-visual-customization-note {
+  padding-top: 0.85rem;
+  border-top: 1px solid #eee3d8;
+}
+
 @media (max-width: 640px) {
   .studio-form-actions {
     flex-direction: column;
@@ -313,6 +365,11 @@ body {
 
   .studio-action-button {
     width: 100%;
+  }
+
+  .studio-visual-customization-heading {
+    flex-direction: column;
+    gap: 0.45rem;
   }
 }
 

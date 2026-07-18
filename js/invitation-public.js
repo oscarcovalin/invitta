@@ -548,6 +548,10 @@ function buildPublicTemplateData(inv, template) {
         hashtagSectionMessage: cleanString(inv.hashtag_section_message, 600),
         colorPrimary: normalizeHexColor(inv.color_primary),
         colorSecondary: normalizeHexColor(inv.color_secondary),
+        palettePreset: cleanString(inv.palette_preset, 40) || "original",
+        titleColor: normalizeHexColor(inv.title_color),
+        bodyColor: normalizeHexColor(inv.body_color),
+        accentColor: normalizeHexColor(inv.accent_color),
         fontPreset: cleanString(inv.font_preset, 40),
         visualTheme: cleanString(inv.visual_theme, 60),
         studioName: cleanString(inv.studio_name, 120),
@@ -579,7 +583,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=vip-access-20260716";
+    bridge.src = "/demos/shared/public-personalization.js?v=visual-customization-20260718";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 
