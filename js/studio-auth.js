@@ -42,6 +42,70 @@
       return data.session;
     },
 
+    // Resuelve un Studio válido incluso si la base aún no tiene la RPC más nueva.
+    resolveStudioContext: async function(preferredStudioId) {
+      const selectPreferredStudio = (studios) => {
+        const list = Array.isArray(studios) ? studios.filter(Boolean) : [];
+        return list.find((studio) => studio.studio_id === preferredStudioId) || list[0] || null;
+      };
+
+      let latestError = null;
+
+      try {
+        const { data, error } = await db.rpc("list_invitta_studios");
+        const studio = selectPreferredStudio(data);
+        if (!error && studio) return { studio, error: null };
+        latestError = error || latestError;
+      } catch (error) {
+        latestError = error;
+      }
+
+      try {
+        const { data, error } = await db.rpc("current_invitta_studio");
+        const legacyStudio = Array.isArray(data) ? data[0] : null;
+        if (!error && legacyStudio) {
+          return {
+            studio: {
+              studio_id: legacyStudio.id,
+              studio_name: legacyStudio.name,
+              studio_role: "owner"
+            },
+            error: null
+          };
+        }
+        latestError = error || latestError;
+      } catch (error) {
+        latestError = error;
+      }
+
+      try {
+        const session = await this.getSession();
+        if (session?.user?.id) {
+          const { data, error } = await db
+            .from("studios")
+            .select("id, name")
+            .eq("user_id", session.user.id)
+            .limit(1);
+          const legacyStudio = Array.isArray(data) ? data[0] : null;
+          if (!error && legacyStudio) {
+            return {
+              studio: {
+                studio_id: legacyStudio.id,
+                studio_name: legacyStudio.name,
+                studio_role: "owner"
+              },
+              error: null
+            };
+          }
+          latestError = error || latestError;
+        }
+      } catch (error) {
+        latestError = error;
+      }
+
+      return { studio: null, error: latestError };
+    },
+
     // Proteger ruta (Redirigir si no hay sesión)
     requireSession: async function() {
       const session = await this.getSession();

@@ -24,24 +24,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function loadNewSalesRequestCount() {
     if (!salesRequestsLink || !salesRequestCount) return;
 
-    const { data: isSalesOperator, error: roleError } = await db
-      .rpc("is_invitta_sales_operator");
+    try {
+      const { data: isSalesOperator, error: roleError } = await db
+        .rpc("is_invitta_sales_operator");
 
-    if (roleError || !isSalesOperator) {
+      if (roleError || !isSalesOperator) {
+        salesRequestsLink.hidden = true;
+        return;
+      }
+
+      const { count, error } = await db
+        .from("invitation_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "new");
+
+      if (error || !count) return;
+
+      salesRequestCount.textContent = count > 99 ? "99+" : String(count);
+      salesRequestCount.hidden = false;
+      salesRequestsLink.setAttribute("aria-label", `Solicitudes (${count} nuevas)`);
+    } catch (error) {
       salesRequestsLink.hidden = true;
-      return;
+      console.warn("No se pudo cargar el contador de solicitudes:", error);
     }
-
-    const { count, error } = await db
-      .from("invitation_requests")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "new");
-
-    if (error || !count) return;
-
-    salesRequestCount.textContent = count > 99 ? "99+" : String(count);
-    salesRequestCount.hidden = false;
-    salesRequestsLink.setAttribute("aria-label", `Solicitudes (${count} nuevas)`);
   }
 
   function createBadge(text, classNames, extraStyles = {}) {
@@ -346,15 +351,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 1. Cargar datos del estudio
   async function loadStudioData() {
-    const { data, error } = await db.rpc("list_invitta_studios");
-    const studios = Array.isArray(data) ? data : [];
     const preferredStudioId = new URLSearchParams(window.location.search).get("studio_id")
       || localStorage.getItem("invitta_studio_id");
-    const studio = studios.find((item) => item.studio_id === preferredStudioId) || studios[0] || null;
+    const { studio, error } = await window.studioAuth.resolveStudioContext(preferredStudioId);
 
     if (error || !studio) {
       document.getElementById("studio-name").textContent = "Estudio no encontrado";
       console.error("Error cargando estudio:", error);
+      const loadingMsg = document.getElementById("loading-msg");
+      const emptyMsg = document.getElementById("empty-msg");
+      loadingMsg.style.display = "none";
+      emptyMsg.textContent = "No fue posible cargar el estudio. Puedes volver a intentarlo o crear una invitación manualmente.";
+      emptyMsg.className = "alert";
+      emptyMsg.style.display = "block";
+      emptyMsg.setAttribute("role", "alert");
       return;
     }
 
@@ -383,13 +393,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     emptyMsg.style.display = "none";
     listContainer.replaceChildren();
 
-    const { data: invitations, error } = await db
-      .from("studio_invitations")
-      .select("id, title, slug, event_type, event_date, published, published_at, expires_at, main_photo_url, music_url, gallery_urls, font_preset, itinerary, template_id, evento_id")
-      .eq("studio_id", currentStudioId)
-      .order("created_at", { ascending: false });
-
-    loadingMsg.style.display = "none";
+    let invitations = null;
+    let error = null;
+    try {
+      const result = await db
+        .from("studio_invitations")
+        .select("id, title, slug, event_type, event_date, published, published_at, expires_at, main_photo_url, music_url, gallery_urls, font_preset, itinerary, template_id, evento_id")
+        .eq("studio_id", currentStudioId)
+        .order("created_at", { ascending: false });
+      invitations = result.data;
+      error = result.error;
+    } catch (requestError) {
+      error = requestError;
+    } finally {
+      loadingMsg.style.display = "none";
+    }
 
     if (error) {
       console.error("Error cargando invitaciones:", error);
@@ -418,5 +436,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Iniciar
-  loadStudioData();
+  loadStudioData().catch((error) => {
+    console.error("No se pudo iniciar el panel de estudio:", error);
+    document.getElementById("loading-msg").style.display = "none";
+    const emptyMsg = document.getElementById("empty-msg");
+    emptyMsg.textContent = "No fue posible iniciar el panel. Intenta recargar la página.";
+    emptyMsg.className = "alert";
+    emptyMsg.style.display = "block";
+  });
 });

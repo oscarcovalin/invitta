@@ -461,11 +461,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Resolve the saved Studio only after verifying that it still belongs to this user.
   {
-    const { data: studios, error: studiosError } = await db.rpc("list_invitta_studios");
-    const studioList = Array.isArray(studios) ? studios : [];
     const preferredStudioId = new URLSearchParams(window.location.search).get("studio_id")
       || localStorage.getItem("invitta_studio_id");
-    const studio = studioList.find((item) => item.studio_id === preferredStudioId) || studioList[0] || null;
+    const { studio, error: studiosError } = await window.studioAuth.resolveStudioContext(preferredStudioId);
     if (studiosError || !studio) {
       errorAlert.textContent = "No se pudo encontrar tu estudio.";
       errorAlert.style.display = "block";
