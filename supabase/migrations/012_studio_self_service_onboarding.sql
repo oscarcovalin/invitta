@@ -71,7 +71,7 @@ begin
 
     insert into public.studio_members (studio_id, user_id, role)
     values (existing_studio_id, current_user_id, 'owner')
-    on conflict (studio_id, user_id) do nothing;
+    on conflict on constraint studio_members_pkey do nothing;
 
     select sm.role into existing_studio_role
     from public.studio_members sm
