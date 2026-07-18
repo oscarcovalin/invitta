@@ -357,6 +357,11 @@ body {
   border-top: 1px solid #eee3d8;
 }
 
+/* Legacy values remain available to existing invitations without duplicating the editor UI. */
+.studio-legacy-visual-control {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .studio-form-actions {
     flex-direction: column;
