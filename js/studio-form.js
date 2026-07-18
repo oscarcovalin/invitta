@@ -237,6 +237,213 @@ function serializeConfirmationNumbers(primary, secondary) {
     .join("|");
 }
 
+function setupStudioVisualPreview() {
+  const fontSelect = document.getElementById("font_preset");
+  const paletteSelect = document.getElementById("palette_preset");
+  const titleColorSelect = document.getElementById("title_color");
+  const bodyColorSelect = document.getElementById("body_color");
+  const accentColorSelect = document.getElementById("accent_color");
+  const fontOptions = document.getElementById("studio-font-options");
+  const paletteOptions = document.getElementById("studio-palette-options");
+  const previewPhone = document.getElementById("studio-preview-phone");
+
+  if (!fontSelect || !paletteSelect || !fontOptions || !paletteOptions || !previewPhone) return;
+
+  const fonts = {
+    classic: {
+      label: "Clasica elegante",
+      sample: "Elegancia",
+      display: '"Cormorant Garamond", Georgia, serif',
+      body: '"Montserrat", Arial, sans-serif'
+    },
+    romantic: {
+      label: "Romantica script",
+      sample: "Con amor",
+      display: '"Great Vibes", "Cormorant Garamond", cursive',
+      body: '"Montserrat", Arial, sans-serif'
+    },
+    editorial: {
+      label: "Editorial fine art",
+      sample: "Editorial",
+      display: '"Playfair Display", Georgia, serif',
+      body: '"Montserrat", Arial, sans-serif'
+    },
+    minimal: {
+      label: "Moderna minimal",
+      sample: "MODERNA",
+      display: '"Montserrat", Arial, sans-serif',
+      body: '"Montserrat", Arial, sans-serif'
+    },
+    luxury: {
+      label: "Luxury dramatica",
+      sample: "Gala",
+      display: '"Playfair Display", Georgia, serif',
+      body: '"Montserrat", Arial, sans-serif'
+    }
+  };
+
+  const palettes = {
+    original: {
+      label: "Original del diseno",
+      surface: "#FFFAF5",
+      card: "#FFFFFF",
+      title: "#342D29",
+      body: "#756961",
+      accent: "#C9867A"
+    },
+    champagne: {
+      label: "Champagne suave",
+      surface: "#FBF6EE",
+      card: "#FFFDF9",
+      title: "#3B3028",
+      body: "#6D6259",
+      accent: "#B99654"
+    },
+    rose: {
+      label: "Rosa editorial",
+      surface: "#FFF5F4",
+      card: "#FFFCFA",
+      title: "#4A3236",
+      body: "#755F62",
+      accent: "#C88A7E"
+    },
+    sage: {
+      label: "Salvia y marfil",
+      surface: "#F6F7F0",
+      card: "#FFFEF8",
+      title: "#344039",
+      body: "#667066",
+      accent: "#718067"
+    },
+    emerald: {
+      label: "Esmeralda y oro",
+      surface: "#F3F4EF",
+      card: "#FCFBF5",
+      title: "#173B30",
+      body: "#53615B",
+      accent: "#B99654"
+    },
+    midnight: {
+      label: "Noche y oro",
+      surface: "#17131A",
+      card: "#251E27",
+      title: "#F4EADF",
+      body: "#CBBFC6",
+      accent: "#D5AF54"
+    }
+  };
+
+  function createOptionButton(value, definition, type) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "studio-visual-option";
+    button.dataset.value = value;
+
+    if (type === "font") {
+      const sample = document.createElement("span");
+      sample.className = "studio-font-sample";
+      sample.textContent = definition.sample;
+      sample.style.fontFamily = definition.display;
+      button.appendChild(sample);
+    } else {
+      const swatches = document.createElement("span");
+      swatches.className = "studio-palette-swatches";
+      [definition.surface, definition.title, definition.body, definition.accent].forEach(color => {
+        const swatch = document.createElement("span");
+        swatch.className = "studio-palette-swatch";
+        swatch.style.backgroundColor = color;
+        swatches.appendChild(swatch);
+      });
+      button.appendChild(swatches);
+    }
+
+    const label = document.createElement("span");
+    label.className = "studio-option-label";
+    label.textContent = definition.label;
+    button.appendChild(label);
+
+    button.addEventListener("click", () => {
+      const select = type === "font" ? fontSelect : paletteSelect;
+      select.value = value;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+
+    return button;
+  }
+
+  Object.entries(fonts).forEach(([value, definition]) => {
+    fontOptions.appendChild(createOptionButton(value, definition, "font"));
+  });
+
+  Object.entries(palettes).forEach(([value, definition]) => {
+    paletteOptions.appendChild(createOptionButton(value, definition, "palette"));
+  });
+
+  function formatPreviewDate(value) {
+    if (!value) return "28 · NOVIEMBRE · 2026";
+    const parts = value.split("-");
+    if (parts.length !== 3) return value;
+    const months = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+    const month = months[Number(parts[1]) - 1] || parts[1];
+    return `${Number(parts[2])} · ${month} · ${parts[0]}`;
+  }
+
+  function updatePreview() {
+    const palette = palettes[paletteSelect.value] || palettes.original;
+    const font = fonts[fontSelect.value] || fonts.classic;
+    const selectedTitle = titleColorSelect?.value || palette.title;
+    const selectedBody = bodyColorSelect?.value || palette.body;
+    const selectedAccent = accentColorSelect?.value || palette.accent;
+    const eventType = document.getElementById("event_type")?.value || "xv";
+    const honoree = document.getElementById("honoree_name")?.value.trim();
+    const title = document.getElementById("title")?.value.trim();
+    const eventDate = document.getElementById("event_date")?.value || "";
+
+    previewPhone.style.setProperty("--preview-surface", palette.surface);
+    previewPhone.style.setProperty("--preview-card", palette.card);
+    previewPhone.style.setProperty("--preview-title", selectedTitle);
+    previewPhone.style.setProperty("--preview-body", selectedBody);
+    previewPhone.style.setProperty("--preview-accent", selectedAccent);
+    previewPhone.style.setProperty("--preview-display", font.display);
+    previewPhone.style.setProperty("--preview-body-font", font.body);
+    previewPhone.dataset.font = fontSelect.value;
+
+    const previewEyebrow = document.getElementById("studio-preview-eyebrow");
+    const previewName = document.getElementById("studio-preview-name");
+    const previewDate = document.getElementById("studio-preview-date");
+    const previewEventTitle = document.getElementById("studio-preview-event-title");
+
+    if (previewEyebrow) previewEyebrow.textContent = eventType === "boda" ? "NUESTRA BODA" : "MIS QUINCE ANOS";
+    if (previewName) previewName.textContent = honoree || (eventType === "boda" ? "Ana & Carlos" : "Maria");
+    if (previewDate) previewDate.textContent = formatPreviewDate(eventDate);
+    if (previewEventTitle) previewEventTitle.textContent = title || (eventType === "boda" ? "Nuestra celebracion" : "Una noche especial");
+
+    fontOptions.querySelectorAll(".studio-visual-option").forEach(option => {
+      const selected = option.dataset.value === fontSelect.value;
+      option.classList.toggle("is-selected", selected);
+      option.setAttribute("aria-pressed", String(selected));
+    });
+
+    paletteOptions.querySelectorAll(".studio-visual-option").forEach(option => {
+      const selected = option.dataset.value === paletteSelect.value;
+      option.classList.toggle("is-selected", selected);
+      option.setAttribute("aria-pressed", String(selected));
+    });
+  }
+
+  [fontSelect, paletteSelect, titleColorSelect, bodyColorSelect, accentColorSelect]
+    .filter(Boolean)
+    .forEach(select => select.addEventListener("change", updatePreview));
+
+  ["title", "honoree_name", "event_date"]
+    .map(id => document.getElementById(id))
+    .filter(Boolean)
+    .forEach(input => input.addEventListener("input", updatePreview));
+
+  document.getElementById("event_type")?.addEventListener("change", updatePreview);
+  updatePreview();
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const session = await window.studioAuth.requireSession();
   if (!session) return;
@@ -504,6 +711,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     loading.style.display = "none";
     form.style.display = "block";
   }
+
+  setupStudioVisualPreview();
 
   // Preview de foto al seleccionar archivo local
   const mainPhotoInput = document.getElementById("mainPhotoFile");

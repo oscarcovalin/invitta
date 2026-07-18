@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editar Invitación · Invitta Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Great+Vibes&family=Montserrat:wght@400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/studio.css">
   <style>
     /* ── Media Upload Section ── */
@@ -427,7 +430,7 @@
       <h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Diseño y Tema</h2>
       
       <div class="form-row">
-        <div class="form-group" style="flex: 1;">
+        <div class="form-group studio-visual-native-control" style="flex: 1;">
           <div class="media-upload-box">
             <span class="media-upload-label">Fondo de Invitación Personalizado</span>
             <p class="media-hint">Sustituye el color liso por una imagen o textura de fondo.<br>Formatos: JPG, PNG, WEBP · Máximo: 8 MB</p>
@@ -484,7 +487,45 @@
           <p>Conserva la estructura del diseno y ajusta solamente la paleta, tipografia y colores de lectura.</p>
         </div>
 
-        <div class="form-group">
+        <div class="studio-visual-preview-layout">
+          <div class="studio-visual-choice-panel">
+            <fieldset class="studio-visual-choice-group">
+              <legend>Estilo tipografico</legend>
+              <div id="studio-font-options" class="studio-font-options" aria-label="Combinaciones tipograficas"></div>
+            </fieldset>
+
+            <fieldset class="studio-visual-choice-group">
+              <legend>Paleta de color</legend>
+              <div id="studio-palette-options" class="studio-palette-options" aria-label="Paletas disponibles"></div>
+            </fieldset>
+          </div>
+
+          <aside class="studio-live-preview" aria-label="Vista previa de personalizacion">
+            <div class="studio-live-preview-heading">
+              <span>Vista previa</span>
+              <small>Se actualiza al instante</small>
+            </div>
+            <div id="studio-preview-phone" class="studio-preview-phone">
+              <div class="studio-preview-phone-speaker"></div>
+              <div class="studio-preview-screen">
+                <div class="studio-preview-ornament">✦</div>
+                <p id="studio-preview-eyebrow" class="studio-preview-eyebrow">MIS QUINCE AÑOS</p>
+                <h4 id="studio-preview-name" class="studio-preview-name">Maria</h4>
+                <p id="studio-preview-date" class="studio-preview-date">28 · NOVIEMBRE · 2026</p>
+                <div class="studio-preview-divider"><span></span><i>◆</i><span></span></div>
+                <div class="studio-preview-card">
+                  <span class="studio-preview-card-icon">♡</span>
+                  <p>CELEBREMOS JUNTOS</p>
+                  <h5 id="studio-preview-event-title">Una noche especial</h5>
+                  <small>Los detalles de tu invitacion conservaran su diseno original.</small>
+                  <span class="studio-preview-button-sample">Ver detalles</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="form-group studio-visual-native-control">
           <label for="palette_preset">Paleta para esta invitacion</label>
           <select id="palette_preset" name="palette_preset" class="form-control">
             <option value="original">Original del diseno</option>
