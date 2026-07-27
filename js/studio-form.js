@@ -626,6 +626,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const saveBtn = document.getElementById("save-btn");
   const previewBtn = document.getElementById("preview-invitation-btn");
   const copyLinkBtn = document.getElementById("copy-invitation-link-btn");
+  const clientDashboardEmail = document.getElementById("clientDashboardEmail");
+  const clientDashboardBadge = document.getElementById("client-dashboard-badge");
+  const clientDashboardStatus = document.getElementById("client-dashboard-status");
+  const sendClientAccessButton = document.getElementById("sendClientAccessButton");
+  const openClientDashboardButton = document.getElementById("openClientDashboardButton");
+  const disableClientAccessButton = document.getElementById("disableClientAccessButton");
 
   // URLs actuales (preservar si no se sube archivo nuevo)
   let existingPhotoUrl = null;
@@ -637,7 +643,141 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentStudioId = null;
   let isCurrentStudioManager = false;
   let currentSlug = "";
+  let currentEventoId = null;
+  let clientDashboardEnabled = false;
   let sourceRequestId = requestId || null;
+
+  function setClientAccessStatus(message, type = "") {
+    if (!clientDashboardStatus) return;
+    clientDashboardStatus.textContent = message;
+    clientDashboardStatus.classList.toggle("is-error", type === "error");
+    clientDashboardStatus.classList.toggle("is-success", type === "success");
+  }
+
+  function updateClientAccessUi(options = {}) {
+    clientDashboardEnabled = options.enabled === true;
+    if (clientDashboardBadge) {
+      clientDashboardBadge.textContent = clientDashboardEnabled ? "Acceso activo" : "Sin activar";
+      clientDashboardBadge.classList.toggle("is-active", clientDashboardEnabled);
+    }
+    if (sendClientAccessButton) {
+      sendClientAccessButton.disabled = !isCurrentStudioManager || !inviteId || !currentEventoId;
+      sendClientAccessButton.textContent = clientDashboardEnabled ? "Reenviar acceso" : "Enviar acceso";
+    }
+    if (openClientDashboardButton) {
+      openClientDashboardButton.disabled = !currentEventoId;
+    }
+    if (disableClientAccessButton) {
+      disableClientAccessButton.hidden = !clientDashboardEnabled;
+      disableClientAccessButton.disabled = !isCurrentStudioManager;
+    }
+
+    if (!inviteId || !currentEventoId) {
+      setClientAccessStatus("Guarda la invitación antes de enviar el acceso.");
+      return;
+    }
+    if (clientDashboardEnabled && options.sentAt) {
+      const sentDate = new Date(options.sentAt);
+      const formatted = Number.isNaN(sentDate.getTime())
+        ? ""
+        : sentDate.toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" });
+      setClientAccessStatus(
+        formatted ? `Acceso enviado por última vez: ${formatted}.` : "El acceso del cliente está activo.",
+        "success"
+      );
+      return;
+    }
+    if (clientDashboardEnabled) {
+      setClientAccessStatus("El acceso del cliente está activo.", "success");
+      return;
+    }
+    setClientAccessStatus("Escribe el correo del cliente y envía su acceso.");
+  }
+
+  async function requestClientDashboardAccess(action) {
+    const email = (clientDashboardEmail?.value || "").trim().toLowerCase();
+    if (action === "send" && !email) {
+      setClientAccessStatus("Escribe el correo del cliente.", "error");
+      clientDashboardEmail?.focus();
+      return null;
+    }
+    if (!inviteId || !currentEventoId) {
+      setClientAccessStatus("Guarda la invitación antes de administrar este acceso.", "error");
+      return null;
+    }
+
+    const activeSession = await window.studioAuth.getSession();
+    if (!activeSession?.access_token) {
+      throw new Error("Tu sesión venció. Inicia sesión nuevamente.");
+    }
+
+    const response = await fetch("/api/client-dashboard-access", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${activeSession.access_token}`
+      },
+      body: JSON.stringify({
+        action,
+        invitationId: inviteId,
+        email
+      })
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || "No fue posible administrar el acceso.");
+    }
+    return payload;
+  }
+
+  sendClientAccessButton?.addEventListener("click", async () => {
+    sendClientAccessButton.disabled = true;
+    sendClientAccessButton.textContent = "Enviando...";
+    setClientAccessStatus("Preparando el acceso seguro del cliente...");
+    try {
+      const result = await requestClientDashboardAccess("send");
+      if (!result) return;
+      updateClientAccessUi({ enabled: true, sentAt: result.sentAt });
+      showSuccessMessage("Acceso del cliente enviado correctamente.");
+    } catch (error) {
+      console.error("No se pudo enviar el acceso del cliente:", error);
+      setClientAccessStatus(error.message || "No fue posible enviar el acceso.", "error");
+    } finally {
+      if (sendClientAccessButton) {
+        sendClientAccessButton.disabled = !isCurrentStudioManager || !inviteId || !currentEventoId;
+        sendClientAccessButton.textContent = clientDashboardEnabled ? "Reenviar acceso" : "Enviar acceso";
+      }
+    }
+  });
+
+  openClientDashboardButton?.addEventListener("click", () => {
+    if (!currentEventoId) {
+      setClientAccessStatus("Guarda la invitación antes de abrir el panel.", "error");
+      return;
+    }
+    window.open(
+      `/administracion/dashboard.html?event_id=${encodeURIComponent(currentEventoId)}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  });
+
+  disableClientAccessButton?.addEventListener("click", async () => {
+    if (!window.confirm("¿Desactivar el acceso del cliente a este evento?")) return;
+    disableClientAccessButton.disabled = true;
+    setClientAccessStatus("Desactivando acceso...");
+    try {
+      const result = await requestClientDashboardAccess("disable");
+      if (!result) return;
+      updateClientAccessUi({ enabled: false });
+      showSuccessMessage("Acceso del cliente desactivado.");
+    } catch (error) {
+      console.error("No se pudo desactivar el acceso del cliente:", error);
+      setClientAccessStatus(error.message || "No fue posible desactivar el acceso.", "error");
+    } finally {
+      if (disableClientAccessButton) disableClientAccessButton.disabled = false;
+    }
+  });
 
   function getCurrentSlugValue() {
     return (document.getElementById("slug")?.value || currentSlug || "").trim();
@@ -861,6 +1001,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         publishedInput.title = "Solo responsables del Studio pueden publicar invitaciones.";
       }
     }
+    updateClientAccessUi({ enabled: clientDashboardEnabled });
   }
 
   // Si es modo edición, cargar datos
@@ -1284,6 +1425,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     currentSlug = data.slug || "";
+    currentEventoId = data.evento_id || null;
+    if (clientDashboardEmail) {
+      clientDashboardEmail.value = data.client_dashboard_email || "";
+    }
+    updateClientAccessUi({
+      enabled: data.client_dashboard_enabled === true,
+      sentAt: data.client_dashboard_last_sent_at
+    });
 
     // Llenar formulario
     const heroFields = splitLegacyXvHeading(data.title, data.honoree_name, data.event_type);
@@ -1740,13 +1889,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       currentSlug = slugToUse;
       const savedInvitationId = result.data?.id || inviteId;
       if (savedInvitationId && isCurrentStudioManager) {
-        const { error: eventSyncError } = await db.rpc("sync_studio_invitation_event", {
+        const { data: syncedEventId, error: eventSyncError } = await db.rpc("sync_studio_invitation_event", {
           target_invitation_id: savedInvitationId
         });
         if (eventSyncError) {
           console.error("No se pudo vincular el panel de invitados:", eventSyncError);
           errorAlert.textContent = "La invitacion se guardo, pero no se pudo vincular el panel de invitados.";
           errorAlert.style.display = "block";
+        } else if (syncedEventId) {
+          currentEventoId = syncedEventId;
         }
       }
       clearSelectedGalleryPreviews();
@@ -1772,6 +1923,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       saveBtn.disabled = false;
       saveBtn.textContent = "Guardar cambios";
+      updateClientAccessUi({ enabled: clientDashboardEnabled });
       showSuccessMessage("Invitación guardada correctamente.");
     }
   });

@@ -27,13 +27,44 @@
             })[0] || null;
     }
 
-    async function getCurrentUserRole() {
+    function getRequestedEventId() {
+        return new URLSearchParams(window.location.search).get("event_id") || null;
+    }
+
+    function pickDashboardEvent(rows, targetEventId) {
+        const rank = { owner: 0, admin: 1, staff: 2, cliente: 3 };
+        const candidates = [...(rows || [])];
+        if (targetEventId) {
+            return candidates.find((row) => row.evento_id === targetEventId) || null;
+        }
+        return candidates.sort((left, right) => {
+            const roleDifference = (rank[left.rol] ?? 99) - (rank[right.rol] ?? 99);
+            if (roleDifference !== 0) return roleDifference;
+            return String(left.evento_id || "").localeCompare(String(right.evento_id || ""));
+        })[0] || null;
+    }
+
+    async function getCurrentUserRole(targetEventId = getRequestedEventId()) {
         const session = await getSession();
         if (!session) {
-            return { user: null, role: null, clienteUsuario: null };
+            return { user: null, role: null, eventoId: null, clienteUsuario: null };
         }
 
         const supabase = window.InvittiaSupabase.getClient();
+        const { data: dashboardEvents, error: dashboardEventsError } = await supabase
+            .rpc("current_user_dashboard_events");
+
+        if (!dashboardEventsError) {
+            const eventAccess = pickDashboardEvent(dashboardEvents, targetEventId);
+            return {
+                user: session.user,
+                role: eventAccess ? eventAccess.rol : null,
+                eventoId: eventAccess ? eventAccess.evento_id : null,
+                clienteUsuario: null
+            };
+        }
+
+        console.warn("[Invittia Auth] Event-scoped access unavailable; using legacy access.", dashboardEventsError);
         const { data, error } = await supabase
             .from("cliente_usuarios")
             .select("id, cliente_id, user_id, rol")
@@ -49,6 +80,7 @@
         return {
             user: session.user,
             role: clienteUsuario ? clienteUsuario.rol : null,
+            eventoId: targetEventId || null,
             clienteUsuario
         };
     }
@@ -57,7 +89,7 @@
         const session = await requireSession();
         if (!session) return null;
 
-        const roleInfo = await getCurrentUserRole();
+        const roleInfo = await getCurrentUserRole(options.eventId || getRequestedEventId());
         const role = roleInfo.role;
 
         if (!role) {
@@ -75,12 +107,17 @@
                 session,
                 role,
                 user: roleInfo.user,
+                eventoId: roleInfo.eventoId,
                 clienteUsuario: roleInfo.clienteUsuario
             };
         }
 
         if (role === "staff" && options.staffRedirect) {
-            window.location.href = options.staffRedirect;
+            const redirect = new URL(options.staffRedirect, window.location.origin);
+            if (roleInfo.eventoId && !redirect.searchParams.has("event_id")) {
+                redirect.searchParams.set("event_id", roleInfo.eventoId);
+            }
+            window.location.href = redirect.pathname + redirect.search;
             return null;
         }
 

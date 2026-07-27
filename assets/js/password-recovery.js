@@ -43,6 +43,19 @@
         return "No fue posible validar este enlace. Solicita uno nuevo.";
     }
 
+    function getSafeNextUrl() {
+        const next = new URLSearchParams(window.location.search).get("next");
+        if (!next) return null;
+        try {
+            const target = new URL(next, window.location.origin);
+            if (target.origin !== window.location.origin) return null;
+            if (target.pathname !== "/administracion/dashboard.html") return null;
+            return target.pathname + target.search;
+        } catch (_error) {
+            return null;
+        }
+    }
+
     function setLoading(button, loading, label) {
         button.disabled = loading;
         button.textContent = loading ? "Procesando..." : label;
@@ -55,7 +68,8 @@
             return;
         }
 
-        const hasRecoveryHash = window.location.hash.includes("type=recovery");
+        const hashType = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("type");
+        const hasRecoveryHash = hashType === "recovery" || hashType === "invite";
         const hasRecoveryCode = new URLSearchParams(window.location.search).has("code");
         if (!hasRecoveryHash && !hasRecoveryCode) return;
 
@@ -81,7 +95,12 @@
             setLoading(requestButton, true, "Enviar enlace de recuperacion");
             const client = window.InvittiaSupabase.getClient();
             const returnToStudio = new URLSearchParams(window.location.search).get("return") === "studio";
-            const redirectTo = `${window.location.origin}/administracion/restablecer-contrasena.html${returnToStudio ? "?return=studio" : ""}`;
+            const next = getSafeNextUrl();
+            const redirectParams = new URLSearchParams();
+            if (returnToStudio) redirectParams.set("return", "studio");
+            if (next) redirectParams.set("next", next);
+            const query = redirectParams.toString();
+            const redirectTo = `${window.location.origin}/administracion/restablecer-contrasena.html${query ? `?${query}` : ""}`;
             const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
             if (error) throw error;
             setNotice("Revisa tu correo. Abre solo el enlace mas reciente para crear tu contrasena nueva.", "success");
@@ -121,7 +140,10 @@
             requestPanel.hidden = false;
             setTimeout(() => {
                 const returnToStudio = new URLSearchParams(window.location.search).get("return") === "studio";
-                window.location.href = returnToStudio ? "studio-login.html" : "login.html";
+                const next = getSafeNextUrl();
+                window.location.href = returnToStudio
+                    ? "studio-login.html"
+                    : `login.html${next ? `?next=${encodeURIComponent(next)}` : ""}`;
             }, 900);
         } catch (error) {
             setNotice(error.message || "No fue posible actualizar la contrasena.", "error");
@@ -132,7 +154,10 @@
 
     const client = window.InvittiaSupabase.getClient();
     client.auth.onAuthStateChange((event) => {
-        if (event === "PASSWORD_RECOVERY") showPasswordForm();
+        if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
+            const hashType = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("type");
+            if (event === "PASSWORD_RECOVERY" || hashType === "invite") showPasswordForm();
+        }
     });
 
     const returnToStudio = new URLSearchParams(window.location.search).get("return") === "studio";

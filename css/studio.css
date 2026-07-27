@@ -1100,3 +1100,115 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.studio-client-access {
+  margin: 1.6rem 0;
+  padding: 1.2rem;
+  border: 1px solid #dfd3c9;
+  border-radius: 8px;
+  background: #fffdfa;
+}
+
+.studio-client-access-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.studio-client-access-heading h2 {
+  margin: 0.2rem 0 0;
+  color: #302720;
+  font-family: var(--font-title, Georgia, serif);
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.studio-client-access-eyebrow {
+  color: #b16f64;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.studio-client-access-badge {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid #e1d7cf;
+  border-radius: 999px;
+  background: #f7f2ed;
+  color: #776b62;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.studio-client-access-badge.is-active {
+  border-color: #b9d7c7;
+  background: #edf8f1;
+  color: #286243;
+}
+
+.studio-client-access-copy,
+.studio-client-access-status {
+  color: #776b62;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.studio-client-access-copy {
+  max-width: 680px;
+  margin: 0.7rem 0 1rem;
+}
+
+.studio-client-access-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto;
+  align-items: end;
+  gap: 1rem;
+}
+
+.studio-client-access-controls .form-group {
+  margin: 0;
+}
+
+.studio-client-access-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.studio-client-access-actions .btn {
+  min-height: 42px;
+}
+
+.studio-client-access-status {
+  margin: 0.8rem 0 0;
+}
+
+.studio-client-access-status.is-error {
+  color: #a13d3d;
+}
+
+.studio-client-access-status.is-success {
+  color: #286243;
+}
+
+@media (max-width: 720px) {
+  .studio-client-access-heading,
+  .studio-client-access-controls {
+    display: block;
+  }
+
+  .studio-client-access-badge {
+    display: inline-block;
+    margin-top: 0.65rem;
+  }
+
+  .studio-client-access-actions {
+    margin-top: 0.8rem;
+  }
+
+  .studio-client-access-actions .btn {
+    flex: 1 1 145px;
+  }
+}

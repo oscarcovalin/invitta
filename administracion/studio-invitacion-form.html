@@ -727,6 +727,46 @@
           <span style="font-weight: 500;">Publicar Invitación (Visible al público)</span>
         </label>
       </div>
+
+      <section id="client-access" class="studio-client-access">
+        <div class="studio-client-access-heading">
+          <div>
+            <span class="studio-client-access-eyebrow">Panel de confirmaciones</span>
+            <h2>Acceso del cliente</h2>
+          </div>
+          <span id="client-dashboard-badge" class="studio-client-access-badge">Sin activar</span>
+        </div>
+        <p class="studio-client-access-copy">
+          El cliente recibirá un correo para crear su contraseña y entrar solamente al panel de este evento.
+        </p>
+        <div class="studio-client-access-controls">
+          <div class="form-group">
+            <label for="clientDashboardEmail">Correo del cliente</label>
+            <input
+              type="email"
+              id="clientDashboardEmail"
+              class="form-control"
+              autocomplete="email"
+              placeholder="cliente@correo.com"
+            >
+          </div>
+          <div class="studio-client-access-actions">
+            <button type="button" id="sendClientAccessButton" class="btn btn-primary">
+              Enviar acceso
+            </button>
+            <button type="button" id="openClientDashboardButton" class="btn btn-secondary">
+              Abrir panel
+            </button>
+            <button type="button" id="disableClientAccessButton" class="btn btn-secondary" hidden>
+              Desactivar
+            </button>
+          </div>
+        </div>
+        <p id="client-dashboard-status" class="studio-client-access-status" aria-live="polite">
+          Guarda la invitación antes de enviar el acceso.
+        </p>
+      </section>
+
       <div class="studio-form-actions">
         <button type="submit" id="save-btn" class="btn btn-primary studio-action-button">Guardar cambios</button>
         <button type="button" id="preview-invitation-btn" class="btn btn-secondary studio-action-button studio-preview-button">Ver invitación</button>

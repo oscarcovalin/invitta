@@ -34,6 +34,22 @@
         loginButton.textContent = isLoading ? "Validando..." : "Entrar al dashboard";
     }
 
+    function getEventIdFromUrl(path) {
+        try {
+            return new URL(path, window.location.origin).searchParams.get("event_id");
+        } catch (_error) {
+            return null;
+        }
+    }
+
+    function addEventId(path, eventId) {
+        const target = new URL(path, window.location.origin);
+        if (eventId && !target.searchParams.has("event_id")) {
+            target.searchParams.set("event_id", eventId);
+        }
+        return target.pathname + target.search + target.hash;
+    }
+
     async function getStudioRedirectUrl() {
         const supabase = window.InvittiaSupabase.getClient();
         const { data, error } = await supabase.rpc("current_invitta_studio");
@@ -49,7 +65,8 @@
             return;
         }
 
-        const roleInfo = await window.InvittiaAuth.getCurrentUserRole();
+        const nextUrl = getNextUrl();
+        const roleInfo = await window.InvittiaAuth.getCurrentUserRole(getEventIdFromUrl(nextUrl));
         const role = roleInfo.role;
 
         if (!role) {
@@ -57,12 +74,12 @@
         }
 
         if (role === "staff") {
-            window.location.href = "checkin.html";
+            window.location.href = addEventId("checkin.html", roleInfo.eventoId);
             return;
         }
 
         if (role === "owner" || role === "admin") {
-            window.location.href = getNextUrl();
+            window.location.href = addEventId(nextUrl, roleInfo.eventoId);
             return;
         }
 

@@ -682,7 +682,9 @@
   }
 
   async function init() {
+    const requestedEventId = new URLSearchParams(window.location.search).get("event_id");
     const access = await window.InvittiaAuth.requireRole(["owner", "admin"], {
+      eventId: requestedEventId,
       staffRedirect: "/administracion/checkin.html",
       signOutOnMissingRole: true
     });

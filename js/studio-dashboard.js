@@ -303,10 +303,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (inv.evento_id) {
       const guestsBtn = document.createElement("a");
       guestsBtn.className = "btn btn-secondary btn-small";
-      guestsBtn.textContent = "Invitados";
+      guestsBtn.textContent = "Panel invitados";
       guestsBtn.href = `/administracion/dashboard.html?event_id=${encodeURIComponent(String(inv.evento_id))}`;
       actionsDiv.appendChild(guestsBtn);
       actionsDiv.appendChild(document.createTextNode(" "));
+
+      if (isCurrentStudioManager && inv.id) {
+        const clientAccessBtn = document.createElement("a");
+        clientAccessBtn.className = "btn btn-secondary btn-small";
+        clientAccessBtn.textContent = "Acceso del cliente";
+        clientAccessBtn.href = `/administracion/studio-invitacion-form.html?id=${encodeURIComponent(String(inv.id))}#client-access`;
+        actionsDiv.appendChild(clientAccessBtn);
+        actionsDiv.appendChild(document.createTextNode(" "));
+      }
     } else if (isCurrentStudioManager) {
       const prepareGuestsBtn = document.createElement("button");
       prepareGuestsBtn.type = "button";
