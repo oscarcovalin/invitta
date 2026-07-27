@@ -70,11 +70,28 @@ for (const relativePath of checkedJavaScript) {
 
 try {
   const vercel = JSON.parse(read("vercel.json"));
-  const invitationRewrite = (vercel.rewrites || []).some(
-    (entry) => entry.source === "/invitacion.html" && entry.destination === "/api/invitation-meta"
+  const routes = vercel.routes || [];
+  const invitationRewrite = routes.some(
+    (entry) => entry.src === "/invitacion\\.html$" && entry.dest === "/api/invitation-meta"
   );
   if (!invitationRewrite) fail("Falta el rewrite de /invitacion.html");
-  if (!(vercel.headers || []).length) fail("Faltan encabezados HTTP de seguridad");
+  const securityRoute = routes.find((entry) => entry.src === "/(.*)" && entry.continue === true);
+  if (!securityRoute?.headers?.["Content-Security-Policy"]) {
+    fail("Faltan encabezados HTTP de seguridad");
+  }
+  const legacyRoutes = [
+    "elegance",
+    "paquete2",
+    "paquete3",
+    "boda-classic-basic",
+    "boda-golden-romance",
+    "boda1"
+  ];
+  for (const legacyRoute of legacyRoutes) {
+    if (!routes.some((entry) => entry.src === `/plantillas/${legacyRoute}/?$` && entry.status === 308)) {
+      fail(`Falta la redirección legada de ${legacyRoute}`);
+    }
+  }
 } catch (error) {
   fail(`vercel.json no es válido: ${error.message}`);
 }
