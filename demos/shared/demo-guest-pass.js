@@ -157,8 +157,26 @@
     });
   }
 
+  function removeDuplicateLocationCalendarLinks() {
+    Array.from(document.querySelectorAll('a[href*="calendar.google.com"]')).forEach(function (link) {
+      var actions = link.parentElement;
+      var insideEventDetails = Boolean(link.closest(
+        '#details, #event-details, #locations, [data-event-details]'
+      ));
+      var nextToDirections = actions && /c[oó]mo llegar|ubicaci[oó]n|maps/i.test(
+        actions.textContent || ""
+      );
+
+      if (insideEventDetails || nextToDirections) {
+        link.remove();
+      }
+    });
+  }
+
   function render() {
     if (!document.body) return false;
+
+    removeDuplicateLocationCalendarLinks();
 
     var data = guestData();
     var anchor = findRsvpSection();
@@ -188,6 +206,10 @@
 
   observer = new MutationObserver(scheduleRender);
   observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  var calendarCleanupObserver = new MutationObserver(removeDuplicateLocationCalendarLinks);
+  calendarCleanupObserver.observe(document.documentElement, { childList: true, subtree: true });
+
   scheduleRender();
   window.addEventListener("load", scheduleRender);
   window.setTimeout(scheduleRender, 500);
