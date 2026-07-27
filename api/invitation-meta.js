@@ -109,5 +109,5 @@ module.exports = async function handler(request, response) {
 
   response.setHeader("Content-Type", "text/html; charset=utf-8");
   response.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
-  response.status(200).send(injectSocialMetadata(html, invitation, slug));
+  response.status(slug && !invitation ? 404 : 200).send(injectSocialMetadata(html, invitation, slug));
 };

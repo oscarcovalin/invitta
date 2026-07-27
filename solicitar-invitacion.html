@@ -453,9 +453,9 @@
         </div>
 
         <div class="submit-row">
-          <button class="submit-button payment-button" type="submit" data-action="payment">Pagar con tarjeta u OXXO</button>
+          <button class="submit-button payment-button" id="paymentButton" type="submit" data-action="payment" hidden>Pagar con tarjeta u OXXO</button>
           <button class="submit-button whatsapp-button" type="submit" data-action="whatsapp">Continuar por WhatsApp</button>
-          <p class="form-note">El pago se realiza de forma segura en Stripe. También puedes continuar con atención personal por WhatsApp.</p>
+          <p class="form-note" id="paymentNote">Continúa con atención personal por WhatsApp.</p>
           <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
         </div>
       </form>
@@ -481,6 +481,8 @@
     const previewDemoLink = document.getElementById('previewDemoLink');
     const palettePreference = document.getElementById('palettePreference');
     const typographyPreference = document.getElementById('typographyPreference');
+    const paymentButton = document.getElementById('paymentButton');
+    const paymentNote = document.getElementById('paymentNote');
     const designImages = {
       'Élégance': 'assets/catalog/xv-elegance.jpg',
       'Rose Champagne': 'assets/catalog/xv-rose-gold.jpg',
@@ -649,6 +651,23 @@
       window.location.assign(result.url);
     }
 
+    async function setupPaymentAvailability() {
+      try {
+        const response = await fetch('/api/payment-config', {
+          headers: { Accept: 'application/json' }
+        });
+        const config = await response.json();
+        const enabled = response.ok && config.enabled === true;
+        paymentButton.hidden = !enabled;
+        paymentNote.textContent = enabled
+          ? 'El pago se realiza de forma segura con tarjeta u OXXO. También puedes continuar por WhatsApp.'
+          : 'Los pagos en línea estarán disponibles próximamente. Continúa con atención personal por WhatsApp.';
+      } catch (error) {
+        console.warn('No se pudo consultar la disponibilidad de pagos:', error);
+        paymentButton.hidden = true;
+      }
+    }
+
     function readDraft() {
       try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
       catch (_) { return {}; }
@@ -733,6 +752,7 @@
     }
     updatePreview();
     updateDemoPreviewLink();
+    setupPaymentAvailability();
     if (params.get('pago') === 'cancelado') {
       status.textContent = 'El pago fue cancelado. Tu solicitud se conserva y puedes intentarlo nuevamente.';
     }

@@ -6,7 +6,7 @@ export function MusicPlayer({ autoPlay }: { autoPlay?: boolean }) {
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const invData = (typeof window !== "undefined" && (window as any).INVITATION_DATA) ? (window as any).INVITATION_DATA : {};
-  const audioSrc = invData.musicUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3";
+  const audioSrc = invData.musicUrl || "./assets/rose-gold-arion.mp3";
   const musicTitle = invData.musicTitle || "Música de Gala";
 
 

@@ -1473,7 +1473,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.querySelectorAll('input[name="custom_font_target"]:checked')
     ).map(input => input.value);
     if (document.getElementById("font_preset")?.value === "custom" && !selectedCustomFontTargets.length) {
-      showMediaError("custom-font", "Elige al menos una zona donde aplicar la tipografÃ­a.");
+      showMediaError("custom-font", "Elige al menos una zona donde aplicar la tipografía.");
       saveBtn.disabled = false;
       saveBtn.textContent = "Guardar cambios";
       return;

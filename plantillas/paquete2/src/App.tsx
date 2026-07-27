@@ -60,7 +60,7 @@ const invData = (typeof window !== "undefined" && (window as any).INVITATION_DAT
     royalGallery05,
     royalGallery06,
   ],
-  musicUrl: "",
+  musicUrl: "./assets/rose-gold-arion.mp3",
   musicTitle: ""
 };
 

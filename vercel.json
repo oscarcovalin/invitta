@@ -5,10 +5,74 @@
       "includeFiles": "invitacion.html"
     }
   },
-  "routes": [
+  "headers": [
     {
-      "src": "/invitacion\\.html",
-      "dest": "/api/invitation-meta"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "base-uri 'self'; object-src 'none'; frame-ancestors 'self'"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/administracion/admin.html",
+      "destination": "/administracion/studio-login.html",
+      "permanent": false
+    },
+    {
+      "source": "/plantillas/elegance",
+      "destination": "/demos/xv-elegance/index.html",
+      "permanent": true
+    },
+    {
+      "source": "/plantillas/paquete2",
+      "destination": "/demos/xv-premium-2/index.html",
+      "permanent": true
+    },
+    {
+      "source": "/plantillas/paquete3",
+      "destination": "/demos/xv-vip-3/index.html",
+      "permanent": true
+    },
+    {
+      "source": "/plantillas/boda-classic-basic",
+      "destination": "/demos/boda-classic-basic/index.html",
+      "permanent": true
+    },
+    {
+      "source": "/plantillas/boda-golden-romance",
+      "destination": "/demos/boda-golden-romance-premium/index.html",
+      "permanent": true
+    },
+    {
+      "source": "/plantillas/boda1",
+      "destination": "/demos/boda-premium-1/index.html",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/invitacion.html",
+      "destination": "/api/invitation-meta"
     }
   ]
 }

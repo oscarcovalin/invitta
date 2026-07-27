@@ -29,6 +29,8 @@ export function ParallaxImage({ src, alt, onClick }: ParallaxImageProps) {
           src={src}
           alt=""
           aria-hidden="true"
+          loading="lazy"
+          decoding="async"
           initial={{ scale: 1.04, x: "-1.5%", y: "-1%" }}
           animate={reduceMotion ? { scale: 1.06, x: 0, y: 0 } : {
             scale: [1.04, 1.12, 1.06],
@@ -48,6 +50,8 @@ export function ParallaxImage({ src, alt, onClick }: ParallaxImageProps) {
         <motion.img
           src={src}
           alt={alt}
+          loading="lazy"
+          decoding="async"
           onLoad={(event) => {
             const image = event.currentTarget;
             setOrientation(image.naturalHeight > image.naturalWidth ? "portrait" : "landscape");

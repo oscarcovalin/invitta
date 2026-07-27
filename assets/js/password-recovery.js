@@ -116,7 +116,7 @@
             const { error } = await client.auth.updateUser({ password });
             if (error) throw error;
             await client.auth.signOut();
-            setNotice("Contrasena actualizada. Ya puedes iniciar sesion.", "success");
+            setNotice("Contraseña actualizada. Ya puedes iniciar sesión.", "success");
             passwordPanel.hidden = true;
             requestPanel.hidden = false;
             setTimeout(() => {

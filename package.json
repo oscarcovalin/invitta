@@ -3,6 +3,11 @@
   "private": true,
   "version": "1.0.0",
   "description": "Invitta digital invitations platform",
+  "scripts": {
+    "check": "node scripts/launch-check.js",
+    "audit:launch": "npm run check && npm audit --omit=dev",
+    "preview": "node scripts/local-preview.js"
+  },
   "dependencies": {
     "stripe": "^18.5.0"
   }

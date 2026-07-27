@@ -8,7 +8,7 @@ export function MusicPlayer({ autoPlay }: { autoPlay?: boolean }) {
 
   useEffect(() => {
     // Elegant royalty-free soft piano/orchestra music for celebration
-    const audio = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3");
+    const audio = new Audio("./assets/marry-you-glee-cast.mp3");
     audio.loop = true;
     audio.volume = volume;
     audioRef.current = audio;

@@ -21,7 +21,12 @@ module.exports = async function handler(request, response) {
     return response.status(405).json({ error: "Metodo no permitido." });
   }
 
-  if (!process.env.STRIPE_SECRET_KEY) {
+  if (
+    !process.env.STRIPE_SECRET_KEY
+    || !process.env.STRIPE_WEBHOOK_SECRET
+    || !process.env.SUPABASE_URL
+    || !process.env.SUPABASE_SERVICE_ROLE_KEY
+  ) {
     return response.status(503).json({
       code: "PAYMENTS_NOT_CONFIGURED",
       error: "Los pagos en linea estaran disponibles muy pronto. Puedes continuar por WhatsApp."
@@ -49,6 +54,9 @@ module.exports = async function handler(request, response) {
   if (clientName.length < 2 || clientPhone.replace(/\D/g, "").length < 8) {
     return response.status(400).json({ error: "Nombre y WhatsApp validos son obligatorios." });
   }
+  if (!isUuid(requestId)) {
+    return response.status(400).json({ error: "Primero registra una solicitud valida antes de iniciar el pago." });
+  }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const metadata = {
@@ -57,7 +65,7 @@ module.exports = async function handler(request, response) {
     client_phone: clientPhone,
     design_name: designName || "Por definir"
   };
-  if (isUuid(requestId)) metadata.invitation_request_id = requestId;
+  metadata.invitation_request_id = requestId;
 
   try {
     const session = await stripe.checkout.sessions.create({
