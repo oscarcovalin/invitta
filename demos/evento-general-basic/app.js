@@ -263,16 +263,19 @@
     function update() {
       scheduled = false;
       var viewportHeight = Math.max(window.innerHeight, 1);
-      var maxShift = window.innerWidth <= 760 ? 38 : 46;
+      var isMobile = window.innerWidth <= 760;
+      var backgroundMaxShift = isMobile ? 96 : 56;
+      var layerMaxShift = isMobile ? 62 : 50;
+      var contentMaxShift = isMobile ? 14 : 10;
 
       targets.forEach(function (section) {
         var rect = section.getBoundingClientRect();
         if (!rect.height) return;
         var distance = (rect.top + rect.height / 2 - viewportHeight / 2) / viewportHeight;
         var progress = Math.max(-1.25, Math.min(1.25, distance));
-        var backgroundShift = Math.round(progress * -maxShift);
-        var layerShift = Math.round(progress * maxShift);
-        var contentShift = Math.round(progress * maxShift * -.18);
+        var backgroundShift = Math.round(progress * -backgroundMaxShift);
+        var layerShift = Math.round(progress * layerMaxShift);
+        var contentShift = Math.round(progress * -contentMaxShift);
 
         section.style.setProperty("--parallax-bg-shift", backgroundShift + "px");
         section.style.setProperty("--parallax-layer-shift", layerShift + "px");

@@ -318,7 +318,7 @@
             ? "linear-gradient(rgba(250,249,247,.48),rgba(250,249,247,.48))"
             : "linear-gradient(rgba(250,249,247,.86),rgba(250,249,247,.86))";
         section.style.setProperty("background-image", veil + ',url("' + url.replace(/"/g, "") + '")', "important");
-        section.style.setProperty("background-size", isMilestoneBirthday && window.innerWidth <= 760 ? "auto 118%" : "cover", "important");
+        section.style.setProperty("background-size", isMilestoneBirthday && window.innerWidth <= 760 ? "auto 132%" : "cover", "important");
         section.style.setProperty("background-position", "center", "important");
         section.style.setProperty("background-repeat", "no-repeat", "important");
         section.dataset.invittaPersonalized = "true";
