@@ -263,7 +263,7 @@
     function update() {
       scheduled = false;
       var viewportHeight = Math.max(window.innerHeight, 1);
-      var maxShift = window.innerWidth <= 760 ? 18 : 42;
+      var maxShift = window.innerWidth <= 760 ? 38 : 46;
 
       targets.forEach(function (section) {
         var rect = section.getBoundingClientRect();
@@ -279,7 +279,7 @@
         section.style.setProperty("--parallax-content-shift", contentShift + "px");
 
         if (section.dataset.invittaSectionBackground) {
-          section.style.setProperty("background-position", "center calc(50% + " + Math.round(backgroundShift * .45) + "px)", "important");
+          section.style.setProperty("background-position", "center calc(50% + " + Math.round(backgroundShift * .9) + "px)", "important");
         }
       });
     }
@@ -313,6 +313,7 @@
   }
   text("event-title", displayEventTitle);
   text("celebrant-name", data.celebrantName);
+  text("section-mark", clean(data.celebrantName).charAt(0).toUpperCase());
   if (!milestone || !renderMilestoneDate(data.eventDate, data.eventTime)) {
     text("event-date", formatDate(data.eventDate) + (data.eventTime ? " · " + formatTime(data.eventTime) : ""));
   }

@@ -70,11 +70,31 @@ function firstGalleryImage(value) {
   }
 }
 
+function heroSectionBackground(value) {
+  if (!value) return "";
+  let backgrounds = value;
+  if (typeof value === "string") {
+    try {
+      backgrounds = JSON.parse(value);
+    } catch (_error) {
+      return "";
+    }
+  }
+  const hero = backgrounds && typeof backgrounds === "object" ? String(backgrounds.hero || "").trim() : "";
+  return /^https:\/\//i.test(hero) ? hero : "";
+}
+
+function isMilestoneInvitation(invitation) {
+  if (!invitation) return false;
+  if (invitation.template_id === "cumpleanos-50-sorpresa") return true;
+  return invitation.event_type === "cumpleanos" && /(?:^|\D)50(?:\D|$)/.test(String(invitation.title || ""));
+}
+
 async function getInvitation(slug) {
   if (!slug) return null;
 
   const query = new URLSearchParams({
-    select: "title,honoree_name,event_type,event_date,main_photo_url,gallery_urls,expires_at",
+    select: "title,honoree_name,event_type,event_date,main_photo_url,gallery_urls,section_backgrounds,template_id,expires_at",
     slug: `eq.${slug}`,
     published: "eq.true",
     or: `(expires_at.is.null,expires_at.gt.${new Date().toISOString()})`,
@@ -105,7 +125,11 @@ function injectSocialMetadata(html, invitation, slug) {
   const description = name
     ? `Acompáñanos a celebrar con ${name}. Consulta todos los detalles de la invitación.`
     : "Tu invitación digital personalizada para este evento especial.";
-  const image = invitation?.main_photo_url || firstGalleryImage(invitation?.gallery_urls);
+  const milestoneFallback = `${APP_URL}/demos/evento-general-basic/assets/navy-gold-agate.webp`;
+  const image = heroSectionBackground(invitation?.section_backgrounds) ||
+    invitation?.main_photo_url ||
+    firstGalleryImage(invitation?.gallery_urls) ||
+    (isMilestoneInvitation(invitation) ? milestoneFallback : "");
   const canonicalUrl = slug
     ? `${APP_URL}/invitacion.html?slug=${encodeURIComponent(slug)}`
     : `${APP_URL}/invitacion.html`;
@@ -125,6 +149,7 @@ function injectSocialMetadata(html, invitation, slug) {
     tags.push(
       `<meta property="og:image" content="${escapeHtml(image)}">`,
       `<meta property="og:image:secure_url" content="${escapeHtml(image)}">`,
+      `<meta property="og:image:type" content="${escapeHtml(/\.webp(?:$|\?)/i.test(image) ? "image/webp" : /\.png(?:$|\?)/i.test(image) ? "image/png" : "image/jpeg")}">`,
       `<meta property="og:image:alt" content="${escapeHtml(name || "Fotografía de la invitación")}">`,
       `<meta name="twitter:image" content="${escapeHtml(image)}">`
     );
