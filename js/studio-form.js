@@ -278,37 +278,112 @@ function serializeConfirmationNumbers(primary, secondary) {
     .join("|");
 }
 
-const TYPOGRAPHY_SCALE_TARGETS = ["titles", "subtitles", "names", "body"];
-const TYPOGRAPHY_SCALE_TOKEN_PREFIX = "scale:";
+const TYPOGRAPHY_ROLES = [
+  "coverName",
+  "closingName",
+  "mainTitle",
+  "sectionTitle",
+  "cardTitle",
+  "guestName",
+  "body",
+  "labels"
+];
+const TYPOGRAPHY_FONT_SOURCES = [
+  "inherit",
+  "classic",
+  "romantic",
+  "editorial",
+  "minimal",
+  "luxury",
+  "signature",
+  "couture",
+  "custom"
+];
+const TYPOGRAPHY_FONT_TOKEN_PREFIX = "typeface:v1:";
+const TYPOGRAPHY_SCALE_TOKEN_PREFIX = "type-scale:v1:";
 
-function parseTypographyScales(value) {
-  const scales = { titles: 100, subtitles: 100, names: 100, body: 100 };
+function emptyTypographyRoleConfig() {
+  return TYPOGRAPHY_ROLES.reduce((result, role) => {
+    result[role] = { font: "inherit", scale: 100 };
+    return result;
+  }, {});
+}
+
+function parseTypographyRoleConfig(value) {
+  const config = emptyTypographyRoleConfig();
   const tokens = Array.isArray(value) ? value : [];
+  let hasRoleTokens = tokens.includes("typography:v1");
+
+  tokens.forEach(token => {
+    const fontMatch = String(token || "").match(/^typeface:v1:([A-Za-z]+):([a-z]+)$/);
+    if (fontMatch && TYPOGRAPHY_ROLES.includes(fontMatch[1]) && TYPOGRAPHY_FONT_SOURCES.includes(fontMatch[2])) {
+      config[fontMatch[1]].font = fontMatch[2];
+      hasRoleTokens = true;
+      return;
+    }
+    const scaleMatch = String(token || "").match(/^type-scale:v1:([A-Za-z]+):(\d{2,3})$/);
+    if (scaleMatch && TYPOGRAPHY_ROLES.includes(scaleMatch[1])) {
+      config[scaleMatch[1]].scale = Math.min(150, Math.max(75, Number(scaleMatch[2]) || 100));
+      hasRoleTokens = true;
+    }
+  });
+
+  if (hasRoleTokens) return config;
+
+  // Traducción transparente de invitaciones creadas con las cuatro zonas anteriores.
+  const legacyTargets = new Set(tokens.filter(token => ["titles", "subtitles", "names", "body"].includes(token)));
+  const legacyScales = { titles: 100, subtitles: 100, names: 100, body: 100 };
   tokens.forEach(token => {
     const match = String(token || "").match(/^scale:(titles|subtitles|names|body):(\d{2,3})$/);
-    if (!match) return;
-    scales[match[1]] = Math.min(150, Math.max(75, Number(match[2]) || 100));
+    if (match) legacyScales[match[1]] = Math.min(150, Math.max(75, Number(match[2]) || 100));
   });
-  return scales;
+  if (legacyTargets.has("titles")) config.mainTitle.font = "custom";
+  if (legacyTargets.has("subtitles")) {
+    config.sectionTitle.font = "custom";
+    config.cardTitle.font = "custom";
+  }
+  if (legacyTargets.has("names")) {
+    config.coverName.font = "custom";
+    config.closingName.font = "custom";
+  }
+  if (legacyTargets.has("body")) config.body.font = "custom";
+  config.mainTitle.scale = legacyScales.titles;
+  config.sectionTitle.scale = legacyScales.subtitles;
+  config.cardTitle.scale = legacyScales.subtitles;
+  config.coverName.scale = legacyScales.names;
+  config.body.scale = legacyScales.body;
+  return config;
 }
 
-function typographyScaleTokens() {
-  return Array.from(document.querySelectorAll('input[name="typography_scale"]'))
-    .map(input => {
-      const target = input.dataset.target;
-      const value = Math.min(150, Math.max(75, Number(input.value) || 100));
-      return TYPOGRAPHY_SCALE_TARGETS.includes(target) && value !== 100
-        ? `${TYPOGRAPHY_SCALE_TOKEN_PREFIX}${target}:${value}`
-        : "";
-    })
-    .filter(Boolean);
+function typographyRoleTokens() {
+  const tokens = ["typography:v1"];
+  document.querySelectorAll('select[name="typography_role_font"]').forEach(select => {
+    const role = select.dataset.role;
+    const source = TYPOGRAPHY_FONT_SOURCES.includes(select.value) ? select.value : "inherit";
+    if (TYPOGRAPHY_ROLES.includes(role) && source !== "inherit") {
+      tokens.push(`${TYPOGRAPHY_FONT_TOKEN_PREFIX}${role}:${source}`);
+    }
+  });
+  document.querySelectorAll('input[name="typography_role_scale"]').forEach(input => {
+    const role = input.dataset.role;
+    const value = Math.min(150, Math.max(75, Number(input.value) || 100));
+    if (TYPOGRAPHY_ROLES.includes(role) && value !== 100) {
+      tokens.push(`${TYPOGRAPHY_SCALE_TOKEN_PREFIX}${role}:${value}`);
+    }
+  });
+  return tokens;
 }
 
-function setTypographyScaleControls(value) {
-  const scales = parseTypographyScales(value);
-  document.querySelectorAll('input[name="typography_scale"]').forEach(input => {
-    const target = input.dataset.target;
-    input.value = String(scales[target] || 100);
+function setTypographyRoleControls(value) {
+  const config = parseTypographyRoleConfig(value);
+  document.querySelectorAll('select[name="typography_role_font"]').forEach(select => {
+    const setting = config[select.dataset.role] || { font: "inherit" };
+    select.value = setting.font;
+    select.dataset.inherit = String(setting.font === "inherit");
+  });
+  document.querySelectorAll('input[name="typography_role_scale"]').forEach(input => {
+    const setting = config[input.dataset.role] || { scale: 100 };
+    input.value = String(setting.scale);
     const output = document.querySelector(`output[for="${input.id}"]`);
     if (output) output.textContent = `${input.value}%`;
   });
@@ -323,8 +398,8 @@ function setupStudioVisualPreview() {
   const customFontInput = document.getElementById("customFontFile");
   const customFontNameInput = document.getElementById("customFontName");
   const customFontUrlInput = document.getElementById("customFontUrl");
-  const customFontTargetInputs = Array.from(document.querySelectorAll('input[name="custom_font_target"]'));
-  const typographyScaleInputs = Array.from(document.querySelectorAll('input[name="typography_scale"]'));
+  const typographyRoleFontSelects = Array.from(document.querySelectorAll('select[name="typography_role_font"]'));
+  const typographyScaleInputs = Array.from(document.querySelectorAll('input[name="typography_role_scale"]'));
   const removeCustomFontBtn = document.getElementById("removeCustomFontBtn");
   const fontOptions = document.getElementById("studio-font-options");
   const paletteOptions = document.getElementById("studio-palette-options");
@@ -382,6 +457,28 @@ function setupStudioVisualPreview() {
       body: '"Montserrat", Arial, sans-serif'
     }
   };
+
+  const typographyFontLabels = {
+    inherit: "Conservar diseño original",
+    classic: "Clásica elegante",
+    romantic: "Romántica script",
+    editorial: "Editorial fine art",
+    minimal: "Moderna minimal",
+    luxury: "Luxury dramática",
+    signature: "Firma orgánica",
+    couture: "Caligrafía couture",
+    custom: "Fuente especial cargada"
+  };
+
+  typographyRoleFontSelects.forEach(select => {
+    TYPOGRAPHY_FONT_SOURCES.forEach(source => {
+      const option = document.createElement("option");
+      option.value = source;
+      option.textContent = typographyFontLabels[source];
+      select.appendChild(option);
+    });
+    select.dataset.inherit = String(select.value === "inherit");
+  });
 
   const palettes = {
     original: {
@@ -521,7 +618,7 @@ function setupStudioVisualPreview() {
     return button;
   }
 
-  Object.entries(fonts).forEach(([value, definition]) => {
+  Object.entries(fonts).filter(([value]) => value !== "custom").forEach(([value, definition]) => {
     fontOptions.appendChild(createOptionButton(value, definition, "font"));
   });
 
@@ -532,12 +629,6 @@ function setupStudioVisualPreview() {
     });
 
   let customFontObjectUrl = "";
-
-  function getSelectedCustomFontTargets() {
-    return customFontTargetInputs
-      .filter(input => input.checked)
-      .map(input => input.value);
-  }
 
   function clearCustomFontError() {
     const errorElement = document.getElementById("custom-font-error");
@@ -574,6 +665,7 @@ function setupStudioVisualPreview() {
       showCustomFontError("No se pudo previsualizar este archivo de tipografía.");
     }
   }
+  window.refreshStudioCustomFontPreview = loadCustomFontPreview;
 
   customFontInput?.addEventListener("change", () => {
     const file = customFontInput.files?.[0];
@@ -586,7 +678,14 @@ function setupStudioVisualPreview() {
     if (customFontObjectUrl) URL.revokeObjectURL(customFontObjectUrl);
     customFontObjectUrl = URL.createObjectURL(file);
     updateCustomFontCard();
-    fontSelect.value = "custom";
+    if (!typographyRoleFontSelects.some(select => select.value === "custom")) {
+      typographyRoleFontSelects.forEach(select => {
+        if (["coverName", "closingName"].includes(select.dataset.role)) {
+          select.value = "custom";
+          select.dataset.inherit = "false";
+        }
+      });
+    }
     loadCustomFontPreview(customFontObjectUrl);
   });
 
@@ -598,8 +697,9 @@ function setupStudioVisualPreview() {
     if (customFontInput) customFontInput.value = "";
     if (customFontUrlInput) customFontUrlInput.value = "";
     if (customFontNameInput) customFontNameInput.value = "";
-    customFontTargetInputs.forEach(input => {
-      input.checked = input.value !== "body";
+    typographyRoleFontSelects.forEach(select => {
+      if (select.value === "custom") select.value = "inherit";
+      select.dataset.inherit = String(select.value === "inherit");
     });
     document.getElementById("custom-font-current")?.classList.remove("visible");
     updateCustomFontCard();
@@ -607,6 +707,7 @@ function setupStudioVisualPreview() {
       fontSelect.value = "classic";
       fontSelect.dispatchEvent(new Event("change", { bubbles: true }));
     }
+    updatePreview();
   });
 
   updateCustomFontCard();
@@ -624,10 +725,6 @@ function setupStudioVisualPreview() {
   function updatePreview() {
     const palette = palettes[paletteSelect.value] || palettes.original;
     const font = fonts[fontSelect.value] || fonts.classic;
-    const customTargets = new Set(getSelectedCustomFontTargets());
-    const isCustomFont = fontSelect.value === "custom";
-    const defaultDisplay = fonts.classic.display;
-    const defaultBody = fonts.classic.body;
     const selectedTitle = titleColorSelect?.value || palette.title;
     const selectedBody = bodyColorSelect?.value || palette.body;
     const selectedAccent = accentColorSelect?.value || palette.accent;
@@ -641,10 +738,10 @@ function setupStudioVisualPreview() {
     previewPhone.style.setProperty("--preview-title", selectedTitle);
     previewPhone.style.setProperty("--preview-body", selectedBody);
     previewPhone.style.setProperty("--preview-accent", selectedAccent);
-    previewPhone.style.setProperty("--preview-title-font", isCustomFont && !customTargets.has("titles") ? defaultDisplay : font.display);
-    previewPhone.style.setProperty("--preview-subtitle-font", isCustomFont && !customTargets.has("subtitles") ? defaultDisplay : font.display);
-    previewPhone.style.setProperty("--preview-name-font", isCustomFont && !customTargets.has("names") ? defaultDisplay : font.display);
-    previewPhone.style.setProperty("--preview-body-font", isCustomFont && !customTargets.has("body") ? defaultBody : (isCustomFont ? font.display : font.body));
+    previewPhone.style.setProperty("--preview-title-font", font.display);
+    previewPhone.style.setProperty("--preview-subtitle-font", font.display);
+    previewPhone.style.setProperty("--preview-name-font", font.display);
+    previewPhone.style.setProperty("--preview-body-font", font.body);
     previewPhone.dataset.font = fontSelect.value;
 
     const previewEyebrow = document.getElementById("studio-preview-eyebrow");
@@ -657,23 +754,38 @@ function setupStudioVisualPreview() {
     if (previewDate) previewDate.textContent = formatPreviewDate(eventDate);
     if (previewEventTitle) previewEventTitle.textContent = title || (eventType === "boda" ? "Nuestra celebracion" : "Una noche especial");
 
-    const scaleSelectors = {
-      titles: ["#studio-preview-event-title"],
-      subtitles: ["#studio-preview-eyebrow", ".studio-preview-card p"],
-      names: ["#studio-preview-name"],
-      body: [".studio-preview-card small"]
+    const previewRoleSelectors = {
+      coverName: ["#studio-preview-name"],
+      closingName: ["#studio-preview-closing-name"],
+      mainTitle: ["#studio-preview-event-title"],
+      sectionTitle: ["#studio-preview-eyebrow"],
+      cardTitle: [".studio-preview-card p"],
+      guestName: ["#studio-preview-guest-name"],
+      body: [".studio-preview-card small"],
+      labels: ["#studio-preview-date", ".studio-preview-button-sample"]
     };
-    previewPhone.querySelectorAll(Object.values(scaleSelectors).flat().join(","))
-      .forEach(element => element.style.removeProperty("font-size"));
-    const scaleValues = typographyScaleInputs.reduce((result, input) => {
-      result[input.dataset.target] = (Number(input.value) || 100) / 100;
+    previewPhone.querySelectorAll(Object.values(previewRoleSelectors).flat().join(","))
+      .forEach(element => {
+        element.style.removeProperty("font-size");
+        element.style.removeProperty("font-family");
+      });
+    const selectedSources = typographyRoleFontSelects.reduce((result, select) => {
+      result[select.dataset.role] = select.value;
       return result;
     }, {});
-    Object.entries(scaleSelectors).forEach(([target, selectors]) => {
+    const scaleValues = typographyScaleInputs.reduce((result, input) => {
+      result[input.dataset.role] = (Number(input.value) || 100) / 100;
+      return result;
+    }, {});
+    Object.entries(previewRoleSelectors).forEach(([role, selectors]) => {
+      const source = selectedSources[role] || "inherit";
+      const selectedFont = source === "inherit" ? font : (fonts[source] || font);
+      const family = ["body", "labels"].includes(role) ? selectedFont.body : selectedFont.display;
       selectors.forEach(selector => {
         previewPhone.querySelectorAll(selector).forEach(element => {
+          element.style.fontFamily = family;
           const baseSize = Number.parseFloat(getComputedStyle(element).fontSize);
-          if (Number.isFinite(baseSize)) element.style.fontSize = `${baseSize * (scaleValues[target] || 1)}px`;
+          if (Number.isFinite(baseSize)) element.style.fontSize = `${baseSize * (scaleValues[role] || 1)}px`;
         });
       });
     });
@@ -695,7 +807,13 @@ function setupStudioVisualPreview() {
     .filter(Boolean)
     .forEach(select => select.addEventListener("change", updatePreview));
 
-  customFontTargetInputs.forEach(input => input.addEventListener("change", updatePreview));
+  typographyRoleFontSelects.forEach(select => select.addEventListener("change", () => {
+    if (select.value === "custom" && !customFontUrlInput?.value && !customFontInput?.files?.[0]) {
+      customFontInput?.click();
+    }
+    select.dataset.inherit = String(select.value === "inherit");
+    updatePreview();
+  }));
   typographyScaleInputs.forEach(input => input.addEventListener("input", () => {
     const output = document.querySelector(`output[for="${input.id}"]`);
     if (output) output.textContent = `${input.value}%`;
@@ -1655,16 +1773,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const customFontCurrentName = document.getElementById("custom-font-current-name");
     if (customFontUrl) customFontUrl.value = data.custom_font_url || "";
     if (customFontName) customFontName.value = data.custom_font_name || "";
-    const savedCustomFontTargets = Array.isArray(data.custom_font_targets)
+    const savedTypographyConfig = Array.isArray(data.custom_font_targets)
       ? data.custom_font_targets
-      : ["titles", "subtitles", "names"];
-    document.querySelectorAll('input[name="custom_font_target"]').forEach(input => {
-      input.checked = savedCustomFontTargets.includes(input.value);
-    });
-    setTypographyScaleControls(savedCustomFontTargets);
+      : [];
+    setTypographyRoleControls(savedTypographyConfig);
+    // El preset "custom" pertenecía al modelo anterior. El nuevo modelo asigna
+    // la fuente cargada por función y conserva Clásica como base del diseño.
+    const savedFontPreset = document.getElementById("font_preset");
+    if (savedFontPreset?.value === "custom") savedFontPreset.value = "classic";
     if (data.custom_font_url) {
       customFontCurrent?.classList.add("visible");
       if (customFontCurrentName) customFontCurrentName.textContent = data.custom_font_name || "Tipografía personalizada cargada";
+      window.refreshStudioCustomFontPreview?.(data.custom_font_url);
     }
     document.getElementById("ceremony_name").value = data.ceremony_name || "";
     document.getElementById("ceremony_address").value = data.ceremony_address || "";
@@ -1793,12 +1913,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Tipografia personalizada
     let finalCustomFontUrl = document.getElementById("customFontUrl")?.value || null;
     const customFontFile = document.getElementById("customFontFile")?.files?.[0];
-    const selectedCustomFontTargets = Array.from(
-      document.querySelectorAll('input[name="custom_font_target"]:checked')
-    ).map(input => input.value);
-    const savedTypographyScaleTokens = typographyScaleTokens();
-    if (document.getElementById("font_preset")?.value === "custom" && !selectedCustomFontTargets.length) {
-      showMediaError("custom-font", "Elige al menos una zona donde aplicar la tipografía.");
+    const savedTypographyRoleTokens = typographyRoleTokens();
+    const usesCustomFont = savedTypographyRoleTokens.some(token => token.endsWith(":custom"));
+    if (usesCustomFont && !finalCustomFontUrl && !customFontFile) {
+      showMediaError("custom-font", "Sube una tipografía antes de asignarla a una zona.");
       saveBtn.disabled = false;
       saveBtn.textContent = "Guardar cambios";
       return;
@@ -2023,7 +2141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       font_preset: document.getElementById("font_preset").value || "classic",
       custom_font_url: finalCustomFontUrl,
       custom_font_name: document.getElementById("customFontName")?.value.trim() || null,
-      custom_font_targets: selectedCustomFontTargets.concat(savedTypographyScaleTokens),
+      custom_font_targets: savedTypographyRoleTokens,
       visual_theme: document.getElementById("visual_theme") ? document.getElementById("visual_theme").value : "rose-floral",
       color_primary: document.getElementById("color_primary").value,
       color_secondary: document.getElementById("color_secondary").value,
