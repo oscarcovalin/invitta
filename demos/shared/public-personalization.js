@@ -307,9 +307,12 @@
       if (!url) return;
       document.querySelectorAll(sections[key]).forEach(function (section) {
         if (section.dataset.invittaSectionBackground === url) return;
+        var isGenericRenderer = rendererTemplateId === "evento-general-basic";
         var veil = key === "hero"
           ? "linear-gradient(rgba(20,16,14,.42),rgba(20,16,14,.42))"
-          : "linear-gradient(rgba(250,249,247,.86),rgba(250,249,247,.86))";
+          : isGenericRenderer && key === "rsvp"
+            ? "linear-gradient(rgba(250,249,247,.48),rgba(250,249,247,.48))"
+            : "linear-gradient(rgba(250,249,247,.86),rgba(250,249,247,.86))";
         section.style.setProperty("background-image", veil + ',url("' + url.replace(/"/g, "") + '")', "important");
         section.style.setProperty("background-size", "cover", "important");
         section.style.setProperty("background-position", "center", "important");

@@ -63,6 +63,8 @@ blockquote { color: var(--title); font-family: var(--display); font-size: clamp(
 .passes { display: grid; gap: .7rem; max-width: 320px; margin: 1.8rem auto; text-align: left; }
 .passes select { min-height: 50px; padding: .75rem; border: 1px solid var(--line); border-radius: 0; background: var(--card); color: var(--title); }
 .actions { display: flex; flex-wrap: wrap; gap: .8rem; justify-content: center; }
+.rsvp[data-invitta-section-background] { min-height: min(88vh, 900px); display: grid; align-items: center; }
+.rsvp[data-invitta-section-background] .section__inner { padding: clamp(2.4rem, 6vw, 4.5rem); border: 1px solid color-mix(in srgb, var(--accent) 34%, rgba(255,255,255,.55)); background: color-mix(in srgb, var(--card) 84%, transparent); box-shadow: 0 24px 70px rgba(25,28,24,.14); backdrop-filter: blur(7px); }
 .closing { position: relative; padding: 4.5rem 1.25rem; overflow: hidden; isolation: isolate; border-top: 1px solid var(--line); background: var(--card); color: var(--body); text-align: center; }
 .closing > * { position: relative; z-index: 1; transform: translate3d(0, var(--parallax-content-shift, 0), 0); }
 .closing p { margin-bottom: .7rem; color: inherit; }
@@ -91,6 +93,7 @@ blockquote { color: var(--title); font-family: var(--display); font-size: clamp(
   .gallery img, .gallery img:first-child:nth-last-child(3) { height: 360px; }
   .timeline__item { grid-template-columns: 76px 1fr; }
   .actions { align-items: stretch; flex-direction: column; }
+  .rsvp[data-invitta-section-background] .section__inner { padding: 2.5rem 1.25rem; }
   .music-player { right: .75rem; bottom: .75rem; left: .75rem; max-width: none; justify-content: space-between; }
   .music-player__track strong, .music-player__track small { max-width: 45vw; }
 }
