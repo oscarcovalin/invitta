@@ -75,6 +75,9 @@ blockquote { color: var(--title); font-family: var(--display); font-size: clamp(
 .closing__message { width: min(100%, 620px); margin: 1rem auto 1.5rem; font-family: var(--display); font-size: clamp(1.25rem, 3vw, 1.75rem); font-style: italic; line-height: 1.55; }
 .closing strong { display: block; margin-top: .65rem; color: var(--title); font-family: var(--display); font-size: clamp(2.8rem, 7vw, 5rem); font-weight: 500; letter-spacing: -.04em; line-height: .95; }
 .hashtag { margin-top: 1.2rem; color: var(--accent) !important; }
+.closing__cta { width: min(100%, 560px); margin: 3rem auto 0; padding-top: 2.25rem; border-top: 1px solid var(--line); }
+.closing__cta p { margin-bottom: 1.25rem; font-family: var(--display); font-size: clamp(1.2rem, 3vw, 1.55rem); font-style: italic; }
+.closing__cta-button { margin-top: 0; }
 .music-player { position: fixed; z-index: 30; right: 1.25rem; bottom: 1.25rem; display: flex; max-width: min(420px, calc(100vw - 2.5rem)); padding: .7rem .7rem .7rem 1rem; align-items: center; gap: 1rem; border: 1px solid var(--line); background: rgba(251,250,247,.94); box-shadow: 0 12px 36px rgba(25,28,24,.15); backdrop-filter: blur(14px); }
 .music-player[hidden] { display: none; }
 .music-player__track { min-width: 0; display: grid; gap: .12rem; }
@@ -144,6 +147,9 @@ body.theme-milestone-50 {
 .theme-milestone-50 .closing { border-color: var(--line); background-color: #050d20; background-image: linear-gradient(rgba(4,12,29,.62), rgba(4,12,29,.74)), url("./assets/navy-gold-agate.webp"); background-position: center; background-size: cover; color: #e4e7ef; }
 .theme-milestone-50 .closing::before { background: radial-gradient(circle, rgba(201,150,36,.18), transparent 58%); }
 .theme-milestone-50 .closing strong { color: var(--gold); background: linear-gradient(180deg, #f0d16d, #b87913 72%, #dcae3a); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 8px 24px rgba(0,0,0,.32)); }
+.theme-milestone-50 .closing__cta { border-color: rgba(201,150,36,.48); }
+.theme-milestone-50 .closing__cta p { color: #f7edd5; }
+.theme-milestone-50 .closing__cta-button { border-color: var(--gold); color: var(--gold-bright); }
 .theme-milestone-50 .music-player { border-color: rgba(201,150,36,.46); background: rgba(4,12,29,.92); box-shadow: 0 16px 42px rgba(0,0,0,.32); }
 .theme-milestone-50 .music-player__toggle { border-color: var(--gold); color: var(--gold-bright); }
 .theme-milestone-50 .music-player__toggle:hover, .theme-milestone-50 .music-player__toggle[aria-pressed="true"] { background: var(--gold); color: #061129; }
