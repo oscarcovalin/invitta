@@ -38,6 +38,40 @@
     return (hour % 12 || 12) + ":" + match[2] + " " + (hour >= 12 ? "p. m." : "a. m.");
   }
 
+  function capitalize(value) {
+    return value ? value.charAt(0).toUpperCase() + value.slice(1) : "";
+  }
+
+  function renderMilestoneDate(dateValue, timeValue) {
+    var container = document.getElementById("event-date");
+    if (!container || !dateValue) return false;
+    var date = new Date(dateValue + (String(dateValue).length === 10 ? "T12:00:00" : ""));
+    if (Number.isNaN(date.getTime())) return false;
+
+    var weekday = document.createElement("span");
+    weekday.className = "hero__date-weekday";
+    weekday.textContent = capitalize(new Intl.DateTimeFormat("es-MX", { weekday: "long" }).format(date));
+
+    var calendar = document.createElement("span");
+    calendar.className = "hero__date-calendar";
+    var month = document.createElement("span");
+    month.textContent = capitalize(new Intl.DateTimeFormat("es-MX", { month: "long" }).format(date));
+    var day = document.createElement("strong");
+    day.textContent = String(date.getDate());
+    calendar.append(month, day);
+
+    container.replaceChildren(weekday, calendar);
+    var timeMatch = String(timeValue || "").match(/(\d{1,2}):(\d{2})/);
+    if (timeMatch) {
+      var hour = Number(timeMatch[1]);
+      var time = document.createElement("span");
+      time.className = "hero__date-time";
+      time.textContent = (hour % 12 || 12) + (timeMatch[2] === "00" ? "" : ":" + timeMatch[2]) + (hour >= 12 ? "pm" : "am");
+      container.appendChild(time);
+    }
+    return true;
+  }
+
   function eventKind(type) {
     return ({
       cumpleanos: "Una vuelta más al sol",
@@ -266,7 +300,9 @@
   if (milestone) displayEventTitle = displayEventTitle.replace(/(?:^|\s)50(?:\s|$)/, " ").trim() || "Aniversario";
   text("event-title", displayEventTitle);
   text("celebrant-name", data.celebrantName);
-  text("event-date", formatDate(data.eventDate) + (data.eventTime ? " · " + formatTime(data.eventTime) : ""));
+  if (!milestone || !renderMilestoneDate(data.eventDate, data.eventTime)) {
+    text("event-date", formatDate(data.eventDate) + (data.eventTime ? " · " + formatTime(data.eventTime) : ""));
+  }
   text("welcome-text", data.quote);
   text("thank-you-title", data.thankYouTitle);
   if (clean(data.thankYouMessage)) {
