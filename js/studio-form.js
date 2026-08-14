@@ -1208,12 +1208,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     SECTION_BACKGROUND_KEYS.forEach(key => {
       const current = document.getElementById(`section-background-${key}-current`);
       const link = document.getElementById(`section-background-${key}-link`);
+      const pending = document.getElementById(`section-background-${key}-pending`);
+      const input = document.querySelector(`[data-section-background-input="${key}"]`);
+      const selectedFile = input?.files?.[0];
       const url = existingSectionBackgrounds[key];
+      const hasBackground = Boolean(url || selectedFile);
       if (current) {
-        current.hidden = !url;
-        current.classList.toggle("visible", Boolean(url));
+        current.hidden = !hasBackground;
+        current.classList.toggle("visible", hasBackground);
       }
-      if (link && url) link.href = url;
+      if (link) {
+        link.hidden = !url;
+        if (url) link.href = url;
+      }
+      if (pending) {
+        pending.hidden = !selectedFile;
+        pending.textContent = selectedFile ? `Archivo seleccionado: ${selectedFile.name}` : "";
+      }
     });
   }
 
@@ -1222,13 +1233,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const key = input.dataset.sectionBackgroundInput;
       clearMediaError(`section-background-${key}`);
       if (input.files?.[0]) removedSectionBackgrounds.delete(key);
+      renderSectionBackgroundStatus();
     });
   });
 
   document.querySelectorAll("[data-section-background-remove]").forEach(button => {
     button.addEventListener("click", () => {
       const key = button.dataset.sectionBackgroundRemove;
-      removedSectionBackgrounds.add(key);
+      if (existingSectionBackgrounds[key]) removedSectionBackgrounds.add(key);
       delete existingSectionBackgrounds[key];
       const input = document.querySelector(`[data-section-background-input="${key}"]`);
       if (input) input.value = "";
