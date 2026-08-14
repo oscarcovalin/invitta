@@ -262,7 +262,9 @@
     show("hero-milestone", true);
   }
   text("event-kind", milestone ? "¡Es una sorpresa!" : eventKind(data.eventType));
-  text("event-title", data.eventTitle);
+  var displayEventTitle = clean(data.eventTitle);
+  if (milestone) displayEventTitle = displayEventTitle.replace(/(?:^|\s)50(?:\s|$)/, " ").trim() || "Aniversario";
+  text("event-title", displayEventTitle);
   text("celebrant-name", data.celebrantName);
   text("event-date", formatDate(data.eventDate) + (data.eventTime ? " · " + formatTime(data.eventTime) : ""));
   text("welcome-text", data.quote);
