@@ -125,11 +125,12 @@ function injectSocialMetadata(html, invitation, slug) {
   const description = name
     ? `Acompáñanos a celebrar con ${name}. Consulta todos los detalles de la invitación.`
     : "Tu invitación digital personalizada para este evento especial.";
-  const milestoneFallback = `${APP_URL}/demos/evento-general-basic/assets/navy-gold-agate.webp`;
-  const image = heroSectionBackground(invitation?.section_backgrounds) ||
+  const milestoneSocialImage = `${APP_URL}/demos/evento-general-basic/assets/cumpleanos-50-sorpresa-social.jpg?v=20260814`;
+  const usesMilestoneSocialImage = isMilestoneInvitation(invitation);
+  const image = (usesMilestoneSocialImage ? milestoneSocialImage : "") ||
+    heroSectionBackground(invitation?.section_backgrounds) ||
     invitation?.main_photo_url ||
-    firstGalleryImage(invitation?.gallery_urls) ||
-    (isMilestoneInvitation(invitation) ? milestoneFallback : "");
+    firstGalleryImage(invitation?.gallery_urls);
   const canonicalUrl = slug
     ? `${APP_URL}/invitacion.html?slug=${encodeURIComponent(slug)}`
     : `${APP_URL}/invitacion.html`;
@@ -153,6 +154,13 @@ function injectSocialMetadata(html, invitation, slug) {
       `<meta property="og:image:alt" content="${escapeHtml(name || "Fotografía de la invitación")}">`,
       `<meta name="twitter:image" content="${escapeHtml(image)}">`
     );
+
+    if (usesMilestoneSocialImage) {
+      tags.push(
+        '<meta property="og:image:width" content="1200">',
+        '<meta property="og:image:height" content="630">'
+      );
+    }
   }
 
   return html

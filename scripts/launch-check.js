@@ -103,6 +103,22 @@ if (!requestPage.includes('id="paymentButton"') || !requestPage.includes("/api/p
   fail("La página de solicitud no controla la disponibilidad de pagos");
 }
 
+const socialCoverPath = "demos/evento-general-basic/assets/cumpleanos-50-sorpresa-social.jpg";
+const socialCoverAbsolutePath = path.join(root, socialCoverPath);
+if (!fs.existsSync(socialCoverAbsolutePath)) {
+  fail(`Falta la portada social de cumpleaños: ${socialCoverPath}`);
+} else if (fs.statSync(socialCoverAbsolutePath).size > 300 * 1024) {
+  fail("La portada social de cumpleaños supera 300 KB");
+}
+
+const invitationMeta = read("api/invitation-meta.js");
+if (!invitationMeta.includes("cumpleanos-50-sorpresa-social.jpg")) {
+  fail("La plantilla de cumpleaños 50 no usa su portada social optimizada");
+}
+if (!invitationMeta.includes('og:image:width') || !invitationMeta.includes('og:image:height')) {
+  fail("Faltan las dimensiones Open Graph de la portada social");
+}
+
 if (failures.length) {
   console.error("\nRevisión de lanzamiento fallida:\n");
   failures.forEach((message) => console.error(`- ${message}`));
