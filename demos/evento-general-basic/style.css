@@ -220,7 +220,7 @@ body.theme-milestone-50 {
   .theme-milestone-50 .hero__secret { font-size: clamp(3rem, 6.2vw, 4.5rem); }
   .theme-milestone-50 .hero__milestone { font-size: clamp(9rem, min(30vw, 31vh), 16rem); }
   .theme-milestone-50 .hero__name { font-size: clamp(2.8rem, 6.2vw, 4rem); }
-  .theme-milestone-50 .hero__ornament { margin: 1.1rem 0 1rem; }
+  .theme-milestone-50 .hero__ornament { margin: 1.6rem 0 1.4rem; }
   .theme-milestone-50 .hero__date { font-size: .92rem; }
 }
 

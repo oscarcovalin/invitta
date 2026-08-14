@@ -125,7 +125,7 @@ if (!generalEventApp.includes('classList.toggle("has-music-player"')) {
 if (!generalEventStyles.includes("body.has-music-player .closing")) {
   fail("La plantilla general no reserva espacio final para el reproductor de música");
 }
-if (!generalEventStyles.includes(".theme-milestone-50 .hero__ornament { margin: 1.1rem 0 1rem; }")) {
+if (!generalEventStyles.includes(".theme-milestone-50 .hero__ornament { margin: 1.6rem 0 1.4rem; }")) {
   fail("La portada de cumpleaños no conserva espacio entre el nombre y la fecha en pantallas bajas");
 }
 
