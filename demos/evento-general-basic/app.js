@@ -177,10 +177,13 @@
   text("thank-you-signature", data.thankYouSignature);
   text("hashtag", data.instagramHashtag);
 
-  if (data.mainPhotoUrl) {
+  var selectedHeroBackground = clean(data.sectionBackgrounds && data.sectionBackgrounds.hero);
+  var heroImage = selectedHeroBackground || data.mainPhotoUrl;
+  if (heroImage) {
     var hero = document.getElementById("hero-photo");
-    hero.style.backgroundImage = 'url("' + data.mainPhotoUrl.replace(/"/g, "") + '")';
+    hero.style.backgroundImage = 'url("' + heroImage.replace(/"/g, "") + '")';
     hero.dataset.invittaPersonalized = "true";
+    if (selectedHeroBackground) hero.dataset.invittaSectionBackground = selectedHeroBackground;
   }
   if (data.giftTableUrl) {
     document.getElementById("gift-link").href = data.giftTableUrl;
