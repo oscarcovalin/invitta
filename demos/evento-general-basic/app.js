@@ -168,6 +168,44 @@
     show("confirm-button", Boolean(data.whatsapp || (data.confirmationPhones || []).length));
   }
 
+  function renderMusic() {
+    if (!data.musicUrl) return;
+    var audio = document.getElementById("event-music");
+    var player = document.getElementById("music-player");
+    var toggle = document.getElementById("music-toggle");
+    var icon = document.getElementById("music-icon");
+    var action = document.getElementById("music-action");
+    var title = document.getElementById("music-track-title");
+    var artist = document.getElementById("music-track-artist");
+
+    audio.src = data.musicUrl;
+    audio.dataset.invittaPersonalized = "true";
+    title.textContent = clean(data.musicTitle) || "Música del evento";
+    if (clean(data.musicArtist)) {
+      artist.textContent = data.musicArtist;
+      artist.hidden = false;
+    }
+    player.hidden = false;
+
+    function updateState(isPlaying) {
+      toggle.setAttribute("aria-pressed", String(isPlaying));
+      toggle.setAttribute("aria-label", isPlaying ? "Pausar música" : "Activar música");
+      icon.textContent = isPlaying ? "‖" : "▶";
+      action.textContent = isPlaying ? "Pausar" : "Activar música";
+    }
+
+    toggle.addEventListener("click", function () {
+      if (audio.paused) {
+        audio.play().then(function () { updateState(true); }).catch(function () { updateState(false); });
+      } else {
+        audio.pause();
+        updateState(false);
+      }
+    });
+    audio.addEventListener("pause", function () { updateState(false); });
+    audio.addEventListener("play", function () { updateState(true); });
+  }
+
   text("event-kind", eventKind(data.eventType));
   text("event-title", data.eventTitle);
   text("celebrant-name", data.celebrantName);
@@ -189,14 +227,10 @@
     document.getElementById("gift-link").href = data.giftTableUrl;
     show("registry", true);
   }
-  if (data.musicUrl) {
-    var audio = document.getElementById("event-music");
-    audio.src = data.musicUrl;
-  }
-
   renderPeople();
   renderLocations();
   renderItinerary();
   renderGallery();
   renderGuest();
+  renderMusic();
 })();

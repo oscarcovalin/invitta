@@ -96,7 +96,18 @@
         <p class="hashtag" id="hashtag"></p>
       </footer>
     </main>
-    <audio id="event-music" loop></audio>
+    <aside class="music-player" id="music-player" aria-label="Música de la invitación" hidden>
+      <div class="music-player__track">
+        <span>Música</span>
+        <strong id="music-track-title">Música del evento</strong>
+        <small id="music-track-artist" hidden></small>
+      </div>
+      <button class="music-player__toggle" id="music-toggle" type="button" aria-pressed="false" aria-label="Activar música">
+        <span class="music-player__icon" id="music-icon" aria-hidden="true">▶</span>
+        <span id="music-action">Activar música</span>
+      </button>
+    </aside>
+    <audio id="event-music" preload="metadata" loop></audio>
     <script src="./app.js"></script>
   </body>
 </html>
