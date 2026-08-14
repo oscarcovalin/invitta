@@ -112,6 +112,10 @@ const publicPersonalization = read("demos/shared/public-personalization.js");
 if (!publicPersonalization.includes("applyTypographyScales") || !publicPersonalization.includes("typographyScales")) {
   fail("La invitación pública no aplica las escalas tipográficas");
 }
+if (!publicPersonalization.includes("typographyTargetSelectors[target]") ||
+    !publicPersonalization.includes(".hero__name,#celebrant-name,#thank-you-signature,#guest-name")) {
+  fail("La fuente y el tamaño no comparten los mismos destinos tipográficos");
+}
 
 const generalEventApp = read("demos/evento-general-basic/app.js");
 const generalEventStyles = read("demos/evento-general-basic/style.css");
