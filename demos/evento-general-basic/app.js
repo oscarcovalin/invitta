@@ -46,6 +46,12 @@
     })[type] || "Una fecha para celebrar";
   }
 
+  function milestoneAge() {
+    if (data.eventType !== "cumpleanos") return "";
+    var match = clean(data.eventTitle).match(/(?:^|\D)(50)(?:\D|$)/);
+    return match ? match[1] : "";
+  }
+
   function renderPeople() {
     var people = [];
     (data.parents || []).forEach(function (name) { if (name) people.push(name); });
@@ -247,7 +253,15 @@
     window.setTimeout(schedule, 600);
   }
 
-  text("event-kind", eventKind(data.eventType));
+  var milestone = milestoneAge();
+  if (milestone) {
+    document.body.classList.add("theme-milestone-50");
+    text("hero-secret", "Shhh…");
+    show("hero-secret", true);
+    text("hero-milestone", milestone);
+    show("hero-milestone", true);
+  }
+  text("event-kind", milestone ? "¡Es una sorpresa!" : eventKind(data.eventType));
   text("event-title", data.eventTitle);
   text("celebrant-name", data.celebrantName);
   text("event-date", formatDate(data.eventDate) + (data.eventTime ? " · " + formatTime(data.eventTime) : ""));

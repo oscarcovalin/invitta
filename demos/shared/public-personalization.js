@@ -7,6 +7,7 @@
   var templateId = data.templateId;
   var rendererTemplateId = data.rendererTemplateId || templateId;
   var isWedding = data.eventType === "boda";
+  var isMilestoneBirthday = data.eventType === "cumpleanos" && /(?:^|\D)50(?:\D|$)/.test(clean(data.eventTitle));
   var applying = false;
   var vipAccessRetryCount = 0;
   var imageSequence = 0;
@@ -305,11 +306,14 @@
     Object.keys(sections).forEach(function (key) {
       var url = clean(backgrounds[key]);
       if (!url) return;
+      if (isMilestoneBirthday && key === "hero") return;
       document.querySelectorAll(sections[key]).forEach(function (section) {
         if (section.dataset.invittaSectionBackground === url) return;
         var isGenericRenderer = rendererTemplateId === "evento-general-basic";
         var veil = key === "hero"
           ? "linear-gradient(rgba(20,16,14,.42),rgba(20,16,14,.42))"
+          : isMilestoneBirthday
+            ? "linear-gradient(rgba(4,12,29,.68),rgba(4,12,29,.68))"
           : isGenericRenderer && key === "rsvp"
             ? "linear-gradient(rgba(250,249,247,.48),rgba(250,249,247,.48))"
             : "linear-gradient(rgba(250,249,247,.86),rgba(250,249,247,.86))";
