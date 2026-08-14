@@ -18,9 +18,12 @@
   var typographyTargetSelectors = {
     titles: "h1,.font-display,.hero-title,.inv-hero-title,.inv-main-title,.cover-title,.main-title,[data-invitta-font-role='title']",
     subtitles: "h2,h3,h4,h5,h6,.inv-card-title,.inv-section-title,.inv-timeline-title,.section-title,.subtitle,[data-invitta-font-role='subtitle']",
-    names: ".hero__name,#celebrant-name,.inv-hero-name,.couple-names,.couple-name,.honoree-name,[data-invitta-font-role='name']",
+    names: ".hero__name,#celebrant-name,#thank-you-signature,.inv-hero-name,.inv-thank-you-signature,.couple-names,.couple-name,.honoree-name,[data-invitta-font-role='name']",
     body: "p,li,blockquote,button,input,select,textarea,.font-body,.font-sans,.inv-card-copy,.inv-section-copy,[data-invitta-font-role='body']"
   };
+  var typographyScaleTargetSelectors = Object.assign({}, typographyTargetSelectors, {
+    names: ".hero__name,#celebrant-name,.inv-hero-name,.couple-names,.couple-name,.honoree-name,[data-invitta-font-role='name']"
+  });
 
   function typographyScaleFor(target) {
     var value = data.typographyScales && Number(data.typographyScales[target]);
@@ -44,7 +47,7 @@
     ["body", "titles", "subtitles", "names"].forEach(function(target) {
       var scale = typographyScaleFor(target);
       if (Math.abs(scale - 1) < .001) return;
-      document.querySelectorAll(typographyTargetSelectors[target]).forEach(function(element) {
+      document.querySelectorAll(typographyScaleTargetSelectors[target]).forEach(function(element) {
         elementScales.set(element, scale);
       });
     });

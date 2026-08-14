@@ -112,13 +112,16 @@ const publicPersonalization = read("demos/shared/public-personalization.js");
 if (!publicPersonalization.includes("applyTypographyScales") || !publicPersonalization.includes("typographyScales")) {
   fail("La invitación pública no aplica las escalas tipográficas");
 }
-const typographyNamesSelector = publicPersonalization.match(/names:\s*"([^"]+)"/)?.[1] || "";
+const typographyFontNamesSelector = publicPersonalization.match(/names:\s*"([^"]+)"/)?.[1] || "";
+const typographyScaleNamesSelector = publicPersonalization.match(/typographyScaleTargetSelectors[\s\S]*?names:\s*"([^"]+)"/)?.[1] || "";
 if (!publicPersonalization.includes("typographyTargetSelectors[target]") ||
-    !typographyNamesSelector.includes(".hero__name,#celebrant-name") ||
-    typographyNamesSelector.includes("guest-name") ||
-    typographyNamesSelector.includes("inv-pass-name") ||
-    typographyNamesSelector.includes("signature")) {
-  fail("La fuente y el tamaño no comparten los mismos destinos tipográficos");
+    !publicPersonalization.includes("typographyScaleTargetSelectors[target]") ||
+    !typographyFontNamesSelector.includes("#thank-you-signature") ||
+    typographyFontNamesSelector.includes("guest-name") ||
+    !typographyScaleNamesSelector.includes(".hero__name,#celebrant-name") ||
+    typographyScaleNamesSelector.includes("guest-name") ||
+    typographyScaleNamesSelector.includes("signature")) {
+  fail("La fuente y el tamaño no respetan sus destinos tipográficos");
 }
 
 const generalEventApp = read("demos/evento-general-basic/app.js");
