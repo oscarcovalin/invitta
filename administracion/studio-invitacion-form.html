@@ -443,6 +443,80 @@
           </div>
         </div>
       </div>
+
+      <div id="section-backgrounds-controls" hidden>
+        <h3 style="margin: 18px 0 8px; font-size: 16px; color: var(--primary-color);">Fondos por sección</h3>
+        <p class="media-hint" style="margin-bottom: 14px;">Disponibles para los diseños generales. Cada imagen se muestra con una capa de contraste para conservar la legibilidad.</p>
+
+        <div class="form-row">
+          <div class="form-group" data-section-background-control="hero">
+            <div class="media-upload-box">
+              <span class="media-upload-label">Portada</span>
+              <input type="file" id="sectionBackgroundHeroFile" data-section-background-input="hero" accept="image/jpeg,image/jpg,image/png,image/webp">
+              <div class="upload-progress" id="section-background-hero-progress">⏳ Subiendo portada...</div>
+              <div class="media-error" id="section-background-hero-error"></div>
+              <div class="media-current" id="section-background-hero-current" hidden>
+                <a id="section-background-hero-link" target="_blank" rel="noopener">Ver fondo actual</a>
+                <button type="button" data-section-background-remove="hero">Quitar</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group" data-section-background-control="family">
+            <div class="media-upload-box">
+              <span class="media-upload-label">Bienvenida y familia</span>
+              <input type="file" id="sectionBackgroundFamilyFile" data-section-background-input="family" accept="image/jpeg,image/jpg,image/png,image/webp">
+              <div class="upload-progress" id="section-background-family-progress">⏳ Subiendo fondo...</div>
+              <div class="media-error" id="section-background-family-error"></div>
+              <div class="media-current" id="section-background-family-current" hidden>
+                <a id="section-background-family-link" target="_blank" rel="noopener">Ver fondo actual</a>
+                <button type="button" data-section-background-remove="family">Quitar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" data-section-background-control="locations">
+            <div class="media-upload-box">
+              <span class="media-upload-label">Ceremonia y recepción</span>
+              <input type="file" id="sectionBackgroundLocationsFile" data-section-background-input="locations" accept="image/jpeg,image/jpg,image/png,image/webp">
+              <div class="upload-progress" id="section-background-locations-progress">⏳ Subiendo fondo...</div>
+              <div class="media-error" id="section-background-locations-error"></div>
+              <div class="media-current" id="section-background-locations-current" hidden>
+                <a id="section-background-locations-link" target="_blank" rel="noopener">Ver fondo actual</a>
+                <button type="button" data-section-background-remove="locations">Quitar</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group" data-section-background-control="gallery">
+            <div class="media-upload-box">
+              <span class="media-upload-label">Galería</span>
+              <input type="file" id="sectionBackgroundGalleryFile" data-section-background-input="gallery" accept="image/jpeg,image/jpg,image/png,image/webp">
+              <div class="upload-progress" id="section-background-gallery-progress">⏳ Subiendo fondo...</div>
+              <div class="media-error" id="section-background-gallery-error"></div>
+              <div class="media-current" id="section-background-gallery-current" hidden>
+                <a id="section-background-gallery-link" target="_blank" rel="noopener">Ver fondo actual</a>
+                <button type="button" data-section-background-remove="gallery">Quitar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" data-section-background-control="rsvp">
+            <div class="media-upload-box">
+              <span class="media-upload-label">Confirmación RSVP</span>
+              <input type="file" id="sectionBackgroundRsvpFile" data-section-background-input="rsvp" accept="image/jpeg,image/jpg,image/png,image/webp">
+              <div class="upload-progress" id="section-background-rsvp-progress">⏳ Subiendo fondo...</div>
+              <div class="media-error" id="section-background-rsvp-error"></div>
+              <div class="media-current" id="section-background-rsvp-current" hidden>
+                <a id="section-background-rsvp-link" target="_blank" rel="noopener">Ver fondo actual</a>
+                <button type="button" data-section-background-remove="rsvp">Quitar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div class="form-row">
         <div class="form-group" style="flex: 1;">
@@ -792,8 +866,8 @@
   <!-- Autenticación de Studio -->
   <script src="/js/studio-auth.js?v=studio-recovery-20260718"></script>
   <!-- Lógica del Formulario -->
-  <script src="/assets/js/invitta-templates.js?v=event-template-catalog-20260813"></script>
-  <script src="/js/studio-form.js?v=event-template-catalog-20260813"></script>
+  <script src="/assets/js/invitta-templates.js?v=section-backgrounds-20260814"></script>
+  <script src="/js/studio-form.js?v=section-backgrounds-20260814"></script>
 
 </body>
 </html>

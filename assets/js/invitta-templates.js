@@ -25,6 +25,10 @@ function createGenericEventTemplate(id, name, type) {
     status: "active",
     galleryLimit: 4,
     activeMonths: 2,
+    rendererTemplateId: "boda-classic-basic",
+    customization: {
+      sectionBackgrounds: ["hero", "family", "locations", "gallery", "rsvp"]
+    },
     features: {
       music: false,
       gallery: true,

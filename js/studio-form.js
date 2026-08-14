@@ -37,6 +37,27 @@ function hasActiveTemplates(eventType) {
   return getValidTemplateIds(eventType).length > 0;
 }
 
+const SECTION_BACKGROUND_KEYS = ["hero", "family", "locations", "gallery", "rsvp"];
+
+function getSelectedTemplateSectionBackgroundKeys() {
+  const templateId = document.getElementById("template_id")?.value;
+  const template = window.InvittaTemplateCatalog?.getById(templateId);
+  const configured = template?.customization?.sectionBackgrounds;
+  return Array.isArray(configured)
+    ? configured.filter(key => SECTION_BACKGROUND_KEYS.includes(key))
+    : [];
+}
+
+function updateSectionBackgroundControls() {
+  const container = document.getElementById("section-backgrounds-controls");
+  if (!container) return;
+  const activeKeys = new Set(getSelectedTemplateSectionBackgroundKeys());
+  container.hidden = activeKeys.size === 0;
+  container.querySelectorAll("[data-section-background-control]").forEach(control => {
+    control.hidden = !activeKeys.has(control.dataset.sectionBackgroundControl);
+  });
+}
+
 function normalizeSlug(value) {
   return String(value || "")
     .normalize("NFD")
@@ -81,7 +102,7 @@ function updatePackageSummary() {
   summary.hidden = false;
 }
 
-let isEditMode = false;
+let isTemplateEditMode = false;
 let originalTemplateId = null;
 let originalEventType = null;
 
@@ -122,7 +143,7 @@ function updateTemplateOptions(options = { preserveLegacyNull: false, preferredT
   
   templateSelect.innerHTML = "";
   
-  const showLegacyNull = isEditMode && originalTemplateId === null && options.preserveLegacyNull;
+  const showLegacyNull = isTemplateEditMode && originalTemplateId === null && options.preserveLegacyNull;
 
   if (showLegacyNull) {
     const opt = document.createElement("option");
@@ -161,6 +182,7 @@ function updateTemplateOptions(options = { preserveLegacyNull: false, preferredT
   }
 
   updatePackageSummary();
+  updateSectionBackgroundControls();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -173,7 +195,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const templateSelect = document.getElementById("template_id");
-  if (templateSelect) templateSelect.addEventListener("change", updatePackageSummary);
+  if (templateSelect) {
+    templateSelect.addEventListener("change", () => {
+      updatePackageSummary();
+      updateSectionBackgroundControls();
+    });
+  }
 });
 
 function parseItineraryText(text) {
@@ -630,6 +657,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let inviteId = urlParams.get("id");
   const requestId = urlParams.get("request");
   let isEditMode = !!inviteId;
+  isTemplateEditMode = isEditMode;
   
   // Elementos del DOM
   const form = document.getElementById("invitation-form");
@@ -651,6 +679,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let existingPhotoUrl = null;
   let existingMusicUrl = null;
   let existingBackgroundUrl = null;
+  let existingSectionBackgrounds = {};
+  const removedSectionBackgrounds = new Set();
   let existingGalleryUrls = [];
   let galleryDraftItems = [];
 
@@ -1162,6 +1192,50 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  function normalizeSectionBackgrounds(value) {
+    let parsed = value;
+    if (typeof value === "string") {
+      try { parsed = JSON.parse(value); } catch { return {}; }
+    }
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    return SECTION_BACKGROUND_KEYS.reduce((result, key) => {
+      if (typeof parsed[key] === "string" && parsed[key].trim()) result[key] = parsed[key].trim();
+      return result;
+    }, {});
+  }
+
+  function renderSectionBackgroundStatus() {
+    SECTION_BACKGROUND_KEYS.forEach(key => {
+      const current = document.getElementById(`section-background-${key}-current`);
+      const link = document.getElementById(`section-background-${key}-link`);
+      const url = existingSectionBackgrounds[key];
+      if (current) {
+        current.hidden = !url;
+        current.classList.toggle("visible", Boolean(url));
+      }
+      if (link && url) link.href = url;
+    });
+  }
+
+  document.querySelectorAll("[data-section-background-input]").forEach(input => {
+    input.addEventListener("change", () => {
+      const key = input.dataset.sectionBackgroundInput;
+      clearMediaError(`section-background-${key}`);
+      if (input.files?.[0]) removedSectionBackgrounds.delete(key);
+    });
+  });
+
+  document.querySelectorAll("[data-section-background-remove]").forEach(button => {
+    button.addEventListener("click", () => {
+      const key = button.dataset.sectionBackgroundRemove;
+      removedSectionBackgrounds.add(key);
+      delete existingSectionBackgrounds[key];
+      const input = document.querySelector(`[data-section-background-input="${key}"]`);
+      if (input) input.value = "";
+      renderSectionBackgroundStatus();
+    });
+  });
+
   function revokeGalleryPreview(item) {
     if (item?.kind === "file" && item.previewUrl) {
       URL.revokeObjectURL(item.previewUrl);
@@ -1589,6 +1663,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Mostrar URL actual de música
     // Preservar URL existente de fondo
     existingBackgroundUrl = data.background_image_url || null;
+    existingSectionBackgrounds = normalizeSectionBackgrounds(data.section_backgrounds);
+    removedSectionBackgrounds.clear();
+    renderSectionBackgroundStatus();
     if (existingBackgroundUrl) {
       const bgCurrent = document.getElementById("background-current");
       const bgDisplay = document.getElementById("background-url-display");
@@ -1730,6 +1807,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
       finalBackgroundUrl = uploadedUrl;
+    }
+
+    // ── Fondos personalizados por sección ──
+    const finalSectionBackgrounds = { ...existingSectionBackgrounds };
+    removedSectionBackgrounds.forEach(key => delete finalSectionBackgrounds[key]);
+    const activeSectionBackgroundKeys = new Set(getSelectedTemplateSectionBackgroundKeys());
+
+    for (const key of SECTION_BACKGROUND_KEYS) {
+      if (!activeSectionBackgroundKeys.has(key)) continue;
+      const input = document.querySelector(`[data-section-background-input="${key}"]`);
+      const file = input?.files?.[0];
+      if (!file) continue;
+      const mediaType = `section-background-${key}`;
+      if (!validateFile(file, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, mediaType)) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar cambios";
+        return;
+      }
+      showProgress(mediaType);
+      const uploadedUrl = await uploadFileToStorage(file, `section-backgrounds/${key}`, slugToUse);
+      hideProgress(mediaType);
+      if (!uploadedUrl) {
+        showMediaError(mediaType, "Error al subir el fondo. Intenta de nuevo.");
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar cambios";
+        return;
+      }
+      finalSectionBackgrounds[key] = uploadedUrl;
     }
 
     // ── Subida de galería ──
@@ -1876,6 +1981,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       gallery_urls: finalGalleryUrls,
       itinerary: parseItineraryText(document.getElementById("itineraryText").value),
       background_image_url: finalBackgroundUrl,
+      section_backgrounds: finalSectionBackgrounds,
       music_title: musicFile ? cleanMusicFileName(musicFile.name) : (document.getElementById("music_title").value || null),
       music_artist: document.getElementById("music_artist").value || null,
       main_photo_url: finalPhotoUrl,
@@ -1941,6 +2047,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!isEditMode && result.data?.id) {
         inviteId = result.data.id;
         isEditMode = true;
+        isTemplateEditMode = true;
         window.history.replaceState({}, "", `/administracion/studio-invitacion-form.html?id=${encodeURIComponent(inviteId)}`);
       }
       saveBtn.disabled = false;

@@ -5,7 +5,8 @@
   if (!data || !data.templateId) return;
 
   var templateId = data.templateId;
-  var isWedding = data.eventType === "boda" || templateId.indexOf("boda-") === 0;
+  var rendererTemplateId = data.rendererTemplateId || templateId;
+  var isWedding = data.eventType === "boda";
   var applying = false;
   var vipAccessRetryCount = 0;
   var imageSequence = 0;
@@ -59,7 +60,7 @@
       ceremonyTime: ["3:00 P.M."],
       receptionTime: ["9:00 P.M."]
     }
-  }[templateId] || {};
+  }[rendererTemplateId] || {};
 
   function clean(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -173,7 +174,8 @@
       addReplacement(list, item, (godparents[index] || godparents[0] || {}).name);
     });
 
-    addReplacement(list, isWedding ? "Nuestra Boda" : "Mis Quince Años", data.eventTitle);
+    addReplacement(list, "Nuestra Boda", data.eventTitle);
+    addReplacement(list, "Mis Quince Años", data.eventTitle);
     addReplacement(list, "Parroquia Sagrado Corazón de Jesús", ceremony.name);
     addReplacement(list, "Santuario del Sagrado Corazón", ceremony.name);
     addReplacement(list, "Cantabria Salón de Eventos", reception.name);
@@ -288,6 +290,34 @@
         element.dataset.invittaPersonalized = "true";
         element.style.backgroundImage = 'url("' + replacement.replace(/"/g, "") + '")';
       });
+  }
+
+  function applySectionBackgrounds() {
+    var backgrounds = data.sectionBackgrounds || {};
+    var sections = {
+      hero: "#hero",
+      family: "#family",
+      locations: "#locations",
+      gallery: "#gallery",
+      rsvp: "#rsvp"
+    };
+
+    Object.keys(sections).forEach(function (key) {
+      var url = clean(backgrounds[key]);
+      if (!url) return;
+      document.querySelectorAll(sections[key]).forEach(function (section) {
+        if (section.dataset.invittaSectionBackground === url) return;
+        var veil = key === "hero"
+          ? "linear-gradient(rgba(20,16,14,.42),rgba(20,16,14,.42))"
+          : "linear-gradient(rgba(250,249,247,.86),rgba(250,249,247,.86))";
+        section.style.setProperty("background-image", veil + ',url("' + url.replace(/"/g, "") + '")', "important");
+        section.style.setProperty("background-size", "cover", "important");
+        section.style.setProperty("background-position", "center", "important");
+        section.style.setProperty("background-repeat", "no-repeat", "important");
+        section.dataset.invittaPersonalized = "true";
+        section.dataset.invittaSectionBackground = url;
+      });
+    });
   }
 
   function applyAudio() {
@@ -773,6 +803,7 @@
     applying = true;
     replaceText(document.body);
     applyImages();
+    applySectionBackgrounds();
     applyAudio();
     applyOptionalContent();
     applyLinks();
