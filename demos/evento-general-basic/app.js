@@ -296,6 +296,18 @@
     window.setTimeout(schedule, 600);
   }
 
+  function installInternalNavigation() {
+    document.querySelectorAll('.hero__links a[href^="#"]').forEach(function (link) {
+      link.addEventListener("click", function (event) {
+        var targetId = link.getAttribute("href");
+        var target = targetId ? document.querySelector(targetId) : null;
+        if (!target) return;
+        event.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  }
+
   var milestone = milestoneAge();
   if (milestone) {
     document.body.classList.add("theme-milestone-50");
@@ -344,5 +356,6 @@
   renderGallery();
   renderGuest();
   renderMusic();
+  installInternalNavigation();
   installParallax();
 })();
