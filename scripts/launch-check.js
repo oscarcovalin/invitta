@@ -9,6 +9,7 @@ const activeDemos = [
   "demos/xv-premium-2/index.html",
   "demos/xv-vip-3/index.html",
   "demos/boda-classic-basic/index.html",
+  "demos/evento-general-basic/index.html",
   "demos/boda-golden-romance-premium/index.html",
   "demos/boda-premium-1/index.html"
 ];
@@ -19,6 +20,7 @@ const checkedJavaScript = [
   "api/payment-status.js",
   "api/stripe-webhook.js",
   "js/invitation-public.js",
+  "demos/evento-general-basic/app.js",
   "js/studio-form.js",
   "assets/js/password-recovery.js"
 ];
