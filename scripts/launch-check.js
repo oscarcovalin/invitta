@@ -112,8 +112,10 @@ const publicPersonalization = read("demos/shared/public-personalization.js");
 if (!publicPersonalization.includes("applyTypographyScales") || !publicPersonalization.includes("typographyScales")) {
   fail("La invitación pública no aplica las escalas tipográficas");
 }
+const typographyNamesSelector = publicPersonalization.match(/names:\s*"([^"]+)"/)?.[1] || "";
 if (!publicPersonalization.includes("typographyTargetSelectors[target]") ||
-    !publicPersonalization.includes(".hero__name,#celebrant-name,#thank-you-signature,#guest-name")) {
+    !typographyNamesSelector.includes(".hero__name,#celebrant-name,#guest-name") ||
+    typographyNamesSelector.includes("signature")) {
   fail("La fuente y el tamaño no comparten los mismos destinos tipográficos");
 }
 

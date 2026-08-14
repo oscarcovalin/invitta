@@ -18,7 +18,7 @@
   var typographyTargetSelectors = {
     titles: "h1,.font-display,.hero-title,.inv-hero-title,.inv-main-title,.cover-title,.main-title,[data-invitta-font-role='title']",
     subtitles: "h2,h3,h4,h5,h6,.inv-card-title,.inv-section-title,.inv-timeline-title,.section-title,.subtitle,[data-invitta-font-role='subtitle']",
-    names: ".hero__name,#celebrant-name,#thank-you-signature,#guest-name,.inv-hero-name,.inv-pass-name,.inv-thank-you-signature,.inv-title-script,.couple-names,.couple-name,.honoree-name,.guest-name,.signature,.font-script,[data-invitta-font-role='name']",
+    names: ".hero__name,#celebrant-name,#guest-name,.inv-hero-name,.inv-pass-name,.couple-names,.couple-name,.honoree-name,.guest-name,[data-invitta-font-role='name']",
     body: "p,li,blockquote,button,input,select,textarea,.font-body,.font-sans,.inv-card-copy,.inv-section-copy,[data-invitta-font-role='body']"
   };
 
