@@ -246,6 +246,7 @@
   }
 
   function renderMusic() {
+    document.body.classList.toggle("has-music-player", Boolean(data.musicUrl));
     if (!data.musicUrl) return;
     var audio = document.getElementById("event-music");
     var player = document.getElementById("music-player");
