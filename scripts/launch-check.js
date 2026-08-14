@@ -134,7 +134,7 @@ if (!generalEventStyles.includes("body.has-music-player .closing")) {
 }
 if (!generalEventStyles.includes(".closing #thank-you-signature") ||
     !generalEventStyles.includes("padding: .2em .16em .3em") ||
-    !generalEventStyles.includes("line-height: 1.3")) {
+    !generalEventStyles.includes("line-height: 1.9")) {
   fail("El nombre final no reserva espacio para los trazos de tipografías caligráficas");
 }
 if (!generalEventApp.includes('clean(data.dressCode)') ||
