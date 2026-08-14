@@ -29,7 +29,7 @@
           <p class="eyebrow" id="event-kind">Una fecha para celebrar</p>
           <span class="hero__milestone" id="hero-milestone" hidden></span>
           <h1 id="event-title">Mi celebración</h1>
-          <p class="hero__name" id="celebrant-name">Nombre</p>
+          <p class="hero__name" id="celebrant-name" data-invitta-font-role="name">Nombre</p>
           <span class="hero__ornament" aria-hidden="true"></span>
           <div class="hero__date" id="event-date">Próximamente</div>
         </div>
@@ -46,12 +46,12 @@
       <section class="section section--tint" id="locations">
         <div class="section__inner">
           <p class="eyebrow">Dónde y cuándo</p>
-          <h2>Detalles del evento</h2>
+          <h2 data-invitta-font-role="subtitle">Detalles del evento</h2>
           <div class="cards" id="location-cards"></div>
           <div class="timeline" id="itinerary" hidden>
             <div class="timeline__heading">
               <p class="eyebrow">El ritmo de la celebración</p>
-              <h3>Programa</h3>
+              <h3 data-invitta-font-role="subtitle">Programa</h3>
             </div>
             <div id="itinerary-items"></div>
           </div>
@@ -61,7 +61,7 @@
       <section class="section" id="gallery" hidden>
         <div class="section__inner">
           <p class="eyebrow">Momentos</p>
-          <h2>Nuestra galería</h2>
+          <h2 data-invitta-font-role="subtitle">Nuestra galería</h2>
           <div class="gallery" id="gallery-grid"></div>
         </div>
       </section>
@@ -69,7 +69,7 @@
       <section class="section section--tint" id="registry" hidden>
         <div class="section__inner section__inner--narrow">
           <p class="eyebrow">Un detalle especial</p>
-          <h2>Mesa de regalos</h2>
+          <h2 data-invitta-font-role="subtitle">Mesa de regalos</h2>
           <p>Tu presencia es lo más importante. Si deseas obsequiarnos algo, puedes consultar nuestra mesa de regalos.</p>
           <a class="button button--outline" id="gift-link" target="_blank" rel="noopener">Ver mesa de regalos</a>
         </div>
@@ -78,10 +78,10 @@
       <section class="section rsvp" id="rsvp">
         <div class="section__inner section__inner--narrow">
           <p class="eyebrow">Reserva la fecha</p>
-          <h2>Confirma tu asistencia</h2>
+          <h2 data-invitta-font-role="subtitle">Confirma tu asistencia</h2>
           <div class="guest-card" id="guest-card" hidden>
             <span>Invitación para</span>
-            <strong id="guest-name"></strong>
+            <strong id="guest-name" data-invitta-font-role="name"></strong>
             <p id="guest-details"></p>
           </div>
           <label class="passes" id="passes-label" hidden>
@@ -98,7 +98,7 @@
       <footer class="closing">
         <p id="thank-you-title">Gracias por ser parte de este momento</p>
         <p class="closing__message" id="thank-you-message" hidden></p>
-        <strong id="thank-you-signature"></strong>
+        <strong id="thank-you-signature" data-invitta-font-role="name"></strong>
         <p class="hashtag" id="hashtag"></p>
         <div class="closing__cta" id="studio-cta" hidden>
           <p>¿Te gustaría una invitación como esta?</p>
