@@ -132,6 +132,15 @@ if (!generalEventApp.includes('classList.toggle("has-music-player"')) {
 if (!generalEventStyles.includes("body.has-music-player .closing")) {
   fail("La plantilla general no reserva espacio final para el reproductor de música");
 }
+if (!generalEventApp.includes('clean(data.dressCode)') ||
+    !generalEventApp.includes('text("dress-code-value", data.dressCode)') ||
+    !generalEventApp.includes('show("dress-code", true)')) {
+  fail("La plantilla general no muestra el código de vestimenta configurado");
+}
+if (!generalEventStyles.includes(".dress-code__panel") ||
+    !generalEventStyles.includes(".theme-milestone-50 .dress-code")) {
+  fail("La plantilla general no incluye el diseño editorial del código de vestimenta");
+}
 if (!generalEventStyles.includes(".theme-milestone-50 .hero__ornament { margin: 1.6rem 0 1.4rem; }")) {
   fail("La portada de cumpleaños no conserva espacio entre el nombre y la fecha en pantallas bajas");
 }

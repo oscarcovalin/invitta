@@ -62,6 +62,15 @@ blockquote { color: var(--title); font-family: var(--display); font-size: clamp(
 .timeline__time { padding-right: 1.3rem; border-right: 1px solid var(--line); color: var(--accent); font: 500 clamp(1.35rem, 2.7vw, 1.75rem)/1.1 var(--display); white-space: nowrap; }
 .timeline__title { color: var(--title); font-family: var(--display); font-size: clamp(1.12rem, 2vw, 1.35rem); line-height: 1.35; }
 
+.dress-code { background-color: var(--card); }
+.dress-code__panel { position: relative; width: min(100%, 620px); margin: 0 auto; padding: clamp(3rem, 7vw, 5rem) clamp(1.5rem, 6vw, 4rem); border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 58%, transparent); }
+.dress-code__panel::before, .dress-code__panel::after { content: ""; position: absolute; left: 50%; width: min(8rem, 30%); height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); transform: translateX(-50%); }
+.dress-code__panel::before { top: 1.4rem; }
+.dress-code__panel::after { bottom: 1.4rem; }
+.dress-code__label { display: block; margin-bottom: 1.15rem; color: var(--accent); font-size: .66rem; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; }
+.dress-code__value { display: block; color: var(--title); font: 500 clamp(2.6rem, 7vw, 5.25rem)/1.05 var(--display); letter-spacing: -.035em; text-wrap: balance; }
+.dress-code__note { width: min(100%, 470px); margin: 1.5rem auto 0; color: var(--body); font-size: clamp(.92rem, 1.8vw, 1.08rem); line-height: 1.7; text-wrap: balance; }
+
 .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: .5rem; }
 .gallery img { width: 100%; height: clamp(260px, 42vw, 540px); object-fit: cover; }
 .gallery img:first-child:nth-last-child(3) { grid-row: span 2; height: 100%; }
@@ -158,6 +167,11 @@ body.theme-milestone-50 {
 .theme-milestone-50 .timeline__item { border-color: rgba(201,150,36,.46); background: linear-gradient(110deg, rgba(4,12,29,.76), rgba(10,29,62,.72)); box-shadow: 0 16px 48px rgba(0,0,0,.16); }
 .theme-milestone-50 .timeline__time { border-color: rgba(201,150,36,.46); color: var(--gold-highlight); }
 .theme-milestone-50 .timeline__title { color: #fff4d8; }
+.theme-milestone-50 .dress-code { background: linear-gradient(145deg, #07142e, #040c1d); }
+.theme-milestone-50 .dress-code__panel { border-color: rgba(201,150,36,.52); background: linear-gradient(145deg, rgba(11,29,61,.8), rgba(3,11,28,.7)); box-shadow: 0 28px 80px rgba(0,0,0,.22); }
+.theme-milestone-50 .dress-code__label { color: var(--gold-highlight); }
+.theme-milestone-50 .dress-code__value { color: #fff4d8; text-shadow: 0 7px 30px rgba(0,0,0,.34); }
+.theme-milestone-50 .dress-code__note { color: #dfe3ed; }
 .theme-milestone-50 .button { border-color: var(--gold); background: linear-gradient(135deg, #a96e10, #d8aa37 48%, #b87812); color: #061129; }
 .theme-milestone-50 .button--outline, .theme-milestone-50 .button--text { background: transparent; color: var(--gold-bright); }
 .theme-milestone-50 .guest-card { border-color: rgba(201,150,36,.5); background: rgba(3,10,25,.72); }

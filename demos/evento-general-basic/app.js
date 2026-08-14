@@ -299,7 +299,7 @@
 
   function installParallax() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var targets = Array.from(document.querySelectorAll("#hero, #family, #locations, #gallery, #registry, #rsvp, .closing"));
+    var targets = Array.from(document.querySelectorAll("#hero, #family, #locations, #dress-code, #gallery, #registry, #rsvp, .closing"));
     var scheduled = false;
 
     function update() {
@@ -394,6 +394,10 @@
   if (data.giftTableUrl) {
     document.getElementById("gift-link").href = data.giftTableUrl;
     show("registry", true);
+  }
+  if (clean(data.dressCode)) {
+    text("dress-code-value", data.dressCode);
+    show("dress-code", true);
   }
   renderPeople();
   renderLocations();
