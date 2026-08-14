@@ -206,6 +206,47 @@
     audio.addEventListener("play", function () { updateState(true); });
   }
 
+  function installParallax() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var targets = Array.from(document.querySelectorAll("#hero, #family, #locations, #gallery, #registry, #rsvp, .closing"));
+    var scheduled = false;
+
+    function update() {
+      scheduled = false;
+      var viewportHeight = Math.max(window.innerHeight, 1);
+      var maxShift = window.innerWidth <= 760 ? 18 : 42;
+
+      targets.forEach(function (section) {
+        var rect = section.getBoundingClientRect();
+        if (!rect.height) return;
+        var distance = (rect.top + rect.height / 2 - viewportHeight / 2) / viewportHeight;
+        var progress = Math.max(-1.25, Math.min(1.25, distance));
+        var backgroundShift = Math.round(progress * -maxShift);
+        var layerShift = Math.round(progress * maxShift);
+        var contentShift = Math.round(progress * maxShift * -.18);
+
+        section.style.setProperty("--parallax-bg-shift", backgroundShift + "px");
+        section.style.setProperty("--parallax-layer-shift", layerShift + "px");
+        section.style.setProperty("--parallax-content-shift", contentShift + "px");
+
+        if (section.dataset.invittaSectionBackground) {
+          section.style.setProperty("background-position", "center calc(50% + " + Math.round(backgroundShift * .45) + "px)", "important");
+        }
+      });
+    }
+
+    function schedule() {
+      if (scheduled) return;
+      scheduled = true;
+      window.requestAnimationFrame(update);
+    }
+
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    window.setTimeout(schedule, 0);
+    window.setTimeout(schedule, 600);
+  }
+
   text("event-kind", eventKind(data.eventType));
   text("event-title", data.eventTitle);
   text("celebrant-name", data.celebrantName);
@@ -237,4 +278,5 @@
   renderGallery();
   renderGuest();
   renderMusic();
+  installParallax();
 })();
