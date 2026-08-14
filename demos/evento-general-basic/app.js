@@ -212,6 +212,10 @@
   text("event-date", formatDate(data.eventDate) + (data.eventTime ? " · " + formatTime(data.eventTime) : ""));
   text("welcome-text", data.quote);
   text("thank-you-title", data.thankYouTitle);
+  if (clean(data.thankYouMessage)) {
+    text("thank-you-message", data.thankYouMessage);
+    show("thank-you-message", true);
+  }
   text("thank-you-signature", data.thankYouSignature);
   text("hashtag", data.instagramHashtag);
 
