@@ -385,6 +385,7 @@ var PUBLIC_TEMPLATE_MANIFEST = {
     "xv-champagne-rose-vip": { id: "xv-champagne-rose-vip", path: "/demos/xv-vip-3/index.html", kind: "xv" },
     "boda-classic-basic": { id: "boda-classic-basic", path: "/demos/boda-classic-basic/index.html", kind: "boda" },
     "cumpleanos-general-basic": { id: "cumpleanos-general-basic", path: "/demos/evento-general-basic/index.html", kind: "cumpleanos", rendererTemplateId: "evento-general-basic" },
+    "cumpleanos-50-sorpresa": { id: "cumpleanos-50-sorpresa", path: "/demos/evento-general-basic/index.html", kind: "cumpleanos", rendererTemplateId: "evento-general-basic" },
     "bautizo-general-basic": { id: "bautizo-general-basic", path: "/demos/evento-general-basic/index.html", kind: "bautizo", rendererTemplateId: "evento-general-basic" },
     "otro-general-basic": { id: "otro-general-basic", path: "/demos/evento-general-basic/index.html", kind: "otro", rendererTemplateId: "evento-general-basic" },
     "boda-golden-romance-premium": { id: "boda-golden-romance-premium", path: "/demos/boda-golden-romance-premium/index.html", kind: "boda" },

@@ -80,7 +80,16 @@
     })[type] || "Una fecha para celebrar";
   }
 
+  function selectedTemplateId() {
+    var queryTemplateId = "";
+    try {
+      queryTemplateId = new URLSearchParams(window.location.search).get("template") || "";
+    } catch (error) {}
+    return clean(data.templateId || window.INVITTA_TEMPLATE_ID || queryTemplateId);
+  }
+
   function milestoneAge() {
+    if (selectedTemplateId() === "cumpleanos-50-sorpresa") return "50";
     if (data.eventType !== "cumpleanos") return "";
     var match = clean(data.eventTitle).match(/(?:^|\D)(50)(?:\D|$)/);
     return match ? match[1] : "";
@@ -297,7 +306,11 @@
   }
   text("event-kind", milestone ? "¡Es una sorpresa!" : eventKind(data.eventType));
   var displayEventTitle = clean(data.eventTitle);
-  if (milestone) displayEventTitle = displayEventTitle.replace(/(?:^|\s)50(?:\s|$)/, " ").trim() || "Aniversario";
+  if (selectedTemplateId() === "cumpleanos-50-sorpresa") {
+    displayEventTitle = "Aniversario";
+  } else if (milestone) {
+    displayEventTitle = displayEventTitle.replace(/(?:^|\s)50(?:\s|$)/, " ").trim() || "Aniversario";
+  }
   text("event-title", displayEventTitle);
   text("celebrant-name", data.celebrantName);
   if (!milestone || !renderMilestoneDate(data.eventDate, data.eventTime)) {
