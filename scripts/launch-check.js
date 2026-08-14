@@ -114,9 +114,10 @@ if (!publicPersonalization.includes("applyTypographyScales") || !publicPersonali
 }
 const typographyNamesSelector = publicPersonalization.match(/names:\s*"([^"]+)"/)?.[1] || "";
 if (!publicPersonalization.includes("typographyTargetSelectors[target]") ||
-    !typographyNamesSelector.includes(".hero__name,#celebrant-name,#thank-you-signature") ||
+    !typographyNamesSelector.includes(".hero__name,#celebrant-name") ||
     typographyNamesSelector.includes("guest-name") ||
-    typographyNamesSelector.includes("inv-pass-name")) {
+    typographyNamesSelector.includes("inv-pass-name") ||
+    typographyNamesSelector.includes("signature")) {
   fail("La fuente y el tamaño no comparten los mismos destinos tipográficos");
 }
 
