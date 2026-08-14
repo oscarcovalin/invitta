@@ -108,7 +108,7 @@ body.theme-milestone-50 {
 .theme-milestone-50 .hero__secret { margin: 0 0 -.35rem; color: var(--gold-bright); font: 400 clamp(3.6rem, 8vw, 7.2rem)/.9 "Great Vibes", cursive; text-shadow: 0 8px 32px rgba(0,0,0,.42); }
 .theme-milestone-50 .hero .eyebrow { margin: 0 0 .7rem; color: #f8edcf; letter-spacing: .42em; }
 .theme-milestone-50 .hero__milestone { position: relative; z-index: 1; display: block; margin: -.08em 0 -.04em; padding: 0 .1em .14em; overflow: visible; color: var(--gold); background: linear-gradient(180deg, #f3d980 0%, #d7a936 24%, #9a620d 54%, #e5bd50 76%, #a76d10 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font: 500 clamp(11rem, min(36vw, 38vh), 27rem)/.92 var(--display); letter-spacing: -.09em; filter: drop-shadow(0 16px 42px rgba(0,0,0,.35)); }
-.theme-milestone-50 .hero__milestone::after { content: "AÑOS"; position: absolute; right: -.75rem; bottom: .31em; background: none; color: var(--gold-highlight); font: 600 clamp(.58rem, 1vw, .72rem)/1 var(--sans); letter-spacing: .42em; writing-mode: vertical-rl; -webkit-text-fill-color: var(--gold-highlight); }
+.theme-milestone-50 .hero__milestone::after { content: "AÑOS"; position: absolute; right: -1.35rem; bottom: .29em; padding-left: .6rem; border-left: 1px solid rgba(243,217,128,.72); background: none; color: #f6dc82; font: 700 clamp(.8rem, 1.2vw, 1.05rem)/1 var(--sans); letter-spacing: .32em; writing-mode: vertical-rl; text-shadow: 0 0 18px rgba(229,189,80,.45), 0 2px 8px rgba(0,0,0,.6); -webkit-text-fill-color: #f6dc82; }
 .theme-milestone-50 .hero h1 { width: min(100%, 430px); display: flex; margin: 0 0 1rem; align-items: center; gap: 1rem; color: var(--gold-bright); font-size: clamp(.68rem, 1vw, .86rem); letter-spacing: .5em; }
 .theme-milestone-50 .hero h1::before, .theme-milestone-50 .hero h1::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, rgba(201,150,36,.68)); }
 .theme-milestone-50 .hero h1::after { background: linear-gradient(90deg, rgba(201,150,36,.68), transparent); }
@@ -157,7 +157,7 @@ body.theme-milestone-50 {
   .theme-milestone-50 .hero__secret { font-size: clamp(3.4rem, 18vw, 5.8rem); }
   .theme-milestone-50 .hero__content::before, .theme-milestone-50 .hero__content::after { display: none; }
   .theme-milestone-50 .hero__milestone { font-size: clamp(10rem, min(58vw, 31vh), 16rem); }
-  .theme-milestone-50 .hero__milestone::after { right: -.35rem; }
+  .theme-milestone-50 .hero__milestone::after { right: -.7rem; padding-left: .45rem; font-size: clamp(.74rem, 3.4vw, .92rem); }
   .theme-milestone-50 .hero__name { font-size: clamp(3rem, 13vw, 4.8rem); }
 }
 
