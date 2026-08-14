@@ -104,9 +104,9 @@ body.theme-milestone-50 {
 .theme-milestone-50 .hero__content { grid-column: 1; grid-row: 1; width: min(100%, 880px); margin: 0 auto; padding: 8rem 2rem 5rem; align-items: center; text-align: center; }
 .theme-milestone-50 .hero__secret { margin: 0 0 -.35rem; color: var(--gold-bright); font: 400 clamp(3.6rem, 8vw, 7.2rem)/.9 "Great Vibes", cursive; text-shadow: 0 8px 32px rgba(0,0,0,.42); }
 .theme-milestone-50 .hero .eyebrow { margin: 0 0 .7rem; color: #f8edcf; letter-spacing: .42em; }
-.theme-milestone-50 .hero__milestone { display: block; margin: -.06em 0 -.12em; color: var(--gold); background: linear-gradient(180deg, #f3d980 0%, #d7a936 24%, #9a620d 54%, #e5bd50 76%, #a76d10 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font: 500 clamp(9rem, 26vw, 20rem)/.82 var(--display); letter-spacing: -.08em; filter: drop-shadow(0 12px 34px rgba(0,0,0,.32)); }
-.theme-milestone-50 .hero h1 { margin: 1rem 0 .8rem; color: var(--gold-bright); font-size: clamp(.72rem, 1.1vw, .95rem); letter-spacing: .44em; }
-.theme-milestone-50 .hero__name { color: #fff8e7; font-size: clamp(3.5rem, 8vw, 7rem); text-shadow: 0 10px 36px rgba(0,0,0,.4); }
+.theme-milestone-50 .hero__milestone { position: relative; z-index: 1; display: block; margin: -.04em 0 .1em; color: var(--gold); background: linear-gradient(180deg, #f3d980 0%, #d7a936 24%, #9a620d 54%, #e5bd50 76%, #a76d10 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font: 500 clamp(9rem, 26vw, 20rem)/.82 var(--display); letter-spacing: -.08em; filter: drop-shadow(0 12px 34px rgba(0,0,0,.32)); }
+.theme-milestone-50 .hero h1 { margin: 0 0 1.15rem; color: var(--gold-bright); font-size: clamp(.72rem, 1.1vw, .95rem); letter-spacing: .44em; }
+.theme-milestone-50 .hero__name { position: relative; z-index: 2; color: #fff8e7; font-size: clamp(3.5rem, 8vw, 7rem); text-shadow: 0 10px 36px rgba(0,0,0,.4); }
 .theme-milestone-50 .hero__ornament { margin: .8rem 0; color: var(--gold-bright); }
 .theme-milestone-50 .hero__date { border-color: rgba(201,150,36,.55); color: #f7edd5; }
 .theme-milestone-50 .section { border-color: var(--line); background-color: #08142b; color: var(--body); }
