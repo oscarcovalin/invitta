@@ -384,9 +384,9 @@ var PUBLIC_TEMPLATE_MANIFEST = {
     "xv-rose-gold-premium": { id: "xv-rose-gold-premium", path: "/demos/xv-premium-2/index.html", kind: "xv" },
     "xv-champagne-rose-vip": { id: "xv-champagne-rose-vip", path: "/demos/xv-vip-3/index.html", kind: "xv" },
     "boda-classic-basic": { id: "boda-classic-basic", path: "/demos/boda-classic-basic/index.html", kind: "boda" },
-    "cumpleanos-general-basic": { id: "cumpleanos-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "cumpleanos" },
-    "bautizo-general-basic": { id: "bautizo-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "bautizo" },
-    "otro-general-basic": { id: "otro-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "otro" },
+    "cumpleanos-general-basic": { id: "cumpleanos-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "cumpleanos", rendererTemplateId: "boda-classic-basic" },
+    "bautizo-general-basic": { id: "bautizo-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "bautizo", rendererTemplateId: "boda-classic-basic" },
+    "otro-general-basic": { id: "otro-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "otro", rendererTemplateId: "boda-classic-basic" },
     "boda-golden-romance-premium": { id: "boda-golden-romance-premium", path: "/demos/boda-golden-romance-premium/index.html", kind: "boda" },
     "boda-midnight-gold-vip": { id: "boda-midnight-gold-vip", path: "/demos/boda-premium-1/index.html", kind: "boda" }
 };
@@ -489,6 +489,20 @@ function normalizeHexColor(val) {
     return /^#[0-9a-f]{6}$/i.test(color) ? color : "";
 }
 
+function normalizeSectionBackgrounds(val) {
+    var allowed = ["hero", "family", "locations", "gallery", "rsvp"];
+    var parsed = val;
+    if (typeof val === "string") {
+        try { parsed = JSON.parse(val); } catch(e) { return {}; }
+    }
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    return allowed.reduce(function(result, key) {
+        var url = safeHttpsUrl(parsed[key]);
+        if (url) result[key] = url;
+        return result;
+    }, {});
+}
+
 function normalizeConfirmationPhones(val) {
     return String(val || "")
         .split(/[|,;\n]+/)
@@ -515,6 +529,7 @@ function buildPublicTemplateData(inv, template) {
 
     return {
         templateId: template.id,
+        rendererTemplateId: template.rendererTemplateId || template.id,
         eventType: cleanString(inv.event_type, 30) || template.kind,
         eventTitle: cleanString(inv.title || inv.event_title, 120) || ({
             boda: "Nuestra Boda",
@@ -574,6 +589,7 @@ function buildPublicTemplateData(inv, template) {
         customFontName: cleanString(inv.custom_font_name, 80),
         customFontTargets: normalizeCustomFontTargets(inv.custom_font_targets),
         visualTheme: cleanString(inv.visual_theme, 60),
+        sectionBackgrounds: normalizeSectionBackgrounds(inv.section_backgrounds),
         studioName: cleanString(inv.studio_name, 120),
         studioLogoUrl: safeHttpsUrl(inv.studio_logo_url),
         studioWhatsapp: cleanWhatsApp(inv.studio_whatsapp),
@@ -603,7 +619,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=custom-font-targets-20260718";
+    bridge.src = "/demos/shared/public-personalization.js?v=section-backgrounds-20260814";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 
