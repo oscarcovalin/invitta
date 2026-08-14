@@ -125,6 +125,9 @@ if (!generalEventApp.includes('classList.toggle("has-music-player"')) {
 if (!generalEventStyles.includes("body.has-music-player .closing")) {
   fail("La plantilla general no reserva espacio final para el reproductor de música");
 }
+if (!generalEventStyles.includes(".theme-milestone-50 .hero__ornament { margin: 1.6rem 0 1.4rem; }")) {
+  fail("La portada de cumpleaños no conserva espacio entre el nombre y la fecha en pantallas bajas");
+}
 
 const socialCoverPath = "demos/evento-general-basic/assets/cumpleanos-50-sorpresa-social.jpg";
 const socialCoverAbsolutePath = path.join(root, socialCoverPath);
