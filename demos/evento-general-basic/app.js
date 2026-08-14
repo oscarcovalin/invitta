@@ -61,12 +61,25 @@
   }
 
   function renderLocations() {
-    var locations = [
-      { label: "Ceremonia", value: data.ceremony || {} },
-      { label: "Celebración", value: data.reception || {} }
-    ].filter(function (entry) {
-      return clean(entry.value.name) || clean(entry.value.address) || clean(entry.value.time);
-    });
+    var ceremony = data.ceremony || {};
+    var reception = data.reception || {};
+    var celebration = {
+      name: reception.name,
+      address: reception.address,
+      mapUrl: reception.mapUrl,
+      time: clean(reception.time) || clean(data.eventTime)
+    };
+    var locations = [];
+
+    // The general event time is also exposed as ceremony.time for legacy
+    // invitations. A ceremony only exists when it has actual location data.
+    if (clean(ceremony.name) || clean(ceremony.address) || clean(ceremony.mapUrl)) {
+      locations.push({ label: "Ceremonia", value: ceremony });
+    }
+
+    if (clean(celebration.name) || clean(celebration.address) || clean(celebration.mapUrl) || clean(celebration.time)) {
+      locations.push({ label: "Celebración", value: celebration });
+    }
 
     if (!locations.length) {
       locations.push({ label: "Evento", value: { name: "Lugar por confirmar", time: data.eventTime } });
