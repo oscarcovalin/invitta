@@ -15,18 +15,22 @@
   var typographyOriginalFontSizes = new WeakMap();
   var typographyResizeTimer = 0;
 
-  var typographyTargetSelectors = {
-    titles: "h1,.font-display,.hero-title,.inv-hero-title,.inv-main-title,.cover-title,.main-title,[data-invitta-font-role='title']",
-    subtitles: "h2,h3,h4,h5,h6,.inv-card-title,.inv-section-title,.inv-timeline-title,.section-title,.subtitle,[data-invitta-font-role='subtitle']",
-    names: ".hero__name,#celebrant-name,#thank-you-signature,.inv-hero-name,.inv-thank-you-signature,.couple-names,.couple-name,.honoree-name,[data-invitta-font-role='name']",
-    body: "p,li,blockquote,button,input,select,textarea,.font-body,.font-sans,.inv-card-copy,.inv-section-copy,[data-invitta-font-role='body']"
+  var typographyRoleOrder = ["body", "labels", "cardTitle", "sectionTitle", "mainTitle", "guestName", "closingName", "coverName"];
+  var typographyRoleSelectors = {
+    body: "p,li,blockquote,.font-body,.font-sans,.inv-card-copy,.inv-section-copy,[data-invitta-font-role='body']",
+    labels: ".eyebrow,label,button,input,select,textarea,.button,.btn,.hero__date,.inv-hero-date,.inv-card-label,.inv-card-time,.inv-timeline-time,.timeline__time,.dress-code__label,.hashtag,[data-invitta-font-role='label']",
+    cardTitle: "h3,h4,h5,h6,.inv-card-title,.inv-timeline-title,.timeline__title,.card__title,[data-invitta-font-role='card-title']",
+    sectionTitle: "h2,.inv-section-title,.section-title,.subtitle,[data-invitta-font-role='section-title']",
+    mainTitle: "h1,.font-display,.hero-title,.inv-hero-title,.inv-main-title,.cover-title,.main-title,[data-invitta-font-role='main-title'],[data-invitta-font-role='title']",
+    guestName: "#guest-name,#inv-guest-name,.inv-pass-name,.guest-name,[data-invitta-font-role='guest-name']",
+    closingName: "#thank-you-signature,.inv-thank-you-signature,[data-invitta-font-role='closing-name']",
+    coverName: ".hero__name,#celebrant-name,.inv-hero-name,.couple-names,.couple-name,.honoree-name,[data-invitta-font-role='cover-name'],[data-invitta-font-role='name']"
   };
-  var typographyScaleTargetSelectors = Object.assign({}, typographyTargetSelectors, {
-    names: ".hero__name,#celebrant-name,.inv-hero-name,.couple-names,.couple-name,.honoree-name,[data-invitta-font-role='name']"
-  });
 
   function typographyScaleFor(target) {
-    var value = data.typographyScales && Number(data.typographyScales[target]);
+    var value = data.typographyRoles && data.typographyRoles[target]
+      ? Number(data.typographyRoles[target].scale)
+      : 1;
     return Number.isFinite(value) ? Math.min(1.5, Math.max(.75, value)) : 1;
   }
 
@@ -44,10 +48,9 @@
     }
 
     var elementScales = new Map();
-    ["body", "titles", "subtitles", "names"].forEach(function(target) {
+    typographyRoleOrder.forEach(function(target) {
       var scale = typographyScaleFor(target);
-      if (Math.abs(scale - 1) < .001) return;
-      document.querySelectorAll(typographyScaleTargetSelectors[target]).forEach(function(element) {
+      document.querySelectorAll(typographyRoleSelectors[target]).forEach(function(element) {
         elementScales.set(element, scale);
       });
     });
@@ -772,53 +775,60 @@
         body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif'
       }
     };
-    var fonts = fontPresets[data.fontPreset];
-    if (fonts) {
-      if ((data.fontPreset === "signature" || data.fontPreset === "couture") && !document.getElementById("invitta-signature-fonts")) {
-        var fontLink = document.createElement("link");
-        fontLink.id = "invitta-signature-fonts";
-        fontLink.rel = "stylesheet";
-        fontLink.href = "https://fonts.googleapis.com/css2?family=Allura&family=Parisienne&display=swap";
-        document.head.appendChild(fontLink);
-      }
-      var customFontTargetStyle = document.getElementById("invitta-custom-font-targets");
-      if (data.fontPreset === "custom" && data.customFontUrl) {
-        var customFontStyle = document.getElementById("invitta-custom-font-face");
-        if (!customFontStyle) {
-          customFontStyle = document.createElement("style");
-          customFontStyle.id = "invitta-custom-font-face";
-          document.head.appendChild(customFontStyle);
-        }
-        var extension = data.customFontUrl.split("?")[0].split(".").pop().toLowerCase();
-        var format = extension === "woff2" ? "woff2" : extension === "woff" ? "woff" : extension === "otf" ? "opentype" : "truetype";
-        customFontStyle.textContent = '@font-face{font-family:"InvittaCustom";src:url(' + JSON.stringify(data.customFontUrl) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
-        var allowedTargets = ["titles", "subtitles", "names", "body"];
-        var customFontTargets = Array.isArray(data.customFontTargets)
-          ? data.customFontTargets.filter(function(target) { return allowedTargets.indexOf(target) !== -1; })
-          : [];
-        if (!customFontTargets.length) customFontTargets = ["titles", "subtitles", "names"];
-        if (!customFontTargetStyle) {
-          customFontTargetStyle = document.createElement("style");
-          customFontTargetStyle.id = "invitta-custom-font-targets";
-          document.head.appendChild(customFontTargetStyle);
-        }
-        customFontTargetStyle.textContent = customFontTargets.map(function(target) {
-          var scopedSelectors = typographyTargetSelectors[target].split(",").map(function(selector) {
-            return "html body " + selector;
-          }).join(",");
-          return scopedSelectors + '{font-family:"InvittaCustom","Cormorant Garamond",Georgia,serif!important;}';
-        }).join("");
-      } else if (customFontTargetStyle) {
-        customFontTargetStyle.remove();
-      }
-      if (data.fontPreset !== "custom") {
-        root.style.setProperty("--font-display", fonts.display);
-        root.style.setProperty("--font-serif", fonts.display);
-        root.style.setProperty("--font-primary", fonts.display);
-        root.style.setProperty("--font-sans", fonts.body);
-        root.style.setProperty("--font-secondary", fonts.body);
-      }
+    var basePreset = data.fontPreset === "custom" ? "classic" : data.fontPreset;
+    var fonts = fontPresets[basePreset] || fontPresets.classic;
+    root.style.setProperty("--font-display", fonts.display);
+    root.style.setProperty("--font-serif", fonts.display);
+    root.style.setProperty("--font-primary", fonts.display);
+    root.style.setProperty("--font-sans", fonts.body);
+    root.style.setProperty("--font-secondary", fonts.body);
+
+    var roleConfig = data.typographyRoles || {};
+    var needsSignatureFonts = basePreset === "signature" || basePreset === "couture" || typographyRoleOrder.some(function(role) {
+      var source = roleConfig[role] && roleConfig[role].font;
+      return source === "signature" || source === "couture";
+    });
+    if (needsSignatureFonts && !document.getElementById("invitta-signature-fonts")) {
+      var fontLink = document.createElement("link");
+      fontLink.id = "invitta-signature-fonts";
+      fontLink.rel = "stylesheet";
+      fontLink.href = "https://fonts.googleapis.com/css2?family=Allura&family=Parisienne&display=swap";
+      document.head.appendChild(fontLink);
     }
+
+    var needsCustomFont = typographyRoleOrder.some(function(role) {
+      return roleConfig[role] && roleConfig[role].font === "custom";
+    });
+    if (needsCustomFont && data.customFontUrl) {
+      var customFontStyle = document.getElementById("invitta-custom-font-face");
+      if (!customFontStyle) {
+        customFontStyle = document.createElement("style");
+        customFontStyle.id = "invitta-custom-font-face";
+        document.head.appendChild(customFontStyle);
+      }
+      var extension = data.customFontUrl.split("?")[0].split(".").pop().toLowerCase();
+      var format = extension === "woff2" ? "woff2" : extension === "woff" ? "woff" : extension === "otf" ? "opentype" : "truetype";
+      customFontStyle.textContent = '@font-face{font-family:"InvittaCustom";src:url(' + JSON.stringify(data.customFontUrl) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
+    }
+
+    var typographyRoleStyle = document.getElementById("invitta-typography-roles");
+    if (!typographyRoleStyle) {
+      typographyRoleStyle = document.createElement("style");
+      typographyRoleStyle.id = "invitta-typography-roles";
+      document.head.appendChild(typographyRoleStyle);
+    }
+    typographyRoleStyle.textContent = typographyRoleOrder.map(function(role) {
+      var source = roleConfig[role] && roleConfig[role].font || "inherit";
+      var selected = source === "inherit" || (source === "custom" && !data.customFontUrl)
+        ? fonts
+        : fontPresets[source];
+      if (!selected) selected = fonts;
+      var family = role === "body" || role === "labels" ? selected.body : selected.display;
+      var scopedSelectors = typographyRoleSelectors[role].split(",").map(function(selector) {
+        return "html body " + selector;
+      }).join(",");
+      return scopedSelectors + "{font-family:" + family + "!important;}";
+    }).join("");
 
     if (data.titleColor) root.style.setProperty("--invitta-title", data.titleColor);
     if (data.bodyColor) root.style.setProperty("--invitta-body", data.bodyColor);

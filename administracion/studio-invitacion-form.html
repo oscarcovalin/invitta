@@ -534,7 +534,6 @@
             <option value="luxury">Luxury Dramática</option>
             <option value="signature">Firma Orgánica</option>
             <option value="couture">Caligrafía Couture</option>
-            <option value="custom">Tipografía Personalizada</option>
           </select>
         </div>
         <div class="form-group studio-legacy-visual-control" style="flex: 1;" aria-hidden="true">
@@ -580,7 +579,7 @@
                     <span class="studio-custom-font-eyebrow">Opcional</span>
                     <h4>Tipografía especial</h4>
                   </div>
-                  <p>Sube una fuente y decide exactamente dónde se utilizará.</p>
+                  <p>Sube una fuente y asígnala abajo a una o varias zonas.</p>
                 </div>
                 <label for="customFontFile">Archivo de tipografía</label>
                 <p>Formatos WOFF2, WOFF, TTF u OTF. Máximo 3 MB.</p>
@@ -589,46 +588,55 @@
                   <input type="text" id="customFontName" maxlength="80" placeholder="Nombre de la tipografía">
                 </div>
                 <div class="studio-custom-font-targets" role="group" aria-labelledby="custom-font-targets-title">
-                  <span id="custom-font-targets-title" class="studio-custom-font-targets-title">Aplicar fuente y ajustar tamaño</span>
-                  <div class="studio-custom-font-target">
-                    <label class="studio-custom-font-target-choice">
-                      <input type="checkbox" name="custom_font_target" value="titles" checked>
-                      <span class="studio-custom-font-target-copy"><strong>Títulos de portada</strong><small>Encabezado principal de la invitación</small></span>
-                    </label>
-                    <label class="studio-font-size-control" for="typographyScaleTitles">
-                      <span>Tamaño <output for="typographyScaleTitles">100%</output></span>
-                      <input type="range" id="typographyScaleTitles" name="typography_scale" data-target="titles" min="75" max="150" step="5" value="100">
-                    </label>
+                  <span id="custom-font-targets-title" class="studio-custom-font-targets-title">Tipografía por tipo de texto</span>
+                  <p class="studio-typography-role-intro">Cada zona puede conservar el diseño original, usar una combinación del catálogo o la fuente que subiste.</p>
+
+                  <div class="studio-custom-font-target" data-typography-role-card="coverName">
+                    <label class="studio-custom-font-target-copy" for="typographyFontCoverName"><strong>Nombre de portada</strong><small>Nombre principal del festejado o pareja</small></label>
+                    <select id="typographyFontCoverName" name="typography_role_font" data-role="coverName" class="form-control studio-role-font-select"></select>
+                    <label class="studio-font-size-control" for="typographyScaleCoverName"><span>Tamaño <output for="typographyScaleCoverName">100%</output></span><input type="range" id="typographyScaleCoverName" name="typography_role_scale" data-role="coverName" min="75" max="150" step="5" value="100"></label>
                   </div>
-                  <div class="studio-custom-font-target">
-                    <label class="studio-custom-font-target-choice">
-                      <input type="checkbox" name="custom_font_target" value="subtitles" checked>
-                      <span class="studio-custom-font-target-copy"><strong>Títulos de secciones</strong><small>Encabezados y títulos de tarjetas</small></span>
-                    </label>
-                    <label class="studio-font-size-control" for="typographyScaleSubtitles">
-                      <span>Tamaño <output for="typographyScaleSubtitles">100%</output></span>
-                      <input type="range" id="typographyScaleSubtitles" name="typography_scale" data-target="subtitles" min="75" max="150" step="5" value="100">
-                    </label>
+
+                  <div class="studio-custom-font-target" data-typography-role-card="closingName">
+                    <label class="studio-custom-font-target-copy" for="typographyFontClosingName"><strong>Nombre de agradecimiento</strong><small>Nombre destacado al final de la invitación</small></label>
+                    <select id="typographyFontClosingName" name="typography_role_font" data-role="closingName" class="form-control studio-role-font-select"></select>
+                    <label class="studio-font-size-control" for="typographyScaleClosingName"><span>Tamaño <output for="typographyScaleClosingName">100%</output></span><input type="range" id="typographyScaleClosingName" name="typography_role_scale" data-role="closingName" min="75" max="150" step="5" value="100"></label>
                   </div>
-                  <div class="studio-custom-font-target">
-                    <label class="studio-custom-font-target-choice">
-                      <input type="checkbox" name="custom_font_target" value="names" checked>
-                      <span class="studio-custom-font-target-copy"><strong>Nombres</strong><small>Fuente: portada y nombre final · Tamaño: portada</small></span>
-                    </label>
-                    <label class="studio-font-size-control" for="typographyScaleNames">
-                      <span>Tamaño <output for="typographyScaleNames">100%</output></span>
-                      <input type="range" id="typographyScaleNames" name="typography_scale" data-target="names" min="75" max="150" step="5" value="100">
-                    </label>
+
+                  <div class="studio-custom-font-target" data-typography-role-card="mainTitle">
+                    <label class="studio-custom-font-target-copy" for="typographyFontMainTitle"><strong>Título de portada</strong><small>Celebración, aniversario o encabezado principal</small></label>
+                    <select id="typographyFontMainTitle" name="typography_role_font" data-role="mainTitle" class="form-control studio-role-font-select"></select>
+                    <label class="studio-font-size-control" for="typographyScaleMainTitle"><span>Tamaño <output for="typographyScaleMainTitle">100%</output></span><input type="range" id="typographyScaleMainTitle" name="typography_role_scale" data-role="mainTitle" min="75" max="150" step="5" value="100"></label>
                   </div>
-                  <div class="studio-custom-font-target">
-                    <label class="studio-custom-font-target-choice">
-                      <input type="checkbox" name="custom_font_target" value="body">
-                      <span class="studio-custom-font-target-copy"><strong>Texto general</strong><small>Párrafos y descripciones</small></span>
-                    </label>
-                    <label class="studio-font-size-control" for="typographyScaleBody">
-                      <span>Tamaño <output for="typographyScaleBody">100%</output></span>
-                      <input type="range" id="typographyScaleBody" name="typography_scale" data-target="body" min="75" max="150" step="5" value="100">
-                    </label>
+
+                  <div class="studio-custom-font-target" data-typography-role-card="sectionTitle">
+                    <label class="studio-custom-font-target-copy" for="typographyFontSectionTitle"><strong>Títulos de secciones</strong><small>Ubicación, galería, RSVP y agradecimiento</small></label>
+                    <select id="typographyFontSectionTitle" name="typography_role_font" data-role="sectionTitle" class="form-control studio-role-font-select"></select>
+                    <label class="studio-font-size-control" for="typographyScaleSectionTitle"><span>Tamaño <output for="typographyScaleSectionTitle">100%</output></span><input type="range" id="typographyScaleSectionTitle" name="typography_role_scale" data-role="sectionTitle" min="75" max="150" step="5" value="100"></label>
+                  </div>
+
+                  <div class="studio-custom-font-target" data-typography-role-card="cardTitle">
+                    <label class="studio-custom-font-target-copy" for="typographyFontCardTitle"><strong>Títulos de tarjetas</strong><small>Programa, recinto y detalles del evento</small></label>
+                    <select id="typographyFontCardTitle" name="typography_role_font" data-role="cardTitle" class="form-control studio-role-font-select"></select>
+                    <label class="studio-font-size-control" for="typographyScaleCardTitle"><span>Tamaño <output for="typographyScaleCardTitle">100%</output></span><input type="range" id="typographyScaleCardTitle" name="typography_role_scale" data-role="cardTitle" min="75" max="150" step="5" value="100"></label>
+                  </div>
+
+                  <div class="studio-custom-font-target" data-typography-role-card="guestName">
+                    <label class="studio-custom-font-target-copy" for="typographyFontGuestName"><strong>Nombre del invitado</strong><small>Nombre personalizado dentro del pase RSVP</small></label>
+                    <select id="typographyFontGuestName" name="typography_role_font" data-role="guestName" class="form-control studio-role-font-select"></select>
+                    <label class="studio-font-size-control" for="typographyScaleGuestName"><span>Tamaño <output for="typographyScaleGuestName">100%</output></span><input type="range" id="typographyScaleGuestName" name="typography_role_scale" data-role="guestName" min="75" max="150" step="5" value="100"></label>
+                  </div>
+
+                  <div class="studio-custom-font-target" data-typography-role-card="body">
+                    <label class="studio-custom-font-target-copy" for="typographyFontBody"><strong>Texto general</strong><small>Mensajes, descripciones y direcciones</small></label>
+                    <select id="typographyFontBody" name="typography_role_font" data-role="body" class="form-control studio-role-font-select"></select>
+                    <label class="studio-font-size-control" for="typographyScaleBody"><span>Tamaño <output for="typographyScaleBody">100%</output></span><input type="range" id="typographyScaleBody" name="typography_role_scale" data-role="body" min="75" max="150" step="5" value="100"></label>
+                  </div>
+
+                  <div class="studio-custom-font-target" data-typography-role-card="labels">
+                    <label class="studio-custom-font-target-copy" for="typographyFontLabels"><strong>Fecha y etiquetas</strong><small>Fecha, hora, categorías, botones y datos breves</small></label>
+                    <select id="typographyFontLabels" name="typography_role_font" data-role="labels" class="form-control studio-role-font-select"></select>
+                    <label class="studio-font-size-control" for="typographyScaleLabels"><span>Tamaño <output for="typographyScaleLabels">100%</output></span><input type="range" id="typographyScaleLabels" name="typography_role_scale" data-role="labels" min="75" max="150" step="5" value="100"></label>
                   </div>
                 </div>
                 <input type="hidden" id="customFontUrl" value="">
@@ -665,8 +673,10 @@
                   <p>CELEBREMOS JUNTOS</p>
                   <h5 id="studio-preview-event-title">Una noche especial</h5>
                   <small>Los detalles de tu invitacion conservaran su diseno original.</small>
+                  <strong id="studio-preview-guest-name" class="studio-preview-guest-name">Familia García</strong>
                   <span class="studio-preview-button-sample">Ver detalles</span>
                 </div>
+                <p id="studio-preview-closing-name" class="studio-preview-closing-name">Maria</p>
               </div>
             </div>
           </aside>
@@ -896,7 +906,7 @@
   <script src="/js/studio-auth.js?v=studio-recovery-20260718"></script>
   <!-- Lógica del Formulario -->
   <script src="/assets/js/invitta-templates.js?v=milestone-template-20260814"></script>
-  <script src="/js/studio-form.js?v=typography-size-controls-20260814"></script>
+  <script src="/js/studio-form.js?v=typography-roles-20260814"></script>
 
 </body>
 </html>

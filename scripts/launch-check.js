@@ -104,24 +104,25 @@ if (!requestPage.includes('id="paymentButton"') || !requestPage.includes("/api/p
 }
 
 const studioInvitationForm = read("administracion/studio-invitacion-form.html");
-if (!studioInvitationForm.includes('name="typography_scale"') || !studioInvitationForm.includes("typographyScaleNames")) {
-  fail("Faltan los controles de tamaño tipográfico del Studio");
+const typographyRoles = ["coverName", "closingName", "mainTitle", "sectionTitle", "cardTitle", "guestName", "body", "labels"];
+if (!studioInvitationForm.includes('name="typography_role_font"') ||
+    !studioInvitationForm.includes('name="typography_role_scale"') ||
+    !typographyRoles.every((role) => studioInvitationForm.includes(`data-role="${role}"`))) {
+  fail("Faltan los controles tipográficos por función del Studio");
 }
 
 const publicPersonalization = read("demos/shared/public-personalization.js");
-if (!publicPersonalization.includes("applyTypographyScales") || !publicPersonalization.includes("typographyScales")) {
-  fail("La invitación pública no aplica las escalas tipográficas");
+if (!publicPersonalization.includes("applyTypographyScales") || !publicPersonalization.includes("typographyRoles")) {
+  fail("La invitación pública no aplica la configuración tipográfica por función");
 }
-const typographyFontNamesSelector = publicPersonalization.match(/names:\s*"([^"]+)"/)?.[1] || "";
-const typographyScaleNamesSelector = publicPersonalization.match(/typographyScaleTargetSelectors[\s\S]*?names:\s*"([^"]+)"/)?.[1] || "";
-if (!publicPersonalization.includes("typographyTargetSelectors[target]") ||
-    !publicPersonalization.includes("typographyScaleTargetSelectors[target]") ||
-    !typographyFontNamesSelector.includes("#thank-you-signature") ||
-    typographyFontNamesSelector.includes("guest-name") ||
-    !typographyScaleNamesSelector.includes(".hero__name,#celebrant-name") ||
-    typographyScaleNamesSelector.includes("guest-name") ||
-    typographyScaleNamesSelector.includes("signature")) {
-  fail("La fuente y el tamaño no respetan sus destinos tipográficos");
+const coverNameSelector = publicPersonalization.match(/coverName:\s*"([^"]+)"/)?.[1] || "";
+const closingNameSelector = publicPersonalization.match(/closingName:\s*"([^"]+)"/)?.[1] || "";
+const guestNameSelector = publicPersonalization.match(/guestName:\s*"([^"]+)"/)?.[1] || "";
+if (!publicPersonalization.includes("typographyRoleSelectors[target]") ||
+    !coverNameSelector.includes("#celebrant-name") || coverNameSelector.includes("thank-you-signature") ||
+    !closingNameSelector.includes("#thank-you-signature") || closingNameSelector.includes("guest-name") ||
+    !guestNameSelector.includes("#guest-name") || guestNameSelector.includes("thank-you-signature")) {
+  fail("La tipografía por función no separa portada, invitado y agradecimiento");
 }
 
 const generalEventApp = read("demos/evento-general-basic/app.js");

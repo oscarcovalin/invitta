@@ -496,6 +496,53 @@ function normalizeTypographyScales(val) {
     return scales;
 }
 
+function normalizeTypographyRoles(val) {
+    var roles = ["coverName", "closingName", "mainTitle", "sectionTitle", "cardTitle", "guestName", "body", "labels"];
+    var sources = ["inherit", "classic", "romantic", "editorial", "minimal", "luxury", "signature", "couture", "custom"];
+    var result = roles.reduce(function(config, role) {
+        config[role] = { font: "inherit", scale: 1 };
+        return config;
+    }, {});
+    var tokens = normalizeStringArray(val);
+    var hasRoleTokens = tokens.indexOf("typography:v1") !== -1;
+
+    tokens.forEach(function(token) {
+        var fontMatch = String(token || "").match(/^typeface:v1:([A-Za-z]+):([a-z]+)$/);
+        if (fontMatch && roles.indexOf(fontMatch[1]) !== -1 && sources.indexOf(fontMatch[2]) !== -1) {
+            result[fontMatch[1]].font = fontMatch[2];
+            hasRoleTokens = true;
+            return;
+        }
+        var scaleMatch = String(token || "").match(/^type-scale:v1:([A-Za-z]+):(\d{2,3})$/);
+        if (scaleMatch && roles.indexOf(scaleMatch[1]) !== -1) {
+            result[scaleMatch[1]].scale = Math.min(150, Math.max(75, Number(scaleMatch[2]) || 100)) / 100;
+            hasRoleTokens = true;
+        }
+    });
+
+    if (hasRoleTokens) return result;
+
+    // Compatibilidad con las invitaciones guardadas antes del modelo por funciones.
+    var legacyTargets = normalizeCustomFontTargets(tokens);
+    var legacyScales = normalizeTypographyScales(tokens);
+    if (legacyTargets.indexOf("titles") !== -1) result.mainTitle.font = "custom";
+    if (legacyTargets.indexOf("subtitles") !== -1) {
+        result.sectionTitle.font = "custom";
+        result.cardTitle.font = "custom";
+    }
+    if (legacyTargets.indexOf("names") !== -1) {
+        result.coverName.font = "custom";
+        result.closingName.font = "custom";
+    }
+    if (legacyTargets.indexOf("body") !== -1) result.body.font = "custom";
+    result.mainTitle.scale = legacyScales.titles;
+    result.sectionTitle.scale = legacyScales.subtitles;
+    result.cardTitle.scale = legacyScales.subtitles;
+    result.coverName.scale = legacyScales.names;
+    result.body.scale = legacyScales.body;
+    return result;
+}
+
 function normalizeHexColor(val) {
     var color = cleanString(val, 20);
     return /^#[0-9a-f]{6}$/i.test(color) ? color : "";
@@ -601,6 +648,7 @@ function buildPublicTemplateData(inv, template) {
         customFontName: cleanString(inv.custom_font_name, 80),
         customFontTargets: normalizeCustomFontTargets(inv.custom_font_targets),
         typographyScales: normalizeTypographyScales(inv.custom_font_targets),
+        typographyRoles: normalizeTypographyRoles(inv.custom_font_targets),
         visualTheme: cleanString(inv.visual_theme, 60),
         sectionBackgrounds: normalizeSectionBackgrounds(inv.section_backgrounds),
         studioName: cleanString(inv.studio_name, 120),
@@ -632,7 +680,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=adelia-final-name-20260814";
+    bridge.src = "/demos/shared/public-personalization.js?v=typography-roles-20260814";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

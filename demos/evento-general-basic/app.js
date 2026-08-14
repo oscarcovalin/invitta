@@ -157,6 +157,7 @@
       card.appendChild(heading);
       if (entry.value.name) {
         var title = document.createElement("h3");
+        title.dataset.invittaFontRole = "card-title";
         title.textContent = entry.value.name;
         card.appendChild(title);
       }
