@@ -7,6 +7,35 @@
  * - Base para clonación al momento de creación de invitación.
  */
 
+function createGenericEventTemplate(id, name, type) {
+  // These event types temporarily reuse the proven wedding renderer, while
+  // retaining their own IDs so invitations can migrate to dedicated designs later.
+  return {
+    id: id,
+    name: name,
+    type: type,
+    level: "basica",
+    packageLabel: "Esencial",
+    price: 399,
+    demoUrl: "demos/boda-classic-basic/index.html",
+    palettePreset: "ivory-sage",
+    typographyPreset: "classic-wedding",
+    templatePath: "demos/boda-classic-basic",
+    customizable: true,
+    status: "active",
+    galleryLimit: 4,
+    activeMonths: 2,
+    features: {
+      music: false,
+      gallery: true,
+      itinerary: false,
+      rsvp: true,
+      qr: false,
+      personalizedPass: false
+    }
+  };
+}
+
 window.InvittaTemplates = [
   {
     id: "xv-elegance-basic",
@@ -151,7 +180,10 @@ window.InvittaTemplates = [
       qr: true,
       personalizedPass: true
     }
-  }
+  },
+  createGenericEventTemplate("cumpleanos-general-basic", "Diseño General — Cumpleaños", "cumpleanos"),
+  createGenericEventTemplate("bautizo-general-basic", "Diseño General — Bautizo", "bautizo"),
+  createGenericEventTemplate("otro-general-basic", "Diseño General — Otro evento", "otro")
 ];
 
 // Helper functions that return unmutated copies
