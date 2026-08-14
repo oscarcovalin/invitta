@@ -38,6 +38,19 @@
     return (hour % 12 || 12) + ":" + match[2] + " " + (hour >= 12 ? "p. m." : "a. m.");
   }
 
+  function itineraryParts(item) {
+    var rawTime = clean(item && item.time);
+    var rawTitle = clean(item && item.title) || "Actividad";
+    if (!rawTime) {
+      var embeddedTime = rawTitle.match(/^(\d{1,2}:\d{2})\s*(?:[-–—·|]\s*)?(.+)$/);
+      if (embeddedTime) {
+        rawTime = embeddedTime[1];
+        rawTitle = clean(embeddedTime[2]) || "Actividad";
+      }
+    }
+    return { rawTime: rawTime, time: formatTime(rawTime), title: rawTitle };
+  }
+
   function capitalize(value) {
     return value ? value.charAt(0).toUpperCase() + value.slice(1) : "";
   }
@@ -147,11 +160,19 @@
         title.textContent = entry.value.name;
         card.appendChild(title);
       }
-      [formatTime(entry.value.time), entry.value.address].filter(Boolean).forEach(function (value) {
-        var line = document.createElement("p");
-        line.textContent = value;
-        card.appendChild(line);
-      });
+      var timeValue = formatTime(entry.value.time);
+      if (timeValue) {
+        var eventTime = document.createElement("p");
+        eventTime.className = "card__time";
+        eventTime.textContent = timeValue;
+        card.appendChild(eventTime);
+      }
+      if (entry.value.address) {
+        var address = document.createElement("p");
+        address.className = "card__address";
+        address.textContent = entry.value.address;
+        card.appendChild(address);
+      }
       if (entry.value.mapUrl) {
         var link = document.createElement("a");
         link.className = "button button--outline";
@@ -169,14 +190,21 @@
     var items = Array.isArray(data.itinerary) ? data.itinerary : [];
     if (!items.length) return;
     var container = document.getElementById("itinerary-items");
-    items.forEach(function (item) {
+    items.forEach(function (item, index) {
+      var parts = itineraryParts(item);
       var row = document.createElement("div");
       row.className = "timeline__item";
+      row.dataset.index = String(index + 1).padStart(2, "0");
+      if (!parts.time) row.classList.add("timeline__item--no-time");
       var time = document.createElement("time");
-      time.textContent = formatTime(item.time);
+      time.className = "timeline__time";
+      time.dateTime = parts.rawTime;
+      time.textContent = parts.time;
       var title = document.createElement("span");
-      title.textContent = item.title || "Actividad";
-      row.append(time, title);
+      title.className = "timeline__title";
+      title.textContent = parts.title;
+      if (parts.time) row.appendChild(time);
+      row.appendChild(title);
       container.appendChild(row);
     });
     show("itinerary", true);
