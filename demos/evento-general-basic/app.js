@@ -255,6 +255,19 @@
     audio.addEventListener("play", function () { updateState(true); });
   }
 
+  function renderStudioCta() {
+    if (data.studioCtaEnabled === false) return;
+    var phone = clean(data.studioWhatsapp).replace(/\D/g, "") || "525566790073";
+    if (!phone) return;
+    var textValue = clean(data.studioCtaText) || "Solicitar informes";
+    var message = clean(data.studioCtaMessage) || "Hola Invitta, vi esta invitación digital y me interesa pedir informes para crear una similar.";
+    var link = document.getElementById("studio-cta-link");
+    if (!link) return;
+    link.textContent = textValue;
+    link.href = "https://wa.me/" + phone + "?text=" + encodeURIComponent(message);
+    show("studio-cta", true);
+  }
+
   function installParallax() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     var targets = Array.from(document.querySelectorAll("#hero, #family, #locations, #gallery, #registry, #rsvp, .closing"));
@@ -359,6 +372,7 @@
   renderGallery();
   renderGuest();
   renderMusic();
+  renderStudioCta();
   installInternalNavigation();
   installParallax();
 })();
