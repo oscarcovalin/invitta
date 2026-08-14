@@ -29,6 +29,23 @@ function getTemplatesByType(eventType) {
   return TEMPLATE_FALLBACKS[eventType] || [];
 }
 
+function getValidTemplateIds(eventType) {
+  return getTemplatesByType(eventType).map(template => template.id);
+}
+
+function hasActiveTemplates(eventType) {
+  return getValidTemplateIds(eventType).length > 0;
+}
+
+function normalizeSlug(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function updatePackageSummary() {
   const summary = document.getElementById("studio-package-summary");
   const templateId = document.getElementById("template_id")?.value;
@@ -63,11 +80,6 @@ function updatePackageSummary() {
 
   summary.hidden = false;
 }
-
-const VALID_TEMPLATES = {
-  xv: getTemplatesByType("xv").map(template => template.id),
-  boda: getTemplatesByType("boda").map(template => template.id)
-};
 
 let isEditMode = false;
 let originalTemplateId = null;
@@ -123,7 +135,7 @@ function updateTemplateOptions(options = { preserveLegacyNull: false, preferredT
     val: template.id,
     text: `${template.name} — ${template.packageLabel || template.level || "Plantilla"}`
   }));
-  const validArray = VALID_TEMPLATES[eventType] || [];
+  const validArray = getValidTemplateIds(eventType);
 
   opts.forEach(o => {
     const opt = document.createElement("option");
@@ -138,12 +150,14 @@ function updateTemplateOptions(options = { preserveLegacyNull: false, preferredT
 
   if (isPreferredValid) {
     templateSelect.value = preferred;
-  } else if (showLegacyNull && (!currentVal || currentVal === "")) {
-    templateSelect.value = "";
   } else if (isCurrentValid) {
     templateSelect.value = currentVal;
+  } else if (showLegacyNull) {
+    // Keep historical invitations without a template unchanged until the user
+    // deliberately selects a current template or changes event type.
+    templateSelect.value = "";
   } else {
-    templateSelect.value = eventType === "xv" ? "xv-rose-gold-premium" : "boda-classic-basic";
+    templateSelect.value = validArray[0] || "";
   }
 
   updatePackageSummary();
@@ -916,7 +930,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       Object.assign(request, claimedRequest);
     }
 
-    const requestEventType = VALID_TEMPLATES[request.event_type] ? request.event_type : "xv";
+    const requestEventType = hasActiveTemplates(request.event_type) ? request.event_type : "xv";
     document.getElementById("event_type").value = requestEventType;
     updateTemplateOptions({
       preserveLegacyNull: false,
@@ -1612,8 +1626,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     saveBtn.disabled = true;
     saveBtn.textContent = "Guardando...";
 
-    const slugValue = document.getElementById("slug").value.trim();
-    const slugToUse = slugValue || currentSlug;
+    const slugInput = document.getElementById("slug");
+    const slugToUse = normalizeSlug(slugInput.value || currentSlug);
+    if (!slugToUse) {
+      errorAlert.textContent = "Escribe un slug con letras o números.";
+      errorAlert.style.display = "block";
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Guardar cambios";
+      return;
+    }
+    slugInput.value = slugToUse;
 
     // Tipografia personalizada
     let finalCustomFontUrl = document.getElementById("customFontUrl")?.value || null;
@@ -1764,7 +1786,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const templateIdRaw = document.getElementById("template_id").value;
     
     let validTemplateId = null;
-    const validArray = VALID_TEMPLATES[eventType] || [];
+    const validArray = getValidTemplateIds(eventType);
     
     if (!isEditMode) {
       if (!validArray.includes(templateIdRaw)) {

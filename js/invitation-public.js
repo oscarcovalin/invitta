@@ -384,6 +384,9 @@ var PUBLIC_TEMPLATE_MANIFEST = {
     "xv-rose-gold-premium": { id: "xv-rose-gold-premium", path: "/demos/xv-premium-2/index.html", kind: "xv" },
     "xv-champagne-rose-vip": { id: "xv-champagne-rose-vip", path: "/demos/xv-vip-3/index.html", kind: "xv" },
     "boda-classic-basic": { id: "boda-classic-basic", path: "/demos/boda-classic-basic/index.html", kind: "boda" },
+    "cumpleanos-general-basic": { id: "cumpleanos-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "cumpleanos" },
+    "bautizo-general-basic": { id: "bautizo-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "bautizo" },
+    "otro-general-basic": { id: "otro-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "otro" },
     "boda-golden-romance-premium": { id: "boda-golden-romance-premium", path: "/demos/boda-golden-romance-premium/index.html", kind: "boda" },
     "boda-midnight-gold-vip": { id: "boda-midnight-gold-vip", path: "/demos/boda-premium-1/index.html", kind: "boda" }
 };
@@ -513,7 +516,13 @@ function buildPublicTemplateData(inv, template) {
     return {
         templateId: template.id,
         eventType: cleanString(inv.event_type, 30) || template.kind,
-        eventTitle: cleanString(inv.title || inv.event_title, 120) || (template.kind === "boda" ? "Nuestra Boda" : "Mis Quince Años"),
+        eventTitle: cleanString(inv.title || inv.event_title, 120) || ({
+            boda: "Nuestra Boda",
+            xv: "Mis Quince Años",
+            cumpleanos: "Mi Cumpleaños",
+            bautizo: "Mi Bautizo",
+            otro: "Nuestro Evento"
+        }[template.kind] || "Nuestro Evento"),
         celebrantName: cleanString(inv.honoree_name || inv.celebrant_name, 160) || "Nombre",
         eventDate: cleanString(inv.event_date, 60),
         eventTime: cleanString(inv.event_time || inv.ceremony_time, 60),
