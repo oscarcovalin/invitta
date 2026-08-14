@@ -620,7 +620,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=mobile-editorial-refinement-20260814";
+    bridge.src = "/demos/shared/public-personalization.js?v=strong-mobile-parallax-20260814";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

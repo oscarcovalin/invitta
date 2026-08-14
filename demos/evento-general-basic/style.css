@@ -165,7 +165,7 @@ body.theme-milestone-50 {
   .music-player__track strong, .music-player__track small { max-width: 45vw; }
   .theme-milestone-50 .hero { min-height: 100svh; display: grid; grid-template-rows: 1fr; }
   .theme-milestone-50 .hero__photo, .theme-milestone-50 .hero__veil, .theme-milestone-50 .hero__content { grid-column: 1; grid-row: 1; }
-  .theme-milestone-50 .hero__photo { opacity: .92; filter: brightness(1.32) saturate(1.1) contrast(.94); }
+  .theme-milestone-50 .hero__photo { opacity: .92; filter: brightness(1.32) saturate(1.1) contrast(.94); transform: translate3d(0, var(--parallax-bg-shift, 0), 0) scale(1.2); }
   .theme-milestone-50 .hero__veil { background: radial-gradient(circle at center, rgba(4,12,29,0), rgba(4,12,29,.2) 92%), linear-gradient(180deg, rgba(4,12,29,0), rgba(4,12,29,.18)); }
   .theme-milestone-50 .hero__content { min-height: 100svh; padding: 7rem 1.35rem 4rem; }
   .theme-milestone-50 .hero__secret { font-size: clamp(3.4rem, 18vw, 5.8rem); }
