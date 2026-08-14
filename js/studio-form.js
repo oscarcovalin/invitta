@@ -278,6 +278,42 @@ function serializeConfirmationNumbers(primary, secondary) {
     .join("|");
 }
 
+const TYPOGRAPHY_SCALE_TARGETS = ["titles", "subtitles", "names", "body"];
+const TYPOGRAPHY_SCALE_TOKEN_PREFIX = "scale:";
+
+function parseTypographyScales(value) {
+  const scales = { titles: 100, subtitles: 100, names: 100, body: 100 };
+  const tokens = Array.isArray(value) ? value : [];
+  tokens.forEach(token => {
+    const match = String(token || "").match(/^scale:(titles|subtitles|names|body):(\d{2,3})$/);
+    if (!match) return;
+    scales[match[1]] = Math.min(150, Math.max(75, Number(match[2]) || 100));
+  });
+  return scales;
+}
+
+function typographyScaleTokens() {
+  return Array.from(document.querySelectorAll('input[name="typography_scale"]'))
+    .map(input => {
+      const target = input.dataset.target;
+      const value = Math.min(150, Math.max(75, Number(input.value) || 100));
+      return TYPOGRAPHY_SCALE_TARGETS.includes(target) && value !== 100
+        ? `${TYPOGRAPHY_SCALE_TOKEN_PREFIX}${target}:${value}`
+        : "";
+    })
+    .filter(Boolean);
+}
+
+function setTypographyScaleControls(value) {
+  const scales = parseTypographyScales(value);
+  document.querySelectorAll('input[name="typography_scale"]').forEach(input => {
+    const target = input.dataset.target;
+    input.value = String(scales[target] || 100);
+    const output = document.querySelector(`output[for="${input.id}"]`);
+    if (output) output.textContent = `${input.value}%`;
+  });
+}
+
 function setupStudioVisualPreview() {
   const fontSelect = document.getElementById("font_preset");
   const paletteSelect = document.getElementById("palette_preset");
@@ -288,6 +324,7 @@ function setupStudioVisualPreview() {
   const customFontNameInput = document.getElementById("customFontName");
   const customFontUrlInput = document.getElementById("customFontUrl");
   const customFontTargetInputs = Array.from(document.querySelectorAll('input[name="custom_font_target"]'));
+  const typographyScaleInputs = Array.from(document.querySelectorAll('input[name="typography_scale"]'));
   const removeCustomFontBtn = document.getElementById("removeCustomFontBtn");
   const fontOptions = document.getElementById("studio-font-options");
   const paletteOptions = document.getElementById("studio-palette-options");
@@ -620,6 +657,27 @@ function setupStudioVisualPreview() {
     if (previewDate) previewDate.textContent = formatPreviewDate(eventDate);
     if (previewEventTitle) previewEventTitle.textContent = title || (eventType === "boda" ? "Nuestra celebracion" : "Una noche especial");
 
+    const scaleSelectors = {
+      titles: ["#studio-preview-event-title"],
+      subtitles: ["#studio-preview-eyebrow", ".studio-preview-card p"],
+      names: ["#studio-preview-name"],
+      body: [".studio-preview-card small"]
+    };
+    previewPhone.querySelectorAll(Object.values(scaleSelectors).flat().join(","))
+      .forEach(element => element.style.removeProperty("font-size"));
+    const scaleValues = typographyScaleInputs.reduce((result, input) => {
+      result[input.dataset.target] = (Number(input.value) || 100) / 100;
+      return result;
+    }, {});
+    Object.entries(scaleSelectors).forEach(([target, selectors]) => {
+      selectors.forEach(selector => {
+        previewPhone.querySelectorAll(selector).forEach(element => {
+          const baseSize = Number.parseFloat(getComputedStyle(element).fontSize);
+          if (Number.isFinite(baseSize)) element.style.fontSize = `${baseSize * (scaleValues[target] || 1)}px`;
+        });
+      });
+    });
+
     fontOptions.querySelectorAll(".studio-visual-option").forEach(option => {
       const selected = option.dataset.value === fontSelect.value;
       option.classList.toggle("is-selected", selected);
@@ -638,6 +696,11 @@ function setupStudioVisualPreview() {
     .forEach(select => select.addEventListener("change", updatePreview));
 
   customFontTargetInputs.forEach(input => input.addEventListener("change", updatePreview));
+  typographyScaleInputs.forEach(input => input.addEventListener("input", () => {
+    const output = document.querySelector(`output[for="${input.id}"]`);
+    if (output) output.textContent = `${input.value}%`;
+    updatePreview();
+  }));
 
   ["title", "honoree_name", "event_date"]
     .map(id => document.getElementById(id))
@@ -1598,6 +1661,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelectorAll('input[name="custom_font_target"]').forEach(input => {
       input.checked = savedCustomFontTargets.includes(input.value);
     });
+    setTypographyScaleControls(savedCustomFontTargets);
     if (data.custom_font_url) {
       customFontCurrent?.classList.add("visible");
       if (customFontCurrentName) customFontCurrentName.textContent = data.custom_font_name || "Tipografía personalizada cargada";
@@ -1732,6 +1796,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const selectedCustomFontTargets = Array.from(
       document.querySelectorAll('input[name="custom_font_target"]:checked')
     ).map(input => input.value);
+    const savedTypographyScaleTokens = typographyScaleTokens();
     if (document.getElementById("font_preset")?.value === "custom" && !selectedCustomFontTargets.length) {
       showMediaError("custom-font", "Elige al menos una zona donde aplicar la tipografía.");
       saveBtn.disabled = false;
@@ -1958,7 +2023,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       font_preset: document.getElementById("font_preset").value || "classic",
       custom_font_url: finalCustomFontUrl,
       custom_font_name: document.getElementById("customFontName")?.value.trim() || null,
-      custom_font_targets: selectedCustomFontTargets,
+      custom_font_targets: selectedCustomFontTargets.concat(savedTypographyScaleTokens),
       visual_theme: document.getElementById("visual_theme") ? document.getElementById("visual_theme").value : "rose-floral",
       color_primary: document.getElementById("color_primary").value,
       color_secondary: document.getElementById("color_secondary").value,

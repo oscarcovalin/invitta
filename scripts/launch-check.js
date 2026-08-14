@@ -103,6 +103,16 @@ if (!requestPage.includes('id="paymentButton"') || !requestPage.includes("/api/p
   fail("La página de solicitud no controla la disponibilidad de pagos");
 }
 
+const studioInvitationForm = read("administracion/studio-invitacion-form.html");
+if (!studioInvitationForm.includes('name="typography_scale"') || !studioInvitationForm.includes("typographyScaleNames")) {
+  fail("Faltan los controles de tamaño tipográfico del Studio");
+}
+
+const publicPersonalization = read("demos/shared/public-personalization.js");
+if (!publicPersonalization.includes("applyTypographyScales") || !publicPersonalization.includes("typographyScales")) {
+  fail("La invitación pública no aplica las escalas tipográficas");
+}
+
 const socialCoverPath = "demos/evento-general-basic/assets/cumpleanos-50-sorpresa-social.jpg";
 const socialCoverAbsolutePath = path.join(root, socialCoverPath);
 if (!fs.existsSync(socialCoverAbsolutePath)) {
