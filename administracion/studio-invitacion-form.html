@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@400;500;600&family=Great+Vibes&family=Montserrat:wght@400;500;600&family=Parisienne&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/studio.css?v=signature-fonts-20260718">
+  <link rel="stylesheet" href="/css/studio.css?v=typography-size-controls-20260814">
   <style>
     /* ── Media Upload Section ── */
     .media-upload-box {
@@ -589,23 +589,47 @@
                   <input type="text" id="customFontName" maxlength="80" placeholder="Nombre de la tipografía">
                 </div>
                 <div class="studio-custom-font-targets" role="group" aria-labelledby="custom-font-targets-title">
-                  <span id="custom-font-targets-title" class="studio-custom-font-targets-title">Aplicar en</span>
-                  <label class="studio-custom-font-target">
-                    <input type="checkbox" name="custom_font_target" value="titles" checked>
-                    <span><strong>Títulos principales</strong><small>Portada y encabezados destacados</small></span>
-                  </label>
-                  <label class="studio-custom-font-target">
-                    <input type="checkbox" name="custom_font_target" value="subtitles" checked>
-                    <span><strong>Subtítulos</strong><small>Títulos de secciones y tarjetas</small></span>
-                  </label>
-                  <label class="studio-custom-font-target">
-                    <input type="checkbox" name="custom_font_target" value="names" checked>
-                    <span><strong>Nombres y firmas</strong><small>Festejada, pareja y agradecimiento</small></span>
-                  </label>
-                  <label class="studio-custom-font-target">
-                    <input type="checkbox" name="custom_font_target" value="body">
-                    <span><strong>Texto general</strong><small>Párrafos y descripciones</small></span>
-                  </label>
+                  <span id="custom-font-targets-title" class="studio-custom-font-targets-title">Aplicar fuente y ajustar tamaño</span>
+                  <div class="studio-custom-font-target">
+                    <label class="studio-custom-font-target-choice">
+                      <input type="checkbox" name="custom_font_target" value="titles" checked>
+                      <span class="studio-custom-font-target-copy"><strong>Títulos de portada</strong><small>Encabezado principal de la invitación</small></span>
+                    </label>
+                    <label class="studio-font-size-control" for="typographyScaleTitles">
+                      <span>Tamaño <output for="typographyScaleTitles">100%</output></span>
+                      <input type="range" id="typographyScaleTitles" name="typography_scale" data-target="titles" min="75" max="150" step="5" value="100">
+                    </label>
+                  </div>
+                  <div class="studio-custom-font-target">
+                    <label class="studio-custom-font-target-choice">
+                      <input type="checkbox" name="custom_font_target" value="subtitles" checked>
+                      <span class="studio-custom-font-target-copy"><strong>Títulos de secciones</strong><small>Encabezados y títulos de tarjetas</small></span>
+                    </label>
+                    <label class="studio-font-size-control" for="typographyScaleSubtitles">
+                      <span>Tamaño <output for="typographyScaleSubtitles">100%</output></span>
+                      <input type="range" id="typographyScaleSubtitles" name="typography_scale" data-target="subtitles" min="75" max="150" step="5" value="100">
+                    </label>
+                  </div>
+                  <div class="studio-custom-font-target">
+                    <label class="studio-custom-font-target-choice">
+                      <input type="checkbox" name="custom_font_target" value="names" checked>
+                      <span class="studio-custom-font-target-copy"><strong>Nombres y firmas</strong><small>Festejados y firma de agradecimiento</small></span>
+                    </label>
+                    <label class="studio-font-size-control" for="typographyScaleNames">
+                      <span>Tamaño <output for="typographyScaleNames">100%</output></span>
+                      <input type="range" id="typographyScaleNames" name="typography_scale" data-target="names" min="75" max="150" step="5" value="100">
+                    </label>
+                  </div>
+                  <div class="studio-custom-font-target">
+                    <label class="studio-custom-font-target-choice">
+                      <input type="checkbox" name="custom_font_target" value="body">
+                      <span class="studio-custom-font-target-copy"><strong>Texto general</strong><small>Párrafos y descripciones</small></span>
+                    </label>
+                    <label class="studio-font-size-control" for="typographyScaleBody">
+                      <span>Tamaño <output for="typographyScaleBody">100%</output></span>
+                      <input type="range" id="typographyScaleBody" name="typography_scale" data-target="body" min="75" max="150" step="5" value="100">
+                    </label>
+                  </div>
                 </div>
                 <input type="hidden" id="customFontUrl" value="">
                 <div class="upload-progress" id="custom-font-progress">Subiendo tipografía...</div>
@@ -872,7 +896,7 @@
   <script src="/js/studio-auth.js?v=studio-recovery-20260718"></script>
   <!-- Lógica del Formulario -->
   <script src="/assets/js/invitta-templates.js?v=milestone-template-20260814"></script>
-  <script src="/js/studio-form.js?v=remove-section-backgrounds-20260814"></script>
+  <script src="/js/studio-form.js?v=typography-size-controls-20260814"></script>
 
 </body>
 </html>

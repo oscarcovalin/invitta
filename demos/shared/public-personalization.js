@@ -11,6 +11,56 @@
   var applying = false;
   var vipAccessRetryCount = 0;
   var imageSequence = 0;
+  var typographyScaledElements = new Set();
+  var typographyOriginalFontSizes = new WeakMap();
+  var typographyResizeTimer = 0;
+
+  var typographyScaleSelectors = {
+    titles: "h1,.hero-title,.inv-hero-title,.inv-main-title,.cover-title,.main-title,[data-invitta-font-role='title']",
+    subtitles: "h2,h3,h4,h5,h6,.inv-card-title,.inv-section-title,.inv-timeline-title,.section-title,.subtitle,[data-invitta-font-role='subtitle']",
+    names: ".hero__name,#celebrant-name,.inv-hero-name,.inv-pass-name,.inv-thank-you-signature,.inv-title-script,.couple-names,.couple-name,.honoree-name,.guest-name,.signature,.font-script,[data-invitta-font-role='name']",
+    body: "p,li,blockquote,button,input,select,textarea,.font-body,.font-sans,.inv-card-copy,.inv-section-copy,[data-invitta-font-role='body']"
+  };
+
+  function typographyScaleFor(target) {
+    var value = data.typographyScales && Number(data.typographyScales[target]);
+    return Number.isFinite(value) ? Math.min(1.5, Math.max(.75, value)) : 1;
+  }
+
+  function restoreTypographyScale(element) {
+    var original = typographyOriginalFontSizes.get(element);
+    if (!original) return;
+    if (original.value) element.style.setProperty("font-size", original.value, original.priority);
+    else element.style.removeProperty("font-size");
+  }
+
+  function applyTypographyScales(refresh) {
+    if (refresh) {
+      typographyScaledElements.forEach(restoreTypographyScale);
+      typographyScaledElements.clear();
+    }
+
+    var elementScales = new Map();
+    ["body", "titles", "subtitles", "names"].forEach(function(target) {
+      var scale = typographyScaleFor(target);
+      if (Math.abs(scale - 1) < .001) return;
+      document.querySelectorAll(typographyScaleSelectors[target]).forEach(function(element) {
+        elementScales.set(element, scale);
+      });
+    });
+
+    elementScales.forEach(function(scale, element) {
+      if (typographyScaledElements.has(element)) return;
+      typographyOriginalFontSizes.set(element, {
+        value: element.style.getPropertyValue("font-size"),
+        priority: element.style.getPropertyPriority("font-size")
+      });
+      var baseSize = Number.parseFloat(getComputedStyle(element).fontSize);
+      if (!Number.isFinite(baseSize)) return;
+      element.style.setProperty("font-size", (baseSize * scale).toFixed(2) + "px", "important");
+      typographyScaledElements.add(element);
+    });
+  }
 
   var defaults = {
     "xv-elegance-basic": {
@@ -817,11 +867,13 @@
     applyGuestData();
     applyVipAccessPass();
     applyConfirmationContacts();
+    applyTypographyScales(false);
     hideLegacyGuestAdmin();
     applying = false;
   }
 
   applyThemeHooks();
+  applyTypographyScales(true);
   installClickBridge();
   applyAll();
 
@@ -830,6 +882,10 @@
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
   window.addEventListener("load", applyAll);
+  window.addEventListener("resize", function() {
+    window.clearTimeout(typographyResizeTimer);
+    typographyResizeTimer = window.setTimeout(function() { applyTypographyScales(true); }, 140);
+  }, { passive: true });
   window.setTimeout(applyAll, 500);
   window.setTimeout(applyAll, 1500);
 })();

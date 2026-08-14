@@ -485,6 +485,17 @@ function normalizeCustomFontTargets(val) {
     return targets.length ? targets : ["titles", "subtitles", "names"];
 }
 
+function normalizeTypographyScales(val) {
+    var scales = { titles: 1, subtitles: 1, names: 1, body: 1 };
+    normalizeStringArray(val).forEach(function(token) {
+        var match = String(token || "").match(/^scale:(titles|subtitles|names|body):(\d{2,3})$/);
+        if (!match) return;
+        var percent = Math.min(150, Math.max(75, Number(match[2]) || 100));
+        scales[match[1]] = percent / 100;
+    });
+    return scales;
+}
+
 function normalizeHexColor(val) {
     var color = cleanString(val, 20);
     return /^#[0-9a-f]{6}$/i.test(color) ? color : "";
@@ -589,6 +600,7 @@ function buildPublicTemplateData(inv, template) {
         customFontUrl: safeHttpsUrl(inv.custom_font_url),
         customFontName: cleanString(inv.custom_font_name, 80),
         customFontTargets: normalizeCustomFontTargets(inv.custom_font_targets),
+        typographyScales: normalizeTypographyScales(inv.custom_font_targets),
         visualTheme: cleanString(inv.visual_theme, 60),
         sectionBackgrounds: normalizeSectionBackgrounds(inv.section_backgrounds),
         studioName: cleanString(inv.studio_name, 120),
@@ -620,7 +632,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=strong-mobile-parallax-20260814";
+    bridge.src = "/demos/shared/public-personalization.js?v=typography-size-controls-20260814";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 
