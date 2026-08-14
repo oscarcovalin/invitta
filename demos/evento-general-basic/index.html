@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#b65f45">
+    <title>Invitación | Evento especial</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <main>
+      <section class="hero" id="hero">
+        <div class="hero__photo" id="hero-photo" aria-hidden="true"></div>
+        <div class="hero__veil"></div>
+        <div class="hero__content">
+          <p class="eyebrow" id="event-kind">Una fecha para celebrar</p>
+          <h1 id="event-title">Mi celebración</h1>
+          <p class="hero__name" id="celebrant-name">Nombre</p>
+          <div class="hero__date" id="event-date">Próximamente</div>
+        </div>
+      </section>
+
+      <section class="welcome section" id="family">
+        <div class="section__inner section__inner--narrow">
+          <p class="section__mark">✦</p>
+          <blockquote id="welcome-text">Hay momentos que merecen celebrarse con las personas que más queremos.</blockquote>
+          <div class="people" id="special-people" hidden></div>
+        </div>
+      </section>
+
+      <section class="section section--tint" id="locations">
+        <div class="section__inner">
+          <p class="eyebrow">Dónde y cuándo</p>
+          <h2>Detalles del evento</h2>
+          <div class="cards" id="location-cards"></div>
+          <div class="timeline" id="itinerary" hidden>
+            <h3>Programa</h3>
+            <div id="itinerary-items"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="gallery" hidden>
+        <div class="section__inner">
+          <p class="eyebrow">Momentos</p>
+          <h2>Nuestra galería</h2>
+          <div class="gallery" id="gallery-grid"></div>
+        </div>
+      </section>
+
+      <section class="section section--tint" id="registry" hidden>
+        <div class="section__inner section__inner--narrow">
+          <p class="eyebrow">Un detalle especial</p>
+          <h2>Mesa de regalos</h2>
+          <p>Tu presencia es lo más importante. Si deseas obsequiarnos algo, puedes consultar nuestra mesa de regalos.</p>
+          <a class="button button--outline" id="gift-link" target="_blank" rel="noopener">Ver mesa de regalos</a>
+        </div>
+      </section>
+
+      <section class="section rsvp" id="rsvp">
+        <div class="section__inner section__inner--narrow">
+          <p class="eyebrow">Reserva la fecha</p>
+          <h2>Confirma tu asistencia</h2>
+          <div class="guest-card" id="guest-card" hidden>
+            <span>Invitación para</span>
+            <strong id="guest-name"></strong>
+            <p id="guest-details"></p>
+          </div>
+          <label class="passes" id="passes-label" hidden>
+            Personas que asistirán
+            <select id="passes-select"></select>
+          </label>
+          <div class="actions">
+            <button class="button" id="confirm-button" type="button">Confirmar por WhatsApp</button>
+            <button class="button button--text" id="decline-button" type="button">No podré asistir</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="closing">
+        <p id="thank-you-title">Gracias por ser parte de este momento</p>
+        <strong id="thank-you-signature"></strong>
+        <p class="hashtag" id="hashtag"></p>
+      </footer>
+    </main>
+    <audio id="event-music" loop></audio>
+    <script src="./app.js"></script>
+  </body>
+</html>

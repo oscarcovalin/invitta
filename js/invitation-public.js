@@ -384,9 +384,9 @@ var PUBLIC_TEMPLATE_MANIFEST = {
     "xv-rose-gold-premium": { id: "xv-rose-gold-premium", path: "/demos/xv-premium-2/index.html", kind: "xv" },
     "xv-champagne-rose-vip": { id: "xv-champagne-rose-vip", path: "/demos/xv-vip-3/index.html", kind: "xv" },
     "boda-classic-basic": { id: "boda-classic-basic", path: "/demos/boda-classic-basic/index.html", kind: "boda" },
-    "cumpleanos-general-basic": { id: "cumpleanos-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "cumpleanos", rendererTemplateId: "boda-classic-basic" },
-    "bautizo-general-basic": { id: "bautizo-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "bautizo", rendererTemplateId: "boda-classic-basic" },
-    "otro-general-basic": { id: "otro-general-basic", path: "/demos/boda-classic-basic/index.html", kind: "otro", rendererTemplateId: "boda-classic-basic" },
+    "cumpleanos-general-basic": { id: "cumpleanos-general-basic", path: "/demos/evento-general-basic/index.html", kind: "cumpleanos", rendererTemplateId: "evento-general-basic" },
+    "bautizo-general-basic": { id: "bautizo-general-basic", path: "/demos/evento-general-basic/index.html", kind: "bautizo", rendererTemplateId: "evento-general-basic" },
+    "otro-general-basic": { id: "otro-general-basic", path: "/demos/evento-general-basic/index.html", kind: "otro", rendererTemplateId: "evento-general-basic" },
     "boda-golden-romance-premium": { id: "boda-golden-romance-premium", path: "/demos/boda-golden-romance-premium/index.html", kind: "boda" },
     "boda-midnight-gold-vip": { id: "boda-midnight-gold-vip", path: "/demos/boda-premium-1/index.html", kind: "boda" }
 };

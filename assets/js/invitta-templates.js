@@ -8,8 +8,7 @@
  */
 
 function createGenericEventTemplate(id, name, type) {
-  // These event types temporarily reuse the proven wedding renderer, while
-  // retaining their own IDs so invitations can migrate to dedicated designs later.
+  // Generic event types share a neutral renderer while retaining independent IDs.
   return {
     id: id,
     name: name,
@@ -17,15 +16,15 @@ function createGenericEventTemplate(id, name, type) {
     level: "basica",
     packageLabel: "Esencial",
     price: 399,
-    demoUrl: "demos/boda-classic-basic/index.html",
-    palettePreset: "ivory-sage",
-    typographyPreset: "classic-wedding",
-    templatePath: "demos/boda-classic-basic",
+    demoUrl: "demos/evento-general-basic/index.html",
+    palettePreset: "terracotta-sand",
+    typographyPreset: "editorial-modern",
+    templatePath: "demos/evento-general-basic",
     customizable: true,
     status: "active",
     galleryLimit: 4,
     activeMonths: 2,
-    rendererTemplateId: "boda-classic-basic",
+    rendererTemplateId: "evento-general-basic",
     customization: {
       sectionBackgrounds: ["hero", "family", "locations", "gallery", "rsvp"]
     },
