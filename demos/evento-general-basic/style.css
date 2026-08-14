@@ -91,7 +91,7 @@ body.theme-milestone-50 {
   --line: rgba(219,182,84,.34);
   background: #050d20;
 }
-.theme-milestone-50 .hero { min-height: 100svh; grid-template-columns: 1fr; background-color: #050d20; background-image: linear-gradient(110deg, rgba(3,9,24,.2), rgba(3,9,24,.62)), url("./assets/navy-gold-agate.png"); background-position: center; background-size: cover; }
+.theme-milestone-50 .hero { min-height: 100svh; grid-template-columns: 1fr; background-color: #050d20; background-image: linear-gradient(110deg, rgba(3,9,24,.2), rgba(3,9,24,.62)), url("./assets/navy-gold-agate.webp"); background-position: center; background-size: cover; }
 .theme-milestone-50 .hero__nav { border-color: rgba(219,182,84,.2); background: rgba(3,9,24,.72); backdrop-filter: blur(16px); }
 .theme-milestone-50 .hero__brand { color: #e5c66f; }
 .theme-milestone-50 .hero__links a { color: #f8edcf; }
@@ -119,7 +119,7 @@ body.theme-milestone-50 {
 .theme-milestone-50 .guest-card { border-color: rgba(219,182,84,.42); background: rgba(3,10,25,.72); }
 .theme-milestone-50 .passes select { border-color: rgba(219,182,84,.42); background: #07142e; color: #fff4d8; }
 .theme-milestone-50 .rsvp[data-invitta-section-background] .section__inner { border-color: rgba(219,182,84,.5); background: rgba(5,15,37,.84); box-shadow: 0 30px 90px rgba(0,0,0,.32); }
-.theme-milestone-50 .closing { border-color: var(--line); background-color: #050d20; background-image: linear-gradient(rgba(4,12,29,.82), rgba(4,12,29,.9)), url("./assets/navy-gold-agate.png"); background-position: center; background-size: cover; color: #d5d9e4; }
+.theme-milestone-50 .closing { border-color: var(--line); background-color: #050d20; background-image: linear-gradient(rgba(4,12,29,.82), rgba(4,12,29,.9)), url("./assets/navy-gold-agate.webp"); background-position: center; background-size: cover; color: #d5d9e4; }
 .theme-milestone-50 .closing::before { background: radial-gradient(circle, rgba(219,182,84,.16), transparent 58%); }
 .theme-milestone-50 .closing strong { color: #f5d77d; text-shadow: 0 8px 34px rgba(0,0,0,.38); }
 .theme-milestone-50 .music-player { border-color: rgba(219,182,84,.38); background: rgba(4,12,29,.92); box-shadow: 0 16px 42px rgba(0,0,0,.32); }
