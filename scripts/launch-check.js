@@ -113,6 +113,15 @@ if (!publicPersonalization.includes("applyTypographyScales") || !publicPersonali
   fail("La invitación pública no aplica las escalas tipográficas");
 }
 
+const generalEventApp = read("demos/evento-general-basic/app.js");
+const generalEventStyles = read("demos/evento-general-basic/style.css");
+if (!generalEventApp.includes('classList.toggle("has-music-player"')) {
+  fail("La plantilla general no identifica cuando el reproductor de música está visible");
+}
+if (!generalEventStyles.includes("body.has-music-player .closing")) {
+  fail("La plantilla general no reserva espacio final para el reproductor de música");
+}
+
 const socialCoverPath = "demos/evento-general-basic/assets/cumpleanos-50-sorpresa-social.jpg";
 const socialCoverAbsolutePath = path.join(root, socialCoverPath);
 if (!fs.existsSync(socialCoverAbsolutePath)) {
