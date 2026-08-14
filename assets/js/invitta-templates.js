@@ -39,6 +39,19 @@ function createGenericEventTemplate(id, name, type) {
   };
 }
 
+function createMilestoneBirthdayTemplate() {
+  var template = createGenericEventTemplate(
+    "cumpleanos-50-sorpresa",
+    "50 Años Sorpresa — Azul Noche y Oro",
+    "cumpleanos"
+  );
+  template.demoUrl = "demos/evento-general-basic/index.html?template=cumpleanos-50-sorpresa";
+  template.palettePreset = "midnight-gold-milestone";
+  template.typographyPreset = "editorial-milestone";
+  template.variant = "milestone-50-surprise";
+  return template;
+}
+
 window.InvittaTemplates = [
   {
     id: "xv-elegance-basic",
@@ -185,6 +198,7 @@ window.InvittaTemplates = [
     }
   },
   createGenericEventTemplate("cumpleanos-general-basic", "Diseño General — Cumpleaños", "cumpleanos"),
+  createMilestoneBirthdayTemplate(),
   createGenericEventTemplate("bautizo-general-basic", "Diseño General — Bautizo", "bautizo"),
   createGenericEventTemplate("otro-general-basic", "Diseño General — Otro evento", "otro")
 ];
