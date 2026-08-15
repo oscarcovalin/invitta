@@ -680,7 +680,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=typography-roles-20260814";
+    bridge.src = "/demos/shared/public-personalization.js?v=preserve-shhh-font-20260815";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 
