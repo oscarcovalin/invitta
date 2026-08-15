@@ -575,6 +575,83 @@ function normalizeTypographyRoles(val, fontLibrary) {
     return result;
 }
 
+// Las invitaciones creadas antes del catálogo conservan el renderer clásico.
+// Aplicamos aquí la misma asignación por función para que no pierdan las
+// tipografías personalizadas al permanecer sin template_id.
+function applyLegacyTypography(inv) {
+    var fonts = normalizeTypographyFontLibrary(
+        inv.typography_fonts,
+        inv.custom_font_targets,
+        inv.custom_font_url,
+        inv.custom_font_name
+    );
+    var roles = normalizeTypographyRoles(inv.custom_font_targets, fonts);
+    var fontFamilies = fonts.reduce(function(result, font) {
+        var safeId = String(font.id || "").replace(/[^A-Za-z0-9_-]/g, "");
+        if (safeId && font.url) result[font.id] = "InvittaLegacyFont_" + safeId;
+        return result;
+    }, {});
+
+    var customFaces = document.getElementById("invitta-legacy-custom-font-faces");
+    if (!customFaces) {
+        customFaces = document.createElement("style");
+        customFaces.id = "invitta-legacy-custom-font-faces";
+        document.head.appendChild(customFaces);
+    }
+    customFaces.textContent = fonts.map(function(font) {
+        var family = fontFamilies[font.id];
+        if (!family) return "";
+        var ext = font.url.split("?")[0].split(".").pop().toLowerCase();
+        var format = ext === "woff2" ? "woff2" : ext === "woff" ? "woff" : ext === "otf" ? "opentype" : "truetype";
+        return '@font-face{font-family:"' + family + '";src:url(' + JSON.stringify(font.url) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
+    }).join("");
+
+    var presets = {
+        classic: '"Cormorant Garamond", Georgia, serif',
+        romantic: '"Great Vibes", "Cormorant Garamond", cursive',
+        editorial: '"Playfair Display", Georgia, serif',
+        minimal: '"Montserrat", Arial, sans-serif',
+        luxury: '"Playfair Display", Georgia, serif',
+        signature: '"Allura", "Great Vibes", cursive',
+        couture: '"Parisienne", "Great Vibes", cursive'
+    };
+    var selectors = {
+        coverName: "#inv-honoree",
+        closingName: "#inv-thank-you-signature",
+        mainTitle: "#inv-title",
+        sectionTitle: ".inv-section-title,.inv-thank-you-title,.inv-share-title,.inv-event-card h2,.inv-timeline-alt-title",
+        cardTitle: ".inv-event-card h3,.inv-event-card h4,.inv-timeline-alt-title,.inv-venue-name",
+        guestName: "#inv-guest-name",
+        body: "#inv-welcome,#inv-thank-you-message,#inv-share-message,.inv-venue-address,.inv-dresscode-text,.inv-godparents-list,.inv-parents-list",
+        labels: ".inv-eyebrow,#inv-hero-date,.inv-ticket-field-label,.inv-ticket-field-value,.inv-premium-button,.inv-select,#inv-music-title,#inv-music-artist"
+    };
+    var style = document.getElementById("invitta-legacy-typography-roles");
+    if (!style) {
+        style = document.createElement("style");
+        style.id = "invitta-legacy-typography-roles";
+        document.head.appendChild(style);
+    }
+    style.textContent = Object.keys(selectors).map(function(role) {
+        var setting = roles[role] || { font: "inherit", scale: 1 };
+        var source = setting.font || "inherit";
+        var family = fontFamilies[source] || presets[source] || "";
+        if (!family || source === "inherit") return "";
+        var fontStack = fontFamilies[source]
+            ? '"' + family + '", "Cormorant Garamond", Georgia, serif'
+            : family;
+        return selectors[role] + "{font-family:" + fontStack + "!important;}";
+    }).join("");
+
+    Object.keys(selectors).forEach(function(role) {
+        var scale = Number(roles[role] && roles[role].scale) || 1;
+        if (scale === 1) return;
+        document.querySelectorAll(selectors[role]).forEach(function(element) {
+            var size = parseFloat(window.getComputedStyle(element).fontSize);
+            if (Number.isFinite(size)) element.style.setProperty("font-size", (size * scale) + "px", "important");
+        });
+    });
+}
+
 function normalizeHexColor(val) {
     var color = cleanString(val, 20);
     return /^#[0-9a-f]{6}$/i.test(color) ? color : "";
@@ -1081,6 +1158,7 @@ function renderDefaultTemplate(inv) {
         el.remove();
       }
     });
+    applyLegacyTypography(inv);
     requestAnimationFrame(() => {
       setupSafeSectionReveal();
     });

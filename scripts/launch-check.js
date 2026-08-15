@@ -120,6 +120,11 @@ if (!studioFormScript.includes("MAX_CUSTOM_FONTS = 4") ||
 }
 
 const publicPersonalization = read("demos/shared/public-personalization.js");
+const publicInvitation = read("js/invitation-public.js");
+if (!publicInvitation.includes("applyLegacyTypography") ||
+    !publicInvitation.includes("InvittaLegacyFont_")) {
+  fail("Las invitaciones heredadas no aplican tipografias personalizadas");
+}
 if (!publicPersonalization.includes("applyTypographyScales") ||
     !publicPersonalization.includes("typographyRoles") ||
     !publicPersonalization.includes("typographyFonts") ||
