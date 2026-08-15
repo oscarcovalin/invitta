@@ -796,19 +796,29 @@
       document.head.appendChild(fontLink);
     }
 
-    var needsCustomFont = typographyRoleOrder.some(function(role) {
-      return roleConfig[role] && roleConfig[role].font === "custom";
-    });
-    if (needsCustomFont && data.customFontUrl) {
+    var typographyFonts = Array.isArray(data.typographyFonts) ? data.typographyFonts.slice(0, 4) : [];
+    if (!typographyFonts.length && data.customFontUrl) {
+      typographyFonts = [{ id: "font-legacy-custom", name: data.customFontName || "Tipografía personalizada", url: data.customFontUrl }];
+    }
+    var customFontFamilies = typographyFonts.reduce(function(map, font) {
+      var safeId = String(font.id || "").replace(/[^A-Za-z0-9_-]/g, "");
+      if (safeId && font.url) map[font.id] = "InvittaUserFont_" + safeId;
+      return map;
+    }, {});
+    if (typographyFonts.length) {
       var customFontStyle = document.getElementById("invitta-custom-font-face");
       if (!customFontStyle) {
         customFontStyle = document.createElement("style");
         customFontStyle.id = "invitta-custom-font-face";
         document.head.appendChild(customFontStyle);
       }
-      var extension = data.customFontUrl.split("?")[0].split(".").pop().toLowerCase();
-      var format = extension === "woff2" ? "woff2" : extension === "woff" ? "woff" : extension === "otf" ? "opentype" : "truetype";
-      customFontStyle.textContent = '@font-face{font-family:"InvittaCustom";src:url(' + JSON.stringify(data.customFontUrl) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
+      customFontStyle.textContent = typographyFonts.map(function(font) {
+        var family = customFontFamilies[font.id];
+        if (!family) return "";
+        var extension = font.url.split("?")[0].split(".").pop().toLowerCase();
+        var format = extension === "woff2" ? "woff2" : extension === "woff" ? "woff" : extension === "otf" ? "opentype" : "truetype";
+        return '@font-face{font-family:"' + family + '";src:url(' + JSON.stringify(font.url) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
+      }).join("");
     }
 
     var typographyRoleStyle = document.getElementById("invitta-typography-roles");
@@ -819,9 +829,10 @@
     }
     typographyRoleStyle.textContent = typographyRoleOrder.map(function(role) {
       var source = roleConfig[role] && roleConfig[role].font || "inherit";
-      var selected = source === "inherit" || (source === "custom" && !data.customFontUrl)
-        ? fonts
-        : fontPresets[source];
+      var customFamily = customFontFamilies[source] || (source === "custom" && typographyFonts[0] ? customFontFamilies[typographyFonts[0].id] : "");
+      var selected = customFamily
+        ? { display: '"' + customFamily + '", "Cormorant Garamond", Georgia, serif', body: '"' + customFamily + '", "Montserrat", Arial, sans-serif' }
+        : (source === "inherit" ? fonts : fontPresets[source]);
       if (!selected) selected = fonts;
       var family = role === "body" || role === "labels" ? selected.body : selected.display;
       var scopedSelectors = typographyRoleSelectors[role].split(",").map(function(selector) {

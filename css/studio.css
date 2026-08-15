@@ -1004,12 +1004,62 @@ body {
 
 .studio-custom-font-fields {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   gap: 0.65rem;
 }
 
 .studio-custom-font-fields input {
   min-width: 0;
+}
+
+.studio-custom-font-count {
+  color: #786b62;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.studio-custom-font-library {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+}
+
+.studio-custom-font-library-empty {
+  margin: 0;
+  padding: 0.7rem;
+  border: 1px dashed #ddcec3;
+  border-radius: 7px;
+  color: #85776e;
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+.studio-custom-font-library-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem;
+  border: 1px solid #e5d9d0;
+  border-radius: 7px;
+  background: rgba(255, 253, 250, 0.9);
+}
+
+.studio-custom-font-library-name {
+  min-width: 0;
+  border: 0;
+  border-bottom: 1px solid #dfd0c6;
+  background: transparent;
+  color: #3f342d;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.studio-custom-font-library-name:focus {
+  outline: 0;
+  border-color: #b97569;
 }
 
 .studio-custom-font-targets {

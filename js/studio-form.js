@@ -299,8 +299,44 @@ const TYPOGRAPHY_FONT_SOURCES = [
   "couture",
   "custom"
 ];
-const TYPOGRAPHY_FONT_TOKEN_PREFIX = "typeface:v1:";
-const TYPOGRAPHY_SCALE_TOKEN_PREFIX = "type-scale:v1:";
+const TYPOGRAPHY_FONT_TOKEN_PREFIX = "typeface:v2:";
+const TYPOGRAPHY_SCALE_TOKEN_PREFIX = "type-scale:v2:";
+const TYPOGRAPHY_LIBRARY_TOKEN_PREFIX = "typography-library:v1:";
+const MAX_CUSTOM_FONTS = 4;
+
+function normalizeTypographyFontLibrary(value) {
+  const parsed = Array.isArray(value) ? value : [];
+  return parsed.slice(0, MAX_CUSTOM_FONTS).map((font, index) => {
+    const id = /^font-[a-z0-9-]{4,50}$/.test(String(font?.id || ""))
+      ? String(font.id)
+      : `font-${index + 1}`;
+    return {
+      id,
+      name: String(font?.name || `Fuente ${index + 1}`).trim().slice(0, 80),
+      url: String(font?.url || "").trim()
+    };
+  }).filter(font => font.name && font.url);
+}
+
+function parseTypographyFontLibraryFallback(value) {
+  const token = (Array.isArray(value) ? value : [])
+    .find(item => String(item || "").startsWith(TYPOGRAPHY_LIBRARY_TOKEN_PREFIX));
+  if (!token) return [];
+  try {
+    return normalizeTypographyFontLibrary(JSON.parse(decodeURIComponent(String(token).slice(TYPOGRAPHY_LIBRARY_TOKEN_PREFIX.length))));
+  } catch (_) {
+    return [];
+  }
+}
+
+function typographyFontLibraryToken(fonts) {
+  const safeFonts = normalizeTypographyFontLibrary(fonts);
+  return `${TYPOGRAPHY_LIBRARY_TOKEN_PREFIX}${encodeURIComponent(JSON.stringify(safeFonts))}`;
+}
+
+function isTypographyFontSource(value) {
+  return TYPOGRAPHY_FONT_SOURCES.includes(value) || /^font-[a-z0-9-]{4,50}$/.test(String(value || ""));
+}
 
 function emptyTypographyRoleConfig() {
   return TYPOGRAPHY_ROLES.reduce((result, role) => {
@@ -312,16 +348,16 @@ function emptyTypographyRoleConfig() {
 function parseTypographyRoleConfig(value) {
   const config = emptyTypographyRoleConfig();
   const tokens = Array.isArray(value) ? value : [];
-  let hasRoleTokens = tokens.includes("typography:v1");
+  let hasRoleTokens = tokens.includes("typography:v1") || tokens.includes("typography:v2");
 
   tokens.forEach(token => {
-    const fontMatch = String(token || "").match(/^typeface:v1:([A-Za-z]+):([a-z]+)$/);
-    if (fontMatch && TYPOGRAPHY_ROLES.includes(fontMatch[1]) && TYPOGRAPHY_FONT_SOURCES.includes(fontMatch[2])) {
+    const fontMatch = String(token || "").match(/^typeface:v(?:1|2):([A-Za-z]+):([a-z0-9-]+)$/);
+    if (fontMatch && TYPOGRAPHY_ROLES.includes(fontMatch[1]) && isTypographyFontSource(fontMatch[2])) {
       config[fontMatch[1]].font = fontMatch[2];
       hasRoleTokens = true;
       return;
     }
-    const scaleMatch = String(token || "").match(/^type-scale:v1:([A-Za-z]+):(\d{2,3})$/);
+    const scaleMatch = String(token || "").match(/^type-scale:v(?:1|2):([A-Za-z]+):(\d{2,3})$/);
     if (scaleMatch && TYPOGRAPHY_ROLES.includes(scaleMatch[1])) {
       config[scaleMatch[1]].scale = Math.min(150, Math.max(75, Number(scaleMatch[2]) || 100));
       hasRoleTokens = true;
@@ -356,10 +392,10 @@ function parseTypographyRoleConfig(value) {
 }
 
 function typographyRoleTokens() {
-  const tokens = ["typography:v1"];
+  const tokens = ["typography:v2"];
   document.querySelectorAll('select[name="typography_role_font"]').forEach(select => {
     const role = select.dataset.role;
-    const source = TYPOGRAPHY_FONT_SOURCES.includes(select.value) ? select.value : "inherit";
+    const source = isTypographyFontSource(select.value) ? select.value : "inherit";
     if (TYPOGRAPHY_ROLES.includes(role) && source !== "inherit") {
       tokens.push(`${TYPOGRAPHY_FONT_TOKEN_PREFIX}${role}:${source}`);
     }
@@ -378,8 +414,11 @@ function setTypographyRoleControls(value) {
   const config = parseTypographyRoleConfig(value);
   document.querySelectorAll('select[name="typography_role_font"]').forEach(select => {
     const setting = config[select.dataset.role] || { font: "inherit" };
-    select.value = setting.font;
-    select.dataset.inherit = String(setting.font === "inherit");
+    const source = setting.font === "custom"
+      ? (select.querySelector("option[data-custom-font]")?.value || "inherit")
+      : setting.font;
+    select.value = select.querySelector(`option[value="${source}"]`) ? source : "inherit";
+    select.dataset.inherit = String(select.value === "inherit");
   });
   document.querySelectorAll('input[name="typography_role_scale"]').forEach(input => {
     const setting = config[input.dataset.role] || { scale: 100 };
@@ -400,7 +439,6 @@ function setupStudioVisualPreview() {
   const customFontUrlInput = document.getElementById("customFontUrl");
   const typographyRoleFontSelects = Array.from(document.querySelectorAll('select[name="typography_role_font"]'));
   const typographyScaleInputs = Array.from(document.querySelectorAll('input[name="typography_role_scale"]'));
-  const removeCustomFontBtn = document.getElementById("removeCustomFontBtn");
   const fontOptions = document.getElementById("studio-font-options");
   const paletteOptions = document.getElementById("studio-palette-options");
   const previewPhone = document.getElementById("studio-preview-phone");
@@ -471,7 +509,7 @@ function setupStudioVisualPreview() {
   };
 
   typographyRoleFontSelects.forEach(select => {
-    TYPOGRAPHY_FONT_SOURCES.forEach(source => {
+    TYPOGRAPHY_FONT_SOURCES.filter(source => source !== "custom").forEach(source => {
       const option = document.createElement("option");
       option.value = source;
       option.textContent = typographyFontLabels[source];
@@ -628,7 +666,8 @@ function setupStudioVisualPreview() {
       paletteOptions.appendChild(createOptionButton(value, definition, "palette"));
     });
 
-  let customFontObjectUrl = "";
+  let typographyFontLibrary = [];
+  const customFontObjectUrls = new Map();
 
   function clearCustomFontError() {
     const errorElement = document.getElementById("custom-font-error");
@@ -644,19 +683,14 @@ function setupStudioVisualPreview() {
     errorElement.classList.add("visible");
   }
 
-  function updateCustomFontCard() {
-    const option = fontOptions.querySelector('[data-value="custom"]');
-    const label = option?.querySelector(".studio-option-label");
-    const sample = option?.querySelector(".studio-font-sample");
-    const name = customFontNameInput?.value.trim();
-    if (label) label.textContent = name || fonts.custom.label;
-    if (sample) sample.textContent = name || fonts.custom.sample;
+  function customPreviewFamily(fontId) {
+    return `InvittaCustomPreview_${String(fontId || "").replace(/[^a-z0-9]/gi, "_")}`;
   }
 
-  async function loadCustomFontPreview(source) {
+  async function loadCustomFontPreview(fontId, source) {
     if (!source || typeof FontFace !== "function") return;
     try {
-      const customFont = new FontFace("InvittaCustomPreview", `url(${JSON.stringify(source)})`);
+      const customFont = new FontFace(customPreviewFamily(fontId), `url(${JSON.stringify(source)})`);
       await customFont.load();
       document.fonts.add(customFont);
       fontSelect.dispatchEvent(new Event("change", { bubbles: true }));
@@ -665,53 +699,134 @@ function setupStudioVisualPreview() {
       showCustomFontError("No se pudo previsualizar este archivo de tipografía.");
     }
   }
-  window.refreshStudioCustomFontPreview = loadCustomFontPreview;
+
+  function refreshTypographyRoleFontOptions() {
+    typographyRoleFontSelects.forEach(select => {
+      const previous = select.value;
+      select.querySelectorAll("option[data-custom-font]").forEach(option => option.remove());
+      typographyFontLibrary.forEach(font => {
+        const option = document.createElement("option");
+        option.value = font.id;
+        option.textContent = font.name;
+        option.dataset.customFont = "true";
+        select.appendChild(option);
+      });
+      const replacement = previous === "custom" ? typographyFontLibrary[0]?.id : previous;
+      select.value = isTypographyFontSource(replacement) && select.querySelector(`option[value="${replacement}"]`)
+        ? replacement
+        : "inherit";
+      select.dataset.inherit = String(select.value === "inherit");
+    });
+  }
+
+  function renderTypographyFontLibrary() {
+    const container = document.getElementById("custom-font-library");
+    const empty = document.getElementById("custom-font-library-empty");
+    const count = document.getElementById("custom-font-count");
+    if (!container) return;
+    container.querySelectorAll(".studio-custom-font-library-item").forEach(item => item.remove());
+    if (empty) empty.hidden = typographyFontLibrary.length > 0;
+    if (count) count.textContent = `${typographyFontLibrary.length} de ${MAX_CUSTOM_FONTS} fuentes`;
+    if (customFontInput) customFontInput.disabled = typographyFontLibrary.length >= MAX_CUSTOM_FONTS;
+
+    typographyFontLibrary.forEach(font => {
+      const item = document.createElement("div");
+      item.className = "studio-custom-font-library-item";
+      item.dataset.fontId = font.id;
+
+      const name = document.createElement("input");
+      name.type = "text";
+      name.maxLength = 80;
+      name.className = "studio-custom-font-library-name";
+      name.value = font.name;
+      name.setAttribute("aria-label", "Nombre de la tipografía");
+      name.style.fontFamily = `"${customPreviewFamily(font.id)}", "Cormorant Garamond", serif`;
+      name.addEventListener("input", () => {
+        font.name = name.value.trim().slice(0, 80) || "Fuente personalizada";
+        refreshTypographyRoleFontOptions();
+        updatePreview();
+      });
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "studio-custom-font-remove";
+      remove.textContent = "Quitar";
+      remove.addEventListener("click", () => {
+        typographyRoleFontSelects.forEach(select => {
+          if (select.value === font.id) select.value = "inherit";
+        });
+        const objectUrl = customFontObjectUrls.get(font.id);
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+        customFontObjectUrls.delete(font.id);
+        typographyFontLibrary = typographyFontLibrary.filter(itemFont => itemFont.id !== font.id);
+        refreshTypographyRoleFontOptions();
+        renderTypographyFontLibrary();
+        updatePreview();
+      });
+
+      item.append(name, remove);
+      container.appendChild(item);
+    });
+  }
+
+  window.setStudioTypographyFontLibrary = (fontsValue, roleTokens = []) => {
+    typographyFontLibrary = (Array.isArray(fontsValue) ? fontsValue : []).slice(0, MAX_CUSTOM_FONTS).map((font, index) => ({
+      id: /^font-[a-z0-9-]{4,50}$/.test(String(font?.id || "")) ? String(font.id) : `font-${index + 1}`,
+      name: String(font?.name || `Fuente ${index + 1}`).trim().slice(0, 80),
+      url: String(font?.url || "").trim(),
+      file: font?.file || null
+    })).filter(font => font.name && (font.url || font.file));
+    refreshTypographyRoleFontOptions();
+    setTypographyRoleControls(roleTokens);
+    typographyRoleFontSelects.forEach(select => {
+      if (select.value === "custom") select.value = typographyFontLibrary[0]?.id || "inherit";
+      select.dataset.inherit = String(select.value === "inherit");
+    });
+    typographyFontLibrary.forEach(font => loadCustomFontPreview(font.id, font.url));
+    renderTypographyFontLibrary();
+    updatePreview();
+  };
+  window.getStudioTypographyFontLibrary = () => typographyFontLibrary.map(font => ({ ...font }));
 
   customFontInput?.addEventListener("change", () => {
     const file = customFontInput.files?.[0];
     clearCustomFontError();
     if (!file) return;
-
-    if (!customFontNameInput.value.trim()) {
-      customFontNameInput.value = file.name.replace(/\.(woff2?|ttf|otf)$/i, "");
+    const extension = file.name.split(".").pop()?.toLowerCase() || "";
+    if (!["woff2", "woff", "ttf", "otf"].includes(extension) || file.size > 3 * 1024 * 1024) {
+      showCustomFontError("Usa un archivo WOFF2, WOFF, TTF u OTF de máximo 3 MB.");
+      customFontInput.value = "";
+      return;
     }
-    if (customFontObjectUrl) URL.revokeObjectURL(customFontObjectUrl);
-    customFontObjectUrl = URL.createObjectURL(file);
-    updateCustomFontCard();
-    if (!typographyRoleFontSelects.some(select => select.value === "custom")) {
+    if (typographyFontLibrary.length >= MAX_CUSTOM_FONTS) {
+      showCustomFontError("Puedes cargar hasta cuatro tipografías por invitación.");
+      customFontInput.value = "";
+      return;
+    }
+    const id = `font-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+    const objectUrl = URL.createObjectURL(file);
+    customFontObjectUrls.set(id, objectUrl);
+    typographyFontLibrary.push({
+      id,
+      name: file.name.replace(/\.(woff2?|ttf|otf)$/i, "").slice(0, 80),
+      url: "",
+      file
+    });
+    refreshTypographyRoleFontOptions();
+    renderTypographyFontLibrary();
+    if (!typographyRoleFontSelects.some(select => /^font-/.test(select.value))) {
       typographyRoleFontSelects.forEach(select => {
         if (["coverName", "closingName"].includes(select.dataset.role)) {
-          select.value = "custom";
+          select.value = id;
           select.dataset.inherit = "false";
         }
       });
     }
-    loadCustomFontPreview(customFontObjectUrl);
-  });
-
-  customFontNameInput?.addEventListener("input", updateCustomFontCard);
-
-  removeCustomFontBtn?.addEventListener("click", () => {
-    if (customFontObjectUrl) URL.revokeObjectURL(customFontObjectUrl);
-    customFontObjectUrl = "";
-    if (customFontInput) customFontInput.value = "";
-    if (customFontUrlInput) customFontUrlInput.value = "";
-    if (customFontNameInput) customFontNameInput.value = "";
-    typographyRoleFontSelects.forEach(select => {
-      if (select.value === "custom") select.value = "inherit";
-      select.dataset.inherit = String(select.value === "inherit");
-    });
-    document.getElementById("custom-font-current")?.classList.remove("visible");
-    updateCustomFontCard();
-    if (fontSelect.value === "custom") {
-      fontSelect.value = "classic";
-      fontSelect.dispatchEvent(new Event("change", { bubbles: true }));
-    }
+    loadCustomFontPreview(id, objectUrl);
+    customFontInput.value = "";
     updatePreview();
   });
-
-  updateCustomFontCard();
-  if (customFontUrlInput?.value) loadCustomFontPreview(customFontUrlInput.value);
+  renderTypographyFontLibrary();
 
   function formatPreviewDate(value) {
     if (!value) return "28 · NOVIEMBRE · 2026";
@@ -779,7 +894,10 @@ function setupStudioVisualPreview() {
     }, {});
     Object.entries(previewRoleSelectors).forEach(([role, selectors]) => {
       const source = selectedSources[role] || "inherit";
-      const selectedFont = source === "inherit" ? font : (fonts[source] || font);
+      const customAsset = typographyFontLibrary.find(asset => asset.id === source);
+      const selectedFont = customAsset
+        ? { display: `"${customPreviewFamily(customAsset.id)}", "Cormorant Garamond", serif`, body: `"${customPreviewFamily(customAsset.id)}", "Cormorant Garamond", serif` }
+        : (source === "inherit" ? font : (fonts[source] || font));
       const family = ["body", "labels"].includes(role) ? selectedFont.body : selectedFont.display;
       selectors.forEach(selector => {
         previewPhone.querySelectorAll(selector).forEach(element => {
@@ -808,7 +926,11 @@ function setupStudioVisualPreview() {
     .forEach(select => select.addEventListener("change", updatePreview));
 
   typographyRoleFontSelects.forEach(select => select.addEventListener("change", () => {
-    if (select.value === "custom" && !customFontUrlInput?.value && !customFontInput?.files?.[0]) {
+    if (select.value === "custom") {
+      select.value = typographyFontLibrary[0]?.id || "inherit";
+    }
+    if (/^font-/.test(select.value) && !typographyFontLibrary.some(font => font.id === select.value)) {
+      select.value = "inherit";
       customFontInput?.click();
     }
     select.dataset.inherit = String(select.value === "inherit");
@@ -1769,23 +1891,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (accentColor) accentColor.value = data.accent_color || "";
     const customFontUrl = document.getElementById("customFontUrl");
     const customFontName = document.getElementById("customFontName");
-    const customFontCurrent = document.getElementById("custom-font-current");
-    const customFontCurrentName = document.getElementById("custom-font-current-name");
     if (customFontUrl) customFontUrl.value = data.custom_font_url || "";
     if (customFontName) customFontName.value = data.custom_font_name || "";
     const savedTypographyConfig = Array.isArray(data.custom_font_targets)
       ? data.custom_font_targets
       : [];
-    setTypographyRoleControls(savedTypographyConfig);
+    let savedTypographyFonts = normalizeTypographyFontLibrary(data.typography_fonts);
+    if (!savedTypographyFonts.length) savedTypographyFonts = parseTypographyFontLibraryFallback(savedTypographyConfig);
+    if (!savedTypographyFonts.length && data.custom_font_url) {
+      savedTypographyFonts = [{
+        id: "font-legacy-custom",
+        name: data.custom_font_name || "Tipografía personalizada",
+        url: data.custom_font_url
+      }];
+    }
+    window.setStudioTypographyFontLibrary?.(savedTypographyFonts, savedTypographyConfig);
     // El preset "custom" pertenecía al modelo anterior. El nuevo modelo asigna
     // la fuente cargada por función y conserva Clásica como base del diseño.
     const savedFontPreset = document.getElementById("font_preset");
     if (savedFontPreset?.value === "custom") savedFontPreset.value = "classic";
-    if (data.custom_font_url) {
-      customFontCurrent?.classList.add("visible");
-      if (customFontCurrentName) customFontCurrentName.textContent = data.custom_font_name || "Tipografía personalizada cargada";
-      window.refreshStudioCustomFontPreview?.(data.custom_font_url);
-    }
     document.getElementById("ceremony_name").value = data.ceremony_name || "";
     document.getElementById("ceremony_address").value = data.ceremony_address || "";
     document.getElementById("ceremony_map_url").value = data.ceremony_map_url || "";
@@ -1910,36 +2034,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     slugInput.value = slugToUse;
 
-    // Tipografia personalizada
-    let finalCustomFontUrl = document.getElementById("customFontUrl")?.value || null;
-    const customFontFile = document.getElementById("customFontFile")?.files?.[0];
+    // Biblioteca de tipografias personalizadas
+    const typographyFontDraft = window.getStudioTypographyFontLibrary?.() || [];
     const savedTypographyRoleTokens = typographyRoleTokens();
-    const usesCustomFont = savedTypographyRoleTokens.some(token => token.endsWith(":custom"));
-    if (usesCustomFont && !finalCustomFontUrl && !customFontFile) {
-      showMediaError("custom-font", "Sube una tipografía antes de asignarla a una zona.");
+    const assignedFontIds = new Set(
+      savedTypographyRoleTokens
+        .map(token => token.match(/^typeface:v2:[^:]+:(.+)$/)?.[1])
+        .filter(source => source?.startsWith("font-"))
+    );
+    const availableFontIds = new Set(typographyFontDraft.map(font => font.id));
+    if (Array.from(assignedFontIds).some(fontId => !availableFontIds.has(fontId))) {
+      showMediaError("custom-font", "Una zona usa una tipografía que ya no está disponible. Selecciona otra antes de guardar.");
       saveBtn.disabled = false;
       saveBtn.textContent = "Guardar cambios";
       return;
     }
-    if (customFontFile) {
-      if (!validateFontFile(customFontFile)) {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
-        return;
+    const finalTypographyFonts = [];
+    for (const font of typographyFontDraft) {
+      let uploadedUrl = font.url || "";
+      if (font.file) {
+        if (!validateFontFile(font.file)) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Guardar cambios";
+          return;
+        }
+        showProgress("custom-font");
+        uploadedUrl = await uploadFileToStorage(font.file, `fonts/${font.id}`, slugToUse);
+        hideProgress("custom-font");
       }
-      showProgress("custom-font");
-      const uploadedUrl = await uploadFileToStorage(customFontFile, "fonts", slugToUse);
-      hideProgress("custom-font");
       if (!uploadedUrl) {
-        showMediaError("custom-font", "Error al subir la tipografía. Intenta de nuevo.");
+        showMediaError("custom-font", `No se pudo subir la tipografía ${font.name || "seleccionada"}. Intenta de nuevo.`);
         saveBtn.disabled = false;
         saveBtn.textContent = "Guardar cambios";
         return;
       }
-      finalCustomFontUrl = uploadedUrl;
-      const customFontUrl = document.getElementById("customFontUrl");
-      if (customFontUrl) customFontUrl.value = uploadedUrl;
+      finalTypographyFonts.push({ id: font.id, name: font.name, url: uploadedUrl });
     }
+    const finalCustomFontUrl = finalTypographyFonts[0]?.url || null;
+    const finalCustomFontName = finalTypographyFonts[0]?.name || null;
+    const savedTypographyTokens = [
+      ...savedTypographyRoleTokens,
+      typographyFontLibraryToken(finalTypographyFonts)
+    ];
 
     // ── Subida de foto ──
     let finalPhotoUrl = existingPhotoUrl;
@@ -2140,8 +2276,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       godparents: godparentsJson,
       font_preset: document.getElementById("font_preset").value || "classic",
       custom_font_url: finalCustomFontUrl,
-      custom_font_name: document.getElementById("customFontName")?.value.trim() || null,
-      custom_font_targets: savedTypographyRoleTokens,
+      custom_font_name: finalCustomFontName,
+      custom_font_targets: savedTypographyTokens,
+      typography_fonts: finalTypographyFonts,
       visual_theme: document.getElementById("visual_theme") ? document.getElementById("visual_theme").value : "rose-floral",
       color_primary: document.getElementById("color_primary").value,
       color_secondary: document.getElementById("color_secondary").value,
@@ -2184,22 +2321,30 @@ document.addEventListener("DOMContentLoaded", async () => {
       updated_at: new Date().toISOString()
     };
 
-    let result;
-    if (isEditMode) {
-      // Actualizar
-      result = await db
+    const saveInvitationPayload = async payloadToSave => {
+      if (isEditMode) {
+        return db
+          .from("studio_invitations")
+          .update(payloadToSave)
+          .eq("id", inviteId)
+          .eq("studio_id", currentStudioId);
+      }
+      return db
         .from("studio_invitations")
-        .update(payload)
-        .eq("id", inviteId)
-        .eq("studio_id", currentStudioId);
-    } else {
-      // Insertar
-      payload.studio_id = currentStudioId;
-      result = await db
-        .from("studio_invitations")
-        .insert([payload])
+        .insert([{ ...payloadToSave, studio_id: currentStudioId }])
         .select("id, slug")
         .single();
+    };
+
+    let result = await saveInvitationPayload(payload);
+    const missingTypographyColumn = result.error && (
+      result.error.code === "PGRST204" ||
+      /typography_fonts.*column|column.*typography_fonts/i.test(result.error.message || "")
+    );
+    if (missingTypographyColumn) {
+      const compatiblePayload = { ...payload };
+      delete compatiblePayload.typography_fonts;
+      result = await saveInvitationPayload(compatiblePayload);
     }
 
     if (result.error) {
