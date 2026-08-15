@@ -496,24 +496,55 @@ function normalizeTypographyScales(val) {
     return scales;
 }
 
-function normalizeTypographyRoles(val) {
+function normalizeTypographyFontLibrary(value, targetTokens, legacyUrl, legacyName) {
+    var parsed = value;
+    if (typeof parsed === "string") {
+        try { parsed = JSON.parse(parsed); } catch (e) { parsed = []; }
+    }
+    if (!Array.isArray(parsed) || !parsed.length) {
+        var libraryToken = normalizeStringArray(targetTokens).find(function(token) {
+            return String(token || "").indexOf("typography-library:v1:") === 0;
+        });
+        if (libraryToken) {
+            try { parsed = JSON.parse(decodeURIComponent(libraryToken.slice("typography-library:v1:".length))); }
+            catch (e) { parsed = []; }
+        }
+    }
+    var fonts = (Array.isArray(parsed) ? parsed : []).map(function(font, index) {
+        if (!font || typeof font !== "object") return null;
+        var id = cleanString(font.id, 60).replace(/[^A-Za-z0-9_-]/g, "");
+        var url = safeHttpsUrl(font.url);
+        if (!id || !url) return null;
+        return { id: id, name: cleanString(font.name, 80) || ("Tipografía " + (index + 1)), url: url };
+    }).filter(Boolean).slice(0, 4);
+    var safeLegacyUrl = safeHttpsUrl(legacyUrl);
+    if (!fonts.length && safeLegacyUrl) {
+        fonts.push({ id: "font-legacy-custom", name: cleanString(legacyName, 80) || "Tipografía personalizada", url: safeLegacyUrl });
+    }
+    return fonts;
+}
+
+function normalizeTypographyRoles(val, fontLibrary) {
     var roles = ["coverName", "closingName", "mainTitle", "sectionTitle", "cardTitle", "guestName", "body", "labels"];
-    var sources = ["inherit", "classic", "romantic", "editorial", "minimal", "luxury", "signature", "couture", "custom"];
+    var sources = ["inherit", "classic", "romantic", "editorial", "minimal", "luxury", "signature", "couture", "custom"]
+        .concat((fontLibrary || []).map(function(font) { return font.id; }));
     var result = roles.reduce(function(config, role) {
         config[role] = { font: "inherit", scale: 1 };
         return config;
     }, {});
     var tokens = normalizeStringArray(val);
-    var hasRoleTokens = tokens.indexOf("typography:v1") !== -1;
+    var hasRoleTokens = tokens.indexOf("typography:v1") !== -1 || tokens.indexOf("typography:v2") !== -1;
 
     tokens.forEach(function(token) {
-        var fontMatch = String(token || "").match(/^typeface:v1:([A-Za-z]+):([a-z]+)$/);
+        var fontMatch = String(token || "").match(/^typeface:v[12]:([A-Za-z]+):([A-Za-z0-9_-]+)$/);
         if (fontMatch && roles.indexOf(fontMatch[1]) !== -1 && sources.indexOf(fontMatch[2]) !== -1) {
-            result[fontMatch[1]].font = fontMatch[2];
+            result[fontMatch[1]].font = fontMatch[2] === "custom" && fontLibrary && fontLibrary[0]
+                ? fontLibrary[0].id
+                : fontMatch[2];
             hasRoleTokens = true;
             return;
         }
-        var scaleMatch = String(token || "").match(/^type-scale:v1:([A-Za-z]+):(\d{2,3})$/);
+        var scaleMatch = String(token || "").match(/^type-scale:v[12]:([A-Za-z]+):(\d{2,3})$/);
         if (scaleMatch && roles.indexOf(scaleMatch[1]) !== -1) {
             result[scaleMatch[1]].scale = Math.min(150, Math.max(75, Number(scaleMatch[2]) || 100)) / 100;
             hasRoleTokens = true;
@@ -525,16 +556,17 @@ function normalizeTypographyRoles(val) {
     // Compatibilidad con las invitaciones guardadas antes del modelo por funciones.
     var legacyTargets = normalizeCustomFontTargets(tokens);
     var legacyScales = normalizeTypographyScales(tokens);
-    if (legacyTargets.indexOf("titles") !== -1) result.mainTitle.font = "custom";
+    var legacyFont = fontLibrary && fontLibrary[0] ? fontLibrary[0].id : "custom";
+    if (legacyTargets.indexOf("titles") !== -1) result.mainTitle.font = legacyFont;
     if (legacyTargets.indexOf("subtitles") !== -1) {
-        result.sectionTitle.font = "custom";
-        result.cardTitle.font = "custom";
+        result.sectionTitle.font = legacyFont;
+        result.cardTitle.font = legacyFont;
     }
     if (legacyTargets.indexOf("names") !== -1) {
-        result.coverName.font = "custom";
-        result.closingName.font = "custom";
+        result.coverName.font = legacyFont;
+        result.closingName.font = legacyFont;
     }
-    if (legacyTargets.indexOf("body") !== -1) result.body.font = "custom";
+    if (legacyTargets.indexOf("body") !== -1) result.body.font = legacyFont;
     result.mainTitle.scale = legacyScales.titles;
     result.sectionTitle.scale = legacyScales.subtitles;
     result.cardTitle.scale = legacyScales.subtitles;
@@ -585,6 +617,12 @@ function buildPublicTemplateData(inv, template) {
         ? [cleanString(inv.father_name, 120), cleanString(inv.mother_name, 120)].filter(Boolean)
         : normalizeStringArray(inv.parents);
     var confirmationPhones = normalizeConfirmationPhones(inv.whatsapp_number);
+    var typographyFonts = normalizeTypographyFontLibrary(
+        inv.typography_fonts,
+        inv.custom_font_targets,
+        inv.custom_font_url,
+        inv.custom_font_name
+    );
 
     return {
         templateId: template.id,
@@ -646,9 +684,10 @@ function buildPublicTemplateData(inv, template) {
         fontPreset: cleanString(inv.font_preset, 40),
         customFontUrl: safeHttpsUrl(inv.custom_font_url),
         customFontName: cleanString(inv.custom_font_name, 80),
+        typographyFonts: typographyFonts,
         customFontTargets: normalizeCustomFontTargets(inv.custom_font_targets),
         typographyScales: normalizeTypographyScales(inv.custom_font_targets),
-        typographyRoles: normalizeTypographyRoles(inv.custom_font_targets),
+        typographyRoles: normalizeTypographyRoles(inv.custom_font_targets, typographyFonts),
         visualTheme: cleanString(inv.visual_theme, 60),
         sectionBackgrounds: normalizeSectionBackgrounds(inv.section_backgrounds),
         studioName: cleanString(inv.studio_name, 120),
@@ -680,7 +719,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=preserve-shhh-font-20260815";
+    bridge.src = "/demos/shared/public-personalization.js?v=font-library-20260815";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

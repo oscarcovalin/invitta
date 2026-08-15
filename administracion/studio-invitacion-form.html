@@ -577,19 +577,22 @@
                 <div class="studio-custom-font-heading">
                   <div>
                     <span class="studio-custom-font-eyebrow">Opcional</span>
-                    <h4>Tipografía especial</h4>
+                    <h4>Biblioteca de tipografías</h4>
                   </div>
-                  <p>Sube una fuente y asígnala abajo a una o varias zonas.</p>
+                  <p>Sube hasta cuatro fuentes y asigna cada una donde la necesites.</p>
                 </div>
-                <label for="customFontFile">Archivo de tipografía</label>
-                <p>Formatos WOFF2, WOFF, TTF u OTF. Máximo 3 MB.</p>
+                <label for="customFontFile">Agregar tipografía</label>
+                <p>Una por una. Formatos WOFF2, WOFF, TTF u OTF; máximo 3 MB por archivo.</p>
                 <div class="studio-custom-font-fields">
                   <input type="file" id="customFontFile" accept=".woff2,.woff,.ttf,.otf,font/woff2,font/woff,font/ttf,font/otf,application/font-woff,application/x-font-ttf,application/x-font-opentype">
-                  <input type="text" id="customFontName" maxlength="80" placeholder="Nombre de la tipografía">
+                  <span id="custom-font-count" class="studio-custom-font-count">0 de 4 fuentes</span>
+                </div>
+                <div id="custom-font-library" class="studio-custom-font-library" aria-live="polite">
+                  <p id="custom-font-library-empty" class="studio-custom-font-library-empty">Todavía no has agregado fuentes propias.</p>
                 </div>
                 <div class="studio-custom-font-targets" role="group" aria-labelledby="custom-font-targets-title">
                   <span id="custom-font-targets-title" class="studio-custom-font-targets-title">Tipografía por tipo de texto</span>
-                  <p class="studio-typography-role-intro">Cada zona puede conservar el diseño original, usar una combinación del catálogo o la fuente que subiste.</p>
+                  <p class="studio-typography-role-intro">Cada zona puede conservar el diseño original, usar una combinación del catálogo o cualquiera de tus fuentes cargadas.</p>
 
                   <div class="studio-custom-font-target" data-typography-role-card="coverName">
                     <label class="studio-custom-font-target-copy" for="typographyFontCoverName"><strong>Nombre de portada</strong><small>Nombre principal del festejado o pareja</small></label>
@@ -640,12 +643,9 @@
                   </div>
                 </div>
                 <input type="hidden" id="customFontUrl" value="">
+                <input type="hidden" id="customFontName" value="">
                 <div class="upload-progress" id="custom-font-progress">Subiendo tipografía...</div>
                 <div class="media-error" id="custom-font-error"></div>
-                <div class="media-current" id="custom-font-current">
-                  <span id="custom-font-current-name"></span>
-                  <button type="button" id="removeCustomFontBtn" class="studio-custom-font-remove">Quitar</button>
-                </div>
               </div>
             </fieldset>
 
@@ -906,7 +906,7 @@
   <script src="/js/studio-auth.js?v=studio-recovery-20260718"></script>
   <!-- Lógica del Formulario -->
   <script src="/assets/js/invitta-templates.js?v=milestone-template-20260814"></script>
-  <script src="/js/studio-form.js?v=typography-roles-20260814"></script>
+  <script src="/js/studio-form.js?v=font-library-20260815"></script>
 
 </body>
 </html>

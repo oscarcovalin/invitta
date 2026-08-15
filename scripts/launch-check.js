@@ -104,15 +104,26 @@ if (!requestPage.includes('id="paymentButton"') || !requestPage.includes("/api/p
 }
 
 const studioInvitationForm = read("administracion/studio-invitacion-form.html");
+const studioFormScript = read("js/studio-form.js");
 const typographyRoles = ["coverName", "closingName", "mainTitle", "sectionTitle", "cardTitle", "guestName", "body", "labels"];
 if (!studioInvitationForm.includes('name="typography_role_font"') ||
     !studioInvitationForm.includes('name="typography_role_scale"') ||
+    !studioInvitationForm.includes('id="custom-font-library"') ||
     !typographyRoles.every((role) => studioInvitationForm.includes(`data-role="${role}"`))) {
   fail("Faltan los controles tipográficos por función del Studio");
 }
 
+if (!studioFormScript.includes("MAX_CUSTOM_FONTS = 4") ||
+    !studioFormScript.includes("getStudioTypographyFontLibrary") ||
+    !studioFormScript.includes("typographyFontLibraryToken")) {
+  fail("La biblioteca de tipografias no conserva el limite, la carga o el respaldo compatible");
+}
+
 const publicPersonalization = read("demos/shared/public-personalization.js");
-if (!publicPersonalization.includes("applyTypographyScales") || !publicPersonalization.includes("typographyRoles")) {
+if (!publicPersonalization.includes("applyTypographyScales") ||
+    !publicPersonalization.includes("typographyRoles") ||
+    !publicPersonalization.includes("typographyFonts") ||
+    !publicPersonalization.includes("InvittaUserFont_")) {
   fail("La invitación pública no aplica la configuración tipográfica por función");
 }
 const coverNameSelector = publicPersonalization.match(/coverName:\s*"([^"]+)"/)?.[1] || "";
