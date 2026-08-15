@@ -119,6 +119,7 @@ const coverNameSelector = publicPersonalization.match(/coverName:\s*"([^"]+)"/)?
 const closingNameSelector = publicPersonalization.match(/closingName:\s*"([^"]+)"/)?.[1] || "";
 const guestNameSelector = publicPersonalization.match(/guestName:\s*"([^"]+)"/)?.[1] || "";
 if (!publicPersonalization.includes("typographyRoleSelectors[target]") ||
+    !publicPersonalization.includes("p:not(.hero__secret)") ||
     !coverNameSelector.includes("#celebrant-name") || coverNameSelector.includes("thank-you-signature") ||
     !closingNameSelector.includes("#thank-you-signature") || closingNameSelector.includes("guest-name") ||
     !guestNameSelector.includes("#guest-name") || guestNameSelector.includes("thank-you-signature")) {
