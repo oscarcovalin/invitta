@@ -130,6 +130,18 @@ body.font-preset-luxury {
   --font-body: "Montserrat", sans-serif;
 }
 
+body.font-preset-signature {
+  --font-title: "Allura", cursive;
+  --font-script: "Allura", cursive;
+  --font-body: "Montserrat", sans-serif;
+}
+
+body.font-preset-couture {
+  --font-title: "Parisienne", cursive;
+  --font-script: "Parisienne", cursive;
+  --font-body: "Playfair Display", serif;
+}
+
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    RESET & BASE
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */

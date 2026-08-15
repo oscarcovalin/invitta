@@ -196,7 +196,8 @@
       addExactReplacement(list, "Mariana", bride.given || bride.first);
       addExactReplacement(list, "Diego", groom.given || groom.first);
       addExactReplacement(list, "Ana Camila", bride.given || bride.first);
-      addExactReplacement(list, "& Carlos", groom.given ? "& " + groom.given : "");
+      addExactReplacement(list, "Carlos", groom.given || groom.first); // Fix for split nodes
+      addExactReplacement(list, "& Carlos", groom.given ? "& " + groom.given : ""); // Legacy
       addExactReplacement(list, "Zavala & González", [bride.surname, groom.surname].filter(Boolean).join(" & "));
       return;
     }
@@ -208,8 +209,13 @@
       addExactReplacement(list, "Zavala", parts.last);
     } else if (templateId === "xv-rose-gold-premium") {
       addExactReplacement(list, "Mary", parts.first);
-      addExactReplacement(list, "Carmen", [parts.middle, parts.last].filter(Boolean).join(" "));
+      addExactReplacement(list, "Carmen", parts.middle); // Handle split Carmen
+      addExactReplacement(list, "Arevalo", parts.last); // In case it renders Arevalo
+      addExactReplacement(list, "Mary Carmen", parts.firstTwo || parts.first);
     } else if (templateId === "xv-champagne-rose-vip") {
+      addExactReplacement(list, "Ana", parts.first);
+      addExactReplacement(list, "Camila", parts.middle);
+      addExactReplacement(list, "Zavala", parts.last);
       addExactReplacement(list, "Ana Camila", parts.firstTwo || parts.first);
       addExactReplacement(list, "Zavala Almazán", parts.remainder || parts.last);
     }
@@ -764,11 +770,11 @@
       },
       signature: {
         display: '"Allura", "Great Vibes", cursive',
-        body: '"Cormorant Garamond", Georgia, serif'
+        body: '"Montserrat", Arial, sans-serif'
       },
       couture: {
         display: '"Parisienne", "Great Vibes", cursive',
-        body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif'
+        body: '"Playfair Display", Georgia, serif'
       },
       custom: {
         display: '"InvittaCustom", "Cormorant Garamond", Georgia, serif',
@@ -784,15 +790,11 @@
     root.style.setProperty("--font-secondary", fonts.body);
 
     var roleConfig = data.typographyRoles || {};
-    var needsSignatureFonts = basePreset === "signature" || basePreset === "couture" || typographyRoleOrder.some(function(role) {
-      var source = roleConfig[role] && roleConfig[role].font;
-      return source === "signature" || source === "couture";
-    });
-    if (needsSignatureFonts && !document.getElementById("invitta-signature-fonts")) {
+    if (!document.getElementById("invitta-global-fonts")) {
       var fontLink = document.createElement("link");
-      fontLink.id = "invitta-signature-fonts";
+      fontLink.id = "invitta-global-fonts";
       fontLink.rel = "stylesheet";
-      fontLink.href = "https://fonts.googleapis.com/css2?family=Allura&family=Parisienne&display=swap";
+      fontLink.href = "https://fonts.googleapis.com/css2?family=Alex+Brush&family=Allura&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Cinzel:wght@400..900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Great+Vibes&family=Inter:wght@100..900&family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Parisienne&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Raleway:ital,wght@0,100..900;1,100..900&family=Sacramento&display=swap";
       document.head.appendChild(fontLink);
     }
 
