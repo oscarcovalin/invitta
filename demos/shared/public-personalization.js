@@ -727,7 +727,6 @@
       root.style.setProperty("--color-background", palette.surface);
       root.style.setProperty("--color-paper", palette.surface);
       root.style.setProperty("--color-surface", palette.card);
-      root.style.setProperty("--color-ink", palette.title);
       root.style.setProperty("--color-primary", palette.accent);
       root.style.setProperty("--color-sage", palette.accent);
     } else {
@@ -864,8 +863,8 @@
     style.textContent = [
       "html[data-invitta-palette] body{background:var(--invitta-surface)!important;color:var(--invitta-body)!important}",
       "html[data-invitta-palette] .bg-paper, html[data-invitta-palette] .bg-cream, html[data-invitta-palette] .bg-ivory {background-color:var(--invitta-card)!important}",
-      "h1,h2,h3,.font-display,.font-serif{color:var(--invitta-title)!important}",
-      "p,.font-sans,.font-body{color:var(--invitta-body)!important}",
+      "h1:not(.text-paper):not(.text-white),h2:not(.text-paper):not(.text-white),h3:not(.text-paper):not(.text-white),.font-display:not(.text-paper):not(.text-white),.font-serif:not(.text-paper):not(.text-white){color:var(--invitta-title)!important}",
+      "p:not(.text-paper):not(.text-white),.font-sans:not(.text-paper):not(.text-white),.font-body:not(.text-paper):not(.text-white){color:var(--invitta-body)!important}",
       ".text-sage, .text-gold, .text-accent {color:var(--invitta-accent)!important}",
       ".border-sage, .border-gold, .border-accent {border-color:var(--invitta-accent)!important}",
       ".bg-sage, .bg-gold, .bg-accent {background-color:var(--invitta-accent)!important}",
