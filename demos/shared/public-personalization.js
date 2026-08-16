@@ -334,12 +334,19 @@
   function applyImages() {
     imageSequence = 0;
     Array.from(document.images).forEach(function (image) {
-      if (image.dataset.invittaPersonalized === "true") return;
+      if (image.dataset.invittaPersonalized === "true") {
+        if (image.dataset.invittaPersonalizedSrc && image.src !== image.dataset.invittaPersonalizedSrc) {
+          image.src = image.dataset.invittaPersonalizedSrc;
+          image.removeAttribute("srcset");
+        }
+        return;
+      }
       var original = image.currentSrc || image.src;
       if (!isPhotoUrl(original)) return;
       var replacement = choosePhoto(original, image);
       if (!replacement) return;
       image.dataset.invittaPersonalized = "true";
+      image.dataset.invittaPersonalizedSrc = replacement;
       image.src = replacement;
       image.removeAttribute("srcset");
     });
@@ -347,10 +354,16 @@
     Array.from(document.querySelectorAll("[style]"))
       .filter(function (element) { return isPhotoUrl(element.style.backgroundImage); })
       .forEach(function (element) {
-        if (element.dataset.invittaPersonalized === "true") return;
+        if (element.dataset.invittaPersonalized === "true") {
+          if (element.dataset.invittaPersonalizedSrc && element.style.backgroundImage.indexOf(element.dataset.invittaPersonalizedSrc) === -1) {
+            element.style.backgroundImage = 'url("' + element.dataset.invittaPersonalizedSrc.replace(/"/g, "") + '")';
+          }
+          return;
+        }
         var replacement = choosePhoto(element.style.backgroundImage, element);
         if (!replacement) return;
         element.dataset.invittaPersonalized = "true";
+        element.dataset.invittaPersonalizedSrc = replacement;
         element.style.backgroundImage = 'url("' + replacement.replace(/"/g, "") + '")';
       });
   }
