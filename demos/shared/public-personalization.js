@@ -165,14 +165,14 @@
 
   function addReplacement(list, from, to) {
     from = clean(from);
-    to = clean(to);
-    if (from && to && from !== to) list.push([from, to]);
+    to = to === undefined || to === null ? "" : String(to).trim();
+    if (from && from !== to) list.push([from, to]);
   }
 
   function addExactReplacement(list, from, to) {
     from = clean(from);
-    to = clean(to);
-    if (from && to && from !== to) list.push([from, to, true]);
+    to = to === undefined || to === null ? "" : String(to).trim();
+    if (from && from !== to) list.push([from, to, true]);
   }
 
   function personNameParts(value) {
@@ -863,12 +863,12 @@
     style.id = "invitta-visual-customization";
     style.textContent = [
       "html[data-invitta-palette] body{background:var(--invitta-surface)!important;color:var(--invitta-body)!important}",
-      "html[data-invitta-palette] [class*='bg-paper'],html[data-invitta-palette] [class*='bg-cream'],html[data-invitta-palette] [class*='bg-ivory']{background-color:var(--invitta-card)!important}",
+      "html[data-invitta-palette] .bg-paper, html[data-invitta-palette] .bg-cream, html[data-invitta-palette] .bg-ivory {background-color:var(--invitta-card)!important}",
       "h1,h2,h3,.font-display,.font-serif{color:var(--invitta-title)!important}",
       "p,.font-sans,.font-body{color:var(--invitta-body)!important}",
-      "[class*='text-sage'],[class*='text-gold'],[class*='text-accent']{color:var(--invitta-accent)!important}",
-      "[class*='border-sage'],[class*='border-gold'],[class*='border-accent']{border-color:var(--invitta-accent)!important}",
-      "[class*='bg-sage'],[class*='bg-gold'],[class*='bg-accent']{background-color:var(--invitta-accent)!important}",
+      ".text-sage, .text-gold, .text-accent {color:var(--invitta-accent)!important}",
+      ".border-sage, .border-gold, .border-accent {border-color:var(--invitta-accent)!important}",
+      ".bg-sage, .bg-gold, .bg-accent {background-color:var(--invitta-accent)!important}",
       "h1,h2,h3,.font-display,.font-serif{font-family:var(--font-display),var(--font-serif),Georgia,serif!important}",
       "body,button,input,select,textarea,.font-sans,.font-body{font-family:var(--font-sans),var(--font-secondary),Arial,sans-serif}"
     ].join("");
