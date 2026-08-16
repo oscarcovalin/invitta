@@ -19,7 +19,7 @@ const checkedJavaScript = [
   "api/payment-config.js",
   "api/payment-status.js",
   "api/stripe-webhook.js",
-  "js/invitation-public.js",
+  "src/main-invitation.js",
   "demos/evento-general-basic/app.js",
   "js/studio-form.js",
   "assets/js/password-recovery.js"
@@ -120,7 +120,7 @@ if (!studioFormScript.includes("MAX_CUSTOM_FONTS = 4") ||
 }
 
 const publicPersonalization = read("demos/shared/public-personalization.js");
-const publicInvitation = read("js/invitation-public.js");
+const publicInvitation = read("src/main-invitation.js");
 if (!publicInvitation.includes("applyLegacyTypography") ||
     !publicInvitation.includes("InvittaLegacyFont_")) {
   fail("Las invitaciones heredadas no aplican tipografias personalizadas");
