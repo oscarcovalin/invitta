@@ -3,8 +3,12 @@ const path = require("path");
 
 const APP_URL = "https://invitta.vercel.app";
 const SUPABASE_URL = "https://zqnlvmafwcioizzxhnhz.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_aGhY_wqkcuv0c2wLDMb-nw_wsjjfTcd";
-const HTML_PATH = path.join(process.cwd(), "invitacion.html");
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "sb_publishable_aGhY_wqkcuv0c2wLDMb-nw_wsjjfTcd";
+
+let HTML_PATH = path.join(process.cwd(), "dist", "invitacion.html");
+if (!fs.existsSync(HTML_PATH)) {
+  HTML_PATH = path.join(process.cwd(), "invitacion.html");
+}
 
 function escapeHtml(value) {
   return String(value || "")
