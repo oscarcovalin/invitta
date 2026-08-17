@@ -2040,6 +2040,7 @@ function renderDefaultTemplate(inv) {
         <section class="inv-error-card">
           <h1>No pudimos abrirla</h1>
           <p>${escapeHtml(publicMessage)}</p>
+          <p style="margin-top:20px; font-size:12px; color:#888; font-family:monospace; word-break:break-all;">Error técnico: ${escapeHtml(errorMessage)}</p>
         </section>
       </main>
     `;
