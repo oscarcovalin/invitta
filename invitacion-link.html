@@ -116,15 +116,133 @@
               Muestra este pase al llegar al evento.
             </p>
           </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Pase - Invitta Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/invitacion-link.css">
+</head>
+<body class="link-builder-page">
+  <main class="link-builder-shell">
+    
+    <section id="linkBuilderCard" class="link-builder-card">
+      <div class="link-builder-mark">Invitta Studio</div>
+      
+      <!-- ESTADO DE CARGA / STATUS -->
+      <div id="statusState" style="text-align: center;">
+        <p class="link-builder-kicker">Pase de emergencia</p>
+        <h1 class="link-builder-title">Cargando</h1>
+        <p class="link-builder-subtitle" id="statusMessage">Cargando configuración...</p>
+      </div>
+
+      <div id="linkBuilderError" class="link-builder-error hidden" style="margin-bottom: 1.5rem;"></div>
+
+      <!-- PANTALLA DE ERROR / DESACTIVADO -->
+      <div id="disabledState" class="hidden" style="text-align: center;">
+        <p class="link-builder-subtitle" style="color: #b42318; font-weight: 600;" id="disabledMessageText">El generador de enlaces no está activo para esta invitación.</p>
+      </div>
+
+      <!-- PIN GATE -->
+      <div id="linkBuilderPinGate" class="link-builder-pin-gate hidden" style="text-align: center;">
+        <p class="link-builder-kicker">Acceso privado</p>
+        <h1 class="link-builder-title">Ingresa el PIN</h1>
+        <p class="link-builder-subtitle" style="margin-bottom: 1.5rem;">
+          Escribe el PIN proporcionado por el estudio para generar pases personalizados.
+        </p>
+
+        <div class="link-builder-field">
+          <label for="linkBuilderPinInput" style="text-align: left; display: block;">PIN de acceso</label>
+          <input
+            id="linkBuilderPinInput"
+            type="password"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            placeholder="••••"
+          >
+        </div>
+
+        <button id="unlockLinkBuilderButton" class="link-builder-button primary" type="button" style="width: 100%; margin-top: .5rem;">
+          Entrar
+        </button>
+
+        <p id="linkBuilderPinError" class="link-builder-error hidden"></p>
+      </div>
+
+      <!-- FORMULARIO DE GENERADOR -->
+      <div id="linkBuilderForm" class="hidden">
+        <p class="link-builder-kicker">Pase de emergencia</p>
+        <h1 id="dynamicTitle" class="link-builder-title">Generador de pase</h1>
+        <p id="dynamicMessage" class="link-builder-subtitle">Crea un pase rápido para invitados de último momento.</p>
+
+        <div id="builderForm">
+          <div class="link-builder-field">
+            <label for="guestName">Nombre o familia *</label>
+            <input type="text" id="guestName" placeholder="Familia García" required>
+          </div>
+
+          <div class="link-builder-field">
+            <label for="guestPasses">Pases</label>
+            <input type="number" id="guestPasses" placeholder="4" min="1">
+          </div>
+
+          <div class="link-builder-field">
+            <label for="guestTable">Mesa</label>
+            <input type="text" id="guestTable" placeholder="5">
+          </div>
+
+          <div class="link-builder-field">
+            <label for="guestWhatsapp">WhatsApp del invitado opcional</label>
+            <input type="tel" id="guestWhatsapp" placeholder="525512345678">
+          </div>
+
+          <div class="link-builder-actions">
+            <button type="button" id="generateLinkButton" class="link-builder-button primary">Generar pase</button>
+          </div>
+
+          <div id="generatedLinkOutput" class="generated-link-output hidden"></div>
+
+          <div id="generatedPassActions" class="link-builder-actions hidden">
+            <button id="copyLinkButton" class="link-builder-button" type="button">Copiar enlace</button>
+            <button id="openInvitationButton" class="link-builder-button" type="button">Abrir invitación</button>
+            <button id="downloadPassButton" class="link-builder-button" type="button">Descargar pase</button>
+            <button id="sendWhatsappButton" class="link-builder-button" type="button">Enviar por WhatsApp</button>
+          </div>
+
+          <div id="generatedPassCard" class="generated-pass-card hidden">
+            <p class="generated-pass-kicker">PASE DE EMERGENCIA</p>
+            <h2 id="generatedPassName" class="generated-pass-name">Familia García</h2>
+
+            <div class="generated-pass-details">
+              <div>
+                <span>Pases</span>
+                <strong id="generatedPassCount">4</strong>
+              </div>
+              <div>
+                <span>Mesa</span>
+                <strong id="generatedPassTable">5</strong>
+              </div>
+            </div>
+
+            <div id="generatedPassQr" class="generated-pass-qr"></div>
+
+            <p class="generated-pass-note">
+              Muestra este pase al llegar al evento.
+            </p>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/assets/js/env.js"></script>
+  <script type="module" src="/assets/js/env.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="/js/invitacion-link.js"></script>
+  <script type="module" src="/js/invitacion-link.js"></script>
 </body>
 </html>
