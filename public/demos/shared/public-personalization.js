@@ -893,83 +893,24 @@
 
     if (!palette && !data.titleColor && !data.bodyColor && !data.accentColor) return;
 
+    root.dataset.invittaTheme = "active";
     var style = document.createElement("style");
     style.id = "invitta-visual-customization";
     style.textContent = [
-      "html[data-invitta-palette] body{background:var(--invitta-surface)!important;color:var(--invitta-body)!important}",
-      "html[data-invitta-palette] :where(.bg-paper, .bg-cream, .bg-ivory) {background-color:var(--invitta-card)!important}",
-      ":where(h1, h2, h3, .font-display, .font-serif):not(.text-paper):not(.text-white) {color:var(--invitta-title)}",
-      ":where(p, .font-sans, .font-body):not(.text-paper):not(.text-white) {color:var(--invitta-body)}",
-      ":where(.text-sage, .text-gold, .text-accent) {color:var(--invitta-accent)}",
-      ":where(.border-sage, .border-gold, .border-accent) {border-color:var(--invitta-accent)}",
-      ":where(.bg-sage, .bg-gold, .bg-accent) {background-color:var(--invitta-accent)}",
-      ":where(h1, h2, h3, .font-display, .font-serif) {font-family:var(--font-display),var(--font-serif),Georgia,serif}",
-      ":where(body, button, input, select, textarea, .font-sans, .font-body) {font-family:var(--font-sans),var(--font-secondary),Arial,sans-serif}"
-    ].join("");
+      "html[data-invitta-theme=\"active\"] body {background:var(--invitta-surface, var(--inv-60))!important; color:var(--invitta-body, var(--text-color))!important}",
+      "html[data-invitta-theme=\"active\"] .bg-paper, html[data-invitta-theme=\"active\"] .bg-cream, html[data-invitta-theme=\"active\"] .bg-ivory {background-color:var(--invitta-card, var(--inv-60))!important}",
+      "html[data-invitta-theme=\"active\"] h1:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] h2:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] h3:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-display:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-serif:not(.text-paper):not(.text-white) {color:var(--invitta-title, var(--inv-text, #2e2722))}",
+      "html[data-invitta-theme=\"active\"] p:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-sans:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-body:not(.text-paper):not(.text-white) {color:var(--invitta-body, var(--inv-text, #2e2722))}",
+      "html[data-invitta-theme=\"active\"] .text-sage, html[data-invitta-theme=\"active\"] .text-gold, html[data-invitta-theme=\"active\"] .text-accent {color:var(--invitta-accent, #cb1823)}",
+      "html[data-invitta-theme=\"active\"] .border-sage, html[data-invitta-theme=\"active\"] .border-gold, html[data-invitta-theme=\"active\"] .border-accent {border-color:var(--invitta-accent, #cb1823)}",
+      "html[data-invitta-theme=\"active\"] .bg-sage, html[data-invitta-theme=\"active\"] .bg-gold, html[data-invitta-theme=\"active\"] .bg-accent {background-color:var(--invitta-accent, #cb1823)}",
+      "html[data-invitta-theme=\"active\"] h1, html[data-invitta-theme=\"active\"] h2, html[data-invitta-theme=\"active\"] h3, html[data-invitta-theme=\"active\"] .font-display, html[data-invitta-theme=\"active\"] .font-serif {font-family:var(--font-display, var(--font-script, 'Georgia')), serif}",
+      "html[data-invitta-theme=\"active\"] body, html[data-invitta-theme=\"active\"] button, html[data-invitta-theme=\"active\"] input, html[data-invitta-theme=\"active\"] select, html[data-invitta-theme=\"active\"] textarea, html[data-invitta-theme=\"active\"] .font-sans, html[data-invitta-theme=\"active\"] .font-body {font-family:var(--font-sans, var(--font-secondary, 'Arial')), sans-serif}"
+    ].join("\\n");
     document.head.appendChild(style);
   }
 
-  function applySmartContrast() {
-    var textNodes = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
-    var node;
-    var elementsToCheck = new Set();
-    while (node = textNodes.nextNode()) {
-      if (node.nodeValue.trim().length > 0) {
-        if (node.parentElement && node.parentElement.tagName !== 'SCRIPT' && node.parentElement.tagName !== 'STYLE') {
-          elementsToCheck.add(node.parentElement);
-        }
-      }
-    }
-    
-    elementsToCheck.forEach(function(el) {
-      if (el.dataset.invittaContrastChecked === "true") return;
-      var style = window.getComputedStyle(el);
-      var colorMatch = style.color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-      if (!colorMatch) return;
-      
-      var tr = parseInt(colorMatch[1], 10);
-      var tg = parseInt(colorMatch[2], 10);
-      var tb = parseInt(colorMatch[3], 10);
-      var textYiq = ((tr*299)+(tg*587)+(tb*114))/1000;
-      
-      var bgEl = el;
-      var bgMatch = null;
-      var alpha = 0;
-      
-      while (bgEl && bgEl !== document && bgEl.tagName !== 'HTML') {
-        var bgStyle = window.getComputedStyle(bgEl);
-        var bg = bgStyle.backgroundColor;
-        if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
-          var tempMatch = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-          if (tempMatch) {
-            var tempAlpha = bg.indexOf('rgba') === 0 ? parseFloat(bg.split(',')[3]) : 1;
-            if (tempAlpha > 0.4) {
-              bgMatch = tempMatch;
-              alpha = tempAlpha;
-              break;
-            }
-          }
-        }
-        bgEl = bgEl.parentElement;
-      }
-      
-      if (bgMatch && alpha > 0.4) {
-        var r = parseInt(bgMatch[1], 10);
-        var g = parseInt(bgMatch[2], 10);
-        var b = parseInt(bgMatch[3], 10);
-        var bgYiq = ((r*299)+(g*587)+(b*114))/1000;
-        
-        if (Math.abs(bgYiq - textYiq) < 60) {
-          if (bgYiq < 128) {
-             el.style.setProperty("color", "#fdfbf7", "important");
-          } else {
-             el.style.setProperty("color", "#2e2722", "important");
-          }
-        }
-      }
-      el.dataset.invittaContrastChecked = "true";
-    });
-  }
+
 
   function applyAll() {
     if (applying || !document.body) return;
@@ -984,7 +925,6 @@
     applyVipAccessPass();
     applyConfirmationContacts();
     applyTypographyScales(false);
-    applySmartContrast();
     hideLegacyGuestAdmin();
     applying = false;
   }
