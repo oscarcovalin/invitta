@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#FAF7F2">
   <link rel="canonical" href="https://invitta.vercel.app/solicitar-invitacion.html">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/favicon-BVvVx6sN.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -363,7 +363,7 @@
         <div class="phone-screen">
           <iframe id="designPreviewFrame" src="demos/xv-elegance/index.html" title="Vista en vivo del diseño seleccionado" loading="eager"></iframe>
         </div>
-        <img id="designPreviewImage" src="assets/catalog/xv-elegance.jpg" alt="Vista previa del diseño seleccionado" width="390" height="844">
+        <img id="designPreviewImage" src="/assets/xv-elegance-Ce50qANQ.jpg" alt="Vista previa del diseño seleccionado" width="390" height="844">
         <figcaption id="designPreviewCaption">Diseño Élégance</figcaption>
       </figure>
       <a class="preview-demo-link" id="previewDemoLink" href="demos/xv-elegance/index.html" target="_blank" rel="noopener">Ver muestra personalizada</a>
@@ -790,7 +790,7 @@
         requestId = await ensureSalesRequest(data);
         requestSaved = true;
       } catch (error) {
-        // console.error('No se pudo registrar la solicitud:', error);
+        console.error('No se pudo registrar la solicitud:', error);
       }
       if (action === 'payment') {
         if (!requestSaved) {
@@ -804,8 +804,8 @@
           await startCheckout(data, requestId);
           return;
         } catch (error) {
-          // console.error('No se pudo iniciar el pago:', error);
-          status.textContent = 'Hubo un problema al iniciar el pago seguro. Por favor, intenta de nuevo o contáctanos por WhatsApp.';
+          console.error('No se pudo iniciar el pago:', error);
+          status.textContent = error.message;
           submitButtons.forEach(button => { button.disabled = false; });
           if (submitButton) submitButton.textContent = originalLabel;
           return;

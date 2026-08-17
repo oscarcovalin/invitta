@@ -346,6 +346,7 @@ body {
   line-height: 1.05;
   letter-spacing: -0.01em;
   margin-bottom: 10px;
+  text-transform: none !important;
 }
 
 .inv-hero:not(.inv-hero--has-photo) .inv-title {
@@ -364,6 +365,7 @@ body {
   font-style: italic;
   font-weight: 300;
   margin-bottom: 20px;
+  text-transform: none !important;
 }
 
 .inv-hero:not(.inv-hero--has-photo) .inv-honoree {
@@ -3704,3 +3706,7 @@ body.inv-reveal-ready .inv-moment-frame.inv-scroll-fade:not(.inv-scroll-visible)
   opacity: 1 !important;
   transform: none !important;
 }
+
+/* FIX UPPERCASE ISSUE */
+.inv-hero h1, .inv-hero-title, .inv-title, .inv-honoree, .inv-hero-title-main, .inv-hero-title-name, .inv-title-script, .inv-title-top { text-transform: none !important; }
+

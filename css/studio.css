@@ -668,7 +668,6 @@ body {
   font-size: 0.46rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .studio-preview-phone[data-font="romantic"] .studio-preview-name,
@@ -685,7 +684,6 @@ body {
 .studio-preview-phone[data-font="luxury"] .studio-preview-name {
   font-size: 1.55rem;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 @media (max-width: 640px) {
@@ -1331,3 +1329,7 @@ body {
     flex: 1 1 145px;
   }
 }
+
+/* FIX UPPERCASE ISSUE */
+.inv-hero h1, .inv-hero-title, .inv-title, .inv-honoree, .inv-hero-title-main, .inv-hero-title-name, .inv-title-script, .inv-title-top, .studio-preview-name, .studio-preview-title { text-transform: none !important; }
+

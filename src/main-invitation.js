@@ -38,7 +38,7 @@ import { supabase as db } from './api/supabase-client.js';
   /* ¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬ Carga ¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬ */
   async function loadInvitation() {
     try {
-      console.log("slug recibido:", slug);
+      // console.log("slug recibido:", slug);
 
       if (studioPreview) {
         var sessionResult = await db.auth.getSession();
@@ -64,8 +64,8 @@ import { supabase as db } from './api/supabase-client.js';
       var data  = result.data;
       var error = result.error;
 
-      console.log("data invitación:", data);
-      console.log("error Supabase:", error);
+      // console.log("data invitación:", data);
+      // console.log("error Supabase:", error);
 
       if (error) {
         console.error("Error real de Supabase:", error);
@@ -104,14 +104,14 @@ import { supabase as db } from './api/supabase-client.js';
         maxPasses = clampInt(guestData.passes, 1, 20);
         tableNum = sanitize(guestData.table || "");
       }
-      console.log("Antes de renderInvitation");
+      // console.log("Antes de renderInvitation");
       try {
         renderInvitation(data);
       } catch (renderError) {
         showInvitationError(renderError);
         return;
       }
-      console.log("Despues de renderInvitation");
+      // console.log("Despues de renderInvitation");
 
     } catch (err) {
       console.error("Error real en loadInvitation:", err);
@@ -1121,8 +1121,8 @@ function renderDefaultTemplate(inv) {
       setupCalendarButton(inv);
     }
 
-    console.log("music_url:", inv.music_url);
-      console.log("music_url:", inv.music_url);
+    // console.log("music_url:", inv.music_url);
+    // console.log("music_url:", inv.music_url);
     setupMusicPlayer(inv);
 
     /* 17. Galería */
@@ -1146,7 +1146,7 @@ function renderDefaultTemplate(inv) {
     /* 19. Limpieza de elementos legacy de audio en el contenido */
     document.querySelectorAll("#inv-content audio, #inv-content [id*='music'], #inv-content [class*='music']").forEach((el) => {
       if (el.id !== "inv-music-player") {
-        console.warn("Removing legacy inline music element:", el);
+        // console.warn("Removing legacy inline music element:", el);
         el.remove();
       }
     });
@@ -1627,7 +1627,7 @@ function renderDefaultTemplate(inv) {
     const artist = document.getElementById("inv-music-artist");
 
     if (!player || !toggle) {
-      console.warn("Music player DOM missing");
+      // console.warn("Music player DOM missing");
       return;
     }
 
@@ -1657,9 +1657,9 @@ function renderDefaultTemplate(inv) {
     
     document.body.classList.add("has-music-player");
 
-    console.log("Music player computed display:", window.getComputedStyle(player).display);
-    console.log("Music player position:", window.getComputedStyle(player).position);
-    console.log("Music player bottom:", window.getComputedStyle(player).bottom);
+    // console.log("Music player computed display:", window.getComputedStyle(player).display);
+    // console.log("Music player position:", window.getComputedStyle(player).position);
+    // console.log("Music player bottom:", window.getComputedStyle(player).bottom);
 
     if (title) title.textContent = getMusicDisplayTitle(invitation);
     if (artist) artist.textContent = "";
@@ -2139,7 +2139,7 @@ function renderDefaultTemplate(inv) {
           ? parsed.filter(item => item && (item.title || item.time))
           : [];
       } catch (err) {
-        console.warn("No se pudo parsear itinerary:", err, value);
+        // console.warn("No se pudo parsear itinerary:", err, value);
         return [];
       }
     }
@@ -2561,7 +2561,7 @@ function setupSlowRevealForProblemSections() {
 function setupRevealOnScroll() {
   const sections = getInvitationRevealSections();
 
-  console.log("Scroll fade sections:", sections.length);
+  // console.log("Scroll fade sections:", sections.length);
 
   if (!sections.length) return;
 
@@ -2676,6 +2676,14 @@ function fitHeroHonoreeSingleLine() {
   }
 }
 
+function toSmartTitleCase(str) {
+  if (!str) return "";
+  if (str === str.toUpperCase() && /[A-Z]/.test(str)) {
+    return str.toLowerCase().replace(/\b\p{L}/gu, (char) => char.toUpperCase());
+  }
+  return str;
+}
+
 function resolveHeroHeading(title, honoreeName, eventType) {
   const rawTitle = String(title || "").trim();
   let honoree = String(honoreeName || "").trim();
@@ -2689,6 +2697,9 @@ function resolveHeroHeading(title, honoreeName, eventType) {
       honoree = legacyTitle[2].trim();
     }
   }
+
+  // Corregir nombres que vengan todos en mayúsculas desde la BD
+  honoree = toSmartTitleCase(honoree);
 
   return {
     title: buildHeroEventTitle(eventTitle, honoree),
