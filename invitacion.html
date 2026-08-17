@@ -365,13 +365,208 @@
       aria-label="Reproducir música"
     >
       <svg class="inv-music-control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <div class="inv-card-ornament" aria-hidden="true">
+          <svg width="210" height="72" viewBox="0 0 210 72" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M105 10C80 0 60 30 10 30C60 30 80 50 105 62C130 50 150 30 200 30C150 30 130 0 105 10Z"/>
+          </svg>
+        </div>
+        <div class="inv-card-icon inv-section-icon" aria-hidden="true"></div>
+        <h2 class="inv-card-title">Ceremonia</h2>
+        <div class="inv-card-details">
+          <p class="inv-venue-name" id="inv-ceremony-name"></p>
+          <p class="inv-venue-address" id="inv-ceremony-address"></p>
+        </div>
+        <a class="inv-premium-button" id="inv-ceremony-map-btn"
+           href="javascript:void(0)" target="_blank" rel="noopener noreferrer" style="display:none">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21c-4-4-8-9-8-13a8 8 0 1 1 16 0c0 4-4 9-8 13z"/><circle cx="12" cy="8" r="3"/></svg> ¿Cómo llegar?
+        </a>
+      </section>
+
+      <!-- 7b. RECEPCIÓN -->
+      <section class="inv-section inv-event-card reveal-on-scroll" id="inv-reception-block" aria-label="Recepción" style="display:none">
+        <div class="inv-card-ornament" aria-hidden="true">
+          <svg width="210" height="72" viewBox="0 0 210 72" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M105 10C80 0 60 30 10 30C60 30 80 50 105 62C130 50 150 30 200 30C150 30 130 0 105 10Z"/>
+          </svg>
+        </div>
+        <div class="inv-card-icon inv-section-icon" aria-hidden="true"></div>
+        <h2 class="inv-card-title">Recepción</h2>
+        <div class="inv-card-details">
+          <p class="inv-venue-name" id="inv-reception-name"></p>
+          <p class="inv-venue-address" id="inv-reception-address"></p>
+        </div>
+        <a class="inv-premium-button" id="inv-reception-map-btn"
+           href="javascript:void(0)" target="_blank" rel="noopener noreferrer" style="display:none">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21c-4-4-8-9-8-13a8 8 0 1 1 16 0c0 4-4 9-8 13z"/><circle cx="12" cy="8" r="3"/></svg> ¿Cómo llegar?
+        </a>
+      </section>
+
+      <!-- ── 8. ITINERARIO ── -->
+      <section id="inv-itinerary-section" class="inv-section inv-timeline-premium reveal-on-scroll" style="display:none;">
+        <div class="inv-timeline-shell">
+          <div class="inv-timeline-header">
+            <div class="inv-card-icon inv-section-icon" aria-hidden="true"></div>
+            <p class="inv-timeline-kicker">ITINERARIO</p>
+            <h2 class="inv-timeline-title">
+              <span class="inv-title-top">Momentos de la</span>
+              <span class="inv-title-script">Noche</span>
+            </h2>
+            <div class="inv-timeline-divider" aria-hidden="true">
+              <span></span>
+              <i class="fa-solid fa-heart"></i>
+              <span></span>
+            </div>
+          </div>
+
+          <div id="inv-itinerary" class="inv-timeline-list"></div>
+        </div>
+      </section>
+
+      <!-- ── 9. DRESS CODE ── -->
+      <section class="inv-event-card reveal-on-scroll" id="inv-dresscode-block" aria-label="Código de vestimenta" style="display:none">
+        <div class="inv-card-ornament" aria-hidden="true">
+          <svg width="210" height="72" viewBox="0 0 210 72" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M105 10C80 0 60 30 10 30C60 30 80 50 105 62C130 50 150 30 200 30C150 30 130 0 105 10Z"/>
+          </svg>
+        </div>
+        <div class="inv-card-icon inv-section-icon" aria-hidden="true"></div>
+        <h2 class="inv-card-title">Dress Code</h2>
+        <div class="inv-card-details">
+          <p class="inv-dresscode-text" id="inv-dresscode"></p>
+        </div>
+      </section>
+
+      <!-- ── 10. MESA DE REGALOS ── -->
+      <section class="inv-event-card reveal-on-scroll" id="inv-gifts-block" aria-label="Mesa de regalos" style="display:none">
+        <div class="inv-card-ornament" aria-hidden="true">
+          <svg width="210" height="72" viewBox="0 0 210 72" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M105 10C80 0 60 30 10 30C60 30 80 50 105 62C130 50 150 30 200 30C150 30 130 0 105 10Z"/>
+          </svg>
+        </div>
+        <div class="inv-card-icon inv-section-icon" aria-hidden="true"></div>
+        <h2 class="inv-card-title">Regalos</h2>
+        <div class="inv-card-details">
+          <p class="inv-gifts-text">Con mucho cariño, te dejamos el enlace a nuestra mesa de regalos.</p>
+        </div>
+        <a class="inv-premium-button" id="inv-gifts-link" href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Ver mesa de regalos
+        </a>
+      </section>
+
+      <!-- ── 11. PASE PERSONALIZADO (Boleto premium) ── -->
+      <section id="inv-pass-section" class="inv-event-card inv-pass-card reveal-on-scroll" aria-label="Tu pase personal">
+        <div class="inv-card-ornament" aria-hidden="true">
+          <svg width="210" height="72" viewBox="0 0 210 72" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M105 10C80 0 60 30 10 30C60 30 80 50 105 62C130 50 150 30 200 30C150 30 130 0 105 10Z"/>
+          </svg>
+        </div>
+        <div class="inv-card-icon inv-section-icon" aria-hidden="true"></div>
+        <h2 class="inv-card-title" style="font-size: clamp(1.4rem, 4vw, 1.8rem);">Pase Personal</h2>
+        <div class="inv-card-details">
+          <p class="inv-ticket-name" id="inv-guest-name" style="font-family: var(--font-script); font-size: 2.2rem; margin: 16px 0; color: var(--inv-primary); line-height: 1.1;"></p>
+          
+          <div class="inv-ticket-grid" style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem;">
+            <div class="inv-ticket-field">
+              <span class="inv-ticket-field-label" style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Pases</span>
+              <span class="inv-ticket-field-value" id="inv-pases" style="font-size: 1.5rem; font-weight: 600;">—</span>
+            </div>
+            <div class="inv-ticket-field" id="inv-mesa-block">
+              <span class="inv-ticket-field-label" style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Mesa</span>
+              <span class="inv-ticket-field-value" id="inv-mesa" style="font-size: 1.5rem; font-weight: 600;">—</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 12. CONFIRMACIÓN POR WHATSAPP ── -->
+      <section class="inv-event-card inv-rsvp-card reveal-on-scroll" id="inv-wa-block" aria-label="Confirmar asistencia">
+        <div class="inv-card-ornament" aria-hidden="true">
+          <svg width="210" height="72" viewBox="0 0 210 72" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M105 10C80 0 60 30 10 30C60 30 80 50 105 62C130 50 150 30 200 30C150 30 130 0 105 10Z"/>
+          </svg>
+        </div>
+        <div class="inv-card-icon inv-section-icon" aria-hidden="true"></div>
+        <h2 class="inv-card-title" style="font-size: clamp(1.8rem, 6vw, 2.4rem);">Confirma</h2>
+        <div class="inv-card-details">
+          <p class="inv-rsvp-sub" style="margin-bottom: 2rem;">Esperamos contar con tu presencia en este día tan especial.</p>
+          
+          <div class="inv-confirm-row" style="margin-bottom: 1.5rem;">
+            <label class="inv-confirm-label" for="inv-confirm-pases" style="display: block; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;">Asistiré con:</label>
+            <select class="inv-select" id="inv-confirm-pases" aria-label="Número de personas que asistirán" style="width: 100%; max-width: 200px; padding: 12px; border-radius: 8px; border: 1px solid var(--inv-border); background: var(--inv-surface); font-family: var(--inv-font-body); font-size: 1rem; text-align: center; margin: 0 auto; display: block;">
+              <option value="1">1 persona</option>
+            </select>
+          </div>
+          
+          <div class="inv-confirm-actions">
+            <button class="inv-premium-button" id="inv-btn-confirm" aria-label="Confirmar por WhatsApp" style="background: #25D366; color: white; width: 100%; max-width: 280px; box-shadow: 0 14px 30px rgba(37,211,102,.2);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span id="inv-confirm-primary-label">Confirmar</span>
+            </button>
+            <button class="inv-premium-button" id="inv-btn-confirm-secondary" aria-label="Confirmar con el segundo contacto por WhatsApp" hidden style="background: #25D366; color: white; width: 100%; max-width: 280px; box-shadow: 0 14px 30px rgba(37,211,102,.2);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span id="inv-confirm-secondary-label">Confirmar con contacto 2</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 13. CIERRE Y AGRADECIMIENTO ── -->
+      <section id="inv-thank-you-section" class="inv-section inv-thank-you-section reveal-on-scroll" style="display:none">
+        <div class="inv-thank-you-card">
+          <p class="inv-thank-you-kicker">Gracias</p>
+          <h2 class="inv-thank-you-title" id="inv-thank-you-title">Con cariño</h2>
+          <p class="inv-thank-you-signature" id="inv-thank-you-signature" style="display:none"></p>
+          <p class="inv-thank-you-message" id="inv-thank-you-message">Gracias por ser parte de mis XV años</p>
+        </div>
+      </section>
+
+      <!-- ── 14. COMPARTE EL MOMENTO ── -->
+      <section id="inv-hashtag-block" class="inv-section inv-share-section reveal-on-scroll" aria-label="Comparte el momento" style="display:none">
+        <div class="inv-share-card">
+          <div class="inv-card-icon inv-section-icon" aria-hidden="true"></div>
+          <p class="inv-share-kicker">Comparte</p>
+          <h2 class="inv-share-title" id="inv-share-title">Comparte el momento</h2>
+          <p class="inv-share-hashtag" id="inv-hashtag"></p>
+          <p class="inv-share-message" id="inv-share-message">Usa el hashtag en tus fotos y videos para que no se pierda ningún recuerdo.</p>
+        </div>
+      </section>
+
+      <!-- ── 15. FOOTER ── -->
+      <footer class="inv-footer">
+        <div class="inv-footer-divider" aria-hidden="true"></div>
+        <p>Invitación creada por <a href="/" target="_blank" rel="noopener">Invitta Studio</a></p>
+      </footer>
+
+    </main>
+  </div><!-- /#inv-content -->
+
+  <!-- ── REPRODUCTOR DE MÚSICA FIJO ── -->
+  <div id="inv-music-player" class="inv-music-player" style="display:none;">
+    <div class="inv-music-left">
+      <div class="inv-music-logo" aria-hidden="true">
+        <span>id</span>
+      </div>
+
+      <div class="inv-music-meta">
+        <p id="inv-music-title">Música del evento</p>
+        <span id="inv-music-artist"></span>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="inv-music-play-button"
+      id="inv-music-toggle"
+      aria-label="Reproducir música"
+    >
+      <svg class="inv-music-control-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M8 5.5v13l10-6.5-10-6.5z"></path>
       </svg>
     </button>
   </div>
 
   <!-- Supabase y Env -->
-  <script type="module" src="/assets/js/env.js"></script>
+  <script src="/js/env.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="/src/main-invitation.js"></script>
 
