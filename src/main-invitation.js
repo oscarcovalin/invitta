@@ -2679,6 +2679,9 @@ function fitHeroHonoreeSingleLine() {
 function toSmartTitleCase(str) {
   if (!str) return "";
   if (str === str.toUpperCase() && /[A-Z]/.test(str)) {
+    if (str.includes("XV") || str.includes("BODA") || str.includes("BAUTIZO") || str.includes("AÑOS")) {
+      return str;
+    }
     return str.toLowerCase().replace(/\b\p{L}/gu, (char) => char.toUpperCase());
   }
   return str;
@@ -2699,6 +2702,7 @@ function resolveHeroHeading(title, honoreeName, eventType) {
   }
 
   // Corregir nombres que vengan todos en mayúsculas desde la BD
+  eventTitle = toSmartTitleCase(eventTitle);
   honoree = toSmartTitleCase(honoree);
 
   return {
