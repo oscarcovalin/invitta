@@ -955,6 +955,58 @@
     document.head.appendChild(style);
   }
 
+  function applyCustomBackground(data) {
+    if (!document.body) return;
+    
+    var root = document.documentElement;
+    var hasBackground = data.bgEnabled === true && data.backgroundImageUrl;
+    
+    if (!hasBackground) {
+      document.body.classList.remove("invitta-custom-bg");
+      return;
+    }
+    
+    var opacity = Number(data.bgOverlayOpacity);
+    opacity = (isNaN(opacity) || opacity < 0) ? 0.35 : Math.min(opacity, 1);
+    
+    var blur = Number(data.bgBlur);
+    blur = (isNaN(blur) || blur < 0) ? 0 : Math.min(blur, 20);
+    
+    var positionMap = { center: "center", top: "top", bottom: "bottom", left: "left", right: "right" };
+    var position = positionMap[data.bgPosition] || "center";
+    
+    var sizeMap = { cover: "cover", contain: "contain", auto: "auto" };
+    var size = sizeMap[data.bgSize] || "cover";
+    
+    var color = data.bgOverlayColor || "#000000";
+    if (data.bgOverlayEnabled === false) {
+      opacity = 0;
+    }
+    
+    root.style.setProperty("--inv-custom-bg-image", "url('" + data.backgroundImageUrl + "')");
+    root.style.setProperty("--inv-custom-bg-position", position);
+    root.style.setProperty("--inv-custom-bg-size", size);
+    root.style.setProperty("--inv-custom-bg-overlay-color", color);
+    root.style.setProperty("--inv-custom-bg-overlay-opacity", opacity);
+    root.style.setProperty("--inv-custom-bg-blur", blur + "px");
+    
+    document.body.classList.add("invitta-custom-bg");
+    
+    if (!document.getElementById("invitta-custom-background-style")) {
+      var style = document.createElement("style");
+      style.id = "invitta-custom-background-style";
+      style.textContent = 
+        "body.invitta-custom-bg { background: transparent !important; }\n" +
+        "body.invitta-custom-bg::before { content: ''; position: fixed; inset: -24px; z-index: -2; pointer-events: none; " +
+        "background-image: var(--inv-custom-bg-image); background-size: var(--inv-custom-bg-size); " +
+        "background-position: var(--inv-custom-bg-position); background-repeat: no-repeat; " +
+        "filter: blur(var(--inv-custom-bg-blur)); transform: scale(1.03); }\n" +
+        "body.invitta-custom-bg::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; " +
+        "background: var(--inv-custom-bg-overlay-color); opacity: var(--inv-custom-bg-overlay-opacity); }\n" +
+        "body.invitta-custom-bg #inv-content { position: relative; z-index: 1; }";
+      document.head.appendChild(style);
+    }
+  }
 
 
   function applyAll() {
@@ -963,6 +1015,7 @@
     replaceText(document.body);
     applyImages();
     applySectionBackgrounds();
+    applyCustomBackground(data);
     applyAudio();
     applyOptionalContent();
     applyLinks();
