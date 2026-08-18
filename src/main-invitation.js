@@ -1808,6 +1808,8 @@ function renderDefaultTemplate(inv) {
       img.alt = "Momento especial";
       img.loading = "lazy";
       img.decoding = "async";
+      img.dataset.invittaPersonalized = "true";
+      img.dataset.invittaPersonalizedSrc = url;
 
       var backdrop = document.createElement("img");
       backdrop.className = "inv-moment-backdrop";
@@ -1816,6 +1818,8 @@ function renderDefaultTemplate(inv) {
       backdrop.setAttribute("aria-hidden", "true");
       backdrop.loading = "lazy";
       backdrop.decoding = "async";
+      backdrop.dataset.invittaPersonalized = "true";
+      backdrop.dataset.invittaPersonalizedSrc = url;
 
       frame.append(backdrop, img);
       container.appendChild(frame);
