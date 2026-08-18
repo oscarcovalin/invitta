@@ -758,6 +758,15 @@ function buildPublicTemplateData(inv, template) {
         typographyRoles: normalizeTypographyRoles(inv.custom_font_targets, typographyFonts),
         visualTheme: cleanString(inv.visual_theme, 60),
         sectionBackgrounds: normalizeSectionBackgrounds(inv.section_backgrounds),
+        backgroundImageUrl: safeHttpsUrl(inv.background_image_url),
+        bgEnabled: Boolean(inv.bg_enabled),
+        bgOverlayEnabled: inv.bg_overlay_enabled !== false,
+        bgOverlayColor: normalizeHexColor(inv.bg_overlay_color) || "#000000",
+        bgOverlayOpacity: Number(inv.bg_overlay_opacity ?? 0.35),
+        bgPosition: cleanString(inv.bg_position, 20) || "center",
+        bgSize: cleanString(inv.bg_size, 20) || "cover",
+        bgBlur: Number(inv.bg_blur ?? 0),
+        bgScope: cleanString(inv.bg_scope, 20) || "all",
         studioName: cleanString(inv.studio_name, 120),
         studioLogoUrl: safeHttpsUrl(inv.studio_logo_url),
         studioWhatsapp: cleanWhatsApp(inv.studio_whatsapp),
@@ -767,6 +776,42 @@ function buildPublicTemplateData(inv, template) {
     };
 }
 
+function resolveTemplateAssetUrl(value, basePath) {
+    if (!value || typeof value !== "string") return value;
+
+    var trimmed = value.trim();
+
+    if (
+        trimmed.startsWith("http://") ||
+        trimmed.startsWith("https://") ||
+        trimmed.startsWith("data:") ||
+        trimmed.startsWith("blob:") ||
+        trimmed.startsWith("mailto:") ||
+        trimmed.startsWith("tel:") ||
+        trimmed.startsWith("#")
+    ) {
+        return value;
+    }
+
+    if (trimmed.startsWith("/demos/")) {
+        return value;
+    }
+
+    if (
+        trimmed.startsWith("./") ||
+        trimmed.startsWith("../") ||
+        trimmed.startsWith("assets/") ||
+        trimmed.startsWith("shared/") ||
+        trimmed === "favicon.ico"
+    ) {
+        var normalizedBase = basePath.endsWith("/") ? basePath : basePath + "/";
+        var resolved = new URL(trimmed, window.location.origin + normalizedBase);
+        return resolved.pathname + resolved.search + resolved.hash;
+    }
+
+    return value;
+}
+
 function addTemplateBridge(html, templatePath, templateData) {
     var parser = new DOMParser();
     var doc = parser.parseFromString(html, "text/html");
@@ -774,6 +819,34 @@ function addTemplateBridge(html, templatePath, templateData) {
     var base = doc.createElement("base");
     base.href = basePath;
     doc.head.insertBefore(base, doc.head.firstChild);
+
+    doc.querySelectorAll("script[src], link[href], img[src], source[src], video[src], audio[src]").forEach(function(el) {
+        if (el.hasAttribute("src")) {
+            el.setAttribute("src", resolveTemplateAssetUrl(el.getAttribute("src"), basePath));
+        }
+        if (el.hasAttribute("href")) {
+            el.setAttribute("href", resolveTemplateAssetUrl(el.getAttribute("href"), basePath));
+        }
+    });
+
+    doc.querySelectorAll("img[srcset], source[srcset]").forEach(function(el) {
+        if (el.hasAttribute("srcset")) {
+            var srcset = el.getAttribute("srcset");
+            var rewritten = srcset.split(",").map(function(part) {
+                var trimmed = part.trim();
+                if (!trimmed) return "";
+                var spaceIndex = trimmed.indexOf(" ");
+                if (spaceIndex === -1) {
+                    return resolveTemplateAssetUrl(trimmed, basePath);
+                } else {
+                    var url = trimmed.slice(0, spaceIndex);
+                    var descriptor = trimmed.slice(spaceIndex);
+                    return resolveTemplateAssetUrl(url, basePath) + descriptor;
+                }
+            }).join(", ");
+            el.setAttribute("srcset", rewritten);
+        }
+    });
 
     var bootstrap = doc.createElement("script");
     var serializedData = JSON.stringify(templateData || {}).replace(/</g, "\\u003c");
@@ -1808,6 +1881,8 @@ function renderDefaultTemplate(inv) {
       img.alt = "Momento especial";
       img.loading = "lazy";
       img.decoding = "async";
+      img.dataset.invittaPersonalized = "true";
+      img.dataset.invittaPersonalizedSrc = url;
 
       var backdrop = document.createElement("img");
       backdrop.className = "inv-moment-backdrop";
@@ -1816,6 +1891,8 @@ function renderDefaultTemplate(inv) {
       backdrop.setAttribute("aria-hidden", "true");
       backdrop.loading = "lazy";
       backdrop.decoding = "async";
+      backdrop.dataset.invittaPersonalized = "true";
+      backdrop.dataset.invittaPersonalizedSrc = url;
 
       frame.append(backdrop, img);
       container.appendChild(frame);
