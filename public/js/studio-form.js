@@ -1993,7 +1993,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (bgDisplay) {
         bgDisplay.innerHTML = `<a href="${existingBackgroundUrl}" target="_blank">Ver fondo</a>`;
       }
+      
+      // UX Fase 2B.1: Actualizar vista previa
+      const bgImageThumbnail = document.getElementById("bgImageThumbnail");
+      const bgImageEmpty = document.getElementById("bgImageEmpty");
+      const bgImagePreview = document.getElementById("bgImagePreview");
+      const bgImageFilename = document.getElementById("bgImageFilename");
+      const bgRemoveImageButton = document.getElementById("bgRemoveImageButton");
+      
+      if (bgImageThumbnail) {
+        bgImageThumbnail.src = existingBackgroundUrl;
+        bgImageThumbnail.style.display = "block";
+      }
+      if (bgImageEmpty) bgImageEmpty.style.display = "none";
+      if (bgImageFilename) bgImageFilename.textContent = "Fondo guardado";
+      if (bgImagePreview) bgImagePreview.classList.remove("studio-bg-image-empty");
+      if (bgRemoveImageButton) bgRemoveImageButton.style.display = "inline-block";
     }
+
 
     if (existingMusicUrl) {
       const musicCurrent = document.getElementById("music-current");
@@ -2420,6 +2437,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  // UX Fase 2B.1: Helper para limpiar URL de fondo guardada
+  window.__clearExistingBackgroundUrl = () => { existingBackgroundUrl = null; };
 });
 
 // --- Editor Visual Fase 1 ---
@@ -2564,11 +2583,66 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Al seleccionar imagen, re-evaluar el aviso de imagen faltante
+  // Al seleccionar imagen, re-evaluar el aviso de imagen faltante y UX
+  const bgSelectImageButton = document.getElementById("bgSelectImageButton");
+  const bgRemoveImageButton = document.getElementById("bgRemoveImageButton");
+  const bgImagePreview = document.getElementById("bgImagePreview");
+  const bgImageThumbnail = document.getElementById("bgImageThumbnail");
+  const bgImageEmpty = document.getElementById("bgImageEmpty");
+  const bgImageFilename = document.getElementById("bgImageFilename");
+
+  if (bgSelectImageButton && bgImageFile) {
+    bgSelectImageButton.addEventListener("click", () => {
+      bgImageFile.click();
+    });
+  }
+
+  if (bgRemoveImageButton && bgImageFile) {
+    bgRemoveImageButton.addEventListener("click", () => {
+      bgImageFile.value = "";
+      if (bgImageThumbnail) {
+        bgImageThumbnail.src = "";
+        bgImageThumbnail.style.display = "none";
+      }
+      if (bgImageEmpty) bgImageEmpty.style.display = "block";
+      if (bgImageFilename) bgImageFilename.textContent = "";
+      if (bgImagePreview) {
+        bgImagePreview.classList.add("studio-bg-image-empty");
+      }
+      bgRemoveImageButton.style.display = "none";
+      
+      const bgDisplay = document.getElementById("background-url-display");
+      if (bgDisplay) bgDisplay.innerHTML = "";
+      const bgCurrent = document.getElementById("background-current");
+      if (bgCurrent) bgCurrent.style.display = "none";
+
+      if (typeof window.__clearExistingBackgroundUrl === "function") {
+        window.__clearExistingBackgroundUrl();
+      }
+      updateBgNoImageNotice();
+    });
+  }
+
   if (bgImageFile) {
-    bgImageFile.addEventListener("change", () => {
+    bgImageFile.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          if (bgImageThumbnail) {
+             bgImageThumbnail.src = evt.target.result;
+             bgImageThumbnail.style.display = "block";
+          }
+          if (bgImageEmpty) bgImageEmpty.style.display = "none";
+          if (bgImageFilename) bgImageFilename.textContent = file.name;
+          if (bgImagePreview) {
+             bgImagePreview.classList.remove("studio-bg-image-empty");
+          }
+          if (bgRemoveImageButton) bgRemoveImageButton.style.display = "inline-block";
+        }
+        reader.readAsDataURL(file);
+      }
       updateBgNoImageNotice();
     });
   }
 });
-

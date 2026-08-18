@@ -1529,3 +1529,13 @@ body {
   margin: 0;
 }
 
+  
+/* --- UX Imagen de Fondo (Fase 2B.1) --- */  
+.studio-bg-image-control { background: var(--bg-secondary, #f8f9fa); border: 1px solid var(--border-color, #e2e8f0); border-radius: 8px; padding: 16px; margin-bottom: 24px; }  
+.studio-bg-image-label { font-weight: 600; display: block; margin-bottom: 4px; color: var(--text-primary, #333); }  
+.studio-bg-image-preview { background: #fff; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 12px; text-align: center; margin-bottom: 12px; min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }  
+.studio-bg-image-empty { background: #f8fafc; }  
+.preview-thumbnail { max-width: 100%%; max-height: 120px; border-radius: 4px; object-fit: cover; margin-bottom: 8px; }  
+.preview-empty-text { color: #64748b; font-size: 13px; }  
+.preview-filename { font-size: 12px; color: #475569; word-break: break-all; }  
+.studio-bg-image-actions { display: flex; gap: 10px; align-items: center; } 
