@@ -53,3 +53,11 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(234, 200, 139, 0.55);
 }
+/* Token Architecture 60/30/10 - Button Contrast Safety */
+html[data-invitta-theme="active"] .hover\:bg-sage:hover {
+  color: var(--inv-button-text, #ffffff) !important;
+}
+
+html[data-invitta-theme="active"] .bg-sage {
+  color: var(--inv-button-text, #ffffff) !important;
+}
