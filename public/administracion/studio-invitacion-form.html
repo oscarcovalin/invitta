@@ -193,8 +193,9 @@
   </style>
 </head>
 <body>
-
-  <div class="container">
+  <div class="studio-editor-layout">
+    <div class="studio-editor-form">
+      <div class="container">
     <div class="header">
       <div>
         <h1 id="page-title">Crear Invitación</h1>
@@ -897,6 +898,26 @@
       Cargando...
     </div>
 
+      </div>
+    </div>
+    
+    <div class="studio-editor-preview">
+      <div class="studio-preview-toolbar">
+        <h3>Vista previa</h3>
+        <div class="studio-preview-actions">
+          <button type="button" id="studio-preview-refresh" class="btn btn-primary btn-sm">Actualizar vista previa</button>
+          <a href="#" id="studio-preview-newtab" target="_blank" class="btn btn-secondary btn-sm" style="display:none;">Abrir en nueva pestaña</a>
+        </div>
+      </div>
+      
+      <div id="studio-preview-empty" class="studio-preview-empty" style="display:none;">
+        <p>Guarda la invitación para generar una vista previa.</p>
+      </div>
+
+      <div class="studio-preview-device" id="studio-preview-device" style="display:none;">
+        <iframe id="studio-preview-frame" class="studio-preview-frame" src="about:blank" title="Vista previa móvil de la invitación"></iframe>
+      </div>
+    </div>
   </div>
 
   <!-- Supabase CDN -->

@@ -2398,3 +2398,45 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
 });
+
+// --- Editor Visual Fase 1 ---
+document.addEventListener("DOMContentLoaded", () => {
+  const iframe = document.getElementById("studio-preview-frame");
+  const deviceContainer = document.getElementById("studio-preview-device");
+  const emptyState = document.getElementById("studio-preview-empty");
+  const btnRefresh = document.getElementById("studio-preview-refresh");
+  const btnNewTab = document.getElementById("studio-preview-newtab");
+  const slugInput = document.getElementById("slug");
+
+  function getPreviewUrl(slug) {
+    if (!slug) return "";
+    return `/invitacion.html?slug=${encodeURIComponent(slug)}&preview=studio&v=${Date.now()}`;
+  }
+
+  function updatePreview() {
+    const slug = slugInput ? slugInput.value.trim() : "";
+    if (slug) {
+      const url = getPreviewUrl(slug);
+      if (iframe) iframe.src = url;
+      if (btnNewTab) {
+        btnNewTab.href = url;
+        btnNewTab.style.display = "inline-block";
+      }
+      if (deviceContainer) deviceContainer.style.display = "block";
+      if (emptyState) emptyState.style.display = "none";
+    } else {
+      if (deviceContainer) deviceContainer.style.display = "none";
+      if (emptyState) emptyState.style.display = "block";
+      if (btnNewTab) btnNewTab.style.display = "none";
+    }
+  }
+
+  if (btnRefresh) {
+    btnRefresh.addEventListener("click", updatePreview);
+  }
+
+  // Carga inicial síncrona, si el slug ya existe (ej. renderizado desde el servidor).
+  // Si no, el usuario debe presionar el botón "Actualizar vista previa" manualmente.
+  updatePreview();
+});
+
