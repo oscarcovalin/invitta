@@ -776,6 +776,42 @@ function buildPublicTemplateData(inv, template) {
     };
 }
 
+function resolveTemplateAssetUrl(value, basePath) {
+    if (!value || typeof value !== "string") return value;
+
+    var trimmed = value.trim();
+
+    if (
+        trimmed.startsWith("http://") ||
+        trimmed.startsWith("https://") ||
+        trimmed.startsWith("data:") ||
+        trimmed.startsWith("blob:") ||
+        trimmed.startsWith("mailto:") ||
+        trimmed.startsWith("tel:") ||
+        trimmed.startsWith("#")
+    ) {
+        return value;
+    }
+
+    if (trimmed.startsWith("/demos/")) {
+        return value;
+    }
+
+    if (
+        trimmed.startsWith("./") ||
+        trimmed.startsWith("../") ||
+        trimmed.startsWith("assets/") ||
+        trimmed.startsWith("shared/") ||
+        trimmed === "favicon.ico"
+    ) {
+        var normalizedBase = basePath.endsWith("/") ? basePath : basePath + "/";
+        var resolved = new URL(trimmed, window.location.origin + normalizedBase);
+        return resolved.pathname + resolved.search + resolved.hash;
+    }
+
+    return value;
+}
+
 function addTemplateBridge(html, templatePath, templateData) {
     var parser = new DOMParser();
     var doc = parser.parseFromString(html, "text/html");
@@ -783,6 +819,34 @@ function addTemplateBridge(html, templatePath, templateData) {
     var base = doc.createElement("base");
     base.href = basePath;
     doc.head.insertBefore(base, doc.head.firstChild);
+
+    doc.querySelectorAll("script[src], link[href], img[src], source[src], video[src], audio[src]").forEach(function(el) {
+        if (el.hasAttribute("src")) {
+            el.setAttribute("src", resolveTemplateAssetUrl(el.getAttribute("src"), basePath));
+        }
+        if (el.hasAttribute("href")) {
+            el.setAttribute("href", resolveTemplateAssetUrl(el.getAttribute("href"), basePath));
+        }
+    });
+
+    doc.querySelectorAll("img[srcset], source[srcset]").forEach(function(el) {
+        if (el.hasAttribute("srcset")) {
+            var srcset = el.getAttribute("srcset");
+            var rewritten = srcset.split(",").map(function(part) {
+                var trimmed = part.trim();
+                if (!trimmed) return "";
+                var spaceIndex = trimmed.indexOf(" ");
+                if (spaceIndex === -1) {
+                    return resolveTemplateAssetUrl(trimmed, basePath);
+                } else {
+                    var url = trimmed.slice(0, spaceIndex);
+                    var descriptor = trimmed.slice(spaceIndex);
+                    return resolveTemplateAssetUrl(url, basePath) + descriptor;
+                }
+            }).join(", ");
+            el.setAttribute("srcset", rewritten);
+        }
+    });
 
     var bootstrap = doc.createElement("script");
     var serializedData = JSON.stringify(templateData || {}).replace(/</g, "\\u003c");
