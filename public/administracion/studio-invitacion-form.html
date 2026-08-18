@@ -446,6 +446,60 @@
         </div>
       </div>
 
+      <!-- ── CONFIGURACIÓN AVANZADA DE FONDO ── -->
+      <div id="bg-config-section" class="studio-bg-config">
+        <label class="studio-bg-toggle" for="bg_enabled">
+          <input type="checkbox" id="bg_enabled">
+          <span>Activar configuración de fondo</span>
+        </label>
+
+        <div id="bg-controls" class="studio-bg-controls" hidden>
+
+          <label class="studio-bg-toggle" for="bg_overlay_enabled">
+            <input type="checkbox" id="bg_overlay_enabled" checked>
+            <span>Mostrar capa de contraste (overlay)</span>
+          </label>
+
+          <div class="form-row" id="bg-overlay-options">
+            <div class="form-group">
+              <label for="bg_overlay_color">Color del overlay</label>
+              <input type="color" id="bg_overlay_color" value="#000000" class="form-control" style="height:40px;">
+            </div>
+            <div class="form-group">
+              <label for="bg_overlay_opacity">Opacidad: <output id="bg_overlay_opacity_display">35%</output></label>
+              <input type="range" id="bg_overlay_opacity" min="0" max="100" value="35" step="5" class="form-control" aria-label="Opacidad del overlay">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bg_position">Posición</label>
+              <select id="bg_position" class="form-control">
+                <option value="center">Centro</option>
+                <option value="top">Arriba</option>
+                <option value="bottom">Abajo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="bg_size">Tamaño</label>
+              <select id="bg_size" class="form-control">
+                <option value="cover">Cubrir (cover)</option>
+                <option value="contain">Ajustar (contain)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bg_blur">Desenfoque: <output id="bg_blur_display">0px</output></label>
+            <input type="range" id="bg_blur" min="0" max="20" value="0" step="1" class="form-control" aria-label="Desenfoque del fondo">
+          </div>
+
+          <div id="bg-no-image-notice" class="studio-bg-empty" hidden>
+            <p>Sube una imagen en el campo de arriba para que el fondo sea visible en la invitación.</p>
+          </div>
+        </div>
+      </div>
+
       <div id="section-backgrounds-controls" hidden>
         <h3 style="margin: 18px 0 8px; font-size: 16px; color: var(--primary-color);">Fondos por sección</h3>
         <p class="media-hint" style="margin-bottom: 14px;">Disponibles para los diseños generales. Cada imagen se muestra con una capa de contraste para conservar la legibilidad.</p>
