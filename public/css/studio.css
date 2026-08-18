@@ -1333,3 +1333,132 @@ body {
 /* FIX UPPERCASE ISSUE */
 .inv-hero h1, .inv-hero-title, .inv-title, .inv-honoree, .inv-hero-title-main, .inv-hero-title-name, .inv-title-script, .inv-title-top, .studio-preview-name, .studio-preview-title { text-transform: none !important; }
 
+
+/* --- Editor Visual Fase 1 --- */
+.studio-editor-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (min-width: 992px) {
+  .studio-editor-layout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.studio-editor-form {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (min-width: 992px) {
+  .studio-editor-form {
+    flex: 0 0 50%;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding-right: 15px;
+  }
+  
+  .studio-editor-form::-webkit-scrollbar {
+    width: 6px;
+  }
+  .studio-editor-form::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 4px;
+  }
+  .studio-editor-form::-webkit-scrollbar-thumb {
+    background: #ccc; 
+    border-radius: 4px;
+  }
+}
+
+.studio-editor-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+}
+
+@media (min-width: 992px) {
+  .studio-editor-preview {
+    flex: 0 0 50%;
+    position: sticky;
+    top: 20px;
+    height: calc(100vh - 40px);
+    overflow: hidden;
+  }
+}
+
+.studio-preview-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.studio-preview-toolbar h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--primary-color);
+}
+
+.studio-preview-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.studio-preview-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px 20px;
+  font-size: 14px;
+}
+
+.studio-preview-device {
+  position: relative;
+  width: 375px;
+  height: 812px;
+  background-color: #1a1a1a;
+  border-radius: 40px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  padding: 12px;
+  border: 4px solid #444;
+  box-sizing: border-box;
+  transform: scale(0.85);
+  transform-origin: top center;
+  margin: 0 auto;
+}
+
+.studio-preview-device::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 25px;
+  background-color: #444;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  z-index: 10;
+}
+
+.studio-preview-frame {
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+  background: #fff;
+  border: none;
+  display: block;
+}
+
