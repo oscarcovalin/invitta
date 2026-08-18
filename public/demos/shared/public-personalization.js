@@ -662,70 +662,90 @@
         card: "#FFFDFC",
         title: "#40362E",
         body: "#66594F",
-        accent: "#B99654"
+        accent: "#B99654",
+        onAccent: "#FFFFFF",
+        overlay: "rgba(64,54,46,0.38)"
       },
       rose: {
         surface: "#FAF0F0",
         card: "#FFFDFD",
         title: "#704853",
         body: "#725C63",
-        accent: "#C88A97"
+        accent: "#C88A97",
+        onAccent: "#FFFFFF",
+        overlay: "rgba(112,72,83,0.32)"
       },
       sage: {
         surface: "#F1F3EC",
         card: "#FEFEFC",
         title: "#405144",
         body: "#5D665B",
-        accent: "#718067"
+        accent: "#718067",
+        onAccent: "#FFFFFF",
+        overlay: "rgba(64,81,68,0.30)"
       },
       emerald: {
         surface: "#F0F4EF",
         card: "#FCFDFC",
         title: "#1F493B",
         body: "#475C52",
-        accent: "#1E6A52"
+        accent: "#1E6A52",
+        onAccent: "#FFFFFF",
+        overlay: "rgba(31,73,59,0.34)"
       },
       midnight: {
         surface: "#1C1920",
         card: "#28232B",
         title: "#F6EAD2",
         body: "#DDD2C5",
-        accent: "#C5A355"
+        accent: "#C5A355",
+        onAccent: "#1C1920",
+        overlay: "rgba(12,10,14,0.55)"
       },
       "terracotta-sand": {
         surface: "#F4E6D8",
         card: "#FFF8F0",
         title: "#512F28",
         body: "#74564A",
-        accent: "#D26345"
+        accent: "#D26345",
+        onAccent: "#FFFFFF",
+        overlay: "rgba(81,47,40,0.32)"
       },
       "plum-olive": {
         surface: "#EEEBDD",
         card: "#F8F5EC",
         title: "#3D1831",
         body: "#5F5C42",
-        accent: "#7A7D45"
+        accent: "#7A7D45",
+        onAccent: "#FFFFFF",
+        overlay: "rgba(61,24,49,0.30)"
       },
       "opal-blue": {
         surface: "#EAF2F4",
         card: "#F8FAFC",
         title: "#263B5B",
         body: "#59697B",
-        accent: "#8B79A8"
+        accent: "#8B79A8",
+        onAccent: "#FFFFFF",
+        overlay: "rgba(38,59,91,0.30)"
       },
       "emerald-jewel": {
         surface: "#E8EFEA",
         card: "#F8F7F0",
         title: "#0E3B31",
         body: "#3F5B52",
-        accent: "#C19A3C"
+        accent: "#C19A3C",
+        onAccent: "#FFFFFF",
+        overlay: "rgba(14,59,49,0.30)"
       },
       "celestial-navy": {
         surface: "#0C1630",
         card: "#142345",
         title: "#F5EBD5",
         body: "#C9D1E2",
-        accent: "#D6AF4B"
+        accent: "#D6AF4B",
+        onAccent: "#0C1630",
+        overlay: "rgba(6,10,22,0.58)"
       }
     };
     var palette = palettePresets[data.palettePreset];
@@ -742,8 +762,22 @@
       root.style.setProperty("--color-surface", palette.card);
       root.style.setProperty("--color-primary", palette.accent);
       root.style.setProperty("--color-sage", palette.accent);
+      // Tokens 60/30/10 semánticos nuevos
+      root.style.setProperty("--inv-on-accent", palette.onAccent || "#ffffff");
+      root.style.setProperty("--inv-button-text", palette.onAccent || "#ffffff");
+      root.style.setProperty("--inv-overlay", palette.overlay || "rgba(0,0,0,0.32)");
     } else {
       delete root.dataset.invittaPalette;
+      // Fallback on-accent derivado de luminancia del acento manual
+      var accentHex = (data.accentColor || data.colorPrimary || "#888888").replace("#", "");
+      if (accentHex.length === 3) accentHex = accentHex.split("").map(function(c){ return c+c; }).join("");
+      var ar = parseInt(accentHex.substr(0,2), 16) || 0;
+      var ag = parseInt(accentHex.substr(2,2), 16) || 0;
+      var ab = parseInt(accentHex.substr(4,2), 16) || 0;
+      var accentYiq = ((ar*299)+(ag*587)+(ab*114))/1000;
+      root.style.setProperty("--inv-on-accent", accentYiq >= 140 ? "#2e2722" : "#ffffff");
+      root.style.setProperty("--inv-button-text", accentYiq >= 140 ? "#2e2722" : "#ffffff");
+      root.style.setProperty("--inv-overlay", "rgba(0,0,0,0.28)");
     }
 
     if (data.colorPrimary && !palette) {
@@ -897,15 +931,25 @@
     var style = document.createElement("style");
     style.id = "invitta-visual-customization";
     style.textContent = [
-      "html[data-invitta-theme=\"active\"] body {background:var(--invitta-surface, var(--inv-60))!important; color:var(--invitta-body, var(--text-color))!important}",
-      "html[data-invitta-theme=\"active\"] .bg-paper, html[data-invitta-theme=\"active\"] .bg-cream, html[data-invitta-theme=\"active\"] .bg-ivory {background-color:var(--invitta-card, var(--inv-60))!important}",
+      /* 60 — fondo base */
+      "html[data-invitta-theme=\"active\"] body {background:var(--invitta-surface, var(--inv-60))!important; color:var(--invitta-body, var(--inv-text, #2e2722))!important}",
+      /* 30 — superficies de tarjeta */
+      "html[data-invitta-theme=\"active\"] .bg-paper, html[data-invitta-theme=\"active\"] .bg-cream, html[data-invitta-theme=\"active\"] .bg-ivory, html[data-invitta-theme=\"active\"] .card, html[data-invitta-theme=\"active\"] .section {background-color:var(--invitta-card, var(--inv-30, var(--inv-60)))!important}",
+      /* Texto de títulos */
       "html[data-invitta-theme=\"active\"] h1:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] h2:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] h3:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-display:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-serif:not(.text-paper):not(.text-white) {color:var(--invitta-title, var(--inv-text, #2e2722))}",
+      /* Texto de cuerpo */
       "html[data-invitta-theme=\"active\"] p:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-sans:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-body:not(.text-paper):not(.text-white) {color:var(--invitta-body, var(--inv-text, #2e2722))}",
-      "html[data-invitta-theme=\"active\"] .text-sage, html[data-invitta-theme=\"active\"] .text-gold, html[data-invitta-theme=\"active\"] .text-accent {color:var(--invitta-accent, #cb1823)}",
-      "html[data-invitta-theme=\"active\"] .border-sage, html[data-invitta-theme=\"active\"] .border-gold, html[data-invitta-theme=\"active\"] .border-accent {border-color:var(--invitta-accent, #cb1823)}",
-      "html[data-invitta-theme=\"active\"] .bg-sage, html[data-invitta-theme=\"active\"] .bg-gold, html[data-invitta-theme=\"active\"] .bg-accent {background-color:var(--invitta-accent, #cb1823)}",
+      /* 10 — acentos */
+      "html[data-invitta-theme=\"active\"] .text-sage, html[data-invitta-theme=\"active\"] .text-gold, html[data-invitta-theme=\"active\"] .text-accent {color:var(--invitta-accent, var(--inv-10, #cb1823))}",
+      "html[data-invitta-theme=\"active\"] .border-sage, html[data-invitta-theme=\"active\"] .border-gold, html[data-invitta-theme=\"active\"] .border-accent {border-color:var(--invitta-accent, var(--inv-10, #cb1823))}",
+      "html[data-invitta-theme=\"active\"] .bg-sage, html[data-invitta-theme=\"active\"] .bg-gold, html[data-invitta-theme=\"active\"] .bg-accent {background-color:var(--invitta-accent, var(--inv-10, #cb1823))}",
+      /* Botones: color acento 10, texto on-accent para legibilidad garantizada */
+      "html[data-invitta-theme=\"active\"] .button:not(.button--outline):not(.button--text) {background-color:var(--invitta-accent, var(--inv-10, #cb1823)); border-color:var(--invitta-accent, var(--inv-10, #cb1823)); color:var(--inv-button-text, #ffffff)}",
+      "html[data-invitta-theme=\"active\"] .button--outline, html[data-invitta-theme=\"active\"] .button--text {color:var(--invitta-accent, var(--inv-10, #cb1823)); border-color:var(--invitta-accent, var(--inv-10, #cb1823))}",
+      /* Tipografías */
       "html[data-invitta-theme=\"active\"] h1, html[data-invitta-theme=\"active\"] h2, html[data-invitta-theme=\"active\"] h3, html[data-invitta-theme=\"active\"] .font-display, html[data-invitta-theme=\"active\"] .font-serif {font-family:var(--font-display, var(--font-script, 'Georgia')), serif}",
       "html[data-invitta-theme=\"active\"] body, html[data-invitta-theme=\"active\"] button, html[data-invitta-theme=\"active\"] input, html[data-invitta-theme=\"active\"] select, html[data-invitta-theme=\"active\"] textarea, html[data-invitta-theme=\"active\"] .font-sans, html[data-invitta-theme=\"active\"] .font-body {font-family:var(--font-sans, var(--font-secondary, 'Arial')), sans-serif}",
+      /* Nombre dinámico: respetar casing exacto del dashboard */
       "html[data-invitta-theme=\"active\"] .hero__name, html[data-invitta-theme=\"active\"] #celebrant-name, html[data-invitta-theme=\"active\"] .inv-hero-name, html[data-invitta-theme=\"active\"] .couple-names, html[data-invitta-theme=\"active\"] .couple-name, html[data-invitta-theme=\"active\"] .honoree-name, html[data-invitta-theme=\"active\"] [data-invitta-font-role='cover-name'], html[data-invitta-theme=\"active\"] [data-invitta-font-role='name'] {text-transform: none !important;}"
     ].join("\\n");
     document.head.appendChild(style);

@@ -4,6 +4,8 @@
   --title: var(--invitta-title, #2d302b);
   --body: var(--invitta-body, #62665f);
   --accent: var(--invitta-accent, #8d9a87);
+  --on-accent: var(--inv-button-text, #ffffff);
+  --overlay: var(--inv-overlay, rgba(0,0,0,0.28));
   --line: color-mix(in srgb, var(--accent) 32%, transparent);
   --display: var(--font-display, "Playfair Display", Georgia, serif);
   --sans: var(--font-sans, "DM Sans", Arial, sans-serif);
@@ -25,7 +27,7 @@ h2 { margin-bottom: 2.6rem; font-size: clamp(2.35rem, 5vw, 4rem); letter-spacing
 .hero__veil { z-index: 1; grid-column: 2; grid-row: 1; background: linear-gradient(180deg, rgba(25,27,24,.02), rgba(25,27,24,.18)); pointer-events: none; }
 .hero__content { position: relative; z-index: 2; grid-column: 1; grid-row: 1; display: flex; padding: 8.5rem clamp(2.2rem, 7vw, 6.2rem) 4rem; align-items: flex-start; flex-direction: column; justify-content: center; text-align: left; transform: translate3d(0, var(--parallax-content-shift, 0), 0); will-change: transform; }
 .hero h1 { margin: .9rem 0 1.2rem; color: var(--title); font-family: var(--sans); font-size: clamp(.76rem, 1.2vw, 1rem); font-weight: 600; letter-spacing: .32em; line-height: 1.5; text-transform: uppercase; }
-.hero__name { max-width: 100%; margin: 0; color: var(--title); font-family: var(--display); font-size: clamp(4rem, 7.2vw, 7.5rem); font-style: normal; letter-spacing: -.055em; line-height: .88; overflow-wrap: anywhere; }
+.hero__name { max-width: 100%; margin: 0; color: var(--title); font-family: var(--display); font-size: clamp(4rem, 7.2vw, 7.5rem); font-style: normal; letter-spacing: -.055em; line-height: .88; overflow-wrap: anywhere; text-shadow: 0 2px 18px rgba(0,0,0,.18); }
 .hero__ornament { position: relative; width: min(11rem, 48vw); height: 1px; display: block; margin: 1.7rem 0 1.5rem; background: linear-gradient(90deg, transparent, var(--accent) 24%, var(--accent) 76%, transparent); }
 .hero__ornament::after { content: ""; position: absolute; top: 50%; left: 50%; width: .55rem; height: .55rem; border: 1px solid var(--accent); background: var(--card); transform: translate(-50%, -50%) rotate(45deg); }
 .hero__date { padding-top: 1.25rem; border-top: 1px solid var(--line); color: var(--body); font-size: .7rem; font-weight: 500; letter-spacing: .16em; line-height: 1.8; text-transform: uppercase; }
@@ -74,7 +76,7 @@ blockquote { color: var(--title); font-family: var(--display); font-size: clamp(
 .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: .5rem; }
 .gallery img { width: 100%; height: clamp(260px, 42vw, 540px); object-fit: cover; }
 .gallery img:first-child:nth-last-child(3) { grid-row: span 2; height: 100%; }
-.button { display: inline-flex; min-height: 48px; padding: .9rem 1.5rem; align-items: center; justify-content: center; border: 1px solid var(--accent); border-radius: 0; background: var(--accent); color: #fff; cursor: pointer; font: 600 .7rem/1 var(--sans); letter-spacing: .14em; text-decoration: none; text-transform: uppercase; }
+.button { display: inline-flex; min-height: 48px; padding: .9rem 1.5rem; align-items: center; justify-content: center; border: 1px solid var(--accent); border-radius: 0; background: var(--accent); color: var(--on-accent, #fff); cursor: pointer; font: 600 .7rem/1 var(--sans); letter-spacing: .14em; text-decoration: none; text-transform: uppercase; }
 .button--outline { margin-top: 1rem; background: transparent; color: var(--accent); }
 .button--text { background: transparent; color: var(--accent); }
 .guest-card { margin: 2.2rem auto; padding: 2rem; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 82%, transparent); }
