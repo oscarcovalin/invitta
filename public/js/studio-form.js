@@ -2009,6 +2009,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (galWarning) galWarning.style.display = "block";
     renderGalleryThumbnails();
 
+    // Cargar configuración avanzada de fondo (Fase 2B)
+    loadBackgroundConfig(data);
+
     form.style.display = "block";
   }
 
@@ -2318,6 +2321,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       music_artist: document.getElementById("music_artist").value || null,
       main_photo_url: finalPhotoUrl,
       music_url: finalMusicUrl,
+      // ── Configuración avanzada de fondo (Fase 2B) ──
+      bg_enabled: document.getElementById("bg_enabled")?.checked === true,
+      bg_overlay_enabled: document.getElementById("bg_overlay_enabled")?.checked !== false,
+      bg_overlay_color: document.getElementById("bg_overlay_color")?.value || "#000000",
+      bg_overlay_opacity: Math.round(Number(document.getElementById("bg_overlay_opacity")?.value ?? 35)) / 100,
+      bg_position: document.getElementById("bg_position")?.value || "center",
+      bg_size: document.getElementById("bg_size")?.value || "cover",
+      bg_blur: Number(document.getElementById("bg_blur")?.value ?? 0),
       updated_at: new Date().toISOString()
     };
 
@@ -2344,6 +2355,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (missingTypographyColumn) {
       const compatiblePayload = { ...payload };
       delete compatiblePayload.typography_fonts;
+      result = await saveInvitationPayload(compatiblePayload);
+    }
+
+    // Fallback: si las columnas bg_* no existen aún en BD (PGRST204)
+    const missingBgColumns = result.error && (
+      result.error.code === "PGRST204" ||
+      /bg_enabled.*column|column.*bg_enabled/i.test(result.error.message || "")
+    );
+    if (missingBgColumns) {
+      const compatiblePayload = { ...payload };
+      ["bg_enabled", "bg_overlay_enabled", "bg_overlay_color",
+       "bg_overlay_opacity", "bg_position", "bg_size", "bg_blur"].forEach(k => delete compatiblePayload[k]);
       result = await saveInvitationPayload(compatiblePayload);
     }
 
@@ -2438,5 +2461,114 @@ document.addEventListener("DOMContentLoaded", () => {
   // Carga inicial síncrona, si el slug ya existe (ej. renderizado desde el servidor).
   // Si no, el usuario debe presionar el botón "Actualizar vista previa" manualmente.
   updatePreview();
+});
+
+// --- Fase 2B: loadBackgroundConfig + UX listeners para controles de fondo ---
+
+/**
+ * Carga los valores de configuración de fondo en los inputs del formulario.
+ * Se llama al final de loadInvitationData(). Segura para invitaciones antiguas
+ * que no tengan los campos bg_* (los valores son null/undefined → se usan defaults).
+ */
+function loadBackgroundConfig(data) {
+  const bgEnabled = document.getElementById("bg_enabled");
+  const bgControls = document.getElementById("bg-controls");
+  if (bgEnabled) {
+    bgEnabled.checked = data.bg_enabled === true;
+    if (bgControls) bgControls.hidden = !bgEnabled.checked;
+  }
+
+  const bgOverlayEnabled = document.getElementById("bg_overlay_enabled");
+  if (bgOverlayEnabled) {
+    bgOverlayEnabled.checked = data.bg_overlay_enabled !== false;
+  }
+
+  const bgOverlayColor = document.getElementById("bg_overlay_color");
+  if (bgOverlayColor) {
+    bgOverlayColor.value = data.bg_overlay_color || "#000000";
+  }
+
+  const bgOverlayOpacity = document.getElementById("bg_overlay_opacity");
+  const bgOpacityDisplay = document.getElementById("bg_overlay_opacity_display");
+  if (bgOverlayOpacity) {
+    const pct = Math.round((data.bg_overlay_opacity ?? 0.35) * 100);
+    bgOverlayOpacity.value = pct;
+    if (bgOpacityDisplay) bgOpacityDisplay.value = `${pct}%`;
+  }
+
+  const bgPosition = document.getElementById("bg_position");
+  if (bgPosition) bgPosition.value = data.bg_position || "center";
+
+  const bgSize = document.getElementById("bg_size");
+  if (bgSize) bgSize.value = data.bg_size || "cover";
+
+  const bgBlur = document.getElementById("bg_blur");
+  const bgBlurDisplay = document.getElementById("bg_blur_display");
+  if (bgBlur) {
+    bgBlur.value = data.bg_blur ?? 0;
+    if (bgBlurDisplay) bgBlurDisplay.value = `${bgBlur.value}px`;
+  }
+
+  updateBgNoImageNotice();
+}
+
+/**
+ * Muestra/oculta el aviso cuando bg_enabled está activo pero no hay imagen subida.
+ * Segura de llamar en cualquier momento.
+ */
+function updateBgNoImageNotice() {
+  const notice = document.getElementById("bg-no-image-notice");
+  if (!notice) return;
+  const bgEnabled = document.getElementById("bg_enabled");
+  // existingBackgroundUrl es una variable en scope del DOMContentLoaded principal.
+  // Como loadBackgroundConfig se define en scope global del archivo, usamos el input
+  // de URL display como proxy confiable.
+  const bgUrlDisplay = document.getElementById("background-url-display");
+  const hasBgImage = Boolean(
+    bgUrlDisplay?.textContent?.trim() ||
+    document.getElementById("backgroundImageFile")?.files?.[0]
+  );
+  const isEnabled = bgEnabled?.checked === true;
+  notice.hidden = !(isEnabled && !hasBgImage);
+}
+
+// UX listeners: se inicializan cuando carga el DOM
+document.addEventListener("DOMContentLoaded", () => {
+  const bgEnabled = document.getElementById("bg_enabled");
+  const bgControls = document.getElementById("bg-controls");
+  const bgOverlayOpacity = document.getElementById("bg_overlay_opacity");
+  const bgOpacityDisplay = document.getElementById("bg_overlay_opacity_display");
+  const bgBlur = document.getElementById("bg_blur");
+  const bgBlurDisplay = document.getElementById("bg_blur_display");
+  const bgImageFile = document.getElementById("backgroundImageFile");
+
+  // Toggle show/hide del panel de controles
+  if (bgEnabled && bgControls) {
+    bgEnabled.addEventListener("change", () => {
+      bgControls.hidden = !bgEnabled.checked;
+      updateBgNoImageNotice();
+    });
+  }
+
+  // Slider de opacidad → actualizar <output>
+  if (bgOverlayOpacity && bgOpacityDisplay) {
+    bgOverlayOpacity.addEventListener("input", () => {
+      bgOpacityDisplay.value = `${bgOverlayOpacity.value}%`;
+    });
+  }
+
+  // Slider de blur → actualizar <output>
+  if (bgBlur && bgBlurDisplay) {
+    bgBlur.addEventListener("input", () => {
+      bgBlurDisplay.value = `${bgBlur.value}px`;
+    });
+  }
+
+  // Al seleccionar imagen, re-evaluar el aviso de imagen faltante
+  if (bgImageFile) {
+    bgImageFile.addEventListener("change", () => {
+      updateBgNoImageNotice();
+    });
+  }
 });
 
