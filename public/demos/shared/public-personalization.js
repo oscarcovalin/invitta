@@ -318,53 +318,158 @@
     if (!element || !element.closest) return false;
     return Boolean(element.closest(
       "#hero, [id*='hero' i], [id*='cover' i], [id*='portada' i], " +
-      "[class*='hero' i], [class*='cover' i], [class*='portada' i]"
+      "[class*='hero' i], [class*='cover' i], [class*='portada' i], " +
+      ".hero, .cover, .inv-hero-section, #inv-hero"
+    )) && !isGalleryPhoto(element, original);
+  }
+
+  function isGalleryPhoto(element, original) {
+    if (/gallery|galeria|galería|moment/i.test(original || "")) return true;
+    if (!element || !element.closest) return false;
+    return Boolean(element.closest(
+      "#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i], " +
+      "[class*='gallery' i], [class*='galeria' i], [class*='galería' i], " +
+      ".inv-moments-section, .inv-gallery-section, #inv-gallery-section, [id*='photo-grid' i]"
     ));
   }
 
-  function choosePhoto(original, element) {
-    var gallery = data.galleryUrls || [];
-    if (isHeroPhoto(element, original) && data.mainPhotoUrl) return data.mainPhotoUrl;
-    if (!gallery.length) return data.mainPhotoUrl || "";
-    var chosen = gallery[imageSequence % gallery.length];
-    imageSequence += 1;
-    return chosen;
+  function getOriginalGalleryIndex(url) {
+    if (!url || typeof url !== "string") return -1;
+    var cleanUrl = url.split("?")[0].toLowerCase();
+    var mClassic = cleanUrl.match(/classic-wedding-gallery-0(\d)/);
+    if (mClassic) return parseInt(mClassic[1], 10) - 2;
+    var mGolden = cleanUrl.match(/golden-romance-gallery-0(\d)/);
+    if (mGolden) return parseInt(mGolden[1], 10) - 2;
+    var mMidnight = cleanUrl.match(/midnight-gallery-(\d+)/);
+    if (mMidnight) return parseInt(mMidnight[1], 10) - 2;
+    var mRoyal = cleanUrl.match(/royal-gallery-0(\d)/);
+    if (mRoyal) return parseInt(mRoyal[1], 10) - 1;
+    var mChampagne = cleanUrl.match(/champagne-gallery-(\d+)/);
+    if (mChampagne) return parseInt(mChampagne[1], 10) - 2;
+    if (cleanUrl.indexOf("natasha-005") !== -1) return 0;
+    if (cleanUrl.indexOf("natasha-008") !== -1) return 1;
+    if (cleanUrl.indexOf("natasha-012") !== -1) return 2;
+    if (cleanUrl.indexOf("natasha-015") !== -1) return 3;
+    if (cleanUrl.indexOf("natasha-021") !== -1) return 4;
+    var mGeneric = cleanUrl.match(/gallery[-_]?0?(\d+)/);
+    if (mGeneric) return parseInt(mGeneric[1], 10) - 1;
+    return -1;
+  }
+
+  function getGallerySlotWrapper(img) {
+    if (!img) return null;
+    var wrapper = img.closest(".cursor-pointer, [role='listitem'], figure, li, [class*='gallery-item'], [class*='gallery-card'], [class*='moment']");
+    if (wrapper && wrapper !== document.body && !wrapper.matches("#gallery, [id*='gallery' i], [id*='galeria' i]")) {
+      return wrapper;
+    }
+    if (img.parentElement && img.parentElement !== document.body && !img.parentElement.matches("#gallery, [id*='gallery' i], [id*='galeria' i]")) {
+      return img.parentElement;
+    }
+    return img;
   }
 
   function applyImages() {
-    imageSequence = 0;
+    var rawGallery = Array.isArray(data.galleryUrls) ? data.galleryUrls.filter(Boolean) : [];
+    var maxGalleryCount = (templateId && templateId.indexOf("basic") !== -1) ? 4 : 10;
+    var gallery = rawGallery.slice(0, maxGalleryCount);
+
+    var gallerySections = document.querySelectorAll(
+      "#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i], " +
+      ".inv-moments-section, .inv-gallery-section, #inv-gallery-section, [id*='photo-grid' i]"
+    );
+
+    if (gallery.length === 0) {
+      gallerySections.forEach(function (sec) {
+        sec.style.setProperty("display", "none", "important");
+      });
+    } else {
+      gallerySections.forEach(function (sec) {
+        sec.style.removeProperty("display");
+        var galleryImgs = Array.from(sec.querySelectorAll("img")).filter(function (img) {
+          var src = img.currentSrc || img.src;
+          return isPhotoUrl(src) || img.dataset.invittaPersonalized === "true";
+        });
+
+        galleryImgs.forEach(function (img, index) {
+          var wrapper = getGallerySlotWrapper(img);
+          if (index < gallery.length) {
+            var targetUrl = gallery[index];
+            img.dataset.invittaPersonalized = "true";
+            img.dataset.invittaPersonalizedSrc = targetUrl;
+            img.dataset.invittaGalleryIndex = String(index);
+            if (img.src !== targetUrl) {
+              img.src = targetUrl;
+              img.removeAttribute("srcset");
+            }
+            if (wrapper) wrapper.style.removeProperty("display");
+          } else {
+            if (wrapper) wrapper.style.setProperty("display", "none", "important");
+          }
+        });
+      });
+    }
+
+    // Procesar imágenes restantes en el documento (Hero, Lightbox, Portada)
     Array.from(document.images).forEach(function (image) {
-      if (image.dataset.invittaPersonalized === "true") {
-        if (image.dataset.invittaPersonalizedSrc && image.src !== image.dataset.invittaPersonalizedSrc) {
-          image.src = image.dataset.invittaPersonalizedSrc;
-          image.removeAttribute("srcset");
+      var original = image.dataset.invittaOriginalSrc || image.currentSrc || image.src;
+      if (!isPhotoUrl(original)) return;
+      if (!image.dataset.invittaOriginalSrc) {
+        image.dataset.invittaOriginalSrc = original;
+      }
+
+      if (isGalleryPhoto(image, original)) {
+        // Las imágenes dentro de la sección ya fueron procesadas arriba.
+        // Si está en un lightbox/modal fuera del contenedor principal:
+        var idx = getOriginalGalleryIndex(original);
+        if (idx >= 0) {
+          if (idx < gallery.length) {
+            var gUrl = gallery[idx];
+            image.dataset.invittaPersonalized = "true";
+            image.dataset.invittaPersonalizedSrc = gUrl;
+            if (image.src !== gUrl) {
+              image.src = gUrl;
+              image.removeAttribute("srcset");
+            }
+          }
         }
         return;
       }
-      var original = image.currentSrc || image.src;
-      if (!isPhotoUrl(original)) return;
-      var replacement = choosePhoto(original, image);
-      if (!replacement) return;
-      image.dataset.invittaPersonalized = "true";
-      image.dataset.invittaPersonalizedSrc = replacement;
-      image.src = replacement;
-      image.removeAttribute("srcset");
+
+      if (isHeroPhoto(image, original)) {
+        if (data.mainPhotoUrl) {
+          image.dataset.invittaPersonalized = "true";
+          image.dataset.invittaPersonalizedSrc = data.mainPhotoUrl;
+          if (image.src !== data.mainPhotoUrl) {
+            image.src = data.mainPhotoUrl;
+            image.removeAttribute("srcset");
+          }
+        }
+        return;
+      }
     });
 
     Array.from(document.querySelectorAll("[style]"))
       .filter(function (element) { return isPhotoUrl(element.style.backgroundImage); })
       .forEach(function (element) {
-        if (element.dataset.invittaPersonalized === "true") {
-          if (element.dataset.invittaPersonalizedSrc && element.style.backgroundImage.indexOf(element.dataset.invittaPersonalizedSrc) === -1) {
-            element.style.backgroundImage = 'url("' + element.dataset.invittaPersonalizedSrc.replace(/"/g, "") + '")';
+        var original = element.dataset.invittaOriginalBg || element.style.backgroundImage;
+        if (!element.dataset.invittaOriginalBg) {
+          element.dataset.invittaOriginalBg = original;
+        }
+
+        if (isGalleryPhoto(element, original)) {
+          if (gallery.length === 0) {
+            element.style.setProperty("display", "none", "important");
           }
           return;
         }
-        var replacement = choosePhoto(element.style.backgroundImage, element);
-        if (!replacement) return;
-        element.dataset.invittaPersonalized = "true";
-        element.dataset.invittaPersonalizedSrc = replacement;
-        element.style.backgroundImage = 'url("' + replacement.replace(/"/g, "") + '")';
+
+        if (isHeroPhoto(element, original)) {
+          if (data.mainPhotoUrl) {
+            element.dataset.invittaPersonalized = "true";
+            element.dataset.invittaPersonalizedSrc = data.mainPhotoUrl;
+            element.style.backgroundImage = 'url("' + data.mainPhotoUrl.replace(/"/g, "") + '")';
+          }
+        }
       });
   }
 
