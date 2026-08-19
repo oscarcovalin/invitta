@@ -1,6 +1,6 @@
-/**
+﻿/**
  * studio-dashboard.js
- * Lógica del dashboard de Invitta Studio
+ * LÃ³gica del dashboard de Invitta Studio
  */
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const link = typeof getLink === "function" ? getLink() : getLink;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(link).then(() => {
-          btn.textContent = "¡Copiado!";
+          btn.textContent = "Â¡Copiado!";
           setTimeout(() => btn.textContent = originalText, 2000);
         }).catch(err => {
           console.error("Error al copiar:", err);
@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const TEMPLATE_NAMES = (window.InvittaTemplateCatalog && window.InvittaTemplateCatalog.TEMPLATE_NAMES) 
     ? window.InvittaTemplateCatalog.TEMPLATE_NAMES 
     : {
-        "xv-elegance-basic": "Élégance XV",
+        "xv-elegance-basic": "Ã‰lÃ©gance XV",
         "xv-rose-gold-premium": "Rose Gold XV",
         "xv-champagne-rose-vip": "Champagne Rose VIP",
         "boda-classic-basic": "Classic Wedding",
@@ -158,203 +158,205 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
 
   function createInvitationItem(inv) {
-    const item = document.createElement("div");
-    item.className = "invitation-item";
+    const item = document.createElement("article");
+    item.className = "studio-invitation-card";
 
-    // Info container
-    const infoDiv = document.createElement("div");
-    infoDiv.className = "invitation-item-info";
+    const headerDiv = document.createElement("div");
+    headerDiv.className = "card-header";
 
     const h3 = document.createElement("h3");
+    h3.className = "card-title";
     const safeTitle = String(inv.title || "Sin título").trim().slice(0, 200);
-    h3.appendChild(document.createTextNode(safeTitle + " "));
+    h3.textContent = safeTitle;
 
-    // Status badge
+    headerDiv.appendChild(h3);
+    item.appendChild(headerDiv);
+
+    const safeSlug = String(inv.slug || "").trim().slice(0, 160);
+    if (safeSlug) {
+      const slugSpan = document.createElement("span");
+      slugSpan.className = "card-slug";
+      slugSpan.textContent = "/" + safeSlug;
+      item.appendChild(slugSpan);
+    }
+
+    const badgesDiv = document.createElement("div");
+    badgesDiv.className = "card-badges";
+
     if (inv.published === true) {
-      h3.appendChild(createBadge("Publicada", "badge badge-published"));
+      const badge = document.createElement("span");
+      badge.className = "card-badge published";
+      badge.textContent = "Publicada";
+      badgesDiv.appendChild(badge);
     } else {
-      h3.appendChild(createBadge("Borrador", "badge badge-draft"));
+      const badge = document.createElement("span");
+      badge.className = "card-badge draft";
+      badge.textContent = "Borrador";
+      badgesDiv.appendChild(badge);
     }
-    h3.appendChild(document.createTextNode(" "));
 
-    // Media badges
     if (inv.main_photo_url) {
-      h3.appendChild(createBadge("📷 Foto", "badge badge-media badge-photo"));
-      h3.appendChild(document.createTextNode(" "));
+      const badge = document.createElement("span");
+      badge.className = "card-badge";
+      badge.textContent = "📷 Foto";
+      badgesDiv.appendChild(badge);
     }
-    if (inv.music_url) {
-      h3.appendChild(createBadge("🎵 Música", "badge badge-media badge-music"));
-      h3.appendChild(document.createTextNode(" "));
-    }
-
     
+    if (inv.music_url) {
+      const badge = document.createElement("span");
+      badge.className = "card-badge";
+      badge.textContent = "🎵 Música";
+      badgesDiv.appendChild(badge);
+    }
+
     if (inv.template_id && TEMPLATE_NAMES[inv.template_id]) {
-      h3.appendChild(createBadge("🎨 " + TEMPLATE_NAMES[inv.template_id], "badge badge-media"));
-      h3.appendChild(document.createTextNode(" "));
+      const badge = document.createElement("span");
+      badge.className = "card-badge";
+      badge.textContent = "✨ " + TEMPLATE_NAMES[inv.template_id];
+      badgesDiv.appendChild(badge);
     }
 
-    if (inv.published && inv.expires_at) {
-      const expiration = new Date(inv.expires_at);
-      if (!Number.isNaN(expiration.getTime())) {
-        h3.appendChild(createBadge(
-          "Vigente hasta " + expiration.toLocaleDateString("es-MX", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-          }),
-          "badge badge-media"
-        ));
-        h3.appendChild(document.createTextNode(" "));
-      }
-    }
     const galleryCount = countArrayValues(inv.gallery_urls, 10);
-
     if (galleryCount > 0) {
-      h3.appendChild(createBadge(`🖼️ Galería ${galleryCount}`, "badge badge-media badge-gallery"));
-      h3.appendChild(document.createTextNode(" "));
+      const badge = document.createElement("span");
+      badge.className = "card-badge";
+      badge.textContent = "🖼️ Galería " + galleryCount;
+      badgesDiv.appendChild(badge);
     }
 
     const timelineCount = countArrayValues(inv.itinerary, 30);
     if (timelineCount > 0) {
-      h3.appendChild(createBadge(`⏱️ Timeline ${timelineCount}`, "badge badge-media badge-timeline", {
-        background: "#e0f2fe", color: "#0369a1", borderColor: "#7dd3fc"
-      }));
-      h3.appendChild(document.createTextNode(" "));
+      const badge = document.createElement("span");
+      badge.className = "card-badge";
+      badge.textContent = "⏱️ Timeline " + timelineCount;
+      badgesDiv.appendChild(badge);
     }
 
-    const fontNames = {
-      classic: "Clásica Elegante",
-      romantic: "Romántica Script",
-      editorial: "Editorial Fine Art",
-      minimal: "Moderna Minimal",
-      luxury: "Luxury Dramática"
-    };
-    const fontName = fontNames[inv.font_preset] || "Clásica Elegante";
-    h3.appendChild(createBadge(`✨ ${fontName}`, "badge badge-media badge-font", {
-      background: "#f3e8ff", color: "#6b21a8", borderColor: "#d8b4fe"
-    }));
+    item.appendChild(badgesDiv);
 
-    infoDiv.appendChild(h3);
-
+    const infoDiv = document.createElement("div");
+    infoDiv.className = "card-info";
+    
     const safeEventType = String(inv.event_type || "-").trim().slice(0, 100);
-    const safeSlug = String(inv.slug || "").trim().slice(0, 160);
     const dateStr = formatInvitationDate(inv.event_date);
 
-    const p = document.createElement("p");
-    
+    const pEvent = document.createElement("p");
     const strongEvent = document.createElement("strong");
     strongEvent.textContent = "Evento: ";
-    p.appendChild(strongEvent);
-    p.appendChild(document.createTextNode(safeEventType + " | "));
+    pEvent.appendChild(strongEvent);
+    pEvent.appendChild(document.createTextNode(safeEventType));
+    infoDiv.appendChild(pEvent);
 
+    const pDate = document.createElement("p");
     const strongDate = document.createElement("strong");
     strongDate.textContent = "Fecha: ";
-    p.appendChild(strongDate);
-    p.appendChild(document.createTextNode(dateStr + " | "));
+    pDate.appendChild(strongDate);
+    pDate.appendChild(document.createTextNode(dateStr));
+    infoDiv.appendChild(pDate);
 
-    const strongSlug = document.createElement("strong");
-    strongSlug.textContent = "Slug: ";
-    p.appendChild(strongSlug);
-    p.appendChild(document.createTextNode(safeSlug));
+    if (inv.published && inv.expires_at) {
+      const expiration = new Date(inv.expires_at);
+      if (!Number.isNaN(expiration.getTime())) {
+        const pExp = document.createElement("p");
+        const strongExp = document.createElement("strong");
+        strongExp.textContent = "Vence: ";
+        pExp.appendChild(strongExp);
+        const expStr = expiration.toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
+        pExp.appendChild(document.createTextNode(expStr));
+        infoDiv.appendChild(pExp);
+      }
+    }
 
-    infoDiv.appendChild(p);
     item.appendChild(infoDiv);
 
-    // Actions container
     const actionsDiv = document.createElement("div");
-    actionsDiv.className = "invitation-item-actions";
+    actionsDiv.className = "card-actions";
 
-    const copyBtn = document.createElement("button");
-    copyBtn.type = "button";
-    copyBtn.className = "btn btn-secondary btn-small copy-btn";
-    copyBtn.textContent = "Copiar Link Base";
-    
+    const primaryActions = document.createElement("div");
+    primaryActions.className = "card-actions-primary";
+
+    if (inv.id) {
+      const editBtn = document.createElement("a");
+      editBtn.className = "btn-card btn-card-primary";
+      editBtn.textContent = "Editar";
+      editBtn.href = "/administracion/studio-invitacion-form.html?id=" + encodeURIComponent(String(inv.id));
+      primaryActions.appendChild(editBtn);
+    } else {
+      const editDisabled = document.createElement("button");
+      editDisabled.className = "btn-card btn-card-primary";
+      editDisabled.textContent = "No disponible";
+      editDisabled.disabled = true;
+      primaryActions.appendChild(editDisabled);
+    }
+
     const demoBtn = document.createElement("a");
-    demoBtn.className = "btn btn-secondary btn-small";
-    
+    demoBtn.className = "btn-card btn-card-outline";
     if (!safeSlug) {
-      copyBtn.disabled = true;
-      demoBtn.textContent = "Demo no disponible";
+      demoBtn.textContent = "No disponible";
+      demoBtn.disabled = true;
     } else {
       demoBtn.textContent = inv.published === true ? "Ver Demo" : "Vista previa";
       demoBtn.target = "_blank";
       demoBtn.rel = "noopener noreferrer";
       demoBtn.href = inv.published === true
-        ? `${buildPublicInvitationPath(safeSlug)}&n=Familia%20Garcia&p=4&m=5`
+        ? buildPublicInvitationPath(safeSlug) + "&n=Familia%20Garcia&p=4&m=5"
         : buildStudioPreviewPath(safeSlug);
-
-      if (inv.published === true) {
-        setCopyButtonFeedback(
-          copyBtn,
-          () => window.location.origin + buildShareInvitationPath(safeSlug)
-        );
-      } else {
-        copyBtn.disabled = true;
-        copyBtn.textContent = "Publica para copiar";
-        copyBtn.title = "Activa Publicar Invitacion antes de compartir el enlace publico.";
-      }
     }
-    
-    actionsDiv.appendChild(copyBtn);
-    actionsDiv.appendChild(document.createTextNode(" "));
-    actionsDiv.appendChild(demoBtn);
-    actionsDiv.appendChild(document.createTextNode(" "));
+    primaryActions.appendChild(demoBtn);
+    actionsDiv.appendChild(primaryActions);
+
+    const secondaryActions = document.createElement("div");
+    secondaryActions.className = "card-actions-secondary";
+
+    const copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.className = "btn-card btn-card-sub copy-btn";
+    copyBtn.textContent = "Copiar Link";
+    if (!safeSlug || inv.published !== true) {
+      copyBtn.disabled = true;
+      copyBtn.textContent = "Publica para copiar";
+    } else {
+      setCopyButtonFeedback(copyBtn, () => window.location.origin + buildShareInvitationPath(safeSlug));
+    }
+    secondaryActions.appendChild(copyBtn);
 
     if (inv.evento_id) {
       const guestsBtn = document.createElement("a");
-      guestsBtn.className = "btn btn-secondary btn-small";
-      guestsBtn.textContent = "Panel invitados";
-      guestsBtn.href = `/administracion/dashboard.html?event_id=${encodeURIComponent(String(inv.evento_id))}`;
-      actionsDiv.appendChild(guestsBtn);
-      actionsDiv.appendChild(document.createTextNode(" "));
+      guestsBtn.className = "btn-card btn-card-sub";
+      guestsBtn.textContent = "Invitados";
+      guestsBtn.href = "/administracion/dashboard.html?event_id=" + encodeURIComponent(String(inv.evento_id));
+      secondaryActions.appendChild(guestsBtn);
 
       if (isCurrentStudioManager && inv.id) {
         const clientAccessBtn = document.createElement("a");
-        clientAccessBtn.className = "btn btn-secondary btn-small";
-        clientAccessBtn.textContent = "Acceso del cliente";
-        clientAccessBtn.href = `/administracion/studio-invitacion-form.html?id=${encodeURIComponent(String(inv.id))}#client-access`;
-        actionsDiv.appendChild(clientAccessBtn);
-        actionsDiv.appendChild(document.createTextNode(" "));
+        clientAccessBtn.className = "btn-card btn-card-sub";
+        clientAccessBtn.textContent = "Acceso Cliente";
+        clientAccessBtn.href = "/administracion/studio-invitacion-form.html?id=" + encodeURIComponent(String(inv.id)) + "#client-access";
+        secondaryActions.appendChild(clientAccessBtn);
       }
     } else if (isCurrentStudioManager) {
       const prepareGuestsBtn = document.createElement("button");
       prepareGuestsBtn.type = "button";
-      prepareGuestsBtn.className = "btn btn-secondary btn-small";
+      prepareGuestsBtn.className = "btn-card btn-card-sub";
       prepareGuestsBtn.textContent = "Preparar invitados";
       prepareGuestsBtn.addEventListener("click", async () => {
         prepareGuestsBtn.disabled = true;
         prepareGuestsBtn.textContent = "Preparando...";
-        const { error } = await db.rpc("sync_studio_invitation_event", {
-          target_invitation_id: inv.id
-        });
+        const { error } = await db.rpc("sync_studio_invitation_event", { target_invitation_id: inv.id });
         if (error) {
-          console.error("No se pudo preparar el panel de invitados:", error);
+          console.error("Error al preparar:", error);
           prepareGuestsBtn.disabled = false;
           prepareGuestsBtn.textContent = "Preparar invitados";
           return;
         }
         await loadInvitations();
       });
-      actionsDiv.appendChild(prepareGuestsBtn);
-      actionsDiv.appendChild(document.createTextNode(" "));
+      secondaryActions.appendChild(prepareGuestsBtn);
     }
 
-    if (inv.id) {
-      const editBtn = document.createElement("a");
-      editBtn.className = "btn btn-primary btn-small";
-      editBtn.textContent = "Editar";
-      editBtn.href = `/administracion/studio-invitacion-form.html?id=${encodeURIComponent(String(inv.id))}`;
-      actionsDiv.appendChild(editBtn);
-    } else {
-      const editDisabled = document.createElement("span");
-      editDisabled.className = "btn btn-primary btn-small";
-      editDisabled.textContent = "Editar no disponible";
-      editDisabled.style.opacity = "0.6";
-      editDisabled.style.cursor = "not-allowed";
-      actionsDiv.appendChild(editDisabled);
-    }
-
+    actionsDiv.appendChild(secondaryActions);
     item.appendChild(actionsDiv);
+
     return item;
   }
 
@@ -369,11 +371,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Error cargando estudio:", error);
       const loadingMsg = document.getElementById("loading-msg");
       const emptyMsg = document.getElementById("empty-msg");
-      loadingMsg.style.display = "none";
-      emptyMsg.textContent = "No fue posible cargar el estudio. Puedes volver a intentarlo o crear una invitación manualmente.";
-      emptyMsg.className = "alert";
+      if(loadingMsg) loadingMsg.style.display = "none";
+      
+      const h3 = emptyMsg.querySelector("h3");
+      if(h3) h3.textContent = "No fue posible cargar el estudio.";
+      const p = emptyMsg.querySelector("p");
+      if(p) p.textContent = "Puedes volver a intentarlo o crear una invitación manualmente.";
       emptyMsg.style.display = "block";
-      emptyMsg.setAttribute("role", "alert");
       return;
     }
 
@@ -394,13 +398,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const emptyMsg = document.getElementById("empty-msg");
     const listContainer = document.getElementById("invitation-list");
 
-    loadingMsg.style.display = "block";
-    loadingMsg.setAttribute("role", "status");
-    loadingMsg.setAttribute("aria-live", "polite");
-    loadingMsg.textContent = "Cargando invitaciones...";
-    
-    emptyMsg.style.display = "none";
-    listContainer.replaceChildren();
+    if(loadingMsg) loadingMsg.style.display = "block";
+    if(emptyMsg) emptyMsg.style.display = "none";
+    if(listContainer) listContainer.replaceChildren();
 
     let invitations = null;
     let error = null;
@@ -415,42 +415,68 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (requestError) {
       error = requestError;
     } finally {
-      loadingMsg.style.display = "none";
+      if(loadingMsg) loadingMsg.style.display = "none";
     }
 
     if (error) {
       console.error("Error cargando invitaciones:", error);
-      emptyMsg.textContent = "No fue posible cargar tus invitaciones. Intenta nuevamente.";
-      emptyMsg.className = "alert";
-      emptyMsg.style.display = "block";
-      emptyMsg.setAttribute("role", "alert");
-      emptyMsg.setAttribute("aria-live", "assertive");
+      const h3 = emptyMsg.querySelector("h3");
+      if(h3) h3.textContent = "No fue posible cargar tus invitaciones";
+      const p = emptyMsg.querySelector("p");
+      if(p) p.textContent = "Intenta recargar la página nuevamente.";
+      if(emptyMsg) emptyMsg.style.display = "block";
       return;
+    }
+
+    // Calculo de KPIs
+    if (invitations) {
+      const elTotal = document.getElementById("kpi-total");
+      const elPublished = document.getElementById("kpi-published");
+      const elDrafts = document.getElementById("kpi-drafts");
+      
+      let publishedCount = 0;
+      let draftCount = 0;
+      invitations.forEach(inv => {
+        if (inv.published) publishedCount++;
+        else draftCount++;
+      });
+      
+      if (elTotal) elTotal.textContent = invitations.length;
+      if (elPublished) elPublished.textContent = publishedCount;
+      if (elDrafts) elDrafts.textContent = draftCount;
     }
 
     if (!invitations || invitations.length === 0) {
-      emptyMsg.textContent = "No tienes invitaciones creadas. ¡Empieza creando una!";
-      emptyMsg.className = "alert";
-      emptyMsg.style.display = "block";
-      emptyMsg.setAttribute("role", "status");
-      emptyMsg.setAttribute("aria-live", "polite");
+      if(emptyMsg) emptyMsg.style.display = "block";
       return;
     }
 
-    // Renderizar
+    // Renderizar optimizado con DocumentFragment
+    const fragment = document.createDocumentFragment();
     invitations.forEach(inv => {
       const item = createInvitationItem(inv);
-      listContainer.appendChild(item);
+      fragment.appendChild(item);
     });
+    if(listContainer) listContainer.appendChild(fragment);
   }
 
   // Iniciar
   loadStudioData().catch((error) => {
     console.error("No se pudo iniciar el panel de estudio:", error);
-    document.getElementById("loading-msg").style.display = "none";
+    const loadingMsg = document.getElementById("loading-msg");
+    if(loadingMsg) loadingMsg.style.display = "none";
     const emptyMsg = document.getElementById("empty-msg");
-    emptyMsg.textContent = "No fue posible iniciar el panel. Intenta recargar la página.";
-    emptyMsg.className = "alert";
-    emptyMsg.style.display = "block";
+    if(emptyMsg) {
+      const h3 = emptyMsg.querySelector("h3");
+      if(h3) h3.textContent = "No fue posible iniciar el panel.";
+      const p = emptyMsg.querySelector("p");
+      if(p) p.textContent = "Intenta recargar la página.";
+      emptyMsg.style.display = "block";
+    }
   });
 });
+
+
+
+
+
