@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const searchInput = document.getElementById("search-input");
   const statusFilter = document.getElementById("status-filter");
   const eventTypeFilter = document.getElementById("event-type-filter");
+  const sortFilter = document.getElementById("sort-filter");
   const clearFiltersBtn = document.getElementById("clear-filters-btn");
   const filtersContainer = document.getElementById("dashboard-filters");
   const filterResultsMsg = document.getElementById("filter-results-msg");
@@ -415,7 +416,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const result = await db
         .from("studio_invitations")
-        .select("id, title, slug, event_type, event_date, published, published_at, expires_at, main_photo_url, music_url, gallery_urls, font_preset, itinerary, template_id, evento_id")
+        .select("id, title, slug, event_type, event_date, published, published_at, expires_at, main_photo_url, music_url, gallery_urls, font_preset, itinerary, template_id, evento_id, created_at")
         .eq("studio_id", currentStudioId)
         .order("created_at", { ascending: false });
       invitations = result.data;
@@ -491,11 +492,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (searchInput) searchInput.addEventListener("input", applyFilters);
       if (statusFilter) statusFilter.addEventListener("change", applyFilters);
       if (eventTypeFilter) eventTypeFilter.addEventListener("change", applyFilters);
+      if (sortFilter) sortFilter.addEventListener("change", applyFilters);
       if (clearFiltersBtn) {
         clearFiltersBtn.addEventListener("click", () => {
           if (searchInput) searchInput.value = "";
           if (statusFilter) statusFilter.value = "all";
           if (eventTypeFilter) eventTypeFilter.value = "all";
+          if (sortFilter) sortFilter.value = "recent";
           applyFilters();
         });
       }
@@ -507,6 +510,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
     const statusVal = statusFilter ? statusFilter.value : "all";
     const typeVal = eventTypeFilter ? eventTypeFilter.value : "all";
+    const sortVal = sortFilter ? sortFilter.value : "recent";
 
     const filtered = allInvitations.filter(inv => {
       let matchesSearch = true;
@@ -529,7 +533,40 @@ document.addEventListener("DOMContentLoaded", async () => {
       return matchesSearch && matchesStatus && matchesType;
     });
 
-    renderInvitations(filtered, true);
+    const sorted = filtered.slice().sort((a, b) => {
+      if (sortVal === "oldest") {
+        if (a.created_at && b.created_at) return new Date(a.created_at) - new Date(b.created_at);
+        return 0;
+      } else if (sortVal === "date-asc") {
+        if (!a.event_date) return 1;
+        if (!b.event_date) return -1;
+        return new Date(a.event_date) - new Date(b.event_date);
+      } else if (sortVal === "date-desc") {
+        if (!a.event_date) return 1;
+        if (!b.event_date) return -1;
+        return new Date(b.event_date) - new Date(a.event_date);
+      } else if (sortVal === "a-z") {
+        const titleA = (a.title || "").toLowerCase();
+        const titleB = (b.title || "").toLowerCase();
+        return titleA.localeCompare(titleB);
+      } else if (sortVal === "z-a") {
+        const titleA = (a.title || "").toLowerCase();
+        const titleB = (b.title || "").toLowerCase();
+        return titleB.localeCompare(titleA);
+      } else if (sortVal === "published-first") {
+        if (a.published === b.published) return 0;
+        return a.published ? -1 : 1;
+      } else if (sortVal === "drafts-first") {
+        if (a.published === b.published) return 0;
+        return a.published ? 1 : -1;
+      }
+      
+      // recent (default)
+      if (a.created_at && b.created_at) return new Date(b.created_at) - new Date(a.created_at);
+      return 0;
+    });
+
+    renderInvitations(sorted, true);
   }
 
   function renderInvitations(invitationsToRender, isFiltering = false) {
