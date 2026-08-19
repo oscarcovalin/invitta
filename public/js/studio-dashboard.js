@@ -166,6 +166,131 @@ document.addEventListener("DOMContentLoaded", async () => {
         "boda-midnight-gold-vip": "Midnight Gold Wedding"
       };
 
+  function parseLocalDate(value) {
+    if (!value) return new Date(NaN);
+    const str = String(value).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+      const [year, month, day] = str.split("-").map(Number);
+      return new Date(year, month - 1, day, 12, 0, 0);
+    }
+    const d = new Date(value);
+    if (!Number.isNaN(d.getTime())) {
+      return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
+    }
+    return d;
+  }
+
+  function getInvitationTimeStatus(inv) {
+    const today = new Date();
+    today.setHours(12, 0, 0, 0); // normalizar a mediodía local
+    const timeStatus = [];
+
+    if (inv.event_date) {
+      const evDate = parseLocalDate(inv.event_date);
+      if (!Number.isNaN(evDate.getTime())) {
+        const diffDays = Math.ceil((evDate - today) / (1000 * 60 * 60 * 24));
+        if (diffDays < 0) {
+          timeStatus.push({ text: "Evento vencido", type: "danger" });
+        } else if (diffDays <= 30) {
+          timeStatus.push({ text: "Evento próximo", type: "warning" });
+        }
+      }
+    }
+
+    if (inv.published && inv.expires_at) {
+      const expDate = parseLocalDate(inv.expires_at);
+      if (!Number.isNaN(expDate.getTime())) {
+        const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+        if (diffDays < 0) {
+          timeStatus.push({ text: "Publicación vencida", type: "danger" });
+        } else if (diffDays <= 30) {
+          timeStatus.push({ text: "Publicación por vencer", type: "warning" });
+        }
+      }
+    }
+    return timeStatus;
+  }
+
+  function getInvitationWarnings(inv) {
+    const warnings = [];
+    if (!inv.main_photo_url) warnings.push({ text: "Falta foto principal", type: "warning" });
+    if (!inv.music_url) warnings.push({ text: "Falta música", type: "warning" });
+    
+    if (countArrayValues(inv.gallery_urls, 10) === 0) {
+      warnings.push({ text: "Falta galería", type: "warning" });
+    }
+
+    if (!inv.event_date) warnings.push({ text: "Sin fecha de evento", type: "warning" });
+    if (!inv.template_id) warnings.push({ text: "Sin plantilla clara", type: "warning" });
+    if (!inv.evento_id) warnings.push({ text: "Invitados no preparados", type: "info" });
+
+    return warnings;
+  }
+
+  function getInvitationHealth(inv) {
+    const health = [];
+    if (inv.published) {
+      health.push({ text: "Publicada", type: "success" });
+    } else {
+      health.push({ text: "Borrador", type: "info" });
+    }
+    return health;
+  }
+
+  function createStatusPanel(inv) {
+    const healthArr = getInvitationHealth(inv);
+    const timeArr = getInvitationTimeStatus(inv);
+    const warnArr = getInvitationWarnings(inv);
+
+    const combined = [...healthArr, ...timeArr, ...warnArr];
+    if (combined.length === 0) return null;
+
+    const panel = document.createElement("div");
+    panel.className = "card-health";
+
+    const row = document.createElement("div");
+    row.className = "card-health-row";
+
+    const MAX_CHIPS = 3;
+    let chipsToShow = combined.slice(0, MAX_CHIPS);
+    let remaining = combined.length - MAX_CHIPS;
+
+    chipsToShow.forEach(chip => {
+      const span = document.createElement("span");
+      span.className = "card-health-chip " + chip.type;
+      span.textContent = chip.text;
+      row.appendChild(span);
+    });
+
+    if (remaining > 0) {
+      const span = document.createElement("span");
+      span.className = "card-health-chip info";
+      span.textContent = "+ " + remaining + " pendientes más";
+      row.appendChild(span);
+    }
+
+    panel.appendChild(row);
+
+    const nextStep = document.createElement("p");
+    nextStep.className = "card-next-step";
+    
+    let nextText = "Siguiente paso: editar contenido";
+    if (warnArr.some(w => w.text === "Invitados no preparados") && inv.published) {
+      nextText = "Siguiente paso: preparar invitados";
+    } else if (timeArr.some(t => t.type === "danger")) {
+      nextText = "Revisar publicación";
+    } else if (inv.published && warnArr.length === 0) {
+      nextText = "Lista para compartir";
+    } else if (!inv.published && warnArr.length === 0) {
+      nextText = "Lista para publicar";
+    }
+    
+    nextStep.textContent = nextText;
+    panel.appendChild(nextStep);
+
+    return panel;
+  }
+
   function createInvitationItem(inv) {
     const item = document.createElement("article");
     item.className = "studio-invitation-card";
@@ -264,7 +389,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     infoDiv.appendChild(pDate);
 
     if (inv.published && inv.expires_at) {
-      const expiration = new Date(inv.expires_at);
+      const expiration = parseLocalDate(inv.expires_at);
       if (!Number.isNaN(expiration.getTime())) {
         const pExp = document.createElement("p");
         const strongExp = document.createElement("strong");
@@ -277,6 +402,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     item.appendChild(infoDiv);
+
+    const statusPanel = createStatusPanel(inv);
+    if (statusPanel) {
+      item.appendChild(statusPanel);
+    }
 
     const actionsDiv = document.createElement("div");
     actionsDiv.className = "card-actions";
@@ -540,11 +670,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else if (sortVal === "date-asc") {
         if (!a.event_date) return 1;
         if (!b.event_date) return -1;
-        return new Date(a.event_date) - new Date(b.event_date);
+        const da = parseLocalDate(a.event_date);
+        const db = parseLocalDate(b.event_date);
+        return da - db;
       } else if (sortVal === "date-desc") {
         if (!a.event_date) return 1;
         if (!b.event_date) return -1;
-        return new Date(b.event_date) - new Date(a.event_date);
+        const da = parseLocalDate(a.event_date);
+        const db = parseLocalDate(b.event_date);
+        return db - da;
       } else if (sortVal === "a-z") {
         const titleA = (a.title || "").toLowerCase();
         const titleB = (b.title || "").toLowerCase();
