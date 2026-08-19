@@ -1,4 +1,4 @@
-﻿/* public/css/studio-dashboard-v2.css */
+/* public/css/studio-dashboard-v2.css */
 /* 
   Invitta Studio 2.0 - SaaS Premium Dashboard
   Palette:
@@ -554,3 +554,48 @@
   font-weight: 500;
   margin: 0;
 }
+
+/* RFC-019: Indicador de Creditos y Planes */
+.kpi-subtext {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.kpi-danger {
+  color: #EF4444;
+}
+
+.btn-primary-v2.btn-disabled,
+.btn-primary-v2[aria-disabled="true"] {
+  background-color: #94A3B8;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.btn-primary-v2.btn-disabled:hover,
+.btn-primary-v2[aria-disabled="true"]:hover {
+  background-color: #94A3B8;
+}
+
+.studio-credits-alert {
+  background-color: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.studio-credits-alert svg {
+  flex-shrink: 0;
+  color: #EF4444;
+}
+

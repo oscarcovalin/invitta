@@ -2395,7 +2395,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (result.error) {
       console.error("Error al guardar:", result.error);
-      errorAlert.textContent = "Error al guardar. Puede que el slug ya esté en uso u otro error de validación.";
+      const isInsufficientCredits = !isEditMode && (
+        result.error.code === "P0001" ||
+        /INVITTA_INSUFFICIENT_CREDITS/i.test(result.error.message || "") ||
+        /INVITTA_INSUFFICIENT_CREDITS/i.test(result.error.details || "")
+      );
+      if (isInsufficientCredits) {
+        errorAlert.textContent = "No tienes créditos disponibles para crear una nueva invitación. Contacta a soporte para recargar.";
+      } else {
+        errorAlert.textContent = "Error al guardar. Puede que el slug ya esté en uso u otro error de validación.";
+      }
       errorAlert.style.display = "block";
       saveBtn.disabled = false;
       saveBtn.textContent = "Guardar cambios";

@@ -58,6 +58,80 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  async function loadStudioCredits(studioId) {
+    const kpiCredits = document.getElementById("kpi-credits");
+    const kpiPlanInfo = document.getElementById("kpi-plan-info");
+    const newInvitationBtn = document.getElementById("new-invitation-btn");
+    const creditsAlert = document.getElementById("studio-credits-alert");
+
+    if (!studioId || !kpiCredits) return;
+
+    try {
+      const { data, error } = await db
+        .from("studios")
+        .select("plan_tier, available_credits, used_credits")
+        .eq("id", studioId)
+        .single();
+
+      if (error) {
+        console.warn("No se pudieron consultar los créditos del estudio:", error);
+        kpiCredits.textContent = "Créditos no disponibles";
+        if (kpiPlanInfo) kpiPlanInfo.textContent = "Plan: - | Usados: -";
+        return;
+      }
+
+      const available = typeof data?.available_credits === "number" ? data.available_credits : 0;
+      const used = typeof data?.used_credits === "number" ? data.used_credits : 0;
+      const plan = String(data?.plan_tier || "beta").trim();
+
+      kpiCredits.textContent = String(available);
+      if (kpiPlanInfo) {
+        kpiPlanInfo.textContent = `Plan: ${plan} | Usados: ${used}`;
+      }
+
+      // Estados visuales de la tarjeta KPI según cantidad de créditos
+      kpiCredits.classList.remove("kpi-success", "kpi-warning", "kpi-danger");
+      if (available > 2) {
+        kpiCredits.classList.add("kpi-success");
+      } else if (available > 0) {
+        kpiCredits.classList.add("kpi-warning");
+      } else {
+        kpiCredits.classList.add("kpi-danger");
+      }
+
+      // Deshabilitar visualmente el botón si no hay créditos disponibles
+      if (newInvitationBtn) {
+        if (available <= 0) {
+          newInvitationBtn.classList.add("btn-disabled");
+          newInvitationBtn.textContent = "Sin créditos";
+          newInvitationBtn.setAttribute("aria-disabled", "true");
+          newInvitationBtn.title = "No tienes créditos disponibles. Contacta a soporte para recargar.";
+          newInvitationBtn.onclick = (e) => {
+            e.preventDefault();
+            alert("No tienes créditos disponibles para crear una nueva invitación. Contacta a soporte para recargar.");
+          };
+
+          if (creditsAlert) {
+            creditsAlert.style.display = "flex";
+          }
+        } else {
+          newInvitationBtn.classList.remove("btn-disabled");
+          newInvitationBtn.textContent = "+ Nueva Invitación";
+          newInvitationBtn.removeAttribute("aria-disabled");
+          newInvitationBtn.removeAttribute("title");
+          newInvitationBtn.onclick = null;
+          if (creditsAlert) {
+            creditsAlert.style.display = "none";
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Error al consultar créditos:", err);
+      if (kpiCredits) kpiCredits.textContent = "Créditos no disponibles";
+      if (kpiPlanInfo) kpiPlanInfo.textContent = "Plan: - | Usados: -";
+    }
+  }
+
   function createBadge(text, classNames, extraStyles = {}) {
     const span = document.createElement("span");
     span.textContent = text;
@@ -526,6 +600,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     // Guardar studio_id en localStorage para usarlo en el form más fácilmente
     localStorage.setItem("invitta_studio_id", currentStudioId);
+
+    // Cargar créditos y plan del estudio
+    await loadStudioCredits(currentStudioId);
 
     // 2. Cargar invitaciones
     await loadInvitations();
