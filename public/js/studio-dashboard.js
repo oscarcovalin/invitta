@@ -875,6 +875,156 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (listContainer) listContainer.appendChild(fragment);
   }
 
+  // RFC-023: Modal de Historial de Créditos
+  const TRANSACTION_TYPE_LABELS = {
+    manual_grant: "Recarga de créditos",
+    invitation_creation: "Creación de invitación",
+    qr_activation: "Activación de Pases QR"
+  };
+
+  function formatTimestamp(isoString) {
+    if (!isoString) return "-";
+    const d = new Date(isoString);
+    if (Number.isNaN(d.getTime())) return "-";
+    return d.toLocaleString("es-MX", { dateStyle: "short", timeStyle: "short" });
+  }
+
+  const viewCreditHistoryBtn = document.getElementById("btn-view-credit-history");
+  const creditHistoryModal = document.getElementById("credit-history-modal");
+  const closeCreditHistoryBtn = document.getElementById("close-credit-history-btn");
+  const dismissCreditHistoryBtn = document.getElementById("dismiss-credit-history-btn");
+
+  if (viewCreditHistoryBtn) {
+    viewCreditHistoryBtn.addEventListener("click", openCreditHistoryModal);
+  }
+
+  if (closeCreditHistoryBtn) {
+    closeCreditHistoryBtn.addEventListener("click", closeCreditHistoryModal);
+  }
+
+  if (dismissCreditHistoryBtn) {
+    dismissCreditHistoryBtn.addEventListener("click", closeCreditHistoryModal);
+  }
+
+  if (creditHistoryModal) {
+    creditHistoryModal.addEventListener("click", (e) => {
+      if (e.target === creditHistoryModal) {
+        closeCreditHistoryModal();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && creditHistoryModal && creditHistoryModal.style.display !== "none") {
+      closeCreditHistoryModal();
+    }
+  });
+
+  async function openCreditHistoryModal() {
+    if (!creditHistoryModal) return;
+    creditHistoryModal.style.display = "flex";
+
+    const loadingMsg = document.getElementById("credit-history-loading");
+    const emptyMsg = document.getElementById("credit-history-empty");
+    const errorMsg = document.getElementById("credit-history-error");
+    const tableWrapper = document.getElementById("credit-history-table-wrapper");
+    const tbody = document.getElementById("credit-history-table-body");
+
+    if (loadingMsg) loadingMsg.style.display = "block";
+    if (emptyMsg) emptyMsg.style.display = "none";
+    if (errorMsg) {
+      errorMsg.style.display = "none";
+      errorMsg.textContent = "";
+    }
+    if (tableWrapper) tableWrapper.style.display = "none";
+    if (tbody) tbody.replaceChildren();
+
+    if (!currentStudioId) {
+      if (loadingMsg) loadingMsg.style.display = "none";
+      if (errorMsg) {
+        errorMsg.textContent = "No se ha identificado el estudio activo.";
+        errorMsg.style.display = "block";
+      }
+      return;
+    }
+
+    try {
+      const { data, error } = await db.rpc("list_my_studio_credit_ledger", {
+        target_studio_id: currentStudioId
+      });
+
+      if (loadingMsg) loadingMsg.style.display = "none";
+
+      if (error) {
+        console.error("Error al consultar historial de créditos:", error);
+        if (errorMsg) {
+          errorMsg.textContent = "No fue posible cargar el historial de créditos. Intenta nuevamente.";
+          errorMsg.style.display = "block";
+        }
+        return;
+      }
+
+      const records = Array.isArray(data) ? data : [];
+      if (records.length === 0) {
+        if (emptyMsg) emptyMsg.style.display = "block";
+        return;
+      }
+
+      if (tbody) {
+        const fragment = document.createDocumentFragment();
+        records.forEach((row) => {
+          const tr = document.createElement("tr");
+
+          // 1. Fecha
+          const tdDate = document.createElement("td");
+          tdDate.textContent = formatTimestamp(row.created_at);
+
+          // 2. Descripción
+          const tdDesc = document.createElement("td");
+          const safeDesc = row.description || TRANSACTION_TYPE_LABELS[row.transaction_type] || "Movimiento de créditos";
+          tdDesc.textContent = safeDesc;
+
+          // 3. Movimiento (+X / -X)
+          const tdDelta = document.createElement("td");
+          const deltaBadge = document.createElement("span");
+          const delta = Number(row.delta_credits) || 0;
+          if (delta > 0) {
+            deltaBadge.className = "card-health-chip success";
+            deltaBadge.textContent = `+${delta}`;
+          } else if (delta < 0) {
+            deltaBadge.className = "card-health-chip danger";
+            deltaBadge.textContent = `${delta}`;
+          } else {
+            deltaBadge.className = "card-health-chip info";
+            deltaBadge.textContent = "0";
+          }
+          tdDelta.appendChild(deltaBadge);
+
+          // 4. Saldo después
+          const tdBalance = document.createElement("td");
+          tdBalance.textContent = typeof row.balance_after === "number" ? `${row.balance_after} créditos` : (row.balance_after ?? "-");
+
+          tr.append(tdDate, tdDesc, tdDelta, tdBalance);
+          fragment.appendChild(tr);
+        });
+        tbody.appendChild(fragment);
+      }
+
+      if (tableWrapper) tableWrapper.style.display = "block";
+    } catch (err) {
+      console.error("Error inesperado al cargar historial de créditos:", err);
+      if (loadingMsg) loadingMsg.style.display = "none";
+      if (errorMsg) {
+        errorMsg.textContent = "Ocurrió un error inesperado al consultar el historial.";
+        errorMsg.style.display = "block";
+      }
+    }
+  }
+
+  function closeCreditHistoryModal() {
+    if (creditHistoryModal) creditHistoryModal.style.display = "none";
+  }
+
   // Iniciar
   loadStudioData().catch((error) => {
     console.error("No se pudo iniciar el panel de estudio:", error);

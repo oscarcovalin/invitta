@@ -77,7 +77,10 @@
             <p class="kpi-value kpi-warning" id="kpi-drafts">0</p>
           </div>
           <div class="studio-kpi-card" id="kpi-credits-card">
-            <h3 class="kpi-label">Créditos Disponibles</h3>
+            <div class="kpi-header-row">
+              <h3 class="kpi-label">Créditos Disponibles</h3>
+              <button type="button" id="btn-view-credit-history" class="btn-kpi-link" title="Ver historial de movimientos de créditos">Ver historial</button>
+            </div>
             <p class="kpi-value" id="kpi-credits">-</p>
             <span class="kpi-subtext" id="kpi-plan-info">Plan: - | Usados: -</span>
           </div>
@@ -139,6 +142,47 @@
       </div>
     </main>
 
+  </div>
+
+  <!-- MODAL: Historial de Créditos (RFC-023) -->
+  <div id="credit-history-modal" class="admin-modal-backdrop" style="display: none;">
+    <div class="admin-modal-box admin-modal-wide">
+      <div class="admin-modal-header">
+        <h3>Historial de Créditos</h3>
+        <button type="button" class="admin-modal-close" id="close-credit-history-btn" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <div id="credit-history-loading" class="studio-dashboard-loading" style="display: none; padding: 24px 20px;">
+          <div class="spinner"></div>
+          <p style="margin-top: 10px;">Cargando historial...</p>
+        </div>
+
+        <div id="credit-history-empty" class="studio-dashboard-empty" style="display: none; padding: 24px 20px;">
+          <p>Aún no hay movimientos de créditos.</p>
+        </div>
+
+        <div id="credit-history-error" class="admin-form-error" style="display: none; margin-top: 0; margin-bottom: 16px;"></div>
+
+        <div id="credit-history-table-wrapper" class="admin-table-wrapper" style="display: none; max-height: 380px; overflow-y: auto;">
+          <table class="admin-studios-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Movimiento</th>
+                <th>Saldo después</th>
+              </tr>
+            </thead>
+            <tbody id="credit-history-table-body">
+              <!-- Inyección JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn-importar" id="dismiss-credit-history-btn">Cerrar</button>
+      </div>
+    </div>
   </div>
 
   <!-- Supabase CDN -->
