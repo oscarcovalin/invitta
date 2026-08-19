@@ -2413,19 +2413,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (typeof window.__invittaStudio_triggerPreviewRefresh === "function") {
         window.__invittaStudio_triggerPreviewRefresh();
       }
-      const savedInvitationId = result.data?.id || inviteId;
-      if (savedInvitationId && isCurrentStudioManager) {
-        const { data: syncedEventId, error: eventSyncError } = await db.rpc("sync_studio_invitation_event", {
-          target_invitation_id: savedInvitationId
-        });
-        if (eventSyncError) {
-          console.error("No se pudo vincular el panel de invitados:", eventSyncError);
-          errorAlert.textContent = "La invitacion se guardo, pero no se pudo vincular el panel de invitados.";
-          errorAlert.style.display = "block";
-        } else if (syncedEventId) {
-          currentEventoId = syncedEventId;
-        }
-      }
       clearSelectedGalleryPreviews();
       existingGalleryUrls = finalGalleryUrls.slice();
       galleryDraftItems = existingGalleryUrls.map((url) => ({ kind: "existing", url }));

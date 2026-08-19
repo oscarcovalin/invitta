@@ -337,6 +337,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       health.push({ text: "Borrador", type: "info" });
     }
+    if (inv.evento_id || inv.qr_credit_charged_at) {
+      health.push({ text: "Pases QR", type: "success" });
+    }
     return health;
   }
 
@@ -580,18 +583,47 @@ document.addEventListener("DOMContentLoaded", async () => {
       const prepareGuestsBtn = document.createElement("button");
       prepareGuestsBtn.type = "button";
       prepareGuestsBtn.className = "btn-card btn-card-sub";
-      prepareGuestsBtn.textContent = "Preparar invitados";
+      prepareGuestsBtn.textContent = "Preparar invitados (1 crédito)";
       prepareGuestsBtn.addEventListener("click", async () => {
+        const confirmed = window.confirm("Activar el Panel de Invitados y Pases QR consumirá 1 crédito adicional de tu saldo. ¿Continuar?");
+        if (!confirmed) return;
+
         prepareGuestsBtn.disabled = true;
-        prepareGuestsBtn.textContent = "Preparando...";
-        const { error } = await db.rpc("sync_studio_invitation_event", { target_invitation_id: inv.id });
-        if (error) {
-          console.error("Error al preparar:", error);
+        prepareGuestsBtn.textContent = "Activando...";
+
+        try {
+          const { data, error } = await db.rpc("activate_studio_invitation_qr", {
+            target_invitation_id: inv.id
+          });
+
+          if (error) {
+            console.error("Error al activar QR:", error);
+            const errStr = (error.message || "") + " " + (error.details || "") + " " + (error.hint || "");
+            if (/INVITTA_INSUFFICIENT_CREDITS_QR/i.test(errStr) || error.code === "P0001") {
+              alert("No tienes créditos disponibles para activar el Panel de Invitados y Pases QR. Recarga créditos desde soporte.");
+            } else if (/INVITTA_UNAUTHORIZED_STUDIO/i.test(errStr) || error.code === "42501") {
+              alert("No tienes permisos para activar el panel de invitados de esta invitación.");
+            } else {
+              alert("No fue posible activar el panel de invitados. Intenta de nuevo.");
+            }
+            prepareGuestsBtn.disabled = false;
+            prepareGuestsBtn.textContent = "Preparar invitados (1 crédito)";
+            return;
+          }
+
+          await loadStudioCredits();
+          await loadInvitations();
+
+          const targetEventId = data?.evento_id;
+          if (targetEventId) {
+            window.location.href = "/administracion/dashboard.html?event_id=" + encodeURIComponent(String(targetEventId));
+          }
+        } catch (err) {
+          console.error("Error inesperado al activar QR:", err);
+          alert("Ocurrió un error inesperado al activar el módulo.");
           prepareGuestsBtn.disabled = false;
-          prepareGuestsBtn.textContent = "Preparar invitados";
-          return;
+          prepareGuestsBtn.textContent = "Preparar invitados (1 crédito)";
         }
-        await loadInvitations();
       });
       secondaryActions.appendChild(prepareGuestsBtn);
     }
@@ -609,12 +641,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const { studio, error } = await window.studioAuth.resolveStudioContext(preferredStudioId);
 
     if (error || !studio) {
-      document.getElementById("studio-name").textContent = "Estudio no encontrado";
-      console.error("Error cargando estudio:", error);
-      const loadingMsg = document.getElementById("loading-msg");
-      const emptyMsg = document.getElementById("empty-msg");
-      if(loadingMsg) loadingMsg.style.display = "none";
-      
       const h3 = emptyMsg.querySelector("h3");
       if(h3) h3.textContent = "No fue posible cargar el estudio.";
       const p = emptyMsg.querySelector("p");
@@ -652,7 +678,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const result = await db
         .from("studio_invitations")
-        .select("id, title, slug, event_type, event_date, published, published_at, expires_at, main_photo_url, music_url, gallery_urls, font_preset, itinerary, template_id, evento_id, created_at")
+        .select("id, title, slug, event_type, event_date, published, published_at, expires_at, main_photo_url, music_url, gallery_urls, font_preset, itinerary, template_id, evento_id, qr_enabled, qr_credit_cost, qr_credit_charged_at, created_at")
         .eq("studio_id", currentStudioId)
         .order("created_at", { ascending: false });
       invitations = result.data;
