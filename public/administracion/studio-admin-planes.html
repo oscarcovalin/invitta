@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración de planes y créditos — Invitta Studio</title>
+  <link rel="stylesheet" href="/css/studio.css">
+  <link rel="stylesheet" href="/css/studio-dashboard-v2.css">
+</head>
+<body class="studio-dashboard-v2">
+
+  <div class="studio-shell">
+    
+    <!-- Sidebar Lateral -->
+    <aside class="studio-sidebar">
+      <div class="studio-sidebar-header">
+        <h2 class="studio-logo">Invitta Studio</h2>
+        <p class="studio-name-text">Operador Interno</p>
+      </div>
+      
+      <nav class="studio-sidebar-nav">
+        <a href="/administracion/studio-dashboard.html" class="studio-nav-item">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Panel de Estudio
+        </a>
+        <a href="/administracion/studio-solicitudes.html" class="studio-nav-item">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+          Solicitudes Comerciales
+        </a>
+        <a href="/administracion/studio-admin-planes.html" class="studio-nav-item active">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Planes y Créditos
+        </a>
+      </nav>
+
+      <div class="studio-sidebar-footer">
+        <button id="admin-logout-btn" class="studio-nav-item studio-btn-logout" type="button">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          Cerrar Sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="studio-main">
+      
+      <!-- Topbar -->
+      <header class="studio-topbar">
+        <div class="studio-topbar-title">
+          <h1>Administración de Planes y Créditos</h1>
+          <p>Consulta estudios registrados, administra planes y realiza recargas manuales auditadas.</p>
+        </div>
+        <div class="studio-topbar-actions">
+          <button id="refresh-studios-btn" class="btn-importar" type="button">Actualizar</button>
+          <a href="/administracion/studio-dashboard.html" class="btn-primary-v2">Volver al Panel</a>
+        </div>
+      </header>
+
+      <div class="studio-content-scroll">
+        
+        <!-- Notificación de feedback -->
+        <div id="admin-toast-msg" class="admin-toast" style="display: none;"></div>
+
+        <!-- Sección de Acceso Denegado -->
+        <div id="access-denied-section" class="access-denied-box" style="display: none;">
+          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          <h2>Acceso Restringido</h2>
+          <p>Este panel está disponible únicamente para el equipo comercial y operadores autorizados de Invitta.</p>
+          <a href="/administracion/studio-dashboard.html" class="btn-primary-v2" style="margin-top: 16px; display: inline-block;">Ir a mi panel de estudio</a>
+        </div>
+
+        <!-- Sección Principal de Operador -->
+        <div id="admin-content-section" style="display: none;">
+
+          <!-- Barra de Búsqueda y Filtros -->
+          <div class="admin-toolbar">
+            <div class="admin-search-wrapper">
+              <input type="text" id="search-studios-input" placeholder="Buscar estudio por nombre o ID..." class="form-control" autocomplete="off">
+            </div>
+            <div class="admin-stats-summary" id="admin-stats-summary">
+              Total estudios: <strong id="total-studios-count">0</strong>
+            </div>
+          </div>
+
+          <!-- Loading msg -->
+          <div id="studios-loading-msg" class="studio-dashboard-loading">
+            <div class="spinner"></div>
+            <p>Cargando lista de estudios...</p>
+          </div>
+
+          <!-- Empty msg -->
+          <div id="studios-empty-msg" class="studio-dashboard-empty" style="display: none;">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <h3>No se encontraron estudios</h3>
+            <p id="studios-empty-text">No hay estudios que coincidan con la búsqueda.</p>
+          </div>
+
+          <!-- Tabla de Estudios -->
+          <div id="studios-table-wrapper" class="admin-table-wrapper" style="display: none;">
+            <table class="admin-studios-table">
+              <thead>
+                <tr>
+                  <th>Estudio</th>
+                  <th>Plan</th>
+                  <th>Créditos Disponibles</th>
+                  <th>Créditos Usados</th>
+                  <th>Fecha Registro</th>
+                  <th style="text-align: right;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="studios-table-body">
+                <!-- Inyección JS -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- MODAL: Recargar Créditos -->
+  <div id="recharge-modal" class="admin-modal-backdrop" style="display: none;">
+    <div class="admin-modal-box">
+      <div class="admin-modal-header">
+        <h3 id="recharge-modal-title">Recargar Créditos</h3>
+        <button type="button" class="admin-modal-close" id="close-recharge-modal-btn">&times;</button>
+      </div>
+      <form id="recharge-form">
+        <div class="admin-modal-body">
+          <p class="recharge-studio-name" id="recharge-target-name">-</p>
+          
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="recharge-amount-input">Cantidad de créditos (1 a 500):</label>
+            <div class="quick-amounts-row">
+              <button type="button" class="quick-amount-btn" data-val="5">+5</button>
+              <button type="button" class="quick-amount-btn" data-val="10">+10</button>
+              <button type="button" class="quick-amount-btn" data-val="25">+25</button>
+              <button type="button" class="quick-amount-btn" data-val="50">+50</button>
+              <button type="button" class="quick-amount-btn" data-val="100">+100</button>
+            </div>
+            <input type="number" id="recharge-amount-input" class="form-control" min="1" max="500" value="10" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="recharge-reason-select">Motivo de recarga:</label>
+            <select id="recharge-reason-select" class="form-control" required>
+              <option value="beta_courtesy">Cortesía Beta</option>
+              <option value="wire_transfer">Pago por transferencia / manual</option>
+              <option value="support_fix">Compensación / Ajuste de soporte</option>
+              <option value="demo">Demostración / Pruebas</option>
+              <option value="other">Otro motivo</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="recharge-note-input">Nota interna (opcional):</label>
+            <textarea id="recharge-note-input" class="form-control" rows="2" placeholder="Ej. Comprobante de transferencia #1234 o solicitud de cliente..."></textarea>
+          </div>
+
+          <div id="recharge-error-msg" class="admin-form-error" style="display: none;"></div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-importar" id="cancel-recharge-btn">Cancelar</button>
+          <button type="submit" class="btn-primary-v2" id="submit-recharge-btn">Confirmar Recarga</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Historial de Créditos (Ledger) -->
+  <div id="ledger-modal" class="admin-modal-backdrop" style="display: none;">
+    <div class="admin-modal-box admin-modal-wide">
+      <div class="admin-modal-header">
+        <h3 id="ledger-modal-title">Historial de Créditos</h3>
+        <button type="button" class="admin-modal-close" id="close-ledger-modal-btn">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <p class="recharge-studio-name" id="ledger-target-name">-</p>
+
+        <div id="ledger-loading-msg" class="studio-dashboard-loading" style="display: none;">
+          <div class="spinner"></div>
+          <p>Consultando libro mayor de créditos...</p>
+        </div>
+
+        <div id="ledger-empty-msg" class="studio-dashboard-empty" style="display: none;">
+          <p>No se encontraron movimientos registrados para este estudio.</p>
+        </div>
+
+        <div id="ledger-table-wrapper" class="admin-table-wrapper" style="display: none; max-height: 380px; overflow-y: auto;">
+          <table class="admin-studios-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Movimiento</th>
+                <th>Saldo Resultante</th>
+                <th>Motivo</th>
+                <th>Notas</th>
+                <th>Operador</th>
+              </tr>
+            </thead>
+            <tbody id="ledger-table-body">
+              <!-- Inyección JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn-importar" id="dismiss-ledger-btn">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Variables de entorno -->
+  <script src="/js/env.js"></script>
+  <!-- Autenticación de Studio -->
+  <script src="/js/studio-auth.js"></script>
+  <!-- Lógica de Administración -->
+  <script src="/js/studio-admin-planes.js"></script>
+
+</body>
+</html>
