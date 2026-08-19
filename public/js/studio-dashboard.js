@@ -14,6 +14,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const salesRequestsLink = document.getElementById("sales-requests-link");
   const salesRequestCount = document.getElementById("sales-request-count");
 
+  let allInvitations = [];
+  const searchInput = document.getElementById("search-input");
+  const statusFilter = document.getElementById("status-filter");
+  const eventTypeFilter = document.getElementById("event-type-filter");
+  const clearFiltersBtn = document.getElementById("clear-filters-btn");
+  const filtersContainer = document.getElementById("dashboard-filters");
+  const filterResultsMsg = document.getElementById("filter-results-msg");
+
   loadNewSalesRequestCount();
 
   // Manejar Logout
@@ -428,20 +436,116 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    if (!invitations || invitations.length === 0) {
-      emptyMsg.textContent = "No tienes invitaciones creadas. ¡Empieza creando una!";
-      emptyMsg.className = "alert";
+    allInvitations = invitations || [];
+    initializeFilters(allInvitations);
+    renderInvitations(allInvitations, false);
+  }
+
+  function initializeFilters(invs) {
+    if (invs.length === 0) {
+      if (filtersContainer) filtersContainer.style.display = "none";
+      return;
+    }
+    if (filtersContainer) filtersContainer.style.display = "flex";
+
+    if (eventTypeFilter) {
+      const types = new Set();
+      invs.forEach(inv => {
+        if (inv.event_type) {
+          types.add(inv.event_type.trim());
+        }
+      });
+      
+      while (eventTypeFilter.options.length > 1) {
+        eventTypeFilter.remove(1);
+      }
+      
+      const sortedTypes = Array.from(types).sort();
+      sortedTypes.forEach(type => {
+        const option = document.createElement("option");
+        option.value = type;
+        option.textContent = type;
+        eventTypeFilter.appendChild(option);
+      });
+    }
+
+    if (!filtersContainer.dataset.initialized) {
+      if (searchInput) searchInput.addEventListener("input", applyFilters);
+      if (statusFilter) statusFilter.addEventListener("change", applyFilters);
+      if (eventTypeFilter) eventTypeFilter.addEventListener("change", applyFilters);
+      if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener("click", () => {
+          if (searchInput) searchInput.value = "";
+          if (statusFilter) statusFilter.value = "all";
+          if (eventTypeFilter) eventTypeFilter.value = "all";
+          applyFilters();
+        });
+      }
+      filtersContainer.dataset.initialized = "true";
+    }
+  }
+
+  function applyFilters() {
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const statusVal = statusFilter ? statusFilter.value : "all";
+    const typeVal = eventTypeFilter ? eventTypeFilter.value : "all";
+
+    const filtered = allInvitations.filter(inv => {
+      let matchesSearch = true;
+      if (searchTerm) {
+        const title = (inv.title || "").toLowerCase();
+        const slug = (inv.slug || "").toLowerCase();
+        const eventType = (inv.event_type || "").toLowerCase();
+        matchesSearch = title.includes(searchTerm) || slug.includes(searchTerm) || eventType.includes(searchTerm);
+      }
+
+      let matchesStatus = true;
+      if (statusVal === "published") matchesStatus = inv.published === true;
+      else if (statusVal === "draft") matchesStatus = inv.published !== true;
+
+      let matchesType = true;
+      if (typeVal !== "all") {
+        matchesType = (inv.event_type || "").trim() === typeVal;
+      }
+
+      return matchesSearch && matchesStatus && matchesType;
+    });
+
+    renderInvitations(filtered, true);
+  }
+
+  function renderInvitations(invitationsToRender, isFiltering = false) {
+    const listContainer = document.getElementById("invitation-list");
+    const emptyMsg = document.getElementById("empty-msg");
+    
+    listContainer.replaceChildren();
+
+    if (invitationsToRender.length === 0) {
       emptyMsg.style.display = "block";
-      emptyMsg.setAttribute("role", "status");
-      emptyMsg.setAttribute("aria-live", "polite");
+      if (isFiltering) {
+        emptyMsg.textContent = "No encontramos invitaciones con esos filtros.";
+      } else {
+        emptyMsg.textContent = "No tienes invitaciones creadas. ¡Empieza creando una!";
+      }
+      if (filterResultsMsg) filterResultsMsg.style.display = "none";
       return;
     }
 
-    // Renderizar
-    invitations.forEach(inv => {
+    emptyMsg.style.display = "none";
+
+    if (isFiltering && filterResultsMsg) {
+      filterResultsMsg.textContent = `Mostrando ${invitationsToRender.length} de ${allInvitations.length} invitaciones.`;
+      filterResultsMsg.style.display = "block";
+    } else if (filterResultsMsg) {
+      filterResultsMsg.style.display = "none";
+    }
+
+    const fragment = document.createDocumentFragment();
+    invitationsToRender.forEach(inv => {
       const item = createInvitationItem(inv);
-      listContainer.appendChild(item);
+      fragment.appendChild(item);
     });
+    listContainer.appendChild(fragment);
   }
 
   // Iniciar
