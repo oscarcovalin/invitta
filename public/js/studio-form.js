@@ -994,6 +994,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let clientDashboardEnabled = false;
   let sourceRequestId = requestId || null;
 
+  window.__invittaStudio_getCurrentSlug = () => currentSlug;
+
   function setClientAccessStatus(message, type = "") {
     if (!clientDashboardStatus) return;
     clientDashboardStatus.textContent = message;
@@ -2030,6 +2032,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     loadBackgroundConfig(data);
 
     form.style.display = "block";
+
+    if (typeof window.__invittaStudio_triggerPreviewRefresh === "function") {
+      window.__invittaStudio_triggerPreviewRefresh();
+    }
   }
 
   // ── Guardar datos ────────────────────────────────────────────────
@@ -2395,6 +2401,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       saveBtn.textContent = "Guardar cambios";
     } else {
       currentSlug = slugToUse;
+      if (typeof window.__invittaStudio_triggerPreviewRefresh === "function") {
+        window.__invittaStudio_triggerPreviewRefresh();
+      }
       const savedInvitationId = result.data?.id || inviteId;
       if (savedInvitationId && isCurrentStudioManager) {
         const { data: syncedEventId, error: eventSyncError } = await db.rpc("sync_studio_invitation_event", {
@@ -2455,22 +2464,35 @@ document.addEventListener("DOMContentLoaded", () => {
     return `/invitacion.html?slug=${encodeURIComponent(slug)}&preview=studio&v=${Date.now()}`;
   }
 
+  window.__invittaStudio_triggerPreviewRefresh = updatePreview;
+
   function updatePreview() {
-    const slug = slugInput ? slugInput.value.trim() : "";
-    if (slug) {
-      const url = getPreviewUrl(slug);
-      if (iframe) iframe.src = url;
-      if (btnNewTab) {
-        btnNewTab.href = url;
-        btnNewTab.style.display = "inline-block";
-      }
-      if (deviceContainer) deviceContainer.style.display = "block";
-      if (emptyState) emptyState.style.display = "none";
-    } else {
+    const savedSlug = typeof window.__invittaStudio_getCurrentSlug === 'function' ? window.__invittaStudio_getCurrentSlug() : "";
+    const inputSlug = slugInput ? slugInput.value.trim() : "";
+
+    if (!savedSlug) {
       if (deviceContainer) deviceContainer.style.display = "none";
-      if (emptyState) emptyState.style.display = "block";
+      if (emptyState) {
+        emptyState.textContent = inputSlug ? "Guarda los cambios para actualizar la vista previa." : "Selecciona un slug y guarda para ver la previsualización.";
+        emptyState.style.display = "block";
+      }
       if (btnNewTab) btnNewTab.style.display = "none";
+      return;
     }
+
+    if (inputSlug && inputSlug !== savedSlug) {
+      alert("Guarda los cambios para actualizar la vista previa.");
+      return;
+    }
+
+    const url = getPreviewUrl(savedSlug);
+    if (iframe) iframe.src = url;
+    if (btnNewTab) {
+      btnNewTab.href = url;
+      btnNewTab.style.display = "inline-block";
+    }
+    if (deviceContainer) deviceContainer.style.display = "block";
+    if (emptyState) emptyState.style.display = "none";
   }
 
   if (btnRefresh) {
