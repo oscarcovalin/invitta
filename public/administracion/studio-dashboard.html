@@ -72,6 +72,29 @@
           </div>
         </section>
 
+        <!-- Filtros -->
+        <div id="dashboard-filters" class="dashboard-filters" style="display: none;">
+          <div class="filter-group">
+            <input type="text" id="search-input" placeholder="Buscar por título o slug..." class="form-control" autocomplete="off">
+          </div>
+          <div class="filter-group">
+            <select id="status-filter" class="form-control">
+              <option value="all">Todas</option>
+              <option value="published">Publicadas</option>
+              <option value="draft">Borradores</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <select id="event-type-filter" class="form-control">
+              <option value="all">Todos los eventos</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <button id="clear-filters-btn" class="btn btn-secondary">Limpiar</button>
+          </div>
+        </div>
+        <div id="filter-results-msg" class="filter-results-msg" style="display: none;"></div>
+
         <!-- Invitations Area -->
         <section class="studio-invitation-area">
           <div id="loading-msg" class="studio-dashboard-loading">
