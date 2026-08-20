@@ -860,7 +860,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=font-library-20260815-2";
+    bridge.src = "/demos/shared/public-personalization.js?v=hero-gallery-fix-20260820";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

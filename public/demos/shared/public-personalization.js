@@ -313,59 +313,194 @@
     return /\.(?:png|jpe?g|webp)(?:\?|$)/i.test(url || "") && !/(logo|icon|qr|section_bg|wedding_bg)/i.test(url || "");
   }
 
-  function isHeroPhoto(element, original) {
-    if (/hero|cover|portada|principal/i.test(original || "")) return true;
+  function isGalleryContainer(element) {
     if (!element || !element.closest) return false;
     return Boolean(element.closest(
-      "#hero, [id*='hero' i], [id*='cover' i], [id*='portada' i], " +
-      "[class*='hero' i], [class*='cover' i], [class*='portada' i]"
+      "#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i], " +
+      "[class*='gallery' i], [class*='galeria' i], [class*='galería' i], " +
+      ".inv-moments-section, .inv-gallery-section, #inv-gallery-section, [id*='photo-grid' i]"
     ));
   }
 
-  function choosePhoto(original, element) {
-    var gallery = data.galleryUrls || [];
-    if (isHeroPhoto(element, original) && data.mainPhotoUrl) return data.mainPhotoUrl;
-    if (!gallery.length) return data.mainPhotoUrl || "";
-    var chosen = gallery[imageSequence % gallery.length];
-    imageSequence += 1;
-    return chosen;
+  function isDemoHeroAsset(src) {
+    if (!src || typeof src !== "string") return false;
+    return /(classic-wedding-hero|golden-romance-hero|midnight-hero|royal-hero|champagne-hero|natasha-005)/i.test(src);
   }
 
-  function applyImages() {
-    imageSequence = 0;
-    Array.from(document.images).forEach(function (image) {
-      if (image.dataset.invittaPersonalized === "true") {
-        if (image.dataset.invittaPersonalizedSrc && image.src !== image.dataset.invittaPersonalizedSrc) {
-          image.src = image.dataset.invittaPersonalizedSrc;
-          image.removeAttribute("srcset");
-        }
-        return;
-      }
-      var original = image.currentSrc || image.src;
-      if (!isPhotoUrl(original)) return;
-      var replacement = choosePhoto(original, image);
-      if (!replacement) return;
-      image.dataset.invittaPersonalized = "true";
-      image.dataset.invittaPersonalizedSrc = replacement;
-      image.src = replacement;
-      image.removeAttribute("srcset");
+  function isDemoGalleryAsset(src) {
+    if (!src || typeof src !== "string") return false;
+    return /(classic-wedding-gallery|golden-romance-gallery|midnight-gallery|royal-gallery|champagne-gallery|natasha-008|natasha-012|natasha-015|natasha-021)/i.test(src);
+  }
+
+  function getOriginalGalleryIndex(url) {
+    if (!url || typeof url !== "string") return -1;
+    var cleanUrl = url.split("?")[0].toLowerCase();
+    var mClassic = cleanUrl.match(/classic-wedding-gallery-0(\d)/);
+    if (mClassic) return parseInt(mClassic[1], 10) - 2;
+    var mGolden = cleanUrl.match(/golden-romance-gallery-0(\d)/);
+    if (mGolden) return parseInt(mGolden[1], 10) - 2;
+    var mMidnight = cleanUrl.match(/midnight-gallery-(\d+)/);
+    if (mMidnight) return parseInt(mMidnight[1], 10) - 2;
+    var mRoyal = cleanUrl.match(/royal-gallery-0(\d)/);
+    if (mRoyal) return parseInt(mRoyal[1], 10) - 1;
+    var mChampagne = cleanUrl.match(/champagne-gallery-(\d+)/);
+    if (mChampagne) return parseInt(mChampagne[1], 10) - 2;
+    if (cleanUrl.indexOf("natasha-008") !== -1) return 0;
+    if (cleanUrl.indexOf("natasha-012") !== -1) return 1;
+    if (cleanUrl.indexOf("natasha-015") !== -1) return 2;
+    if (cleanUrl.indexOf("natasha-021") !== -1) return 3;
+    var mGeneric = cleanUrl.match(/gallery[-_]?0?(\d+)/);
+    if (mGeneric) return parseInt(mGeneric[1], 10) - 1;
+    return -1;
+  }
+
+  function getGallerySlotWrapper(img) {
+    if (!img) return null;
+    var wrapper = img.closest(".cursor-pointer, [role='listitem'], figure, li, [class*='gallery-item'], [class*='gallery-card'], [class*='moment']");
+    if (wrapper && wrapper !== document.body && !wrapper.matches("#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i]")) {
+      return wrapper;
+    }
+    if (img.parentElement && img.parentElement !== document.body && !img.parentElement.matches("#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i]")) {
+      return img.parentElement;
+    }
+    return img;
+  }
+
+  function applyHeroImage() {
+    var heroUrl = data.mainPhotoUrl;
+    if (!heroUrl || typeof heroUrl !== "string") return;
+
+    // 1. Reemplazar elementos <img> en la sección Hero / Portada
+    var heroImages = Array.from(document.querySelectorAll(
+      "#hero img, [id*='hero' i] img, [id*='cover' i] img, [id*='portada' i] img, " +
+      "[class*='hero' i] img, [class*='cover' i] img, [class*='portada' i] img, " +
+      ".hero img, .cover img, .inv-hero img, #inv-hero img, #inv-hero-img, [data-hero-img]"
+    )).filter(function (img) {
+      if (isGalleryContainer(img)) return false;
+      var src = img.currentSrc || img.src || "";
+      if (/(logo|icon|qr|section_bg|wedding_bg)/i.test(src)) return false;
+      return true;
     });
 
-    Array.from(document.querySelectorAll("[style]"))
-      .filter(function (element) { return isPhotoUrl(element.style.backgroundImage); })
-      .forEach(function (element) {
-        if (element.dataset.invittaPersonalized === "true") {
-          if (element.dataset.invittaPersonalizedSrc && element.style.backgroundImage.indexOf(element.dataset.invittaPersonalizedSrc) === -1) {
-            element.style.backgroundImage = 'url("' + element.dataset.invittaPersonalizedSrc.replace(/"/g, "") + '")';
-          }
-          return;
+    // Detectar también por asset de demo hero conocido
+    Array.from(document.images).forEach(function (img) {
+      if (isGalleryContainer(img)) return false;
+      var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
+      if (isDemoHeroAsset(src) && heroImages.indexOf(img) === -1) {
+        heroImages.push(img);
+      }
+    });
+
+    heroImages.forEach(function (img) {
+      if (!img.dataset.invittaOriginalSrc) {
+        img.dataset.invittaOriginalSrc = img.currentSrc || img.src;
+      }
+      img.dataset.invittaPersonalized = "true";
+      img.dataset.invittaPersonalizedSrc = heroUrl;
+
+      // Si está dentro de <picture>, actualizar los <source>
+      if (img.parentElement && img.parentElement.tagName.toLowerCase() === "picture") {
+        img.parentElement.querySelectorAll("source").forEach(function (sourceEl) {
+          sourceEl.srcset = heroUrl;
+        });
+      }
+
+      if (img.hasAttribute("srcset")) {
+        img.removeAttribute("srcset");
+      }
+      if (img.src !== heroUrl) {
+        img.src = heroUrl;
+      }
+    });
+
+    // 2. Reemplazar background-image en elementos Hero / Portada
+    var heroBgElements = Array.from(document.querySelectorAll(
+      "#hero, [id*='hero' i], [id*='cover' i], [id*='portada' i], " +
+      "[class*='hero' i], [class*='cover' i], [class*='portada' i], " +
+      ".hero, .cover, .inv-hero, .inv-hero-bg, #inv-hero, #inv-hero-bg, [data-hero-bg]"
+    )).filter(function (el) {
+      if (isGalleryContainer(el)) return false;
+      return true;
+    });
+
+    heroBgElements.forEach(function (el) {
+      var currentBg = el.style.backgroundImage || "";
+      var isExplicitHeroBg = el.id === "inv-hero-bg" || el.classList.contains("inv-hero-bg") || el.hasAttribute("data-hero-bg");
+      if (currentBg || isExplicitHeroBg) {
+        if (currentBg && /(logo|icon|qr|pattern|overlay|section_bg|wedding_bg)/i.test(currentBg)) return;
+        el.dataset.invittaPersonalized = "true";
+        el.dataset.invittaPersonalizedSrc = heroUrl;
+        el.style.backgroundImage = 'url("' + heroUrl.replace(/"/g, "") + '")';
+        if (isExplicitHeroBg && el.style.display === "none") {
+          el.style.display = "";
         }
-        var replacement = choosePhoto(element.style.backgroundImage, element);
-        if (!replacement) return;
-        element.dataset.invittaPersonalized = "true";
-        element.dataset.invittaPersonalizedSrc = replacement;
-        element.style.backgroundImage = 'url("' + replacement.replace(/"/g, "") + '")';
+      }
+    });
+  }
+
+  function applyGalleryImages() {
+    var rawGallery = Array.isArray(data.galleryUrls) ? data.galleryUrls.filter(Boolean) : [];
+    var maxGalleryCount = (templateId && templateId.indexOf("basic") !== -1) ? 4 : 10;
+    var gallery = rawGallery.slice(0, maxGalleryCount);
+
+    var gallerySections = document.querySelectorAll(
+      "#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i], " +
+      ".inv-moments-section, .inv-gallery-section, #inv-gallery-section, [id*='photo-grid' i]"
+    );
+
+    if (gallery.length === 0) {
+      gallerySections.forEach(function (sec) {
+        sec.style.setProperty("display", "none", "important");
       });
+    } else {
+      gallerySections.forEach(function (sec) {
+        sec.style.removeProperty("display");
+        var galleryImgs = Array.from(sec.querySelectorAll("img")).filter(function (img) {
+          var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src;
+          return isPhotoUrl(src) || isDemoGalleryAsset(src) || img.dataset.invittaPersonalized === "true";
+        });
+
+        galleryImgs.forEach(function (img, index) {
+          if (!img.dataset.invittaOriginalSrc) {
+            img.dataset.invittaOriginalSrc = img.currentSrc || img.src;
+          }
+          var wrapper = getGallerySlotWrapper(img);
+
+          if (index < gallery.length) {
+            var targetUrl = gallery[index];
+            img.dataset.invittaPersonalized = "true";
+            img.dataset.invittaPersonalizedSrc = targetUrl;
+            img.dataset.invittaGalleryIndex = String(index);
+            if (img.src !== targetUrl) {
+              img.src = targetUrl;
+              img.removeAttribute("srcset");
+            }
+            if (wrapper) wrapper.style.removeProperty("display");
+          } else {
+            if (wrapper) wrapper.style.setProperty("display", "none", "important");
+          }
+        });
+      });
+    }
+
+    // Modal / Lightbox handling
+    Array.from(document.images).forEach(function (image) {
+      if (!isGalleryContainer(image)) {
+        var original = image.dataset.invittaOriginalSrc || image.currentSrc || image.src;
+        var modalIdx = getOriginalGalleryIndex(original);
+        if (modalIdx >= 0) {
+          if (gallery.length > 0 && modalIdx < gallery.length) {
+            var gUrl = gallery[modalIdx];
+            image.dataset.invittaPersonalized = "true";
+            image.dataset.invittaPersonalizedSrc = gUrl;
+            if (image.src !== gUrl) {
+              image.src = gUrl;
+              image.removeAttribute("srcset");
+            }
+          }
+        }
+      }
+    });
   }
 
   function applySectionBackgrounds() {
@@ -1013,7 +1148,8 @@
     if (applying || !document.body) return;
     applying = true;
     replaceText(document.body);
-    applyImages();
+    applyHeroImage();
+    applyGalleryImages();
     applySectionBackgrounds();
     applyCustomBackground(data);
     applyAudio();
