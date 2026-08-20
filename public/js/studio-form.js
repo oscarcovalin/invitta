@@ -969,8 +969,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   const successAlert = document.getElementById("form-success");
   const pageTitle = document.getElementById("page-title");
   const saveBtn = document.getElementById("save-btn");
+  const saveBtnTop = document.getElementById("save-btn-top");
   const previewBtn = document.getElementById("preview-invitation-btn");
+  const previewBtnTop = document.getElementById("preview-invitation-btn-top");
   const copyLinkBtn = document.getElementById("copy-invitation-link-btn");
+  const copyLinkBtnTop = document.getElementById("copy-invitation-link-btn-top");
+  const previewRefreshBtnTop = document.getElementById("preview-refresh-btn-top");
+
+  function setSavingState(isSaving) {
+    const label = isSaving ? "Guardando..." : "Guardar cambios";
+    if (saveBtn) {
+      saveBtn.disabled = isSaving;
+      saveBtn.textContent = label;
+    }
+    if (saveBtnTop) {
+      saveBtnTop.disabled = isSaving;
+      saveBtnTop.textContent = label;
+    }
+  }
   const clientDashboardEmail = document.getElementById("clientDashboardEmail");
   const clientDashboardBadge = document.getElementById("client-dashboard-badge");
   const clientDashboardStatus = document.getElementById("client-dashboard-status");
@@ -1278,10 +1294,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     showSuccessMessage("Solicitud precargada. Completa los nombres y los detalles del evento antes de guardar.");
   }
 
+  saveBtnTop?.addEventListener("click", () => {
+    if (typeof form.requestSubmit === "function") {
+      form.requestSubmit();
+    } else {
+      saveBtn?.click();
+    }
+  });
+
+  previewRefreshBtnTop?.addEventListener("click", () => {
+    if (typeof window.__invittaStudio_triggerPreviewRefresh === "function") {
+      window.__invittaStudio_triggerPreviewRefresh();
+    }
+  });
+
   previewBtn?.addEventListener("click", () => {
     const slug = requireSlugForAction();
     if (!slug) return;
     window.open(getPreviewInvitationUrl(slug), "_blank", "noopener");
+  });
+
+  previewBtnTop?.addEventListener("click", () => {
+    previewBtn?.click();
   });
 
   copyLinkBtn?.addEventListener("click", async () => {
@@ -1295,6 +1329,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error(err);
       alert("Error al copiar el enlace.");
     }
+  });
+
+  copyLinkBtnTop?.addEventListener("click", () => {
+    copyLinkBtn?.click();
   });
 
   const openLinkBuilderBtn = document.getElementById("openLinkBuilderBtn");
@@ -2046,16 +2084,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     clearMediaError("photo");
     clearMediaError("music");
     clearMediaError("custom-font");
-    saveBtn.disabled = true;
-    saveBtn.textContent = "Guardando...";
+    setSavingState(true);
 
     const slugInput = document.getElementById("slug");
     const slugToUse = normalizeSlug(slugInput.value || currentSlug);
     if (!slugToUse) {
       errorAlert.textContent = "Escribe un slug con letras o números.";
       errorAlert.style.display = "block";
-      saveBtn.disabled = false;
-      saveBtn.textContent = "Guardar cambios";
+      setSavingState(false);
       return;
     }
     slugInput.value = slugToUse;
@@ -2071,8 +2107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const availableFontIds = new Set(typographyFontDraft.map(font => font.id));
     if (Array.from(assignedFontIds).some(fontId => !availableFontIds.has(fontId))) {
       showMediaError("custom-font", "Una zona usa una tipografía que ya no está disponible. Selecciona otra antes de guardar.");
-      saveBtn.disabled = false;
-      saveBtn.textContent = "Guardar cambios";
+      setSavingState(false);
       return;
     }
     const finalTypographyFonts = [];
@@ -2080,8 +2115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       let uploadedUrl = font.url || "";
       if (font.file) {
         if (!validateFontFile(font.file)) {
-          saveBtn.disabled = false;
-          saveBtn.textContent = "Guardar cambios";
+          setSavingState(false);
           return;
         }
         showProgress("custom-font");
@@ -2090,8 +2124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       if (!uploadedUrl) {
         showMediaError("custom-font", `No se pudo subir la tipografía ${font.name || "seleccionada"}. Intenta de nuevo.`);
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
       finalTypographyFonts.push({ id: font.id, name: font.name, url: uploadedUrl });
@@ -2108,8 +2141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const photoFile = document.getElementById("mainPhotoFile")?.files[0];
     if (photoFile) {
       if (!validateFile(photoFile, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "photo")) {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
       showProgress("photo");
@@ -2117,8 +2149,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       hideProgress("photo");
       if (!uploadedUrl) {
         showMediaError("photo", "Error al subir la foto. Intenta de nuevo.");
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
       finalPhotoUrl = uploadedUrl;
@@ -2129,8 +2160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const musicFile = document.getElementById("musicFile")?.files[0];
     if (musicFile) {
       if (!validateFile(musicFile, ALLOWED_AUDIO_TYPES, MAX_MUSIC_BYTES, "music")) {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
       showProgress("music");
@@ -2138,8 +2168,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       hideProgress("music");
       if (!uploadedUrl) {
         showMediaError("music", "Error al subir la música. Intenta de nuevo.");
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
       finalMusicUrl = uploadedUrl;
@@ -2150,8 +2179,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const bgFile = document.getElementById("backgroundImageFile")?.files[0];
     if (bgFile) {
       if (!validateFile(bgFile, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, "background")) {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
       showProgress("background");
@@ -2159,8 +2187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       hideProgress("background");
       if (!uploadedUrl) {
         showMediaError("background", "Error al subir el fondo. Intenta de nuevo.");
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
       finalBackgroundUrl = uploadedUrl;
@@ -2178,8 +2205,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!file) continue;
       const mediaType = `section-background-${key}`;
       if (!validateFile(file, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES, mediaType)) {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
       showProgress(mediaType);
@@ -2187,8 +2213,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       hideProgress(mediaType);
       if (!uploadedUrl) {
         showMediaError(mediaType, "Error al subir el fondo. Intenta de nuevo.");
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
       finalSectionBackgrounds[key] = uploadedUrl;
@@ -2216,8 +2241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!url) {
         hideProgress("gallery");
         showMediaError("gallery", `Error al subir la foto ${i + 1}. Intenta de nuevo.`);
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
 
@@ -2254,8 +2278,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!validArray.includes(templateIdRaw)) {
         errorAlert.textContent = "La plantilla seleccionada no es válida para este tipo de evento.";
         errorAlert.style.display = "block";
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Guardar cambios";
+        setSavingState(false);
         return;
       }
       validTemplateId = templateIdRaw;
@@ -2268,8 +2291,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!validArray.includes(templateIdRaw)) {
           errorAlert.textContent = "La plantilla seleccionada no es válida para el tipo de evento actual.";
           errorAlert.style.display = "block";
-          saveBtn.disabled = false;
-          saveBtn.textContent = "Guardar cambios";
+          setSavingState(false);
           return;
         }
         validTemplateId = templateIdRaw;
@@ -2406,8 +2428,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         errorAlert.textContent = "Error al guardar. Puede que el slug ya esté en uso u otro error de validación.";
       }
       errorAlert.style.display = "block";
-      saveBtn.disabled = false;
-      saveBtn.textContent = "Guardar cambios";
+      setSavingState(false);
     } else {
       currentSlug = slugToUse;
       if (typeof window.__invittaStudio_triggerPreviewRefresh === "function") {
@@ -2435,8 +2456,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         isTemplateEditMode = true;
         window.history.replaceState({}, "", `/administracion/studio-invitacion-form.html?id=${encodeURIComponent(inviteId)}`);
       }
-      saveBtn.disabled = false;
-      saveBtn.textContent = "Guardar cambios";
+      setSavingState(false);
       updateClientAccessUi({ enabled: clientDashboardEnabled });
       showSuccessMessage("Invitación guardada correctamente.");
     }
