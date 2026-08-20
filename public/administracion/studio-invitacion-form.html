@@ -196,13 +196,19 @@
       gap: 10px;
     }
     .studio-editor-preview {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
       overflow-y: auto !important;
+    }
+    .studio-preview-toolbar {
+      width: 100%;
     }
     /* ── Proporciones Realistas y Equilibradas para Smartphone ── */
     .studio-preview-device {
       position: relative;
-      width: min(345px, 100%) !important;
-      height: clamp(600px, 66vh, 680px) !important;
+      width: min(325px, 100%) !important;
+      height: clamp(590px, 66vh, 660px) !important;
       max-height: none !important;
       background-color: #1a1a1a !important;
       border-radius: 38px !important;
@@ -211,7 +217,8 @@
       border: 3.5px solid #383838 !important;
       box-sizing: border-box !important;
       transform: none !important;
-      margin: 0 auto !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
       flex-shrink: 0;
     }
     .studio-preview-device::before {
@@ -238,8 +245,10 @@
     /* ── Action Dock under Preview Device ── */
     .studio-preview-dock {
       width: 100%;
-      max-width: 345px;
+      max-width: 325px;
       margin-top: 14px;
+      margin-left: auto;
+      margin-right: auto;
       padding: 10px;
       background: #ffffff;
       border: 1px solid var(--border-color);
@@ -282,7 +291,7 @@
     @media (max-width: 991px) {
       .studio-preview-dock {
         margin-top: 14px;
-        max-width: 345px;
+        max-width: 325px;
       }
     }
     @media (max-width: 480px) {
