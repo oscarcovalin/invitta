@@ -192,30 +192,67 @@
     }
     .header-actions {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
       align-items: center;
+      gap: 10px;
     }
-    .header-actions .btn {
-      white-space: nowrap;
-      font-size: 13px;
-      padding: 7px 12px;
+    .studio-editor-preview {
+      overflow-y: auto !important;
     }
-    @media (max-width: 768px) {
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+    /* ── Action Dock under Preview Device ── */
+    .studio-preview-dock {
+      width: 100%;
+      max-width: 375px;
+      margin-top: 16px;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(16, 42, 67, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 20;
+    }
+    .studio-preview-dock-main {
+      width: 100%;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .studio-preview-dock-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .studio-preview-dock-grid .btn {
+      font-size: 12px;
+      padding: 8px 10px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      line-height: 1.25;
+    }
+    .studio-preview-dock-grid .btn:first-child {
+      grid-column: 1 / -1;
+    }
+    @media (max-width: 991px) {
+      .studio-preview-dock {
+        margin-top: 16px;
+        max-width: 375px;
       }
-      .header-actions {
-        width: 100%;
-        gap: 6px;
+    }
+    @media (max-width: 480px) {
+      .studio-preview-dock-grid {
+        grid-template-columns: 1fr;
       }
-      .header-actions .btn {
-        flex: 1 1 auto;
-        text-align: center;
-        font-size: 12px;
-        padding: 6px 10px;
+      .studio-preview-dock-grid .btn:first-child {
+        grid-column: auto;
       }
     }
   </style>
@@ -229,11 +266,7 @@
         <h1 id="page-title">Crear Invitación</h1>
       </div>
       <div class="header-actions">
-        <button type="button" id="save-btn-top" class="btn btn-primary studio-action-button">Guardar cambios</button>
-        <button type="button" id="preview-refresh-btn-top" class="btn btn-secondary studio-action-button">Actualizar vista previa</button>
-        <button type="button" id="preview-invitation-btn-top" class="btn btn-secondary studio-action-button studio-preview-button">Ver invitación</button>
-        <button type="button" id="copy-invitation-link-btn-top" class="btn btn-secondary studio-action-button studio-copy-button">Copiar enlace</button>
-        <a href="/administracion/studio-dashboard.html" class="btn btn-secondary studio-action-button">Volver al Dashboard</a>
+        <a href="/administracion/studio-dashboard.html" class="btn btn-secondary">Volver al Dashboard</a>
       </div>
     </div>
 
@@ -1000,10 +1033,6 @@
     <div class="studio-editor-preview">
       <div class="studio-preview-toolbar">
         <h3>Vista previa</h3>
-        <div class="studio-preview-actions">
-          <button type="button" id="studio-preview-refresh" class="btn btn-primary btn-sm">Actualizar vista previa</button>
-          <a href="#" id="studio-preview-newtab" target="_blank" class="btn btn-secondary btn-sm" style="display:none;">Abrir en nueva pestaña</a>
-        </div>
       </div>
       
       <div id="studio-preview-empty" class="studio-preview-empty" style="display:none;">
@@ -1012,6 +1041,15 @@
 
       <div class="studio-preview-device" id="studio-preview-device" style="display:none;">
         <iframe id="studio-preview-frame" class="studio-preview-frame" src="about:blank" title="Vista previa móvil de la invitación"></iframe>
+      </div>
+
+      <div class="studio-preview-dock" id="studio-preview-dock">
+        <button type="button" id="save-btn-dock" class="btn btn-primary studio-preview-dock-main">Guardar cambios</button>
+        <div class="studio-preview-dock-grid">
+          <button type="button" id="studio-preview-refresh" class="btn btn-secondary btn-sm">Actualizar vista previa</button>
+          <button type="button" id="preview-invitation-btn-dock" class="btn btn-secondary btn-sm studio-preview-button">Ver invitación</button>
+          <button type="button" id="copy-invitation-link-btn-dock" class="btn btn-secondary btn-sm studio-copy-button">Copiar enlace</button>
+        </div>
       </div>
     </div>
   </div>
