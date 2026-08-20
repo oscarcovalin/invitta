@@ -29,8 +29,16 @@ function fail(message) {
   failures.push(message);
 }
 
+function resolveFilePath(relativePath) {
+  const directPath = path.join(root, relativePath);
+  if (fs.existsSync(directPath)) return directPath;
+  const publicPath = path.join(root, "public", relativePath);
+  if (fs.existsSync(publicPath)) return publicPath;
+  return directPath;
+}
+
 function read(relativePath) {
-  const absolutePath = path.join(root, relativePath);
+  const absolutePath = resolveFilePath(relativePath);
   if (!fs.existsSync(absolutePath)) {
     fail(`Falta ${relativePath}`);
     return "";
@@ -45,19 +53,25 @@ for (const demo of activeDemos) {
     fail(`${demo} apunta a código fuente en lugar de una compilación`);
   }
 
+  const demoFile = resolveFilePath(demo);
   const references = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css)(?:\?[^"]*)?)"/g)];
   for (const match of references) {
     const reference = match[1].split("?")[0];
     if (/^(?:https?:)?\/\//.test(reference)) continue;
-    const target = path.resolve(path.dirname(path.join(root, demo)), reference);
+    let target = path.resolve(path.dirname(demoFile), reference);
     if (!target.startsWith(root) || !fs.existsSync(target)) {
-      fail(`${demo} referencia un recurso inexistente: ${reference}`);
+      if (reference.startsWith("/")) {
+        target = path.join(root, "public", reference.slice(1));
+      }
+      if (!fs.existsSync(target)) {
+        fail(`${demo} referencia un recurso inexistente: ${reference}`);
+      }
     }
   }
 }
 
 for (const relativePath of checkedJavaScript) {
-  const absolutePath = path.join(root, relativePath);
+  const absolutePath = resolveFilePath(relativePath);
   if (!fs.existsSync(absolutePath)) {
     fail(`Falta ${relativePath}`);
     continue;
@@ -169,7 +183,7 @@ if (!generalEventStyles.includes(".theme-milestone-50 .hero__ornament { margin: 
 }
 
 const socialCoverPath = "demos/evento-general-basic/assets/cumpleanos-50-sorpresa-social.jpg";
-const socialCoverAbsolutePath = path.join(root, socialCoverPath);
+const socialCoverAbsolutePath = resolveFilePath(socialCoverPath);
 if (!fs.existsSync(socialCoverAbsolutePath)) {
   fail(`Falta la portada social de cumpleaños: ${socialCoverPath}`);
 } else if (fs.statSync(socialCoverAbsolutePath).size > 300 * 1024) {
