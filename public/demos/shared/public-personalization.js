@@ -492,67 +492,184 @@
     });
   }
 
-  function applyGalleryImages() {
-    var rawGallery = Array.isArray(data.galleryUrls) ? data.galleryUrls.filter(Boolean) : [];
-    var maxGalleryCount = (templateId && templateId.indexOf("basic") !== -1) ? 4 : 10;
-    var gallery = rawGallery.slice(0, maxGalleryCount);
+  function ensureGalleryStyles() {
+    if (document.getElementById("invitta-gallery-styles")) return;
+    var style = document.createElement("style");
+    style.id = "invitta-gallery-styles";
+    style.textContent = [
+      ".invitta-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; width: 100%; max-width: 1200px; margin: 32px auto 0; padding: 0 16px; box-sizing: border-box; }",
+      "@media (min-width: 640px) {",
+      "  .invitta-gallery-grid[data-count='1'] { grid-template-columns: minmax(280px, 480px); justify-content: center; }",
+      "  .invitta-gallery-grid[data-count='2'] { grid-template-columns: repeat(2, minmax(240px, 420px)); justify-content: center; }",
+      "  .invitta-gallery-grid[data-count='3'] { grid-template-columns: repeat(3, 1fr); }",
+      "  .invitta-gallery-grid[data-count='4'] { grid-template-columns: repeat(2, 1fr); }",
+      "}",
+      "@media (min-width: 1024px) {",
+      "  .invitta-gallery-grid[data-count='4'] { grid-template-columns: repeat(4, 1fr); }",
+      "}",
+      ".invitta-gallery-item { position: relative; overflow: hidden; border-radius: 8px; background: var(--inv-30, rgba(0,0,0,0.05)); aspect-ratio: 4 / 5; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }",
+      ".invitta-gallery-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); }",
+      ".invitta-gallery-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }",
+      ".invitta-gallery-item:hover .invitta-gallery-img { transform: scale(1.04); }"
+    ].join("\n");
+    document.head.appendChild(style);
+  }
 
-    var gallerySections = document.querySelectorAll(
-      "#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i], " +
-      ".inv-moments-section, .inv-gallery-section, #inv-gallery-section, [id*='photo-grid' i]"
-    );
+  function openGalleryLightbox(url) {
+    var existing = document.getElementById("invitta-gallery-lightbox");
+    if (existing) existing.remove();
+
+    var overlay = document.createElement("div");
+    overlay.id = "invitta-gallery-lightbox";
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;cursor:pointer;";
+
+    var img = document.createElement("img");
+    img.src = url;
+    img.style.cssText = "max-width:92vw;max-height:90vh;object-fit:contain;border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,0.5);cursor:default;";
+    img.addEventListener("click", function(e) { e.stopPropagation(); });
+
+    var closeBtn = document.createElement("button");
+    closeBtn.textContent = "✕";
+    closeBtn.style.cssText = "position:absolute;top:20px;right:24px;background:rgba(255,255,255,0.2);color:#fff;border:none;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;";
+    closeBtn.addEventListener("click", function() { overlay.remove(); });
+
+    overlay.appendChild(img);
+    overlay.appendChild(closeBtn);
+    overlay.addEventListener("click", function() { overlay.remove(); });
+    document.body.appendChild(overlay);
+  }
+
+  function applyGalleryImages() {
+    if (!isRealStudioInvitation()) return;
+
+    var rawGallery = Array.isArray(data.galleryUrls) ? data.galleryUrls.filter(Boolean) : [];
+    var gallery = [];
+    var seen = {};
+    for (var i = 0; i < rawGallery.length; i++) {
+      var u = String(rawGallery[i]).trim();
+      if ((u.startsWith("http://") || u.startsWith("https://")) && !seen[u]) {
+        seen[u] = true;
+        gallery.push(u);
+      }
+    }
+
+    var isPremium = false;
+    if (templateId && /premium|vip|pro/i.test(templateId)) isPremium = true;
+    if (data.planTier && /premium|vip|pro/i.test(data.planTier)) isPremium = true;
+    if (data.tier && /premium|vip|pro/i.test(data.tier)) isPremium = true;
+    var maxGalleryCount = isPremium ? 10 : 4;
+    gallery = gallery.slice(0, maxGalleryCount);
+
+    var gallerySections = Array.from(document.querySelectorAll(
+      "#gallery, [id='gallery'], [id='galeria'], [id='galería'], " +
+      ".inv-moments-section, .inv-gallery-section, #inv-gallery-section"
+    ));
+    var galleryNavs = Array.from(document.querySelectorAll("nav button, nav a, .inv-nav-button"));
 
     if (gallery.length === 0) {
       gallerySections.forEach(function (sec) {
         sec.style.setProperty("display", "none", "important");
+        sec.hidden = true;
       });
-    } else {
-      gallerySections.forEach(function (sec) {
-        sec.style.removeProperty("display");
-        var galleryImgs = Array.from(sec.querySelectorAll("img")).filter(function (img) {
-          var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src;
-          return isPhotoUrl(src) || isDemoGalleryAsset(src) || img.dataset.invittaPersonalized === "true";
-        });
-
-        galleryImgs.forEach(function (img, index) {
-          if (!img.dataset.invittaOriginalSrc) {
-            img.dataset.invittaOriginalSrc = img.currentSrc || img.src;
-          }
-          var wrapper = getGallerySlotWrapper(img);
-
-          if (index < gallery.length) {
-            var targetUrl = gallery[index];
-            img.dataset.invittaPersonalized = "true";
-            img.dataset.invittaPersonalizedSrc = targetUrl;
-            img.dataset.invittaGalleryIndex = String(index);
-            if (img.src !== targetUrl) {
-              img.src = targetUrl;
-              img.removeAttribute("srcset");
-            }
-            if (wrapper) wrapper.style.removeProperty("display");
-          } else {
-            if (wrapper) wrapper.style.setProperty("display", "none", "important");
-          }
-        });
+      galleryNavs.forEach(function(btn) {
+        var text = (btn.textContent || "").toLowerCase();
+        var href = (btn.getAttribute("href") || "").toLowerCase();
+        if (/galer[ií]a|fotos|recuerdos|book/i.test(text) || /#gallery|#galeria/i.test(href)) {
+          btn.style.setProperty("display", "none", "important");
+        }
       });
+      return;
     }
 
-    // Modal / Lightbox handling
-    Array.from(document.images).forEach(function (image) {
-      if (!isGalleryContainer(image)) {
-        var original = image.dataset.invittaOriginalSrc || image.currentSrc || image.src;
-        var modalIdx = getOriginalGalleryIndex(original);
-        if (modalIdx >= 0) {
-          if (gallery.length > 0 && modalIdx < gallery.length) {
-            var gUrl = gallery[modalIdx];
-            image.dataset.invittaPersonalized = "true";
-            image.dataset.invittaPersonalizedSrc = gUrl;
-            if (image.src !== gUrl) {
-              image.src = gUrl;
-              image.removeAttribute("srcset");
-            }
-          }
+    // Si no existe sección de galería en la plantilla y hay fotos reales, crear invitta-gallery-section
+    if (gallerySections.length === 0 && gallery.length > 0) {
+      var newSec = document.createElement("section");
+      newSec.id = "inv-gallery-section";
+      newSec.className = "section inv-gallery-section";
+
+      var newInner = document.createElement("div");
+      newInner.className = "section__inner max-w-5xl mx-auto text-center space-y-8";
+
+      var kicker = document.createElement("p");
+      kicker.className = "eyebrow text-sage text-xs tracking-widest uppercase font-semibold";
+      kicker.textContent = "Momentos";
+      newInner.appendChild(kicker);
+
+      var title = document.createElement("h2");
+      title.className = "font-serif text-3xl md:text-4xl text-ink font-light";
+      title.textContent = "Galería de Fotos";
+      newInner.appendChild(title);
+
+      newSec.appendChild(newInner);
+
+      var rsvpSec = document.querySelector("#rsvp, #gifts, #registry, footer");
+      if (rsvpSec && rsvpSec.parentElement) {
+        rsvpSec.parentElement.insertBefore(newSec, rsvpSec);
+      } else {
+        var targetContainer = document.querySelector("#inv-content, main, .main-content") || document.body;
+        targetContainer.appendChild(newSec);
+      }
+      gallerySections = [newSec];
+    }
+
+    ensureGalleryStyles();
+    gallerySections.forEach(function (sec) {
+      sec.style.removeProperty("display");
+      sec.hidden = false;
+    });
+    galleryNavs.forEach(function(btn) {
+      var text = (btn.textContent || "").toLowerCase();
+      var href = (btn.getAttribute("href") || "").toLowerCase();
+      if (/galer[ií]a|fotos|recuerdos|book/i.test(text) || /#gallery|#galeria/i.test(href)) {
+        btn.style.removeProperty("display");
+      }
+    });
+
+    gallerySections.forEach(function (sec) {
+      var demoItems = sec.querySelectorAll(".grid > *, .gallery > *, [class*='grid'] > *, [class*='gallery']:not(.invitta-gallery-grid)");
+      demoItems.forEach(function (item) {
+        if (item.closest && item.closest(".invitta-gallery-grid")) return;
+        if (item.classList && (item.classList.contains("invitta-gallery-grid") || item.classList.contains("invitta-gallery-item"))) return;
+        item.style.setProperty("display", "none", "important");
+      });
+
+      var grid = sec.querySelector(".invitta-gallery-grid");
+      if (!grid) {
+        grid = document.createElement("div");
+        grid.className = "invitta-gallery-grid";
+        var inner = sec.querySelector(".section__inner, .max-w-4xl, .max-w-5xl, .max-w-6xl, .max-w-[1500px], .max-w-[1600px], .container, .space-y-16") || sec;
+        inner.appendChild(grid);
+      }
+
+      grid.dataset.count = String(gallery.length);
+
+      var galleryKey = gallery.join("|");
+      if (grid.dataset.invittaGalleryKey !== galleryKey) {
+        grid.dataset.invittaGalleryKey = galleryKey;
+        while (grid.firstChild) {
+          grid.removeChild(grid.firstChild);
         }
+
+        gallery.forEach(function (photoUrl, idx) {
+          var item = document.createElement("div");
+          item.className = "invitta-gallery-item";
+
+          var img = document.createElement("img");
+          img.className = "invitta-gallery-img";
+          img.src = photoUrl;
+          img.alt = "Foto de galería " + (idx + 1);
+          img.loading = "lazy";
+          img.decoding = "async";
+          img.dataset.invittaPersonalized = "true";
+          img.dataset.invittaGalleryIndex = String(idx);
+
+          item.addEventListener("click", function () {
+            openGalleryLightbox(photoUrl);
+          });
+
+          item.appendChild(img);
+          grid.appendChild(item);
+        });
       }
     });
   }
@@ -1481,27 +1598,58 @@
       root.style.setProperty("--accent-color", data.accentColor);
     }
 
-    // Regla 60-30-10 integrada a nivel iFrame/Runtime público
-    var color60 = data.colorSecondary || (palette ? palette.surface : null) || "#ffffff";
-    var color30 = (palette ? palette.card : null) || "#ece5cf";
-    var color10 = data.colorPrimary || data.accentColor || (palette ? palette.accent : null) || "#cb1823";
-    
-    var fallbackText = data.titleColor || (palette ? palette.title : null);
-    if (!fallbackText) {
-      var hex = color60.replace("#", "");
-      if (hex.length === 3) hex = hex.split('').map(function(c) { return c + c; }).join('');
-      var r = parseInt(hex.substr(0,2), 16) || 255;
-      var g = parseInt(hex.substr(2,2), 16) || 255;
-      var b = parseInt(hex.substr(4,2), 16) || 255;
-      var yiq = ((r*299)+(g*587)+(b*114))/1000;
-      fallbackText = (yiq >= 128) ? "#2e2722" : "#fdfbf7";
+    // Regla 60-30-10 integrada con tokens semánticos
+    var color60 = data.colorSecondary || (palette ? palette.surface : null) || "#FAF7F2";
+    var color30 = (palette ? palette.card : null) || "#FFFFFF";
+    var color10 = data.colorPrimary || data.accentColor || (palette ? palette.accent : null) || "#8A6D47";
+
+    function getYiq(hexColor) {
+      if (!hexColor) return 200;
+      var h = String(hexColor).replace("#", "").trim();
+      if (h.length === 3) h = h.split("").map(function(c) { return c + c; }).join("");
+      if (h.length !== 6) return 200;
+      var r = parseInt(h.substr(0, 2), 16) || 0;
+      var g = parseInt(h.substr(2, 2), 16) || 0;
+      var b = parseInt(h.substr(4, 2), 16) || 0;
+      return ((r * 299) + (g * 587) + (b * 114)) / 1000;
     }
+
+    var yiq60 = getYiq(color60);
+    var yiq30 = getYiq(color30);
+    var yiq10 = getYiq(color10);
+
+    var is60Dark = yiq60 < 135;
+    var is30Dark = yiq30 < 135;
+    var is10Dark = yiq10 < 135;
+
+    var textOn60 = (palette && palette.title) || data.titleColor || (is60Dark ? "#FAF6EE" : "#241F1A");
+    var bodyOn60 = (palette && palette.body) || data.bodyColor || (is60Dark ? "#D8CFBE" : "#574E45");
+
+    var cardBg = color30;
+    var cardText = is30Dark ? "#FAF6EE" : "#241F1A";
+    var cardMuted = is30Dark ? "rgba(250, 246, 238, 0.72)" : "rgba(36, 31, 26, 0.70)";
+    var textOn30 = cardText;
+
+    var onAccent = (palette && palette.onAccent) || (is10Dark ? "#FFFFFF" : "#1A1714");
+    var overlay = (palette && palette.overlay) || (is60Dark ? "rgba(0, 0, 0, 0.65)" : "rgba(0, 0, 0, 0.42)");
+    var cardBorder = is30Dark ? "rgba(255, 255, 255, 0.12)" : "rgba(138, 109, 71, 0.22)";
+    var inputBorder = is30Dark ? "rgba(255, 255, 255, 0.25)" : "rgba(138, 109, 71, 0.35)";
 
     root.style.setProperty("--inv-60", color60);
     root.style.setProperty("--inv-30", color30);
     root.style.setProperty("--inv-10", color10);
-    root.style.setProperty("--inv-text", fallbackText);
-    root.style.setProperty("--text-color", fallbackText); // Forzar rescate de legacy
+    root.style.setProperty("--inv-text-on-60", textOn60);
+    root.style.setProperty("--inv-body-on-60", bodyOn60);
+    root.style.setProperty("--inv-text-on-30", textOn30);
+    root.style.setProperty("--inv-card-bg", cardBg);
+    root.style.setProperty("--inv-card-text", cardText);
+    root.style.setProperty("--inv-card-muted", cardMuted);
+    root.style.setProperty("--inv-on-accent", onAccent);
+    root.style.setProperty("--inv-button-text", onAccent);
+    root.style.setProperty("--inv-overlay", overlay);
+    root.style.setProperty("--inv-card-border", cardBorder);
+    root.style.setProperty("--inv-input-border", inputBorder);
+    root.style.setProperty("--text-color", textOn60);
 
     var existingStyle = document.getElementById("invitta-visual-customization");
     if (existingStyle) existingStyle.remove();
@@ -1512,27 +1660,52 @@
     var style = document.createElement("style");
     style.id = "invitta-visual-customization";
     style.textContent = [
-      /* 60 — fondo base */
-      "html[data-invitta-theme=\"active\"] body {background:var(--invitta-surface, var(--inv-60))!important; color:var(--invitta-body, var(--inv-text, #2e2722))!important}",
-      /* 30 — superficies de tarjeta */
-      "html[data-invitta-theme=\"active\"] .bg-paper, html[data-invitta-theme=\"active\"] .bg-cream, html[data-invitta-theme=\"active\"] .bg-ivory, html[data-invitta-theme=\"active\"] .card, html[data-invitta-theme=\"active\"] .section {background-color:var(--invitta-card, var(--inv-30, var(--inv-60)))!important}",
-      /* Texto de títulos */
-      "html[data-invitta-theme=\"active\"] h1:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] h2:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] h3:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-display:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-serif:not(.text-paper):not(.text-white) {color:var(--invitta-title, var(--inv-text, #2e2722))}",
-      /* Texto de cuerpo */
-      "html[data-invitta-theme=\"active\"] p:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-sans:not(.text-paper):not(.text-white), html[data-invitta-theme=\"active\"] .font-body:not(.text-paper):not(.text-white) {color:var(--invitta-body, var(--inv-text, #2e2722))}",
-      /* 10 — acentos */
-      "html[data-invitta-theme=\"active\"] .text-sage, html[data-invitta-theme=\"active\"] .text-gold, html[data-invitta-theme=\"active\"] .text-accent {color:var(--invitta-accent, var(--inv-10, #cb1823))}",
-      "html[data-invitta-theme=\"active\"] .border-sage, html[data-invitta-theme=\"active\"] .border-gold, html[data-invitta-theme=\"active\"] .border-accent {border-color:var(--invitta-accent, var(--inv-10, #cb1823))}",
-      "html[data-invitta-theme=\"active\"] .bg-sage, html[data-invitta-theme=\"active\"] .bg-gold, html[data-invitta-theme=\"active\"] .bg-accent {background-color:var(--invitta-accent, var(--inv-10, #cb1823))}",
-      /* Botones: color acento 10, texto on-accent para legibilidad garantizada */
-      "html[data-invitta-theme=\"active\"] .button:not(.button--outline):not(.button--text) {background-color:var(--invitta-accent, var(--inv-10, #cb1823)); border-color:var(--invitta-accent, var(--inv-10, #cb1823)); color:var(--inv-button-text, #ffffff)}",
-      "html[data-invitta-theme=\"active\"] .button--outline, html[data-invitta-theme=\"active\"] .button--text {color:var(--invitta-accent, var(--inv-10, #cb1823)); border-color:var(--invitta-accent, var(--inv-10, #cb1823))}",
+      /* 60 — fondo dominante */
+      "html[data-invitta-theme=\"active\"] body { background-color: var(--inv-60) !important; color: var(--inv-body-on-60) !important; }",
+
+      /* Títulos principales sobre fondo 60 */
+      "html[data-invitta-theme=\"active\"] h1:not(.text-paper):not(.text-white):not([class*='hero']):not(.card h1):not(.invitta-gift-title), html[data-invitta-theme=\"active\"] h2:not(.text-paper):not(.text-white):not([class*='hero']):not(.card h2), html[data-invitta-theme=\"active\"] h3:not(.text-paper):not(.text-white):not([class*='hero']):not(.card h3):not(.invitta-gift-title), html[data-invitta-theme=\"active\"] .font-display:not(.text-paper):not(.text-white):not([class*='hero']), html[data-invitta-theme=\"active\"] .font-serif:not(.text-paper):not(.text-white):not([class*='hero']):not(.card *) { color: var(--inv-text-on-60) !important; }",
+
+      /* Párrafos sobre fondo 60 */
+      "html[data-invitta-theme=\"active\"] p:not(.text-paper):not(.text-white):not([class*='hero']):not(.card p):not(.invitta-gift-card p), html[data-invitta-theme=\"active\"] .font-sans:not(.text-paper):not(.text-white):not([class*='hero']):not(.card *):not(.invitta-gift-card *) { color: var(--inv-body-on-60); }",
+
+      /* 30 — Tarjetas y superficies secundarias (Dresscode, RSVP, Regalos, Itinerario, Padres, Mensajes, Countdown) */
+      "html[data-invitta-theme=\"active\"] .bg-paper, html[data-invitta-theme=\"active\"] .bg-cream, html[data-invitta-theme=\"active\"] .bg-ivory, html[data-invitta-theme=\"active\"] .card, html[data-invitta-theme=\"active\"] .section-card, html[data-invitta-theme=\"active\"] [data-invitta-card], html[data-invitta-theme=\"active\"] .invitta-gift-card, html[data-invitta-theme=\"active\"] #rsvp .max-w-2xl, html[data-invitta-theme=\"active\"] .itinerary-card, html[data-invitta-theme=\"active\"] .timeline-item, html[data-invitta-theme=\"active\"] .dresscode-card, html[data-invitta-theme=\"active\"] .dresscode-item, html[data-invitta-theme=\"active\"] .family-card, html[data-invitta-theme=\"active\"] .parent-card, html[data-invitta-theme=\"active\"] .countdown-card { background-color: var(--inv-card-bg) !important; color: var(--inv-card-text) !important; border-color: var(--inv-card-border) !important; }",
+
+      /* Títulos dentro de tarjetas */
+      "html[data-invitta-theme=\"active\"] .card h1, html[data-invitta-theme=\"active\"] .card h2, html[data-invitta-theme=\"active\"] .card h3, html[data-invitta-theme=\"active\"] .card h4, html[data-invitta-theme=\"active\"] .invitta-gift-title, html[data-invitta-theme=\"active\"] .bg-paper h1, html[data-invitta-theme=\"active\"] .bg-paper h2, html[data-invitta-theme=\"active\"] .bg-paper h3, html[data-invitta-theme=\"active\"] .bg-paper h4, html[data-invitta-theme=\"active\"] #rsvp .max-w-2xl h2, html[data-invitta-theme=\"active\"] #rsvp .max-w-2xl h3 { color: var(--inv-card-text) !important; }",
+
+      /* Texto secundario y párrafos en tarjetas */
+      "html[data-invitta-theme=\"active\"] .card p, html[data-invitta-theme=\"active\"] .card span:not(.badge):not(.invitta-gift-icon):not([class*='icon']):not([class*='number']), html[data-invitta-theme=\"active\"] .invitta-gift-description, html[data-invitta-theme=\"active\"] .invitta-gift-bank-info, html[data-invitta-theme=\"active\"] .bg-paper p, html[data-invitta-theme=\"active\"] .bg-paper span:not(.badge):not([class*='icon']), html[data-invitta-theme=\"active\"] #rsvp .max-w-2xl p { color: var(--inv-card-muted) !important; }",
+
+      /* 10 — Acentos y Realces */
+      "html[data-invitta-theme=\"active\"] .text-sage, html[data-invitta-theme=\"active\"] .text-gold, html[data-invitta-theme=\"active\"] .text-accent, html[data-invitta-theme=\"active\"] .countdown-number, html[data-invitta-theme=\"active\"] [class*='countdown'] span, html[data-invitta-theme=\"active\"] .invitta-gift-icon, html[data-invitta-theme=\"active\"] [data-invitta-accent] { color: var(--inv-10) !important; }",
+      "html[data-invitta-theme=\"active\"] .border-sage, html[data-invitta-theme=\"active\"] .border-gold, html[data-invitta-theme=\"active\"] .border-accent { border-color: var(--inv-10) !important; }",
+      "html[data-invitta-theme=\"active\"] .bg-sage, html[data-invitta-theme=\"active\"] .bg-gold, html[data-invitta-theme=\"active\"] .bg-accent { background-color: var(--inv-10) !important; }",
+
+      /* Botones */
+      "html[data-invitta-theme=\"active\"] .button:not(.button--outline):not(.button--text), html[data-invitta-theme=\"active\"] button.btn-primary, html[data-invitta-theme=\"active\"] .btn-accent, html[data-invitta-theme=\"active\"] .invitta-gift-button { background-color: var(--inv-10) !important; border-color: var(--inv-10) !important; color: var(--inv-on-accent) !important; }",
+      "html[data-invitta-theme=\"active\"] .button--outline, html[data-invitta-theme=\"active\"] .button--text { color: var(--inv-10) !important; border-color: var(--inv-10) !important; background-color: transparent !important; }",
+
+      /* Inputs, Selects, Textareas y Placeholders */
+      "html[data-invitta-theme=\"active\"] input:not([type='checkbox']):not([type='radio']):not([type='submit']), html[data-invitta-theme=\"active\"] select, html[data-invitta-theme=\"active\"] textarea { background-color: var(--inv-card-bg) !important; color: var(--inv-card-text) !important; border: 1px solid var(--inv-input-border) !important; }",
+      "html[data-invitta-theme=\"active\"] input::placeholder, html[data-invitta-theme=\"active\"] textarea::placeholder { color: var(--inv-card-muted) !important; opacity: 0.75 !important; }",
+
+      /* Texto sobre fotos / Hero Cover */
+      "html[data-invitta-theme=\"active\"] .hero__cover::after, html[data-invitta-theme=\"active\"] [class*='hero'] [class*='overlay'], html[data-invitta-theme=\"active\"] .hero-cover-overlay { background: var(--inv-overlay) !important; }",
+      "html[data-invitta-theme=\"active\"] [class*='hero'] h1, html[data-invitta-theme=\"active\"] [class*='hero'] h2, html[data-invitta-theme=\"active\"] [class*='hero'] p, html[data-invitta-theme=\"active\"] [class*='hero'] .hero__name, html[data-invitta-theme=\"active\"] [class*='hero'] [data-invitta-font-role='name'] { text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45); }",
+
+      /* Reproductor de Música y Barra Inferior (Bottom Bar) */
+      "html[data-invitta-theme=\"active\"] #invitta-audio-control, html[data-invitta-theme=\"active\"] .inv-music-dock, html[data-invitta-theme=\"active\"] .inv-bottom-bar, html[data-invitta-theme=\"active\"] nav.inv-bottom-nav { background-color: var(--inv-30) !important; color: var(--inv-card-text) !important; border-color: var(--inv-card-border) !important; }",
+      "html[data-invitta-theme=\"active\"] #invitta-audio-control span, html[data-invitta-theme=\"active\"] #invitta-audio-control p, html[data-invitta-theme=\"active\"] .inv-music-dock span, html[data-invitta-theme=\"active\"] .inv-bottom-bar span, html[data-invitta-theme=\"active\"] nav.inv-bottom-nav span { color: var(--inv-card-text) !important; }",
+
       /* Tipografías */
-      "html[data-invitta-theme=\"active\"] h1, html[data-invitta-theme=\"active\"] h2, html[data-invitta-theme=\"active\"] h3, html[data-invitta-theme=\"active\"] .font-display, html[data-invitta-theme=\"active\"] .font-serif {font-family:var(--font-display, var(--font-script, 'Georgia')), serif}",
-      "html[data-invitta-theme=\"active\"] body, html[data-invitta-theme=\"active\"] button, html[data-invitta-theme=\"active\"] input, html[data-invitta-theme=\"active\"] select, html[data-invitta-theme=\"active\"] textarea, html[data-invitta-theme=\"active\"] .font-sans, html[data-invitta-theme=\"active\"] .font-body {font-family:var(--font-sans, var(--font-secondary, 'Arial')), sans-serif}",
+      "html[data-invitta-theme=\"active\"] h1, html[data-invitta-theme=\"active\"] h2, html[data-invitta-theme=\"active\"] h3, html[data-invitta-theme=\"active\"] .font-display, html[data-invitta-theme=\"active\"] .font-serif { font-family: var(--font-display, var(--font-script, 'Georgia')), serif; }",
+      "html[data-invitta-theme=\"active\"] body, html[data-invitta-theme=\"active\"] button, html[data-invitta-theme=\"active\"] input, html[data-invitta-theme=\"active\"] select, html[data-invitta-theme=\"active\"] textarea, html[data-invitta-theme=\"active\"] .font-sans, html[data-invitta-theme=\"active\"] .font-body { font-family: var(--font-sans, var(--font-secondary, 'Arial')), sans-serif; }",
+
       /* Nombre dinámico: respetar casing exacto del dashboard */
-      "html[data-invitta-theme=\"active\"] .hero__name, html[data-invitta-theme=\"active\"] #celebrant-name, html[data-invitta-theme=\"active\"] .inv-hero-name, html[data-invitta-theme=\"active\"] .couple-names, html[data-invitta-theme=\"active\"] .couple-name, html[data-invitta-theme=\"active\"] .honoree-name, html[data-invitta-theme=\"active\"] [data-invitta-font-role='cover-name'], html[data-invitta-theme=\"active\"] [data-invitta-font-role='name'] {text-transform: none !important;}"
-    ].join("\\n");
+      "html[data-invitta-theme=\"active\"] .hero__name, html[data-invitta-theme=\"active\"] #celebrant-name, html[data-invitta-theme=\"active\"] .inv-hero-name, html[data-invitta-theme=\"active\"] .couple-names, html[data-invitta-theme=\"active\"] .couple-name, html[data-invitta-theme=\"active\"] .honoree-name, html[data-invitta-theme=\"active\"] [data-invitta-font-role='cover-name'], html[data-invitta-theme=\"active\"] [data-invitta-font-role='name'] { text-transform: none !important; }"
+    ].join("\n");
     document.head.appendChild(style);
   }
 
