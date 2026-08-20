@@ -468,6 +468,105 @@ function cleanWhatsApp(val) {
     return (digits.length >= 10 && digits.length <= 15) ? digits : "";
 }
 
+function normalizeGiftOptions(inv) {
+    if (!inv || typeof inv !== "object") return [];
+
+    var rawOptions = inv.gift_options;
+    if (typeof rawOptions === "string") {
+        try {
+            rawOptions = JSON.parse(rawOptions);
+        } catch(e) {
+            rawOptions = [];
+        }
+    }
+
+    var optionsList = Array.isArray(rawOptions) ? rawOptions : [];
+    var normalized = [];
+
+    for (var i = 0; i < optionsList.length; i++) {
+        var opt = optionsList[i];
+        if (!opt || typeof opt !== "object") continue;
+        if (opt.enabled === false) continue;
+
+        var type = opt.type === "bank" ? "bank" : "registry";
+        var id = cleanString(opt.id, 50) || ("gift-" + (normalized.length + 1));
+
+        if (type === "registry") {
+            var title = cleanString(opt.title, 120);
+            var safeUrl = safeHttpsUrl(cleanString(opt.url, 500));
+            var description = cleanString(opt.description, 300);
+
+            // Ignorar registry sin title y sin url válida
+            if (!title && !safeUrl) continue;
+
+            normalized.push({
+                id: id,
+                type: "registry",
+                enabled: true,
+                title: title || "Mesa de regalos",
+                url: safeUrl || "",
+                description: description
+            });
+        } else if (type === "bank") {
+            var bank = cleanString(opt.bank, 120);
+            var holder = cleanString(opt.holder, 160);
+            var clabe = cleanString(opt.clabe, 50);
+            var account = cleanString(opt.account, 50);
+            var note = cleanString(opt.note, 300);
+            var bankTitle = cleanString(opt.title, 120) || "Transferencia / Depósito";
+
+            // Ignorar bank sin bank, holder, clabe ni account
+            if (!bank && !holder && !clabe && !account) continue;
+
+            normalized.push({
+                id: id,
+                type: "bank",
+                enabled: true,
+                title: bankTitle,
+                bank: bank,
+                holder: holder,
+                clabe: clabe,
+                account: account,
+                note: note
+            });
+        }
+
+        if (normalized.length >= 3) break;
+    }
+
+    // Si inv.gift_options viene vacío pero existe inv.gift_table_url legacy segura:
+    if (normalized.length === 0) {
+        var legacyUrl = safeHttpsUrl(cleanString(inv.gift_table_url, 500));
+        if (legacyUrl) {
+            normalized.push({
+                id: "gift-1",
+                type: "registry",
+                enabled: true,
+                title: "Mesa de regalos",
+                url: legacyUrl,
+                description: ""
+            });
+        }
+    }
+
+    return normalized.slice(0, 3);
+}
+
+function resolveGiftTableUrl(inv, giftOptions) {
+    if (inv && inv.gift_table_url) {
+        var safeLegacy = safeHttpsUrl(inv.gift_table_url);
+        if (safeLegacy) return safeLegacy;
+    }
+    var options = giftOptions || normalizeGiftOptions(inv);
+    var firstRegistry = options.find(function(o) {
+        return o && o.type === "registry" && o.url;
+    });
+    if (firstRegistry && firstRegistry.url) {
+        return safeHttpsUrl(firstRegistry.url) || "";
+    }
+    return "";
+}
+
 function normalizeCustomFontTargets(val) {
     var allowed = ["titles", "subtitles", "names", "body"];
     var targets = normalizeStringArray(val).filter(function(target) {
@@ -691,6 +790,8 @@ function buildPublicTemplateData(inv, template) {
         inv.custom_font_url,
         inv.custom_font_name
     );
+    var giftOptions = normalizeGiftOptions(inv);
+    var giftTableUrl = resolveGiftTableUrl(inv, giftOptions);
 
     return {
         templateId: template.id,
@@ -736,7 +837,8 @@ function buildPublicTemplateData(inv, template) {
         musicTitle: cleanString(inv.music_title, 120),
         musicArtist: cleanString(inv.music_artist, 120),
         dressCode: cleanString(inv.dress_code, 120),
-        giftTableUrl: safeHttpsUrl(inv.gift_table_url),
+        giftOptions: giftOptions,
+        giftTableUrl: giftTableUrl,
         instagramHashtag: cleanString(inv.instagram_hashtag, 120),
         thankYouTitle: cleanString(inv.thank_you_title, 160),
         thankYouMessage: cleanString(inv.thank_you_message, 600),
@@ -980,6 +1082,8 @@ function renderRoseGoldPremium(inv) {
         guestName: cleanString(guestName, 120),
         passes: maxPasses,
         table: cleanString(tableNum, 30),
+        giftOptions: normalizeGiftOptions(inv),
+        giftTableUrl: resolveGiftTableUrl(inv),
         mainPhotoUrl: safeHttpsUrl(inv.main_photo_url) || "",
         galleryUrls: normalizeGalleryUrls(inv.gallery_urls),
         musicUrl: safeHttpsUrl(inv.music_url) || "",
