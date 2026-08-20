@@ -969,12 +969,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const successAlert = document.getElementById("form-success");
   const pageTitle = document.getElementById("page-title");
   const saveBtn = document.getElementById("save-btn");
-  const saveBtnTop = document.getElementById("save-btn-top");
+  const saveBtnDock = document.getElementById("save-btn-dock");
   const previewBtn = document.getElementById("preview-invitation-btn");
-  const previewBtnTop = document.getElementById("preview-invitation-btn-top");
+  const previewBtnDock = document.getElementById("preview-invitation-btn-dock");
   const copyLinkBtn = document.getElementById("copy-invitation-link-btn");
-  const copyLinkBtnTop = document.getElementById("copy-invitation-link-btn-top");
-  const previewRefreshBtnTop = document.getElementById("preview-refresh-btn-top");
+  const copyLinkBtnDock = document.getElementById("copy-invitation-link-btn-dock");
 
   function setSavingState(isSaving) {
     const label = isSaving ? "Guardando..." : "Guardar cambios";
@@ -982,9 +981,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       saveBtn.disabled = isSaving;
       saveBtn.textContent = label;
     }
-    if (saveBtnTop) {
-      saveBtnTop.disabled = isSaving;
-      saveBtnTop.textContent = label;
+    if (saveBtnDock) {
+      saveBtnDock.disabled = isSaving;
+      saveBtnDock.textContent = label;
     }
   }
   const clientDashboardEmail = document.getElementById("clientDashboardEmail");
@@ -1294,17 +1293,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     showSuccessMessage("Solicitud precargada. Completa los nombres y los detalles del evento antes de guardar.");
   }
 
-  saveBtnTop?.addEventListener("click", () => {
+  saveBtnDock?.addEventListener("click", () => {
     if (typeof form.requestSubmit === "function") {
       form.requestSubmit();
     } else {
       saveBtn?.click();
-    }
-  });
-
-  previewRefreshBtnTop?.addEventListener("click", () => {
-    if (typeof window.__invittaStudio_triggerPreviewRefresh === "function") {
-      window.__invittaStudio_triggerPreviewRefresh();
     }
   });
 
@@ -1314,7 +1307,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.open(getPreviewInvitationUrl(slug), "_blank", "noopener");
   });
 
-  previewBtnTop?.addEventListener("click", () => {
+  previewBtnDock?.addEventListener("click", () => {
     previewBtn?.click();
   });
 
@@ -1331,7 +1324,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  copyLinkBtnTop?.addEventListener("click", () => {
+  copyLinkBtnDock?.addEventListener("click", () => {
     copyLinkBtn?.click();
   });
 
