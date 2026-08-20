@@ -190,6 +190,34 @@
       flex-wrap: wrap;
       gap: 8px;
     }
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .header-actions .btn {
+      white-space: nowrap;
+      font-size: 13px;
+      padding: 7px 12px;
+    }
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .header-actions {
+        width: 100%;
+        gap: 6px;
+      }
+      .header-actions .btn {
+        flex: 1 1 auto;
+        text-align: center;
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -201,7 +229,11 @@
         <h1 id="page-title">Crear Invitación</h1>
       </div>
       <div class="header-actions">
-        <a href="/administracion/studio-dashboard.html" class="btn btn-secondary">Volver al Dashboard</a>
+        <button type="button" id="save-btn-top" class="btn btn-primary studio-action-button">Guardar cambios</button>
+        <button type="button" id="preview-refresh-btn-top" class="btn btn-secondary studio-action-button">Actualizar vista previa</button>
+        <button type="button" id="preview-invitation-btn-top" class="btn btn-secondary studio-action-button studio-preview-button">Ver invitación</button>
+        <button type="button" id="copy-invitation-link-btn-top" class="btn btn-secondary studio-action-button studio-copy-button">Copiar enlace</button>
+        <a href="/administracion/studio-dashboard.html" class="btn btn-secondary studio-action-button">Volver al Dashboard</a>
       </div>
     </div>
 

@@ -298,14 +298,27 @@
       var parentName = node.parentElement ? node.parentElement.tagName : "";
       if (parentName === "SCRIPT" || parentName === "STYLE" || parentName === "TEXTAREA") continue;
       var value = node.nodeValue;
+      var replaced = false;
       replacements.forEach(function (pair) {
         if (pair[2]) {
-          if (value.trim() === pair[0]) value = value.replace(pair[0], pair[1]);
+          if (value.trim() === pair[0]) {
+            value = value.replace(pair[0], pair[1]);
+            replaced = true;
+          }
           return;
         }
-        value = value.split(pair[0]).join(pair[1]);
+        if (value.indexOf(pair[0]) !== -1) {
+          value = value.split(pair[0]).join(pair[1]);
+          replaced = true;
+        }
       });
-      if (value !== node.nodeValue) node.nodeValue = value;
+      if (value !== node.nodeValue) {
+        node.nodeValue = value;
+        if (node.parentElement) {
+          node.parentElement.setAttribute("data-invitta-dynamic-text", "true");
+          node.parentElement.style.setProperty("text-transform", "none", "important");
+        }
+      }
     }
   }
 
@@ -578,10 +591,53 @@
     });
   }
 
+  function ensureDynamicCasingStyles() {
+    if (document.getElementById("invitta-dynamic-casing-style")) return;
+    var style = document.createElement("style");
+    style.id = "invitta-dynamic-casing-style";
+    style.textContent = [
+      "[data-invitta-dynamic-text], [data-personalized], ",
+      ".hero__name, #celebrant-name, .inv-hero-name, .couple-names, .couple-name, .honoree-name, ",
+      "#inv-title, #inv-hero-title, .inv-hero-title, .inv-main-title, ",
+      "[data-invitta-font-role='cover-name'], [data-invitta-font-role='name'], ",
+      "[data-invitta-font-role='main-title'], [data-invitta-font-role='title'] ",
+      "{ text-transform: none !important; }"
+    ].join("");
+    document.head.appendChild(style);
+  }
+
+  function ensureMusicControlStyles() {
+    var existing = document.getElementById("invitta-no-music-style");
+    if (!data.musicUrl) {
+      document.documentElement.setAttribute("data-invitta-no-music", "true");
+      if (!existing) {
+        var style = document.createElement("style");
+        style.id = "invitta-no-music-style";
+        style.textContent = [
+          "#music-player-container, #music-player-bottom-bar, #inv-music-player, #music-player, ",
+          "[id*='music-player' i], [class*='music-player' i], .music-bar, .music-floating-btn, ",
+          "button[aria-label*='música' i], button[title*='música' i], button[aria-label*='musica' i], button[title*='musica' i], ",
+          "[id*='music-toggle' i], [id*='music-mute' i], [id*='music-volume' i], [class*='music-toggle' i], ",
+          "[class*='floating-music' i], [class*='audio-btn' i], [class*='sound-btn' i] ",
+          "{ display: none !important; }"
+        ].join("");
+        document.head.appendChild(style);
+      }
+    } else {
+      document.documentElement.removeAttribute("data-invitta-no-music");
+      if (existing) existing.remove();
+    }
+  }
+
   function applyAudio() {
+    ensureMusicControlStyles();
+
     var musicContainers = document.querySelectorAll(
       "#music-player-container, #music-player-bottom-bar, #inv-music-player, #music-player, " +
-      "[id*='music-player' i], [class*='music-player' i], .music-bar, .music-floating-btn"
+      "[id*='music-player' i], [class*='music-player' i], .music-bar, .music-floating-btn, " +
+      "button[aria-label*='música' i], button[title*='música' i], button[aria-label*='musica' i], button[title*='musica' i], " +
+      "[id*='music-toggle' i], [id*='music-mute' i], [id*='music-volume' i], [class*='music-toggle' i], " +
+      "[class*='floating-music' i], [class*='audio-btn' i], [class*='sound-btn' i]"
     );
 
     if (!data.musicUrl) {
@@ -1213,6 +1269,8 @@
   function applyAll() {
     if (applying || !document.body) return;
     applying = true;
+    ensureDynamicCasingStyles();
+    ensureMusicControlStyles();
     replaceText(document.body);
     applyHeroImage();
     applyGalleryImages();
@@ -1252,6 +1310,8 @@
     };
   }
 
+  ensureDynamicCasingStyles();
+  ensureMusicControlStyles();
   applyThemeHooks();
   applyTypographyScales(true);
   installClickBridge();
