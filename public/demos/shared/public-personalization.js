@@ -366,9 +366,13 @@
     return img;
   }
 
+  function isDemoAudio(url) {
+    if (!url || typeof url !== "string") return false;
+    return /(what-a-wonderful-world|a-thousand-years|marry-you|SoundHelix|million-to-one|rose-gold|the-climb|\.mp3)/i.test(url);
+  }
+
   function applyHeroImage() {
     var heroUrl = data.mainPhotoUrl;
-    if (!heroUrl || typeof heroUrl !== "string") return;
 
     // 1. Reemplazar elementos <img> en la sección Hero / Portada
     var heroImages = Array.from(document.querySelectorAll(
@@ -391,28 +395,6 @@
       }
     });
 
-    heroImages.forEach(function (img) {
-      if (!img.dataset.invittaOriginalSrc) {
-        img.dataset.invittaOriginalSrc = img.currentSrc || img.src;
-      }
-      img.dataset.invittaPersonalized = "true";
-      img.dataset.invittaPersonalizedSrc = heroUrl;
-
-      // Si está dentro de <picture>, actualizar los <source>
-      if (img.parentElement && img.parentElement.tagName.toLowerCase() === "picture") {
-        img.parentElement.querySelectorAll("source").forEach(function (sourceEl) {
-          sourceEl.srcset = heroUrl;
-        });
-      }
-
-      if (img.hasAttribute("srcset")) {
-        img.removeAttribute("srcset");
-      }
-      if (img.src !== heroUrl) {
-        img.src = heroUrl;
-      }
-    });
-
     // 2. Reemplazar background-image en elementos Hero / Portada
     var heroBgElements = Array.from(document.querySelectorAll(
       "#hero, [id*='hero' i], [id*='cover' i], [id*='portada' i], " +
@@ -423,17 +405,76 @@
       return true;
     });
 
-    heroBgElements.forEach(function (el) {
-      var currentBg = el.style.backgroundImage || "";
-      var isExplicitHeroBg = el.id === "inv-hero-bg" || el.classList.contains("inv-hero-bg") || el.hasAttribute("data-hero-bg");
-      if (currentBg || isExplicitHeroBg) {
-        if (currentBg && /(logo|icon|qr|pattern|overlay|section_bg|wedding_bg)/i.test(currentBg)) return;
-        el.dataset.invittaPersonalized = "true";
-        el.dataset.invittaPersonalizedSrc = heroUrl;
-        el.style.backgroundImage = 'url("' + heroUrl.replace(/"/g, "") + '")';
-        if (isExplicitHeroBg && el.style.display === "none") {
-          el.style.display = "";
+    if (heroUrl && typeof heroUrl === "string") {
+      heroImages.forEach(function (img) {
+        if (!img.dataset.invittaOriginalSrc) {
+          img.dataset.invittaOriginalSrc = img.currentSrc || img.src;
         }
+        img.dataset.invittaPersonalized = "true";
+        img.dataset.invittaPersonalizedSrc = heroUrl;
+
+        // Si está dentro de <picture>, actualizar los <source>
+        if (img.parentElement && img.parentElement.tagName.toLowerCase() === "picture") {
+          img.parentElement.querySelectorAll("source").forEach(function (sourceEl) {
+            sourceEl.srcset = heroUrl;
+          });
+        }
+
+        if (img.hasAttribute("srcset")) {
+          img.removeAttribute("srcset");
+        }
+        if (img.src !== heroUrl) {
+          img.src = heroUrl;
+        }
+        img.style.removeProperty("display");
+      });
+
+      heroBgElements.forEach(function (el) {
+        var currentBg = el.style.backgroundImage || "";
+        var isExplicitHeroBg = el.id === "inv-hero-bg" || el.classList.contains("inv-hero-bg") || el.hasAttribute("data-hero-bg");
+        if (currentBg || isExplicitHeroBg) {
+          if (currentBg && /(logo|icon|qr|pattern|overlay|section_bg|wedding_bg)/i.test(currentBg)) return;
+          el.dataset.invittaPersonalized = "true";
+          el.dataset.invittaPersonalizedSrc = heroUrl;
+          el.style.backgroundImage = 'url("' + heroUrl.replace(/"/g, "") + '")';
+          if (isExplicitHeroBg && el.style.display === "none") {
+            el.style.display = "";
+          }
+        }
+      });
+    } else {
+      // En invitaciones reales sin foto principal: ocultar los placeholders demo de portada
+      heroImages.forEach(function (img) {
+        img.style.setProperty("display", "none", "important");
+      });
+
+      heroBgElements.forEach(function (el) {
+        var currentBg = el.style.backgroundImage || "";
+        var isExplicitHeroBg = el.id === "inv-hero-bg" || el.classList.contains("inv-hero-bg") || el.hasAttribute("data-hero-bg");
+        if (isExplicitHeroBg) {
+          el.style.setProperty("display", "none", "important");
+        } else if (currentBg && isDemoHeroAsset(currentBg)) {
+          el.style.setProperty("background-image", "none", "important");
+        }
+      });
+    }
+  }
+
+  function applyInternalEditorialImages() {
+    // Eliminar imágenes de stock demo usadas como fondo en secciones internas
+    Array.from(document.querySelectorAll("[style*='background-image']")).forEach(function (el) {
+      if (isGalleryContainer(el)) return;
+      var bg = el.style.backgroundImage || "";
+      if (isDemoGalleryAsset(bg) || isDemoHeroAsset(bg)) {
+        el.style.setProperty("background-image", "none", "important");
+      }
+    });
+
+    Array.from(document.images).forEach(function (img) {
+      if (isGalleryContainer(img)) return;
+      var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
+      if (isDemoGalleryAsset(src)) {
+        img.style.setProperty("display", "none", "important");
       }
     });
   }
@@ -538,9 +579,34 @@
   }
 
   function applyAudio() {
-    if (!data.musicUrl) return;
+    var musicContainers = document.querySelectorAll(
+      "#music-player-container, #music-player-bottom-bar, #inv-music-player, #music-player, " +
+      "[id*='music-player' i], [class*='music-player' i], .music-bar, .music-floating-btn"
+    );
+
+    if (!data.musicUrl) {
+      document.querySelectorAll("audio").forEach(function (audio) {
+        try {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.src = "";
+          audio.removeAttribute("src");
+        } catch (e) {}
+      });
+
+      musicContainers.forEach(function (el) {
+        el.style.setProperty("display", "none", "important");
+      });
+      document.body.classList.remove("has-music-player");
+      return;
+    }
+
+    musicContainers.forEach(function (el) {
+      el.style.removeProperty("display");
+    });
+
     document.querySelectorAll("audio").forEach(function (audio) {
-      if (audio.dataset.invittaPersonalized === "true") return;
+      if (audio.dataset.invittaPersonalized === "true" && audio.src === data.musicUrl) return;
       audio.dataset.invittaPersonalized = "true";
       audio.src = data.musicUrl;
       audio.load();
@@ -1150,6 +1216,7 @@
     replaceText(document.body);
     applyHeroImage();
     applyGalleryImages();
+    applyInternalEditorialImages();
     applySectionBackgrounds();
     applyCustomBackground(data);
     applyAudio();
@@ -1161,6 +1228,28 @@
     applyTypographyScales(false);
     hideLegacyGuestAdmin();
     applying = false;
+  }
+
+  if (typeof HTMLAudioElement !== "undefined" && !window.__invittaAudioHooked) {
+    window.__invittaAudioHooked = true;
+    var origPlay = HTMLAudioElement.prototype.play;
+    HTMLAudioElement.prototype.play = function () {
+      if (!data.musicUrl) {
+        try {
+          this.pause();
+          this.currentTime = 0;
+          this.src = "";
+          this.removeAttribute("src");
+        } catch (e) {}
+        return Promise.resolve();
+      }
+
+      if (this.src && isDemoAudio(this.src) && this.src !== data.musicUrl) {
+        this.src = data.musicUrl;
+      }
+
+      return origPlay.apply(this, arguments);
+    };
   }
 
   applyThemeHooks();
