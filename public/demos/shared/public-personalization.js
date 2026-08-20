@@ -712,6 +712,330 @@
     }
   }
 
+  function ensureGiftOptionStyles() {
+    if (document.getElementById("invitta-gift-options-styles")) return;
+    var style = document.createElement("style");
+    style.id = "invitta-gift-options-styles";
+    style.textContent = [
+      ".invitta-gift-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 960px; margin: 28px auto 0; padding: 0 16px; box-sizing: border-box; }",
+      ".invitta-gift-card { flex: 1 1 260px; max-width: 380px; min-width: 240px; background: var(--surface-container-low, #fffdf9); border: 1px solid var(--outline-variant, rgba(155, 118, 83, 0.25)); border-radius: 6px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); box-sizing: border-box; position: relative; transition: transform 0.2s, box-shadow 0.2s; }",
+      ".invitta-gift-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); }",
+      ".invitta-gift-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(155, 118, 83, 0.1); color: var(--invitta-primary, #9b7653); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }",
+      ".invitta-gift-title { margin: 0 0 8px; font-family: var(--font-display, Georgia, serif); font-size: 1.2rem; font-weight: 500; color: var(--text-color, #2e2722); }",
+      ".invitta-gift-description { margin: 0 0 16px; font-family: var(--font-sans, Arial, sans-serif); font-size: 0.85rem; color: var(--on-surface-variant, #666); line-height: 1.45; flex-grow: 1; }",
+      ".invitta-gift-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; background: var(--invitta-primary, #2e2722); color: #ffffff !important; text-decoration: none; font-family: var(--font-sans, Arial, sans-serif); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 3px; border: none; cursor: pointer; transition: opacity 0.2s; margin-top: auto; }",
+      ".invitta-gift-button:hover { opacity: 0.88; }",
+      ".invitta-gift-bank-info { width: 100%; text-align: left; margin: 12px 0 16px; font-family: var(--font-sans, Arial, sans-serif); font-size: 0.8125rem; color: var(--text-color, #2e2722); }",
+      ".invitta-gift-bank-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed rgba(155, 118, 83, 0.15); }",
+      ".invitta-gift-bank-label { font-weight: 600; color: var(--on-surface-variant, #777); margin-right: 8px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }",
+      ".invitta-gift-bank-val { font-family: monospace; font-weight: 500; color: var(--text-color, #2e2722); word-break: break-all; font-size: 0.8125rem; }",
+      ".invitta-gift-copy-btn { background: transparent; border: 1px solid var(--outline-variant, #ccc); border-radius: 3px; padding: 2px 8px; font-size: 0.7rem; font-weight: 600; cursor: pointer; margin-left: 8px; color: var(--invitta-primary, #9b7653); transition: all 0.2s; flex-shrink: 0; }",
+      ".invitta-gift-copy-btn:hover { background: var(--invitta-primary, #9b7653); color: #ffffff; }",
+      ".invitta-gift-bank-note { margin-top: 10px; font-size: 0.8rem; font-style: italic; color: var(--on-surface-variant, #666); text-align: center; }"
+    ].join("\n");
+    document.head.appendChild(style);
+  }
+
+  function isRealStudioInvitation() {
+    if (!window.INVITATION_DATA || !data) return false;
+    if (data.invitationSlug || data.guestToken || data.studioInvitationId) return true;
+    try {
+      var search = window.location.search || "";
+      if (window.parent && window.parent.location && window.parent.location.search) {
+        search += " " + window.parent.location.search;
+      }
+      if (/[?&](?:slug|preview=studio|i)=/i.test(search)) return true;
+    } catch (e) {}
+    if (data.templateId && (data.eventTitle || data.celebrantName)) return true;
+    return false;
+  }
+
+  function getGiftOptions() {
+    var options = Array.isArray(data.giftOptions) ? data.giftOptions : [];
+    var result = [];
+
+    for (var i = 0; i < options.length; i++) {
+      var opt = options[i];
+      if (!opt || typeof opt !== "object") continue;
+      if (opt.enabled === false) continue;
+
+      var type = opt.type === "bank" ? "bank" : "registry";
+      var id = clean(opt.id) || ("gift-" + (result.length + 1));
+
+      if (type === "registry") {
+        var title = clean(opt.title);
+        var rawUrl = clean(opt.url);
+        var safeUrl = (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) ? rawUrl : "";
+        var description = clean(opt.description);
+
+        if (!title && !safeUrl) continue;
+
+        result.push({
+          id: id,
+          type: "registry",
+          enabled: true,
+          title: title || "Mesa de regalos",
+          url: safeUrl,
+          description: description
+        });
+      } else if (type === "bank") {
+        var bank = clean(opt.bank);
+        var holder = clean(opt.holder);
+        var clabe = clean(opt.clabe);
+        var account = clean(opt.account);
+        var note = clean(opt.note);
+        var bankTitle = clean(opt.title) || "Transferencia / Depósito";
+
+        if (!bank && !holder && !clabe && !account) continue;
+
+        result.push({
+          id: id,
+          type: "bank",
+          enabled: true,
+          title: bankTitle,
+          bank: bank,
+          holder: holder,
+          clabe: clabe,
+          account: account,
+          note: note
+        });
+      }
+
+      if (result.length >= 3) break;
+    }
+
+    if (result.length === 0) {
+      var legacyUrl = clean(data.giftTableUrl);
+      if (legacyUrl && (legacyUrl.startsWith("http://") || legacyUrl.startsWith("https://"))) {
+        result.push({
+          id: "gift-legacy",
+          type: "registry",
+          enabled: true,
+          title: "Mesa de regalos",
+          url: legacyUrl,
+          description: ""
+        });
+      }
+    }
+
+    return result.slice(0, 3);
+  }
+
+  function createRegistryCard(opt) {
+    var card = document.createElement("div");
+    card.className = "invitta-gift-card invitta-gift-card--registry";
+
+    var icon = document.createElement("div");
+    icon.className = "invitta-gift-icon";
+    icon.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
+    card.appendChild(icon);
+
+    var title = document.createElement("h3");
+    title.className = "invitta-gift-title";
+    title.textContent = opt.title || "Mesa de regalos";
+    card.appendChild(title);
+
+    if (opt.description) {
+      var desc = document.createElement("p");
+      desc.className = "invitta-gift-description";
+      desc.textContent = opt.description;
+      card.appendChild(desc);
+    }
+
+    if (opt.url && (opt.url.startsWith("http://") || opt.url.startsWith("https://"))) {
+      var btn = document.createElement("a");
+      btn.className = "invitta-gift-button";
+      btn.href = opt.url;
+      btn.target = "_blank";
+      btn.rel = "noopener noreferrer";
+      btn.textContent = "Ver mesa de regalos";
+      card.appendChild(btn);
+    }
+
+    return card;
+  }
+
+  function createBankCard(opt) {
+    var card = document.createElement("div");
+    card.className = "invitta-gift-card invitta-gift-card--bank";
+
+    var icon = document.createElement("div");
+    icon.className = "invitta-gift-icon";
+    icon.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>';
+    card.appendChild(icon);
+
+    var title = document.createElement("h3");
+    title.className = "invitta-gift-title";
+    title.textContent = opt.title || "Transferencia / Depósito";
+    card.appendChild(title);
+
+    var bankInfo = document.createElement("div");
+    bankInfo.className = "invitta-gift-bank-info";
+
+    function addRow(label, value, isCopyable) {
+      if (!value) return;
+      var row = document.createElement("div");
+      row.className = "invitta-gift-bank-row";
+
+      var labelEl = document.createElement("span");
+      labelEl.className = "invitta-gift-bank-label";
+      labelEl.textContent = label;
+      row.appendChild(labelEl);
+
+      var rightEl = document.createElement("div");
+      rightEl.style.display = "flex";
+      rightEl.style.alignItems = "center";
+
+      var valEl = document.createElement("span");
+      valEl.className = "invitta-gift-bank-val";
+      valEl.textContent = value;
+      rightEl.appendChild(valEl);
+
+      if (isCopyable) {
+        var copyBtn = document.createElement("button");
+        copyBtn.type = "button";
+        copyBtn.className = "invitta-gift-copy-btn";
+        copyBtn.textContent = "Copiar";
+        copyBtn.addEventListener("click", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(value).then(function() {
+              copyBtn.textContent = "¡Copiado!";
+              setTimeout(function() { copyBtn.textContent = "Copiar"; }, 2000);
+            }).catch(function() {});
+          } else {
+            var tempInput = document.createElement("input");
+            tempInput.value = value;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+              document.execCommand("copy");
+              copyBtn.textContent = "¡Copiado!";
+              setTimeout(function() { copyBtn.textContent = "Copiar"; }, 2000);
+            } catch(err) {}
+            document.body.removeChild(tempInput);
+          }
+        });
+        rightEl.appendChild(copyBtn);
+      }
+
+      row.appendChild(rightEl);
+      bankInfo.appendChild(row);
+    }
+
+    if (opt.bank) addRow("Banco", opt.bank, false);
+    if (opt.holder) addRow("Titular", opt.holder, false);
+    if (opt.clabe) addRow("CLABE", opt.clabe, true);
+    if (opt.account) addRow("Cuenta", opt.account, true);
+
+    card.appendChild(bankInfo);
+
+    if (opt.note) {
+      var note = document.createElement("p");
+      note.className = "invitta-gift-bank-note";
+      note.textContent = opt.note;
+      card.appendChild(note);
+    }
+
+    return card;
+  }
+
+  function applyGiftOptions() {
+    if (!isRealStudioInvitation()) return;
+
+    ensureGiftOptionStyles();
+    var options = getGiftOptions();
+
+    var giftSections = Array.from(document.querySelectorAll("#registry, #gifts, #gift, #inv-gifts-block"));
+    var giftModals = Array.from(document.querySelectorAll("#registry-modal-overlay, #registry-modal-container, [id*='registry-modal'], [class*='registry-modal']"));
+    var giftNavs = Array.from(document.querySelectorAll("nav button, nav a, .inv-nav-button"));
+
+    // Siempre ocultar modales demo
+    giftModals.forEach(function(m) {
+      if (m.closest && m.closest(".invitta-gift-options")) return;
+      if (m.classList && m.classList.contains("invitta-gift-options")) return;
+      m.style.setProperty("display", "none", "important");
+    });
+
+    if (options.length === 0) {
+      giftSections.forEach(function(s) {
+        s.style.setProperty("display", "none", "important");
+        s.hidden = true;
+      });
+      giftNavs.forEach(function(btn) {
+        var text = (btn.textContent || "").toLowerCase();
+        var href = (btn.getAttribute("href") || "").toLowerCase();
+        if (/regalos|registry|mesa de regalo/i.test(text) || /#registry|#gifts|#gift/i.test(href)) {
+          btn.style.setProperty("display", "none", "important");
+        }
+      });
+      return;
+    }
+
+    // Hay opciones reales: limpiar display:none anterior y mostrar secciones/navs
+    giftSections.forEach(function(s) {
+      s.style.removeProperty("display");
+      s.hidden = false;
+    });
+    giftNavs.forEach(function(btn) {
+      var text = (btn.textContent || "").toLowerCase();
+      var href = (btn.getAttribute("href") || "").toLowerCase();
+      if (/regalos|registry|mesa de regalo/i.test(text) || /#registry|#gifts|#gift/i.test(href)) {
+        btn.style.removeProperty("display");
+      }
+    });
+
+    var singleGiftLink = document.getElementById("gift-link");
+    if (singleGiftLink && options.length === 1 && options[0].type === "registry") {
+      singleGiftLink.href = options[0].url || "#";
+      singleGiftLink.textContent = options[0].title ? ("Ver " + options[0].title) : "Ver mesa de regalos";
+      if (!options[0].url) singleGiftLink.style.setProperty("display", "none", "important");
+      else singleGiftLink.style.removeProperty("display");
+      return;
+    }
+
+    giftSections.forEach(function(section) {
+      // 1. Ocultar tarjetas demo existentes dentro de la sección excluyendo siempre invitta-gift-*
+      var demoCards = section.querySelectorAll(".grid > *, article, [class*='grid'] > *, [class*='card']");
+      demoCards.forEach(function(card) {
+        if (card.closest && card.closest(".invitta-gift-options")) return;
+        if (card.classList && (card.classList.contains("invitta-gift-options") || card.classList.contains("invitta-gift-card") || card.classList.contains("invitta-gift-button"))) return;
+        card.style.setProperty("display", "none", "important");
+      });
+
+      if (singleGiftLink && (options.length > 1 || options[0].type === "bank")) {
+        singleGiftLink.style.setProperty("display", "none", "important");
+      }
+
+      // 2. Comprobar si ya existe el contenedor real
+      var container = section.querySelector(".invitta-gift-options");
+      if (!container) {
+        container = document.createElement("div");
+        container.className = "invitta-gift-options";
+        var inner = section.querySelector(".section__inner, .max-w-4xl, .max-w-5xl, .max-w-2xl, .container") || section;
+        inner.appendChild(container);
+      }
+
+      // 3. Renderizar o actualizar solo las tarjetas reales
+      var optionsKey = options.map(function(o) { return o.id + ":" + o.title + ":" + (o.url || o.clabe || ""); }).join("|");
+      if (container.dataset.invittaOptionsKey !== optionsKey) {
+        container.dataset.invittaOptionsKey = optionsKey;
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+
+        options.forEach(function(opt) {
+          if (opt.type === "bank") {
+            container.appendChild(createBankCard(opt));
+          } else {
+            container.appendChild(createRegistryCard(opt));
+          }
+        });
+      }
+    });
+  }
+
   function setControlledValue(input, value) {
     if (!input || !value || input.dataset.invittaPrefilled === "true") return;
     var setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
@@ -1279,6 +1603,7 @@
     applyCustomBackground(data);
     applyAudio();
     applyOptionalContent();
+    applyGiftOptions();
     applyLinks();
     applyGuestData();
     applyVipAccessPass();
