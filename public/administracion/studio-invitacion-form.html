@@ -309,6 +309,75 @@
         grid-column: auto;
       }
     }
+
+    /* ── Gift Options Section (RFC-032) ── */
+    .studio-gift-options {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .studio-gift-card {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: #fafbfc;
+      padding: 16px;
+      transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    }
+    .studio-gift-card.is-active {
+      border-color: var(--primary-color, #b88a3d);
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(16, 42, 67, 0.05);
+    }
+    .studio-gift-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .studio-gift-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--secondary-color, #102a43);
+      font-size: 14px;
+      user-select: none;
+      margin: 0;
+    }
+    .studio-gift-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--primary-color, #b88a3d);
+    }
+    .studio-gift-toggle-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .studio-gift-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: #edf2f7;
+      color: #486581;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .studio-gift-card.is-active .studio-gift-badge {
+      background: #fdf6e7;
+      color: #976d24;
+    }
+    .studio-gift-card-body {
+      margin-top: 14px;
+      transition: opacity 0.2s;
+    }
+    .studio-gift-card:not(.is-active) .studio-gift-card-body {
+      opacity: 0.5;
+    }
   </style>
 </head>
 <body>
@@ -963,9 +1032,110 @@
         <p class="form-help">Escribe una actividad por línea usando el formato: hora | actividad</p>
       </div>
       
-      <div class="form-group">
-        <label for="gift_table_url">URL Mesa de Regalos</label>
-        <input type="url" id="gift_table_url" class="form-control">
+      <!-- ── SECCIÓN DE REGALOS (RFC-032) ── -->
+      <div class="studio-gift-section" style="margin-top: 25px; margin-bottom: 25px;">
+        <h3 style="font-size: 16px; color: var(--primary-color); margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+          <span>🎁 Opciones de Regalo</span>
+        </h3>
+        <p class="form-help" style="margin-top: 0; margin-bottom: 16px;">
+          Configura hasta 3 opciones de regalo para tus invitados (mesas de regalos online y/o cuenta para transferencias). Puedes activar una, varias o ninguna.
+        </p>
+
+        <!-- Input oculto para retrocompatibilidad con scripts existentes -->
+        <input type="hidden" id="gift_table_url">
+
+        <div class="studio-gift-options">
+          <!-- Bloque 1: Mesa de regalos 1 -->
+          <div class="studio-gift-card" id="gift-card-1">
+            <div class="studio-gift-card-header">
+              <label class="studio-gift-toggle" for="gift_1_enabled">
+                <input type="checkbox" id="gift_1_enabled">
+                <span class="studio-gift-toggle-title">Mesa de regalos 1</span>
+              </label>
+              <span class="studio-gift-badge">Mesa online</span>
+            </div>
+            <div class="studio-gift-card-body" id="gift_1_body">
+              <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                  <label for="gift_1_title">Nombre o tienda</label>
+                  <input type="text" id="gift_1_title" class="form-control" placeholder="Ej: Liverpool, Amazon, Palacio de Hierro">
+                </div>
+                <div class="form-group" style="flex: 2;">
+                  <label for="gift_1_url">URL de la mesa de regalos</label>
+                  <input type="url" id="gift_1_url" class="form-control" placeholder="https://mesaderegalos.liverpool.com.mx/...">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="gift_1_description">Descripción o indicaciones (Opcional)</label>
+                <input type="text" id="gift_1_description" class="form-control" placeholder="Ej: Evento no. 51234567 o busca por el nombre de la festejada">
+              </div>
+            </div>
+          </div>
+
+          <!-- Bloque 2: Mesa de regalos 2 -->
+          <div class="studio-gift-card" id="gift-card-2">
+            <div class="studio-gift-card-header">
+              <label class="studio-gift-toggle" for="gift_2_enabled">
+                <input type="checkbox" id="gift_2_enabled">
+                <span class="studio-gift-toggle-title">Mesa de regalos 2</span>
+              </label>
+              <span class="studio-gift-badge">Mesa online</span>
+            </div>
+            <div class="studio-gift-card-body" id="gift_2_body">
+              <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                  <label for="gift_2_title">Nombre o tienda</label>
+                  <input type="text" id="gift_2_title" class="form-control" placeholder="Ej: Amazon, Sears, El Corte Inglés">
+                </div>
+                <div class="form-group" style="flex: 2;">
+                  <label for="gift_2_url">URL de la mesa de regalos</label>
+                  <input type="url" id="gift_2_url" class="form-control" placeholder="https://www.amazon.com.mx/baby-reg/...">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="gift_2_description">Descripción o indicaciones (Opcional)</label>
+                <input type="text" id="gift_2_description" class="form-control" placeholder="Ej: Código de evento o instrucciones de compra">
+              </div>
+            </div>
+          </div>
+
+          <!-- Bloque 3: Cuenta bancaria / depósito -->
+          <div class="studio-gift-card" id="gift-card-3">
+            <div class="studio-gift-card-header">
+              <label class="studio-gift-toggle" for="gift_3_enabled">
+                <input type="checkbox" id="gift_3_enabled">
+                <span class="studio-gift-toggle-title">Cuenta bancaria / Depósito</span>
+              </label>
+              <span class="studio-gift-badge">Transferencia</span>
+            </div>
+            <div class="studio-gift-card-body" id="gift_3_body">
+              <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                  <label for="gift_3_bank">Banco</label>
+                  <input type="text" id="gift_3_bank" class="form-control" placeholder="Ej: BBVA, Banorte, Santander, Nu">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label for="gift_3_holder">Titular de la cuenta</label>
+                  <input type="text" id="gift_3_holder" class="form-control" placeholder="Ej: Paola García López">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                  <label for="gift_3_clabe">CLABE Interbancaria (18 dígitos)</label>
+                  <input type="text" id="gift_3_clabe" class="form-control" placeholder="Ej: 012180015400000000" maxlength="18">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label for="gift_3_account">Número de cuenta o tarjeta (Opcional)</label>
+                  <input type="text" id="gift_3_account" class="form-control" placeholder="Ej: 4152 3134 5678 9010">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="gift_3_note">Nota o concepto sugerido (Opcional)</label>
+                <input type="text" id="gift_3_note" class="form-control" placeholder="Ej: Favor de incluir tu nombre en el concepto">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="form-row">

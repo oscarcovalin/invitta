@@ -278,6 +278,224 @@ function serializeConfirmationNumbers(primary, secondary) {
     .join("|");
 }
 
+// ── RFC-032: Opciones de Regalo (Mesas de regalos y Datos bancarios) ──
+
+/**
+ * Actualiza la apariencia visual de las tarjetas de opciones de regalo
+ * según el estado de sus checkboxes.
+ */
+function updateGiftOptionsVisibility() {
+  [1, 2, 3].forEach(index => {
+    const enabled = document.getElementById(`gift_${index}_enabled`)?.checked === true;
+    const card = document.getElementById(`gift-card-${index}`);
+    if (card) {
+      card.classList.toggle("is-active", enabled);
+    }
+  });
+}
+
+/**
+ * Carga las opciones de regalo desde los datos de la invitación en los 3 bloques.
+ * Si existe gift_options (array), lo mapea a los bloques.
+ * Si no existe gift_options pero existe gift_table_url, lo precarga en Mesa 1 como fallback retrocompatible.
+ */
+function loadGiftOptions(data = {}) {
+  const gift1Enabled = document.getElementById("gift_1_enabled");
+  const gift1Title = document.getElementById("gift_1_title");
+  const gift1Url = document.getElementById("gift_1_url");
+  const gift1Desc = document.getElementById("gift_1_description");
+
+  const gift2Enabled = document.getElementById("gift_2_enabled");
+  const gift2Title = document.getElementById("gift_2_title");
+  const gift2Url = document.getElementById("gift_2_url");
+  const gift2Desc = document.getElementById("gift_2_description");
+
+  const gift3Enabled = document.getElementById("gift_3_enabled");
+  const gift3Bank = document.getElementById("gift_3_bank");
+  const gift3Holder = document.getElementById("gift_3_holder");
+  const gift3Clabe = document.getElementById("gift_3_clabe");
+  const gift3Account = document.getElementById("gift_3_account");
+  const gift3Note = document.getElementById("gift_3_note");
+
+  const legacyInput = document.getElementById("gift_table_url");
+
+  // Reset defaults
+  if (gift1Enabled) gift1Enabled.checked = false;
+  if (gift1Title) gift1Title.value = "";
+  if (gift1Url) gift1Url.value = "";
+  if (gift1Desc) gift1Desc.value = "";
+
+  if (gift2Enabled) gift2Enabled.checked = false;
+  if (gift2Title) gift2Title.value = "";
+  if (gift2Url) gift2Url.value = "";
+  if (gift2Desc) gift2Desc.value = "";
+
+  if (gift3Enabled) gift3Enabled.checked = false;
+  if (gift3Bank) gift3Bank.value = "";
+  if (gift3Holder) gift3Holder.value = "";
+  if (gift3Clabe) gift3Clabe.value = "";
+  if (gift3Account) gift3Account.value = "";
+  if (gift3Note) gift3Note.value = "";
+
+  const options = Array.isArray(data?.gift_options) ? data.gift_options : [];
+
+  if (options.length > 0) {
+    // Opción 1: Buscar por id 'gift-1' o primer registry
+    const opt1 = options.find(o => o?.id === "gift-1") || options.find(o => o?.type === "registry");
+    if (opt1) {
+      if (gift1Enabled) gift1Enabled.checked = opt1.enabled !== false;
+      if (gift1Title) gift1Title.value = opt1.title || "";
+      if (gift1Url) gift1Url.value = opt1.url || "";
+      if (gift1Desc) gift1Desc.value = opt1.description || "";
+    }
+
+    // Opción 2: Buscar por id 'gift-2' o segundo registry
+    const opt2 = options.find(o => o?.id === "gift-2") || options.filter(o => o?.type === "registry" && o !== opt1)[0];
+    if (opt2) {
+      if (gift2Enabled) gift2Enabled.checked = opt2.enabled !== false;
+      if (gift2Title) gift2Title.value = opt2.title || "";
+      if (gift2Url) gift2Url.value = opt2.url || "";
+      if (gift2Desc) gift2Desc.value = opt2.description || "";
+    }
+
+    // Opción 3: Buscar por id 'gift-3' o tipo 'bank'
+    const opt3 = options.find(o => o?.id === "gift-3" || o?.type === "bank");
+    if (opt3) {
+      if (gift3Enabled) gift3Enabled.checked = opt3.enabled !== false;
+      if (gift3Bank) gift3Bank.value = opt3.bank || "";
+      if (gift3Holder) gift3Holder.value = opt3.holder || "";
+      if (gift3Clabe) gift3Clabe.value = opt3.clabe || "";
+      if (gift3Account) gift3Account.value = opt3.account || "";
+      if (gift3Note) gift3Note.value = opt3.note || "";
+    }
+  } else if (data?.gift_table_url && String(data.gift_table_url).trim()) {
+    // Fallback retrocompatible para invitaciones existentes con gift_table_url único
+    if (gift1Enabled) gift1Enabled.checked = true;
+    if (gift1Title) gift1Title.value = "Mesa de regalos";
+    if (gift1Url) gift1Url.value = String(data.gift_table_url).trim();
+  }
+
+  // Sincronizar campo legacy
+  if (legacyInput) {
+    legacyInput.value = data?.gift_table_url || (gift1Enabled?.checked ? (gift1Url?.value || "") : "");
+  }
+
+  updateGiftOptionsVisibility();
+}
+
+/**
+ * Construye el array gift_options con las opciones activadas y válidas.
+ * - Registry: enabled=true + (title o url)
+ * - Bank: enabled=true + (bank, holder, clabe o account)
+ */
+function buildGiftOptions() {
+  const result = [];
+
+  const gift1Enabled = document.getElementById("gift_1_enabled")?.checked === true;
+  const gift1Title = document.getElementById("gift_1_title")?.value.trim() || "";
+  const gift1Url = document.getElementById("gift_1_url")?.value.trim() || "";
+  const gift1Desc = document.getElementById("gift_1_description")?.value.trim() || "";
+
+  if (gift1Enabled && (gift1Title || gift1Url)) {
+    result.push({
+      id: "gift-1",
+      type: "registry",
+      enabled: true,
+      title: gift1Title || "Mesa de regalos",
+      url: gift1Url,
+      description: gift1Desc
+    });
+  }
+
+  const gift2Enabled = document.getElementById("gift_2_enabled")?.checked === true;
+  const gift2Title = document.getElementById("gift_2_title")?.value.trim() || "";
+  const gift2Url = document.getElementById("gift_2_url")?.value.trim() || "";
+  const gift2Desc = document.getElementById("gift_2_description")?.value.trim() || "";
+
+  if (gift2Enabled && (gift2Title || gift2Url)) {
+    result.push({
+      id: "gift-2",
+      type: "registry",
+      enabled: true,
+      title: gift2Title || "Mesa de regalos 2",
+      url: gift2Url,
+      description: gift2Desc
+    });
+  }
+
+  const gift3Enabled = document.getElementById("gift_3_enabled")?.checked === true;
+  const gift3Bank = document.getElementById("gift_3_bank")?.value.trim() || "";
+  const gift3Holder = document.getElementById("gift_3_holder")?.value.trim() || "";
+  const gift3Clabe = document.getElementById("gift_3_clabe")?.value.trim() || "";
+  const gift3Account = document.getElementById("gift_3_account")?.value.trim() || "";
+  const gift3Note = document.getElementById("gift_3_note")?.value.trim() || "";
+
+  if (gift3Enabled && (gift3Bank || gift3Holder || gift3Clabe || gift3Account)) {
+    result.push({
+      id: "gift-3",
+      type: "bank",
+      enabled: true,
+      title: "Transferencia / Depósito",
+      bank: gift3Bank,
+      holder: gift3Holder,
+      clabe: gift3Clabe,
+      account: gift3Account,
+      note: gift3Note
+    });
+  }
+
+  return result;
+}
+
+/**
+ * Obtiene la URL de la Mesa 1 si está habilitada, para guardarla en el campo legacy gift_table_url.
+ */
+function getLegacyGiftTableUrl(giftOptions) {
+  if (Array.isArray(giftOptions)) {
+    const gift1 = giftOptions.find(o => o?.id === "gift-1" || o?.type === "registry");
+    if (gift1 && gift1.url) {
+      return String(gift1.url).trim();
+    }
+  }
+  const gift1Enabled = document.getElementById("gift_1_enabled")?.checked === true;
+  const gift1Url = document.getElementById("gift_1_url")?.value.trim() || "";
+  if (gift1Enabled && gift1Url) return gift1Url;
+
+  return "";
+}
+
+/**
+ * Configura listeners de eventos para reactividad de opciones de regalo.
+ */
+function setupGiftOptionListeners() {
+  [1, 2, 3].forEach(index => {
+    const toggle = document.getElementById(`gift_${index}_enabled`);
+    if (toggle) {
+      toggle.addEventListener("change", () => {
+        updateGiftOptionsVisibility();
+        if (index === 1) {
+          const legacyInput = document.getElementById("gift_table_url");
+          const gift1Url = document.getElementById("gift_1_url");
+          if (legacyInput) {
+            legacyInput.value = toggle.checked ? (gift1Url?.value.trim() || "") : "";
+          }
+        }
+      });
+    }
+  });
+
+  const gift1UrlInput = document.getElementById("gift_1_url");
+  if (gift1UrlInput) {
+    gift1UrlInput.addEventListener("input", () => {
+      const gift1Enabled = document.getElementById("gift_1_enabled")?.checked === true;
+      const legacyInput = document.getElementById("gift_table_url");
+      if (legacyInput && gift1Enabled) {
+        legacyInput.value = gift1UrlInput.value.trim();
+      }
+    });
+  }
+}
+
 const TYPOGRAPHY_ROLES = [
   "coverName",
   "closingName",
@@ -1391,12 +1609,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   } else {
     // Modo creación
     updateTemplateOptions({ preserveLegacyNull: false });
+    loadGiftOptions({});
     if (sourceRequestId) await loadSalesRequest(sourceRequestId);
     loading.style.display = "none";
     form.style.display = "block";
   }
 
   setupStudioVisualPreview();
+  setupGiftOptionListeners();
 
   // Preview de foto al seleccionar archivo local
   const mainPhotoInput = document.getElementById("mainPhotoFile");
@@ -1949,7 +2169,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("reception_name").value = data.reception_name || "";
     document.getElementById("reception_address").value = data.reception_address || "";
     document.getElementById("reception_map_url").value = data.reception_map_url || "";
-    document.getElementById("gift_table_url").value = data.gift_table_url || "";
+    loadGiftOptions(data);
     document.getElementById("dress_code").value = data.dress_code || "";
     const confirmationNumbers = parseConfirmationNumbers(data.whatsapp_number);
     document.getElementById("whatsapp_number").value = confirmationNumbers[0] || "";
@@ -2297,6 +2517,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       eventType
     );
 
+    const finalGiftOptions = buildGiftOptions();
+    const legacyGiftTableUrl = getLegacyGiftTableUrl(finalGiftOptions);
+
     const payload = {
       title: heroFields.title,
       slug: slugToUse,
@@ -2333,7 +2556,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       reception_name: document.getElementById("reception_name").value,
       reception_address: document.getElementById("reception_address").value,
       reception_map_url: document.getElementById("reception_map_url").value,
-      gift_table_url: document.getElementById("gift_table_url").value,
+      gift_options: finalGiftOptions,
+      gift_table_url: legacyGiftTableUrl,
       dress_code: document.getElementById("dress_code").value,
       whatsapp_number: serializeConfirmationNumbers(
         document.getElementById("whatsapp_number").value,
@@ -2386,6 +2610,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     let result = await saveInvitationPayload(payload);
+
+    // Fallback RFC-032: si la columna gift_options no existe aún en BD (PGRST204)
+    const missingGiftOptionsColumn = result.error && (
+      result.error.code === "PGRST204" ||
+      /gift_options.*column|column.*gift_options/i.test(result.error.message || "")
+    );
+    if (missingGiftOptionsColumn) {
+      const compatiblePayload = { ...payload };
+      delete compatiblePayload.gift_options;
+      result = await saveInvitationPayload(compatiblePayload);
+    }
+
     const missingTypographyColumn = result.error && (
       result.error.code === "PGRST204" ||
       /typography_fonts.*column|column.*typography_fonts/i.test(result.error.message || "")
@@ -2393,6 +2629,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (missingTypographyColumn) {
       const compatiblePayload = { ...payload };
       delete compatiblePayload.typography_fonts;
+      if (missingGiftOptionsColumn) delete compatiblePayload.gift_options;
       result = await saveInvitationPayload(compatiblePayload);
     }
 
@@ -2405,6 +2642,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const compatiblePayload = { ...payload };
       ["bg_enabled", "bg_overlay_enabled", "bg_overlay_color",
        "bg_overlay_opacity", "bg_position", "bg_size", "bg_blur"].forEach(k => delete compatiblePayload[k]);
+      if (missingGiftOptionsColumn) delete compatiblePayload.gift_options;
       result = await saveInvitationPayload(compatiblePayload);
     }
 
