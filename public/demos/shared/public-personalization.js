@@ -1,6 +1,8 @@
 (function () {
   "use strict";
 
+  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-hotfix-20260820";
+
   var data = window.INVITATION_DATA;
   if (!data || !data.templateId) return;
 
@@ -94,7 +96,7 @@
       receptionTime: ["9:00 P.M."]
     },
     "boda-classic-basic": {
-      names: ["Mariana & Diego"],
+      names: ["Mariana & Diego", "Mariana y Diego", "Alicia & Gonzalo", "Alicia y Gonzalo"],
       parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
       godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
       dates: ["12 Diciembre 2026"],
@@ -102,7 +104,7 @@
       receptionTime: ["9:00 P.M."]
     },
     "boda-golden-romance-premium": {
-      names: ["Mariana & Diego"],
+      names: ["Mariana & Diego", "Mariana y Diego", "Alicia & Gonzalo", "Alicia y Gonzalo"],
       parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
       godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
       dates: ["12 Diciembre 2026", "12 · Diciembre · 2026"],
@@ -110,9 +112,17 @@
       receptionTime: ["9:00 P.M."]
     },
     "boda-midnight-gold-vip": {
-      names: ["Ana Camila & Carlos Zavala & González", "Ana Camila & Carlos", "Ana Camila"],
+      names: ["Ana Camila & Carlos Zavala & González", "Ana Camila & Carlos", "Ana Camila", "Alicia & Gonzalo", "Alicia y Gonzalo"],
       parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
       godparents: ["Patricia & Alejandro Farrera"],
+      dates: ["12 Diciembre 2026"],
+      ceremonyTime: ["3:00 P.M."],
+      receptionTime: ["9:00 P.M."]
+    },
+    "evento-general-basic": {
+      names: ["Alicia & Gonzalo", "Alicia y Gonzalo", "Mariana & Diego", "Ana Camila Zavala"],
+      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+      godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
       dates: ["12 Diciembre 2026"],
       ceremonyTime: ["3:00 P.M."],
       receptionTime: ["9:00 P.M."]
@@ -198,6 +208,8 @@
       addExactReplacement(list, "Ana Camila", bride.given || bride.first);
       addExactReplacement(list, "Carlos", groom.given || groom.first); // Fix for split nodes
       addExactReplacement(list, "& Carlos", groom.given ? "& " + groom.given : ""); // Legacy
+      addExactReplacement(list, "Alicia", bride.given || bride.first);
+      addExactReplacement(list, "Gonzalo", groom.given || groom.first);
       addExactReplacement(list, "Zavala & González", [bride.surname, groom.surname].filter(Boolean).join(" & "));
       return;
     }
@@ -626,7 +638,7 @@
     });
 
     gallerySections.forEach(function (sec) {
-      var demoItems = sec.querySelectorAll(".grid > *, .gallery > *, [class*='grid'] > *, [class*='gallery']:not(.invitta-gallery-grid)");
+      var demoItems = sec.querySelectorAll(".grid > *, .gallery > *, [class*='grid'] > *, [class*='gallery']:not(.invitta-gallery-grid), [class*='photo'], [class*='slot'], [class*='item']:not(.invitta-gallery-item)");
       demoItems.forEach(function (item) {
         if (item.closest && item.closest(".invitta-gallery-grid")) return;
         if (item.classList && (item.classList.contains("invitta-gallery-grid") || item.classList.contains("invitta-gallery-item"))) return;
@@ -853,17 +865,31 @@
     document.head.appendChild(style);
   }
 
+  function hasStudioPreviewParams(search) {
+    if (!search || typeof search !== "string") return false;
+    try {
+      var params = new URLSearchParams(search);
+      if (params.get("slug")) return true;
+      if (params.get("i")) return true;
+      var preview = String(params.get("preview") || "").toLowerCase();
+      if (preview === "studio" || preview === "true") return true;
+    } catch (e) {}
+    return false;
+  }
+
   function isRealStudioInvitation() {
     if (!window.INVITATION_DATA || !data) return false;
-    if (data.invitationSlug || data.guestToken || data.studioInvitationId) return true;
+    if (data.invitationSlug || data.slug || data.studioInvitationId || data.guestToken) return true;
+    if (data.mainPhotoUrl) return true;
+    if (Array.isArray(data.galleryUrls) && data.galleryUrls.length > 0) return true;
+    if (Array.isArray(data.giftOptions) && data.giftOptions.length > 0) return true;
+    if (data.templateId && (data.eventTitle || data.celebrantName || data.ceremonyName || data.receptionName)) return true;
     try {
-      var search = window.location.search || "";
-      if (window.parent && window.parent.location && window.parent.location.search) {
-        search += " " + window.parent.location.search;
+      if (hasStudioPreviewParams(window.location.search || "")) return true;
+      if (window.parent && window.parent.location) {
+        if (hasStudioPreviewParams(window.parent.location.search || "")) return true;
       }
-      if (/[?&](?:slug|preview=studio|i)=/i.test(search)) return true;
     } catch (e) {}
-    if (data.templateId && (data.eventTitle || data.celebrantName)) return true;
     return false;
   }
 
