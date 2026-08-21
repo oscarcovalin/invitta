@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-hotfix2-20260820";
+  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-hotfix3-20260820";
 
   var data = window.INVITATION_DATA;
   if (!data || !data.templateId) return;

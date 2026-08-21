@@ -956,15 +956,23 @@ function addTemplateBridge(html, templatePath, templateData) {
         "window.INVITTA_TEMPLATE_ID = window.INVITATION_DATA.templateId;";
     doc.head.insertBefore(bootstrap, doc.head.children[1] || null);
 
-    var qrLibrary = doc.createElement("script");
-    qrLibrary.src = "/assets/vendor/qrcode.min.js";
-    qrLibrary.defer = true;
-    doc.body.appendChild(qrLibrary);
+    var qrLibrary = doc.querySelector("script[src*='qrcode']");
+    if (!qrLibrary) {
+        qrLibrary = doc.createElement("script");
+        qrLibrary.src = "/assets/vendor/qrcode.min.js";
+        qrLibrary.defer = true;
+        doc.body.appendChild(qrLibrary);
+    }
 
-    var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=rfc032-034-hotfix2-20260820";
-    bridge.defer = true;
-    doc.body.appendChild(bridge);
+    var bridge = doc.querySelector("script[src*='public-personalization']");
+    if (!bridge) {
+        bridge = doc.createElement("script");
+        bridge.src = "/demos/shared/public-personalization.js?v=rfc032-034-hotfix3-20260820";
+        bridge.defer = true;
+        doc.body.appendChild(bridge);
+    } else {
+        bridge.src = "/demos/shared/public-personalization.js?v=rfc032-034-hotfix3-20260820";
+    }
 
     return "<!doctype html>\n" + doc.documentElement.outerHTML;
 }
