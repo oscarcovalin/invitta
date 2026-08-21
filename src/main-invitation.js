@@ -979,7 +979,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=actions-rsvp-contrast-20260821";
+    bridge.src = "/demos/shared/public-personalization.js?v=rsvp-fallback-anchor-20260821";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

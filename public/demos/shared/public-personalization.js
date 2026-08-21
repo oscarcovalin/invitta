@@ -1696,7 +1696,10 @@
   function applyConfirmationContacts() {
     var phones = Array.isArray(data.confirmationPhones)
       ? data.confirmationPhones.filter(Boolean).slice(0, 2)
-      : [data.whatsapp].filter(Boolean);
+      : [];
+    // `whatsapp` already includes the studio number as a safe fallback in
+    // buildPublicTemplateData().  Keep it when the event itself has no phone.
+    if (!phones.length && data.whatsapp) phones = [data.whatsapp];
     if (!phones.length) return;
 
     var whatsappActions = Array.from(document.querySelectorAll("a, button")).filter(function (element) {
@@ -1710,12 +1713,18 @@
       return !element.hidden && element.offsetParent !== null;
     });
     if (!visibleWhatsappActions.length && !document.querySelector("[data-invitta-generated-whatsapp]")) {
-      var rsvpSection = document.querySelector("section#rsvp, section[id*='rsvp'], section[id*='confirm']");
+      var rsvpSection = document.querySelector("#rsvp, [data-invitta-rsvp], [data-rsvp], [id*='rsvp'], [id*='confirm'], [class*='rsvp'], [class*='confirm']");
+      if (!rsvpSection) {
+        var rsvpRadio = Array.from(document.querySelectorAll("input[type='radio']")).find(function (element) {
+          return element.offsetParent !== null;
+        });
+        rsvpSection = rsvpRadio && (rsvpRadio.closest("form, section, article, [role='region'], [class*='rsvp'], [class*='confirm']") || rsvpRadio.parentElement);
+      }
       if (!rsvpSection) {
         var rsvpTrigger = Array.from(document.querySelectorAll("a, button")).find(function (element) {
-          return /CONFIRMAR|RSVP/i.test(element.textContent || "") && element.closest("section");
+          return /CONFIRMAR|RSVP/i.test(element.textContent || "");
         });
-        rsvpSection = rsvpTrigger && rsvpTrigger.closest("section");
+        rsvpSection = rsvpTrigger && (rsvpTrigger.closest("form, section, article, [role='region'], [class*='rsvp'], [class*='confirm']") || rsvpTrigger.parentElement);
       }
 
       if (rsvpSection) {
