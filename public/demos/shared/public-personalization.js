@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-hotfix4-20260820";
+  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-hotfix5-20260820";
 
   var data = window.INVITATION_DATA;
   if (!data || !data.templateId) return;
@@ -417,18 +417,38 @@
     var style = document.createElement("style");
     style.id = "invitta-hero-photo-style";
     style.textContent = [
-      ".invitta-hero-photo { width: 100%; max-width: 540px; margin: 24px auto; padding: 0 16px; box-sizing: border-box; text-align: center; }",
-      ".invitta-hero-photo .invitta-hero-img { width: 100%; max-height: 72vh; object-fit: cover; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.14); display: block; margin: 0 auto; }"
+      "html[data-invitta-real-studio=\"true\"] .invitta-hero-photo {",
+      "  width: 100%;",
+      "  min-height: 360px;",
+      "  display: block !important;",
+      "  position: relative;",
+      "  overflow: hidden;",
+      "  background: #111;",
+      "  margin: 0 auto 32px;",
+      "  box-sizing: border-box;",
+      "  text-align: center;",
+      "}",
+      "html[data-invitta-real-studio=\"true\"] .invitta-hero-photo img {",
+      "  width: 100%;",
+      "  height: 100%;",
+      "  min-height: 360px;",
+      "  max-height: 82vh;",
+      "  object-fit: cover;",
+      "  display: block !important;",
+      "  margin: 0 auto;",
+      "}"
     ].join("\n");
     document.head.appendChild(style);
   }
 
   function applyHeroImage() {
-    var heroUrl = clean(data.mainPhotoUrl);
     var isReal = isRealStudioInvitation();
+    if (!isReal) return;
 
-    // 1. Localizar elementos <img> en la sección Hero / Portada
-    var heroImages = safeQuerySelectorAll(
+    var heroUrl = clean(data.mainPhotoUrl);
+
+    // 1. Ocultar imágenes demo de portada en la plantilla
+    var demoHeroImages = safeQuerySelectorAll(
       "#hero img, [id*='hero' i] img, [id*='cover' i] img, [id*='portada' i] img, " +
       "[class*='hero' i] img, [class*='cover' i] img, [class*='portada' i] img, " +
       ".hero img, .cover img, .inv-hero img, #inv-hero img, #inv-hero-img, [data-hero-img]"
@@ -440,18 +460,16 @@
       return true;
     });
 
-    // Detectar también por asset de demo hero conocido
     Array.from(document.images).forEach(function (img) {
       if (isGalleryContainer(img)) return;
       if (img.dataset.invittaOwnedHero === "true" || (img.closest && img.closest("[data-invitta-owned-hero='true']"))) return;
       var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
-      if (isDemoHeroAsset(src) && heroImages.indexOf(img) === -1) {
-        heroImages.push(img);
+      if (isDemoHeroAsset(src) && demoHeroImages.indexOf(img) === -1) {
+        demoHeroImages.push(img);
       }
     });
 
-    // 2. Localizar background-image en elementos Hero / Portada
-    var heroBgElements = safeQuerySelectorAll(
+    var demoHeroBgElements = safeQuerySelectorAll(
       "#hero, [id*='hero' i], [id*='cover' i], [id*='portada' i], " +
       "[class*='hero' i], [class*='cover' i], [class*='portada' i], " +
       ".hero, .cover, .inv-hero, .inv-hero-bg, #inv-hero, #inv-hero-bg, [data-hero-bg]"
@@ -460,111 +478,56 @@
       return true;
     });
 
+    demoHeroImages.forEach(function (img) {
+      img.style.setProperty("display", "none", "important");
+    });
+    demoHeroBgElements.forEach(function (el) {
+      var currentBg = el.style.backgroundImage || "";
+      var isExplicitHeroBg = el.id === "inv-hero-bg" || el.classList.contains("inv-hero-bg") || el.hasAttribute("data-hero-bg");
+      if (isExplicitHeroBg) {
+        el.style.setProperty("display", "none", "important");
+      } else if (currentBg && isDemoHeroAsset(currentBg)) {
+        el.style.setProperty("background-image", "none", "important");
+      }
+    });
+
+    var ownedHero = safeQuerySelector("[data-invitta-owned-hero='true']");
+
     if (heroUrl && (heroUrl.startsWith("http://") || heroUrl.startsWith("https://"))) {
-      var updatedSlot = false;
-      var explicitSlots = safeQuerySelectorAll("#inv-hero-img, #hero-img, .hero-image img, .hero__image img, [data-hero-img], [data-invitta-hero-slot]");
-      explicitSlots.forEach(function(img) {
-        img.src = heroUrl;
-        img.dataset.invittaPersonalized = "true";
-        img.style.removeProperty("display");
-        updatedSlot = true;
-      });
+      ensureHeroStyles();
 
-      heroImages.forEach(function (img) {
-        if (!img.dataset.invittaOriginalSrc) {
-          img.dataset.invittaOriginalSrc = img.currentSrc || img.src;
+      if (!ownedHero) {
+        ownedHero = document.createElement("div");
+        ownedHero.className = "invitta-hero-photo";
+        ownedHero.setAttribute("data-invitta-owned-hero", "true");
+
+        var ownedImg = document.createElement("img");
+        ownedImg.className = "invitta-hero-img";
+        ownedImg.src = heroUrl;
+        ownedImg.alt = "Foto principal";
+        ownedImg.loading = "eager";
+        ownedImg.dataset.invittaPersonalized = "true";
+        ownedHero.appendChild(ownedImg);
+
+        // Insertar justo después del header/nav principal o al inicio del primer main/section
+        var headerOrNav = safeQuerySelector("header, nav, [class*='nav' i]:not(.invitta-gallery-item):not(.invitta-gift-card), .navbar");
+        var mainContainer = safeQuerySelector("main, #inv-content, .main-content, #app, #root");
+
+        if (headerOrNav && headerOrNav.parentElement) {
+          headerOrNav.parentElement.insertBefore(ownedHero, headerOrNav.nextSibling);
+        } else if (mainContainer) {
+          mainContainer.insertBefore(ownedHero, mainContainer.firstChild);
+        } else if (document.body) {
+          document.body.insertBefore(ownedHero, document.body.firstChild);
         }
-        img.dataset.invittaPersonalized = "true";
-        img.dataset.invittaPersonalizedSrc = heroUrl;
-
-        // Si está dentro de <picture>, actualizar los <source>
-        if (img.parentElement && img.parentElement.tagName.toLowerCase() === "picture") {
-          img.parentElement.querySelectorAll("source").forEach(function (sourceEl) {
-            sourceEl.srcset = heroUrl;
-          });
+      } else {
+        var existingImg = safeQuerySelector("img", ownedHero);
+        if (existingImg && existingImg.src !== heroUrl) {
+          existingImg.src = heroUrl;
         }
-
-        if (img.hasAttribute("srcset")) {
-          img.removeAttribute("srcset");
-        }
-        if (img.src !== heroUrl) {
-          img.src = heroUrl;
-        }
-        img.style.removeProperty("display");
-        updatedSlot = true;
-      });
-
-      heroBgElements.forEach(function (el) {
-        var currentBg = el.style.backgroundImage || "";
-        var isExplicitHeroBg = el.id === "inv-hero-bg" || el.classList.contains("inv-hero-bg") || el.hasAttribute("data-hero-bg");
-        if (currentBg || isExplicitHeroBg) {
-          if (currentBg && /(logo|icon|qr|pattern|overlay|section_bg|wedding_bg)/i.test(currentBg)) return;
-          el.dataset.invittaPersonalized = "true";
-          el.dataset.invittaPersonalizedSrc = heroUrl;
-          el.style.backgroundImage = 'url("' + heroUrl.replace(/"/g, "") + '")';
-          if (isExplicitHeroBg && el.style.display === "none") {
-            el.style.display = "";
-          }
-          updatedSlot = true;
-        }
-      });
-
-      // Si no hubo ningún slot en la plantilla (ej. plantillas React/Framer sin slot <img> en Hero), crear bloque propio owned
-      if (!updatedSlot && isReal) {
-        ensureHeroStyles();
-        var ownedHero = safeQuerySelector("[data-invitta-owned-hero='true']");
-        if (!ownedHero) {
-          ownedHero = document.createElement("div");
-          ownedHero.className = "invitta-hero-photo";
-          ownedHero.setAttribute("data-invitta-owned-hero", "true");
-
-          var ownedImg = document.createElement("img");
-          ownedImg.className = "invitta-hero-img";
-          ownedImg.src = heroUrl;
-          ownedImg.alt = "Foto principal";
-          ownedImg.loading = "eager";
-          ownedImg.dataset.invittaPersonalized = "true";
-          ownedHero.appendChild(ownedImg);
-
-          var heroAnchor = safeQuerySelector("#hero, [id='hero'], .hero, header, #inv-hero, .hero-section");
-          if (heroAnchor && heroAnchor.parentElement) {
-            heroAnchor.parentElement.insertBefore(ownedHero, heroAnchor.nextSibling);
-          } else if (heroAnchor) {
-            heroAnchor.appendChild(ownedHero);
-          } else {
-            var targetContainer = safeQuerySelector("#inv-content, main, .main-content") || document.body;
-            targetContainer.insertBefore(ownedHero, targetContainer.firstChild);
-          }
-        } else {
-          var existingImg = safeQuerySelector("img", ownedHero);
-          if (existingImg && existingImg.src !== heroUrl) {
-            existingImg.src = heroUrl;
-          }
-        }
-      } else if (updatedSlot) {
-        var excessOwned = safeQuerySelector("[data-invitta-owned-hero='true']");
-        if (excessOwned) excessOwned.remove();
       }
     } else {
-      // En invitaciones reales sin foto principal: ocultar los placeholders demo de portada
-      if (isReal) {
-        heroImages.forEach(function (img) {
-          img.style.setProperty("display", "none", "important");
-        });
-
-        heroBgElements.forEach(function (el) {
-          var currentBg = el.style.backgroundImage || "";
-          var isExplicitHeroBg = el.id === "inv-hero-bg" || el.classList.contains("inv-hero-bg") || el.hasAttribute("data-hero-bg");
-          if (isExplicitHeroBg) {
-            el.style.setProperty("display", "none", "important");
-          } else if (currentBg && isDemoHeroAsset(currentBg)) {
-            el.style.setProperty("background-image", "none", "important");
-          }
-        });
-
-        var staleOwned = safeQuerySelector("[data-invitta-owned-hero='true']");
-        if (staleOwned) staleOwned.remove();
-      }
+      if (ownedHero) ownedHero.remove();
     }
   }
 
@@ -1873,49 +1836,56 @@
       "  --inv-readable-dark: #1f1b18;",
       "  --inv-readable-light: #fffaf2;",
       "}",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-black'],",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-ink'],",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-dark'],",
       "html[data-invitta-real-studio=\"true\"] .bg-black,",
       "html[data-invitta-real-studio=\"true\"] .bg-ink,",
-      "html[data-invitta-real-studio=\"true\"] .bg-charcoal {",
+      "html[data-invitta-real-studio=\"true\"] .bg-charcoal,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-black\"],",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ink\"],",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-dark\"] {",
       "  color: var(--inv-readable-light) !important;",
       "}",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-black'] p,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-ink'] p,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-dark'] p,",
       "html[data-invitta-real-studio=\"true\"] .bg-black p,",
       "html[data-invitta-real-studio=\"true\"] .bg-ink p,",
       "html[data-invitta-real-studio=\"true\"] .bg-charcoal p,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-black'] h1,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-black'] h2,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-black'] h3,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-ink'] h1,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-ink'] h2,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-ink'] h3,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-dark'] h1,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-dark'] h2,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-dark'] h3 {",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-black\"] p,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ink\"] p,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-dark\"] p {",
+      "  color: var(--inv-readable-light) !important;",
+      "  opacity: 0.92 !important;",
+      "}",
+      "html[data-invitta-real-studio=\"true\"] .bg-black h1,",
+      "html[data-invitta-real-studio=\"true\"] .bg-black h2,",
+      "html[data-invitta-real-studio=\"true\"] .bg-black h3,",
+      "html[data-invitta-real-studio=\"true\"] .bg-ink h1,",
+      "html[data-invitta-real-studio=\"true\"] .bg-ink h2,",
+      "html[data-invitta-real-studio=\"true\"] .bg-ink h3,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-black\"] h1,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-black\"] h2,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-black\"] h3,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ink\"] h1,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ink\"] h2,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ink\"] h3,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-dark\"] h1,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-dark\"] h2,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-dark\"] h3 {",
       "  color: var(--inv-readable-light) !important;",
       "}",
       "html[data-invitta-real-studio=\"true\"] .bg-paper,",
       "html[data-invitta-real-studio=\"true\"] .bg-cream,",
       "html[data-invitta-real-studio=\"true\"] .bg-ivory,",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-paper'],",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-cream'],",
-      "html[data-invitta-real-studio=\"true\"] [class*='bg-ivory'] {",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-paper\"],",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-cream\"],",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ivory\"] {",
       "  color: var(--inv-readable-dark) !important;",
       "}",
       "html[data-invitta-real-studio=\"true\"] .bg-paper p,",
       "html[data-invitta-real-studio=\"true\"] .bg-cream p,",
       "html[data-invitta-real-studio=\"true\"] .bg-ivory p,",
-      "html[data-invitta-real-studio=\"true\"] .bg-paper h1,",
-      "html[data-invitta-real-studio=\"true\"] .bg-paper h2,",
-      "html[data-invitta-real-studio=\"true\"] .bg-paper h3,",
-      "html[data-invitta-real-studio=\"true\"] .bg-cream h1,",
-      "html[data-invitta-real-studio=\"true\"] .bg-cream h2,",
-      "html[data-invitta-real-studio=\"true\"] .bg-cream h3 {",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-paper\"] p,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-cream\"] p,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ivory\"] p {",
       "  color: var(--inv-readable-dark) !important;",
+      "  opacity: 0.92 !important;",
       "}",
       "html[data-invitta-real-studio=\"true\"] input:not([type='checkbox']):not([type='radio']):not([type='submit']),",
       "html[data-invitta-real-studio=\"true\"] textarea,",
@@ -1929,22 +1899,13 @@
       "  color: #6b635b !important;",
       "  opacity: 0.85 !important;",
       "}",
+      "html[data-invitta-real-studio=\"true\"] .music-player,",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"music\"],",
       "html[data-invitta-real-studio=\"true\"] #inv-music-player,",
       "html[data-invitta-real-studio=\"true\"] #music-player-bottom-bar,",
       "html[data-invitta-real-studio=\"true\"] #invitta-audio-control,",
-      "html[data-invitta-real-studio=\"true\"] .music-bar,",
       "html[data-invitta-real-studio=\"true\"] .inv-music-dock {",
-      "  color: var(--inv-readable-dark) !important;",
-      "}",
-      "html[data-invitta-real-studio=\"true\"] #inv-music-player p,",
-      "html[data-invitta-real-studio=\"true\"] #inv-music-player span,",
-      "html[data-invitta-real-studio=\"true\"] #music-player-bottom-bar p,",
-      "html[data-invitta-real-studio=\"true\"] #music-player-bottom-bar span,",
-      "html[data-invitta-real-studio=\"true\"] #invitta-audio-control p,",
-      "html[data-invitta-real-studio=\"true\"] #invitta-audio-control span,",
-      "html[data-invitta-real-studio=\"true\"] .music-bar p,",
-      "html[data-invitta-real-studio=\"true\"] .music-bar span {",
-      "  color: var(--inv-readable-dark) !important;",
+      "  color: var(--inv-readable-light) !important;",
       "}"
     ].join("\n");
     document.head.appendChild(style);
@@ -1960,10 +1921,12 @@
         console.log("INVIITA DEBUG:", {
           version: window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION,
           isRealStudio: isRealStudioInvitation(),
-          mainPhotoUrl: Boolean(data.mainPhotoUrl),
+          mainPhotoUrl: data.mainPhotoUrl || null,
+          ownedHeroImgCount: document.querySelectorAll("[data-invitta-owned-hero='true'] img").length,
+          contrastStyleExists: !!document.querySelector("#invitta-real-studio-contrast"),
+          realStudioFlag: document.documentElement.getAttribute("data-invitta-real-studio"),
           galleryUrlsCount: Array.isArray(data.galleryUrls) ? data.galleryUrls.length : 0,
           ownedGalleryImgCount: document.querySelectorAll(".invitta-gallery-img").length,
-          ownedHeroImgCount: document.querySelectorAll("[data-invitta-owned-hero='true'] img").length,
           giftOptionsCount: Array.isArray(data.giftOptions) ? data.giftOptions.length : 0
         });
       }
