@@ -440,6 +440,18 @@
     });
   }
 
+  function normalizeLocationHeading() {
+    // This is product copy, not a style override. Preserve each template's
+    // own element, font and animation while keeping the section title
+    // consistently capitalized across every invitation.
+    Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, span")).forEach(function(element) {
+      if (element.children.length !== 0) return;
+      if (clean(element.textContent).toLocaleLowerCase("es-MX") !== "¿dónde celebraremos?") return;
+      element.textContent = "¿Dónde Celebraremos?";
+      element.setAttribute("data-invitta-dynamic-text", "true");
+    });
+  }
+
   function hideSectionWithHeading(headingText) {
     var heading = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, span, p")).find(function (element) {
       return clean(element.textContent) === headingText;
@@ -449,13 +461,15 @@
   }
 
   function hideUnsupportedPlumNoirSamples() {
-    if (templateId !== "boda-midnight-gold-vip") return;
-
     // These modules ship with static demonstration records. Invitta has no
     // persisted data model for collaborative albums or lodging yet, therefore
     // they must not be published as event content.
+    var collaborativeAlbum = document.getElementById("collaborative-album");
+    if (collaborativeAlbum) collaborativeAlbum.style.setProperty("display", "none", "important");
     hideSectionWithHeading("Álbum Colaborativo");
     hideSectionWithHeading("Sugerencias de Hospedaje");
+
+    if (templateId !== "boda-midnight-gold-vip") return;
 
     // The agenda is configurable in Studio. Without entries, avoid showing
     // the template's fictional schedule.
@@ -2165,6 +2179,93 @@
     }
   }
 
+  function applyTemplateTypography() {
+    // Typography is an explicit Studio choice. The default "classic" keeps
+    // the native design untouched; a selected preset changes families only,
+    // never the template's responsive sizes, spacing, or motion.
+    var root = document.documentElement;
+    var style = document.getElementById("invitta-template-typography");
+    if (style) style.remove();
+    delete root.dataset.invittaFontPreset;
+
+    var selectedPreset = data.fontPreset;
+    if (!selectedPreset || selectedPreset === "classic") return;
+    var presets = {
+      romantic: { display: '"Great Vibes", "Cormorant Garamond", cursive', body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif' },
+      editorial: { display: '"Playfair Display", "Cormorant Garamond", Georgia, serif', body: '"Hanken Grotesk", "Montserrat", Arial, sans-serif' },
+      minimal: { display: '"Montserrat", "Hanken Grotesk", Arial, sans-serif', body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif' },
+      luxury: { display: '"Playfair Display", "Cormorant Garamond", Georgia, serif', body: '"Hanken Grotesk", "Montserrat", Arial, sans-serif' },
+      signature: { display: '"Allura", "Great Vibes", cursive', body: '"Montserrat", Arial, sans-serif' },
+      couture: { display: '"Parisienne", "Great Vibes", cursive', body: '"Playfair Display", Georgia, serif' }
+    };
+    var fonts = presets[selectedPreset];
+    if (selectedPreset === "custom") {
+      var customFont = (Array.isArray(data.typographyFonts) && data.typographyFonts[0]) ||
+        (data.customFontUrl ? { id: "legacy", url: data.customFontUrl } : null);
+      if (customFont && customFont.url) {
+        var safeId = String(customFont.id || "custom").replace(/[^A-Za-z0-9_-]/g, "");
+        var family = "InvittaUserFont_" + (safeId || "custom");
+        var extension = customFont.url.split("?")[0].split(".").pop().toLowerCase();
+        var format = extension === "woff2" ? "woff2" : extension === "woff" ? "woff" : extension === "otf" ? "opentype" : "truetype";
+        var customStyle = document.createElement("style");
+        customStyle.textContent = '@font-face{font-family:"' + family + '";src:url(' + JSON.stringify(customFont.url) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
+        document.head.appendChild(customStyle);
+        fonts = { display: '"' + family + '", "Cormorant Garamond", Georgia, serif', body: '"' + family + '", "Montserrat", Arial, sans-serif' };
+      }
+    }
+    if (!fonts) return;
+
+    root.dataset.invittaFontPreset = selectedPreset;
+    root.style.setProperty("--font-display", fonts.display);
+    root.style.setProperty("--font-serif", fonts.display);
+    root.style.setProperty("--font-sans", fonts.body);
+    var fontLink = document.getElementById("invitta-template-fonts");
+    if (!fontLink) {
+      fontLink = document.createElement("link");
+      fontLink.id = "invitta-template-fonts";
+      fontLink.rel = "stylesheet";
+      fontLink.href = "https://fonts.googleapis.com/css2?family=Allura&family=Great+Vibes&family=Hanken+Grotesk:wght@400..700&family=Montserrat:wght@400..700&family=Parisienne&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap";
+      document.head.appendChild(fontLink);
+    }
+
+    // Restrict the adapter to invitation content. In particular, it does not
+    // touch the header, player controls, QR artwork or native layout helpers.
+    var sections = "#hero,#cover,#portada,#inv-hero,#family,#honors,#details,#locations,#itinerary,#gallery,#registry,#rsvp";
+    var headingSelectors = sections.split(",").map(function(section) {
+      return section + " h1," + section + " h2," + section + " h3," + section + " .font-display," + section + " .font-serif";
+    }).join(",");
+    var bodySelectors = sections.split(",").map(function(section) {
+      return section + " p," + section + " li," + section + " blockquote";
+    }).join(",");
+    style = document.createElement("style");
+    style.id = "invitta-template-typography";
+    style.textContent = headingSelectors + "{font-family:" + fonts.display + "!important;}" +
+      bodySelectors + "{font-family:" + fonts.body + "!important;}";
+    document.head.appendChild(style);
+  }
+
+  function applyTemplatePaletteAdapter() {
+    // These are the few legacy premium/VIP surfaces that use literal utility
+    // colors instead of the native tokens. Scope them tightly so palettes do
+    // not overwrite imagery, parallax, animations, or ordinary template CSS.
+    var existing = document.getElementById("invitta-template-palette-adapter");
+    if (existing) existing.remove();
+    if (!data.palettePreset) return;
+    var style = document.createElement("style");
+    style.id = "invitta-template-palette-adapter";
+    style.textContent = [
+      "html[data-invitta-palette] #itinerary{background-color:var(--inv-60)!important;color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #itinerary h1,html[data-invitta-palette] #itinerary h2,html[data-invitta-palette] #itinerary h3,html[data-invitta-palette] #itinerary h4,html[data-invitta-palette] #itinerary p,html[data-invitta-palette] #itinerary li{color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #itinerary .text-sage,html[data-invitta-palette] #itinerary .text-champagne-gold,html[data-invitta-palette] #itinerary .text-primary{color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #itinerary .bg-paper,html[data-invitta-palette] #itinerary .bg-surface-container-low,html[data-invitta-palette] #itinerary .bg-surface-container-lowest{background-color:var(--inv-60)!important;}",
+      "html[data-invitta-palette] #music-player-bottom-bar,html[data-invitta-palette] #music-player-container{background-color:var(--inv-60)!important;border-color:var(--inv-10)!important;color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #music-player-bottom-bar p,html[data-invitta-palette] #music-player-bottom-bar span,html[data-invitta-palette] #music-player-bottom-bar button,html[data-invitta-palette] #music-player-container p,html[data-invitta-palette] #music-player-container span,html[data-invitta-palette] #music-player-container button{color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #music-player-bottom-bar .text-sage,html[data-invitta-palette] #music-player-bottom-bar .text-champagne-gold,html[data-invitta-palette] #music-player-container .text-sage,html[data-invitta-palette] #music-player-container .text-champagne-gold{color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #music-toggle-play-btn{background-color:var(--inv-30)!important;border-color:var(--inv-10)!important;color:var(--inv-60)!important;}",
+      "html[data-invitta-palette] #music-player-bottom-bar input,html[data-invitta-palette] #music-player-container input{accent-color:var(--inv-10)!important;}"
+    ].join("");
+    document.head.appendChild(style);
+  }
 
   function applyAll() {
     if (applying || !document.body) return;
@@ -2194,6 +2295,7 @@
     applyPlumNoirWeddingAdapter();
     hideUnsupportedPlumNoirSamples();
     applyItineraryHeading();
+    normalizeLocationHeading();
     applying = false;
   }
 
@@ -2222,6 +2324,8 @@
   ensureDynamicCasingStyles();
   ensureMusicControlStyles();
   applyThemeHooks();
+  applyTemplatePaletteAdapter();
+  applyTemplateTypography();
   applyTypographyScales(true);
   installClickBridge();
   applyAll();
