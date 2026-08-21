@@ -1108,6 +1108,7 @@
     if (heading && heading.children.length === 0) {
       heading.textContent = dressCode;
       heading.setAttribute("data-invitta-dynamic-text", "true");
+      heading.setAttribute("data-invitta-dress-code-title", "true");
       heading.style.setProperty("text-transform", "none", "important");
     }
 
@@ -1167,6 +1168,79 @@
     if (!childrenNote && !childrenLabel && (childrenMessage || childrenBadge)) {
       var supportingCopy = (childrenMessage || childrenBadge).parentElement;
       if (supportingCopy) supportingCopy.style.setProperty("display", "none", "important");
+    }
+  }
+
+  function locationCardFor(details, expression) {
+    var heading = Array.from(details.querySelectorAll("h1, h2, h3, h4")).find(function(element) {
+      return expression.test(clean(element.textContent));
+    });
+    if (!heading) return null;
+    return heading.closest(".bg-paper, .card, article, [class*='border']") || heading.parentElement;
+  }
+
+  function applyLocationCard(card, location) {
+    if (!card) return false;
+    var hasContent = Boolean(location && (clean(location.name) || clean(location.address) || clean(location.mapUrl)));
+    if (!hasContent) {
+      card.style.setProperty("display", "none", "important");
+      return false;
+    }
+
+    card.style.removeProperty("display");
+    var name = card.querySelector("p.font-semibold, [data-invitta-location-name]");
+    if (name) {
+      if (clean(location.name)) {
+        name.textContent = location.name;
+        name.setAttribute("data-invitta-location-name", "true");
+        name.setAttribute("data-invitta-dynamic-text", "true");
+        name.style.removeProperty("display");
+      } else {
+        name.style.setProperty("display", "none", "important");
+      }
+    }
+    var address = Array.from(card.querySelectorAll("p")).find(function(element) {
+      return element !== name && (/opacity-|font-sans/.test(element.className || "") || element.querySelector("br"));
+    });
+    if (address) {
+      if (clean(location.address)) {
+        address.textContent = location.address;
+        address.setAttribute("data-invitta-dynamic-text", "true");
+        address.style.setProperty("white-space", "pre-line");
+        address.style.removeProperty("display");
+      } else {
+        address.style.setProperty("display", "none", "important");
+      }
+    }
+    var mapLink = Array.from(card.querySelectorAll("a, button")).find(function(element) {
+      return /C[ÓO]MO LLEGAR/.test(element.textContent || "");
+    });
+    if (mapLink) {
+      if (clean(location.mapUrl)) {
+        if (mapLink.tagName === "A") mapLink.href = location.mapUrl;
+        mapLink.dataset.invittaUrl = location.mapUrl;
+        mapLink.style.removeProperty("display");
+      } else {
+        mapLink.style.setProperty("display", "none", "important");
+      }
+    }
+    return true;
+  }
+
+  function applyLocationContent() {
+    // Premium and VIP templates ship with two filled sample cards. A real
+    // invitation must show only saved ceremony/reception data, never those
+    // samples or their empty framed remnants.
+    var details = document.getElementById("details");
+    if (!details || !isRealStudioInvitation()) return;
+    var ceremonyCard = locationCardFor(details, /ceremonia|iglesia/i);
+    var receptionCard = locationCardFor(details, /recepci[oó]n|sal[oó]n/i);
+    var hasCeremony = applyLocationCard(ceremonyCard, data.ceremony || {});
+    var hasReception = applyLocationCard(receptionCard, data.reception || {});
+    if (!hasCeremony && !hasReception && (ceremonyCard || receptionCard)) {
+      details.style.setProperty("display", "none", "important");
+    } else if (hasCeremony || hasReception) {
+      details.style.removeProperty("display");
     }
   }
 
@@ -2285,11 +2359,13 @@
       "html[data-invitta-palette] #music-player-bottom-bar p,html[data-invitta-palette] #music-player-bottom-bar span,html[data-invitta-palette] #music-player-bottom-bar button,html[data-invitta-palette] #music-player-container p,html[data-invitta-palette] #music-player-container span,html[data-invitta-palette] #music-player-container button{color:var(--inv-30)!important;}",
       "html[data-invitta-palette] #music-player-bottom-bar .text-sage,html[data-invitta-palette] #music-player-bottom-bar .text-champagne-gold,html[data-invitta-palette] #music-player-container .text-sage,html[data-invitta-palette] #music-player-container .text-champagne-gold{color:var(--inv-10)!important;}",
       "html[data-invitta-palette] #music-toggle-play-btn{background-color:var(--inv-30)!important;border-color:var(--inv-10)!important;color:var(--inv-60)!important;}",
+      "html[data-invitta-palette] #music-toggle-play-btn>span{color:var(--inv-60)!important;}",
       "html[data-invitta-palette] #music-player-bottom-bar input,html[data-invitta-palette] #music-player-container input{accent-color:var(--inv-10)!important;}",
       "html[data-invitta-palette] #music-player{background-color:var(--inv-60)!important;border-color:var(--inv-10)!important;color:var(--inv-30)!important;}",
       "html[data-invitta-palette] #music-player .music-player__track span,html[data-invitta-palette] #music-player .music-player__toggle{color:var(--inv-10)!important;}",
       "html[data-invitta-palette] #music-player .music-player__track strong,html[data-invitta-palette] #music-player .music-player__track small{color:var(--inv-30)!important;}",
-      "html[data-invitta-palette] #music-player .music-player__toggle{border-color:var(--inv-10)!important;}"
+      "html[data-invitta-palette] #music-player .music-player__toggle{border-color:var(--inv-10)!important;}",
+      "[data-invitta-dress-code-title]{font-size:clamp(2.25rem,10vw,4.25rem)!important;font-weight:400!important;letter-spacing:-.045em!important;line-height:.92!important;max-width:10ch!important;margin-left:auto!important;margin-right:auto!important;text-wrap:balance!important;}"
     ].join("");
     document.head.appendChild(style);
   }
@@ -2300,6 +2376,7 @@
     ensureDynamicCasingStyles();
     ensureMusicControlStyles();
     replaceText(document.body);
+    applyLocationContent();
     cleanRsvpMessageLabels();
     markFamilySectionTitles();
     applyHeroImage();
