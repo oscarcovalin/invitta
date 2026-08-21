@@ -910,10 +910,13 @@
       "html[data-invitta-real-studio=\"true\"] .section-title, ",
       "html[data-invitta-real-studio=\"true\"] .inv-section-title, ",
       "html[data-invitta-real-studio=\"true\"] .invitta-section-title {",
-      "  font-size: clamp(18px, 4.8vw, 24px) !important;",
-      "  line-height: 1.25 !important;",
-      "  letter-spacing: normal !important;",
+      "  font-size: clamp(22px, 5.8vw, 30px) !important;",
+      "  line-height: 1.2 !important;",
+      "  letter-spacing: 0 !important;",
       "  text-transform: none !important;",
+      "  transform: none !important;",
+      "  scale: 1 !important;",
+      "  opacity: 1 !important;",
       "}",
       "",
       "@media (max-width: 390px) {",
@@ -922,8 +925,8 @@
       "  html[data-invitta-real-studio=\"true\"] .section-title, ",
       "  html[data-invitta-real-studio=\"true\"] .inv-section-title, ",
       "  html[data-invitta-real-studio=\"true\"] .invitta-section-title {",
-      "    font-size: 18px !important;",
-      "    line-height: 1.3 !important;",
+      "    font-size: 22px !important;",
+      "    line-height: 1.2 !important;",
       "  }",
       "}"
     ].join("\n");
@@ -1015,7 +1018,12 @@
     "AGRADECIMIENTO SINCERO": "Agradecimiento Sincero",
     "HOSPEDAJE SUGERIDO": "Hospedaje Sugerido",
 
+    "GUARDA LA FECHA": "Guarda la Fecha",
     "GUARDA LA FECHA ESPECIAL": "Guarda la Fecha Especial",
+    "RESERVA LA FECHA": "Reserva la Fecha",
+    "SAVE THE DATE": "Save the Date",
+    "ACOMPAÑADA DE MI CHAMBELÁN": "Acompañada de mi Chambelán",
+    "ACOMPANADA DE MI CHAMBELAN": "Acompañada de mi Chambelán",
     "TE ESPERO EL DÍA": "Te Espero el Día",
     "TE ESPERO EL DIA": "Te Espero el Día"
   };
@@ -1057,13 +1065,14 @@
       "#family h2, #family h3, #honors h2, #honors h3",
       "#locations h2, #details h2, #itinerary h2, .itinerary-section h2",
       "#registry h2, .registry-title, #dress-code h2, .dress-code-title",
-      "#rsvp h2, .rsvp-title, #gifts h2, .gifts-title"
+      "#rsvp h2, .rsvp-title, #gifts h2, .gifts-title",
+      "#countdown h2, #countdown h3, #date h2, #date h3, #date-section h2, #date-section h3"
     ];
 
     sectionTitleSelectors.forEach(function (sel) {
       safeQuerySelectorAll(sel).forEach(function (el) {
         if (!el) return;
-        if (el.matches && el.matches(".eyebrow, label, button, .button, .btn, .badge, .invitta-gallery-eyebrow, [data-invitta-font-role='label'], [data-invitta-font-role='body']")) {
+        if (el.matches && el.matches(".eyebrow, label, button, .button, .btn, .badge, .invitta-gallery-eyebrow, [data-invitta-font-role='label'], [data-invitta-font-role='body'], #music-player-bottom-bar *, #music-player-container *, .music-player *, #inv-music-player *, nav, nav *")) {
           return;
         }
         el.setAttribute("data-invitta-section-title", "true");
