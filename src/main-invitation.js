@@ -962,7 +962,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=rfc032-034-hotfix-20260820";
+    bridge.src = "/demos/shared/public-personalization.js?v=rfc032-034-hotfix2-20260820";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

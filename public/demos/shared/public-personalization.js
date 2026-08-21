@@ -1,10 +1,26 @@
 (function () {
   "use strict";
 
-  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-hotfix-20260820";
+  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-hotfix2-20260820";
 
   var data = window.INVITATION_DATA;
   if (!data || !data.templateId) return;
+
+  function safeQuerySelector(selector, root) {
+    try {
+      return (root || document).querySelector(selector);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function safeQuerySelectorAll(selector, root) {
+    try {
+      return Array.from((root || document).querySelectorAll(selector));
+    } catch (e) {
+      return [];
+    }
+  }
 
   var templateId = data.templateId;
   var rendererTemplateId = data.rendererTemplateId || templateId;
@@ -572,11 +588,11 @@
     var maxGalleryCount = isPremium ? 10 : 4;
     gallery = gallery.slice(0, maxGalleryCount);
 
-    var gallerySections = Array.from(document.querySelectorAll(
+    var gallerySections = safeQuerySelectorAll(
       "#gallery, [id='gallery'], [id='galeria'], [id='galería'], " +
       ".inv-moments-section, .inv-gallery-section, #inv-gallery-section"
-    ));
-    var galleryNavs = Array.from(document.querySelectorAll("nav button, nav a, .inv-nav-button"));
+    );
+    var galleryNavs = safeQuerySelectorAll("nav button, nav a, .inv-nav-button");
 
     if (gallery.length === 0) {
       gallerySections.forEach(function (sec) {
@@ -614,11 +630,11 @@
 
       newSec.appendChild(newInner);
 
-      var rsvpSec = document.querySelector("#rsvp, #gifts, #registry, footer");
+      var rsvpSec = safeQuerySelector("#rsvp, #gifts, #registry, footer");
       if (rsvpSec && rsvpSec.parentElement) {
         rsvpSec.parentElement.insertBefore(newSec, rsvpSec);
       } else {
-        var targetContainer = document.querySelector("#inv-content, main, .main-content") || document.body;
+        var targetContainer = safeQuerySelector("#inv-content, main, .main-content") || document.body;
         targetContainer.appendChild(newSec);
       }
       gallerySections = [newSec];
@@ -638,18 +654,18 @@
     });
 
     gallerySections.forEach(function (sec) {
-      var demoItems = sec.querySelectorAll(".grid > *, .gallery > *, [class*='grid'] > *, [class*='gallery']:not(.invitta-gallery-grid), [class*='photo'], [class*='slot'], [class*='item']:not(.invitta-gallery-item)");
+      var demoItems = safeQuerySelectorAll(".grid > *, .gallery > *, [class*='grid'] > *, [class*='gallery']:not(.invitta-gallery-grid), [class*='photo'], [class*='slot'], [class*='item']:not(.invitta-gallery-item)", sec);
       demoItems.forEach(function (item) {
         if (item.closest && item.closest(".invitta-gallery-grid")) return;
         if (item.classList && (item.classList.contains("invitta-gallery-grid") || item.classList.contains("invitta-gallery-item"))) return;
         item.style.setProperty("display", "none", "important");
       });
 
-      var grid = sec.querySelector(".invitta-gallery-grid");
+      var grid = safeQuerySelector(".invitta-gallery-grid", sec);
       if (!grid) {
         grid = document.createElement("div");
         grid.className = "invitta-gallery-grid";
-        var inner = sec.querySelector(".section__inner, .max-w-4xl, .max-w-5xl, .max-w-6xl, .max-w-[1500px], .max-w-[1600px], .container, .space-y-16") || sec;
+        var inner = safeQuerySelector(".section__inner, .max-w-4xl, .max-w-5xl, .max-w-6xl, .container, .space-y-16", sec) || sec;
         inner.appendChild(grid);
       }
 
@@ -1090,9 +1106,9 @@
     ensureGiftOptionStyles();
     var options = getGiftOptions();
 
-    var giftSections = Array.from(document.querySelectorAll("#registry, #gifts, #gift, #inv-gifts-block"));
-    var giftModals = Array.from(document.querySelectorAll("#registry-modal-overlay, #registry-modal-container, [id*='registry-modal'], [class*='registry-modal']"));
-    var giftNavs = Array.from(document.querySelectorAll("nav button, nav a, .inv-nav-button"));
+    var giftSections = safeQuerySelectorAll("#registry, #gifts, #gift, #inv-gifts-block");
+    var giftModals = safeQuerySelectorAll("#registry-modal-overlay, #registry-modal-container, [id*='registry-modal'], [class*='registry-modal']");
+    var giftNavs = safeQuerySelectorAll("nav button, nav a, .inv-nav-button");
 
     // Siempre ocultar modales demo
     giftModals.forEach(function(m) {
@@ -1140,7 +1156,7 @@
 
     giftSections.forEach(function(section) {
       // 1. Ocultar tarjetas demo existentes dentro de la sección excluyendo siempre invitta-gift-*
-      var demoCards = section.querySelectorAll(".grid > *, article, [class*='grid'] > *, [class*='card']");
+      var demoCards = safeQuerySelectorAll(".grid > *, article, [class*='grid'] > *, [class*='card']", section);
       demoCards.forEach(function(card) {
         if (card.closest && card.closest(".invitta-gift-options")) return;
         if (card.classList && (card.classList.contains("invitta-gift-options") || card.classList.contains("invitta-gift-card") || card.classList.contains("invitta-gift-button"))) return;
@@ -1152,11 +1168,11 @@
       }
 
       // 2. Comprobar si ya existe el contenedor real
-      var container = section.querySelector(".invitta-gift-options");
+      var container = safeQuerySelector(".invitta-gift-options", section);
       if (!container) {
         container = document.createElement("div");
         container.className = "invitta-gift-options";
-        var inner = section.querySelector(".section__inner, .max-w-4xl, .max-w-5xl, .max-w-2xl, .container") || section;
+        var inner = safeQuerySelector(".section__inner, .max-w-4xl, .max-w-5xl, .max-w-2xl, .container", section) || section;
         inner.appendChild(container);
       }
 
@@ -1792,23 +1808,23 @@
   function applyAll() {
     if (applying || !document.body) return;
     applying = true;
-    ensureDynamicCasingStyles();
-    ensureMusicControlStyles();
-    replaceText(document.body);
-    applyHeroImage();
-    applyGalleryImages();
-    applyInternalEditorialImages();
-    applySectionBackgrounds();
-    applyCustomBackground(data);
-    applyAudio();
-    applyOptionalContent();
-    applyGiftOptions();
-    applyLinks();
-    applyGuestData();
-    applyVipAccessPass();
-    applyConfirmationContacts();
-    applyTypographyScales(false);
-    hideLegacyGuestAdmin();
+    try { ensureDynamicCasingStyles(); } catch (e) {}
+    try { ensureMusicControlStyles(); } catch (e) {}
+    try { replaceText(document.body); } catch (e) {}
+    try { applyHeroImage(); } catch (e) {}
+    try { applyGalleryImages(); } catch (e) {}
+    try { applyInternalEditorialImages(); } catch (e) {}
+    try { applySectionBackgrounds(); } catch (e) {}
+    try { applyCustomBackground(data); } catch (e) {}
+    try { applyAudio(); } catch (e) {}
+    try { applyOptionalContent(); } catch (e) {}
+    try { applyGiftOptions(); } catch (e) {}
+    try { applyLinks(); } catch (e) {}
+    try { applyGuestData(); } catch (e) {}
+    try { applyVipAccessPass(); } catch (e) {}
+    try { applyConfirmationContacts(); } catch (e) {}
+    try { applyTypographyScales(false); } catch (e) {}
+    try { hideLegacyGuestAdmin(); } catch (e) {}
     applying = false;
   }
 
