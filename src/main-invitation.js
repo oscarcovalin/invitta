@@ -979,7 +979,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=composition-tokens-20260821";
+    bridge.src = "/demos/shared/public-personalization.js?v=palette-audit-20260821";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

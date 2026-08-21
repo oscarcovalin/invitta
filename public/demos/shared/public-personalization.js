@@ -919,6 +919,18 @@
     },
     "boda-midnight-gold-vip": {
       family: ["#honors"], locations: ["#details"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-bottom-bar"]
+    },
+    "cumpleanos-general-basic": {
+      family: ["#family"], locations: ["#location-cards"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player"]
+    },
+    "cumpleanos-50-sorpresa": {
+      family: ["#family"], locations: ["#location-cards"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player"]
+    },
+    "bautizo-general-basic": {
+      family: ["#family"], locations: ["#location-cards"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player"]
+    },
+    "otro-general-basic": {
+      family: ["#family"], locations: ["#location-cards"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player"]
     }
   };
 
@@ -1729,7 +1741,9 @@
       "--color-surface-container-low", "--color-surface-container-lowest",
       "--color-ink", "--color-on-background", "--color-on-surface",
       "--color-on-surface-variant", "--color-primary", "--color-sage",
-      "--color-champagne-gold", "--color-outline-variant"
+      "--color-champagne-gold", "--color-outline-variant",
+      "--invitta-surface", "--invitta-card", "--invitta-title",
+      "--invitta-body", "--invitta-accent", "--inv-button-text", "--inv-overlay"
     ];
     paletteVariables.forEach(function(name) { root.style.removeProperty(name); });
     delete root.dataset.invittaTheme;
@@ -1762,6 +1776,15 @@
     root.style.setProperty("--color-sage", palette.accent);
     root.style.setProperty("--color-champagne-gold", palette.accent);
     root.style.setProperty("--color-outline-variant", palette.accent);
+    // The general-event renderer intentionally has its own semantic tokens.
+    // Feed it the same three colors instead of leaving its fixed defaults.
+    root.style.setProperty("--invitta-surface", palette.base);
+    root.style.setProperty("--invitta-card", palette.base);
+    root.style.setProperty("--invitta-title", palette.support);
+    root.style.setProperty("--invitta-body", palette.support);
+    root.style.setProperty("--invitta-accent", palette.accent);
+    root.style.setProperty("--inv-button-text", accentText);
+    root.style.setProperty("--inv-overlay", "rgba(0,0,0,0.28)");
     return;
 
     var palettePresets = {
@@ -2262,7 +2285,11 @@
       "html[data-invitta-palette] #music-player-bottom-bar p,html[data-invitta-palette] #music-player-bottom-bar span,html[data-invitta-palette] #music-player-bottom-bar button,html[data-invitta-palette] #music-player-container p,html[data-invitta-palette] #music-player-container span,html[data-invitta-palette] #music-player-container button{color:var(--inv-30)!important;}",
       "html[data-invitta-palette] #music-player-bottom-bar .text-sage,html[data-invitta-palette] #music-player-bottom-bar .text-champagne-gold,html[data-invitta-palette] #music-player-container .text-sage,html[data-invitta-palette] #music-player-container .text-champagne-gold{color:var(--inv-10)!important;}",
       "html[data-invitta-palette] #music-toggle-play-btn{background-color:var(--inv-30)!important;border-color:var(--inv-10)!important;color:var(--inv-60)!important;}",
-      "html[data-invitta-palette] #music-player-bottom-bar input,html[data-invitta-palette] #music-player-container input{accent-color:var(--inv-10)!important;}"
+      "html[data-invitta-palette] #music-player-bottom-bar input,html[data-invitta-palette] #music-player-container input{accent-color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #music-player{background-color:var(--inv-60)!important;border-color:var(--inv-10)!important;color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #music-player .music-player__track span,html[data-invitta-palette] #music-player .music-player__toggle{color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #music-player .music-player__track strong,html[data-invitta-palette] #music-player .music-player__track small{color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #music-player .music-player__toggle{border-color:var(--inv-10)!important;}"
     ].join("");
     document.head.appendChild(style);
   }
