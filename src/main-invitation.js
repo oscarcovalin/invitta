@@ -967,11 +967,11 @@ function addTemplateBridge(html, templatePath, templateData) {
     var bridge = doc.querySelector("script[src*='public-personalization']");
     if (!bridge) {
         bridge = doc.createElement("script");
-        bridge.src = "/demos/shared/public-personalization.js?v=rfc032-034-hotfix6-20260820";
+        bridge.src = "/demos/shared/public-personalization.js?v=rfc032-034-audio-contrast-20260821";
         bridge.defer = true;
         doc.body.appendChild(bridge);
     } else {
-        bridge.src = "/demos/shared/public-personalization.js?v=rfc032-034-hotfix6-20260820";
+        bridge.src = "/demos/shared/public-personalization.js?v=rfc032-034-audio-contrast-20260821";
     }
 
     return "<!doctype html>\n" + doc.documentElement.outerHTML;

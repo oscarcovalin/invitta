@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-hotfix6-20260820";
+  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-audio-contrast-20260821";
 
   var data = window.INVITATION_DATA;
   if (!data || !data.templateId) return;
@@ -1060,6 +1060,165 @@
     });
   }
 
+  function ensureSharedAudioContrastStyles() {
+    if (document.getElementById("invitta-audio-contrast-styles")) return;
+    var style = document.createElement("style");
+    style.id = "invitta-audio-contrast-styles";
+    style.textContent = [
+      /* 1. Base tokens */
+      "html {",
+      "  --inv-player-bg: var(--inv-30, #161715);",
+      "  --inv-player-fg: var(--inv-text-on-30, #faf6ee);",
+      "  --inv-player-border: var(--inv-card-border, rgba(255, 255, 255, 0.14));",
+      "  --inv-player-primary: var(--inv-10, #d4b57a);",
+      "  --inv-player-primary-fg: var(--inv-on-accent, #ffffff);",
+      "  --inv-player-muted: var(--inv-card-muted, rgba(250, 246, 238, 0.72));",
+      "}",
+      "",
+      /* 2. Container / Dock / Bars */
+      "#music-player-bottom-bar,",
+      "#music-player-container,",
+      "#music-player-container > div.rounded-full,",
+      "#music-player-container > div.bg-paper\\/90,",
+      "#music-player-container > div:first-child:not(.rounded-full),",
+      "#music-player,",
+      ".music-player,",
+      "#inv-music-player,",
+      ".inv-music-dock,",
+      ".inv-bottom-bar,",
+      "#invitta-audio-control {",
+      "  background: var(--inv-player-bg) !important;",
+      "  background-color: var(--inv-player-bg) !important;",
+      "  color: var(--inv-player-fg) !important;",
+      "  border-color: var(--inv-player-border) !important;",
+      "}",
+      "",
+      /* 3. Main Texts */
+      "#music-player-bottom-bar span,",
+      "#music-player-bottom-bar p,",
+      "#music-player-container span,",
+      "#music-player-container p,",
+      ".music-player__track strong,",
+      ".music-player__track span,",
+      "#inv-music-title,",
+      ".inv-music-title,",
+      ".inv-music-meta,",
+      "#invitta-audio-control span,",
+      "#invitta-audio-control p {",
+      "  color: var(--inv-player-fg) !important;",
+      "  opacity: 1 !important;",
+      "}",
+      "",
+      /* 4. Secondary / Meta Texts */
+      "#music-player-bottom-bar span.text-paper\\/80,",
+      "#music-player-bottom-bar span.text-paper,",
+      "#music-player-bottom-bar .font-sans,",
+      ".music-player__track small,",
+      "#inv-music-artist,",
+      ".inv-music-artist {",
+      "  color: var(--inv-player-muted) !important;",
+      "  opacity: 1 !important;",
+      "}",
+      "",
+      /* 5. Protect against weak template colors inside player scope */
+      ":where(#music-player-bottom-bar, #music-player-container, #music-player, #inv-music-player, .inv-music-dock, .inv-bottom-bar, #invitta-audio-control) :where(.text-clay, .text-sage, .text-olive, .text-gold, .text-muted, .text-on-surface-variant, .text-secondary, .text-ink) {",
+      "  color: var(--inv-player-fg) !important;",
+      "  opacity: 1 !important;",
+      "}",
+      "",
+      /* 6. Primary Play/Pause Button (10 / Accent) */
+      "#music-toggle-play-btn,",
+      "#music-player-container button:first-of-type,",
+      "#music-btn,",
+      ".music-btn,",
+      "#music-toggle,",
+      ".music-player__toggle,",
+      "#inv-music-toggle,",
+      ".inv-music-toggle {",
+      "  background: var(--inv-player-primary) !important;",
+      "  background-color: var(--inv-player-primary) !important;",
+      "  color: var(--inv-player-primary-fg) !important;",
+      "  border: 1px solid var(--inv-player-primary) !important;",
+      "  border-color: var(--inv-player-primary) !important;",
+      "  opacity: 1 !important;",
+      "}",
+      "",
+      "#music-toggle-play-btn *,",
+      "#music-player-container button:first-of-type *,",
+      "#music-btn *,",
+      ".music-btn *,",
+      "#music-toggle *,",
+      ".music-player__toggle *,",
+      "#inv-music-toggle *,",
+      ".inv-music-toggle * {",
+      "  color: var(--inv-player-primary-fg) !important;",
+      "  fill: currentColor !important;",
+      "  stroke: currentColor !important;",
+      "  opacity: 1 !important;",
+      "}",
+      "",
+      "#music-toggle-play-btn svg,",
+      "#music-player-container button:first-of-type svg,",
+      "#music-toggle svg,",
+      "#inv-music-toggle svg,",
+      ".inv-music-control-icon {",
+      "  stroke: currentColor !important;",
+      "  fill: currentColor !important;",
+      "  color: var(--inv-player-primary-fg) !important;",
+      "}",
+      "",
+      /* 7. Secondary Controls / Mute / Volume */
+      "#music-mute-toggle-btn,",
+      "#music-player-container button:last-of-type:not(:first-of-type),",
+      "[id*=\"music-mute\" i],",
+      "[class*=\"music-mute\" i] {",
+      "  color: var(--inv-player-fg) !important;",
+      "  opacity: 1 !important;",
+      "  background: transparent !important;",
+      "  border: none !important;",
+      "}",
+      "",
+      "#music-mute-toggle-btn *,",
+      "#music-player-container button:last-of-type:not(:first-of-type) *,",
+      "[id*=\"music-mute\" i] *,",
+      "[class*=\"music-mute\" i] * {",
+      "  color: var(--inv-player-fg) !important;",
+      "  stroke: currentColor !important;",
+      "  opacity: 1 !important;",
+      "}",
+      "",
+      "#music-volume-slider {",
+      "  accent-color: var(--inv-player-primary) !important;",
+      "  background: var(--inv-player-border) !important;",
+      "  opacity: 1 !important;",
+      "}",
+      "",
+      "#music-player-bottom-bar .w-px,",
+      "#music-player-container .w-px,",
+      "#music-player-bottom-bar .bg-sage\\/20 {",
+      "  background-color: var(--inv-player-border) !important;",
+      "  opacity: 1 !important;",
+      "}",
+      "",
+      /* 8. Equalizer / Waveform / Bars */
+      "#music-player-bottom-bar .flex.items-end > div,",
+      "#music-player-container .flex.items-end span,",
+      ".music-player-wave,",
+      ".music-player-bar,",
+      ".music-wave,",
+      ".equalizer-bar {",
+      "  background-color: var(--inv-player-primary) !important;",
+      "  opacity: 1 !important;",
+      "}",
+      "",
+      "#music-player-bottom-bar .flex.items-end > div:not(.animate-pulse):not([style*=\"100%\"]),",
+      "#music-player-container .flex.items-end span:not([class*=\"animate\"]) {",
+      "  background-color: var(--inv-player-muted) !important;",
+      "}"
+    ].join("\n");
+    document.head.appendChild(style);
+  }
+
   function ensureMusicControlStyles() {
     var existing = document.getElementById("invitta-no-music-style");
     if (!data.musicUrl) {
@@ -1084,6 +1243,7 @@
   }
 
   function applyAudio() {
+    ensureSharedAudioContrastStyles();
     ensureMusicControlStyles();
 
     var musicContainers = document.querySelectorAll(
@@ -2002,6 +2162,15 @@
     root.style.setProperty("--inv-input-border", inputBorder);
     root.style.setProperty("--text-color", textOn60);
 
+    /* Tokens semánticos del reproductor 60/30/10 */
+    var playerMuted = is30Dark ? "rgba(250, 246, 238, 0.72)" : "rgba(36, 31, 26, 0.72)";
+    root.style.setProperty("--inv-player-bg", color30 || (is30Dark ? "#161715" : "#fdfbf7"));
+    root.style.setProperty("--inv-player-fg", textOn30 || (is30Dark ? "#faf6ee" : "#241f1a"));
+    root.style.setProperty("--inv-player-border", cardBorder);
+    root.style.setProperty("--inv-player-primary", color10 || "#d4b57a");
+    root.style.setProperty("--inv-player-primary-fg", onAccent || (is10Dark ? "#FFFFFF" : "#1A1714"));
+    root.style.setProperty("--inv-player-muted", playerMuted);
+
     var existingStyle = document.getElementById("invitta-visual-customization");
     if (existingStyle) existingStyle.remove();
 
@@ -2274,6 +2443,7 @@
 
     try { ensureDynamicCasingStyles(); } catch (e) {}
     try { ensureMusicControlStyles(); } catch (e) {}
+    try { ensureSharedAudioContrastStyles(); } catch (e) {}
     try { ensureRealStudioContrastStyles(); } catch (e) {}
     try { markRealStudioContrastSurfaces(); } catch (e) {}
     try { replaceText(document.body); } catch (e) {}
@@ -2321,6 +2491,7 @@
 
   ensureDynamicCasingStyles();
   ensureMusicControlStyles();
+  ensureSharedAudioContrastStyles();
   applyThemeHooks();
   applyTypographyScales(true);
   installClickBridge();
