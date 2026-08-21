@@ -1703,6 +1703,34 @@
       return /WHATSAPP/i.test(element.textContent || "");
     });
 
+    // Some native templates never included a WhatsApp action.  The public
+    // bridge owns this single fallback so every invitation offers the same
+    // confirmation route when an event has a confirmation number configured.
+    var visibleWhatsappActions = whatsappActions.filter(function (element) {
+      return !element.hidden && element.offsetParent !== null;
+    });
+    if (!visibleWhatsappActions.length && !document.querySelector("[data-invitta-generated-whatsapp]")) {
+      var rsvpSection = document.querySelector("section#rsvp, section[id*='rsvp'], section[id*='confirm']");
+      if (!rsvpSection) {
+        var rsvpTrigger = Array.from(document.querySelectorAll("a, button")).find(function (element) {
+          return /CONFIRMAR|RSVP/i.test(element.textContent || "") && element.closest("section");
+        });
+        rsvpSection = rsvpTrigger && rsvpTrigger.closest("section");
+      }
+
+      if (rsvpSection) {
+        var generatedAction = document.createElement("button");
+        generatedAction.type = "button";
+        generatedAction.textContent = "CONFIRMAR POR WHATSAPP";
+        generatedAction.dataset.invittaGeneratedWhatsapp = "true";
+        generatedAction.dataset.invittaPhone = phones[0];
+        generatedAction.setAttribute("aria-label", "Confirmar asistencia por WhatsApp");
+        var actionHost = rsvpSection.querySelector("form") || rsvpSection;
+        actionHost.appendChild(generatedAction);
+        whatsappActions.push(generatedAction);
+      }
+    }
+
     whatsappActions.forEach(function (element) {
       if (!element.dataset.invittaPhone) element.dataset.invittaPhone = phones[0];
     });
@@ -1717,6 +1745,35 @@
     secondary.setAttribute("aria-label", "Confirmar con el segundo contacto");
     secondary.textContent = "CONFIRMAR CON SEGUNDO CONTACTO";
     primary.insertAdjacentElement("afterend", secondary);
+  }
+
+  function ensureActionAccessibilityStyles() {
+    if (document.getElementById("invitta-action-accessibility")) return;
+    var style = document.createElement("style");
+    style.id = "invitta-action-accessibility";
+    style.textContent = [
+      "[data-invitta-primary-action]{background-color:var(--inv-30,#40362E)!important;border-color:var(--inv-10,#B99654)!important;color:var(--inv-60,#F7F0E7)!important;}",
+      "[data-invitta-primary-action] *{color:inherit!important;}",
+      "[data-invitta-primary-action]:hover,[data-invitta-primary-action]:focus-visible,[data-invitta-primary-action]:active,[data-invitta-primary-action][aria-pressed='true'],[data-invitta-primary-action][data-state='selected'],[data-invitta-primary-action].is-selected{background-color:var(--inv-30,#40362E)!important;border-color:var(--inv-10,#B99654)!important;color:var(--inv-60,#F7F0E7)!important;box-shadow:inset 0 0 0 2px var(--inv-10,#B99654);outline:2px solid var(--inv-10,#B99654)!important;outline-offset:3px;}",
+      "[data-invitta-primary-action]:hover *,[data-invitta-primary-action]:focus-visible *,[data-invitta-primary-action]:active *,[data-invitta-primary-action][aria-pressed='true'] *,[data-invitta-primary-action][data-state='selected'] *{color:inherit!important;}",
+      "[data-invitta-secondary-action]{background-color:transparent!important;border-color:var(--inv-10,#B99654)!important;color:var(--inv-30,#40362E)!important;}",
+      "[data-invitta-secondary-action]:hover,[data-invitta-secondary-action]:focus-visible,[data-invitta-secondary-action]:active,[data-invitta-secondary-action][aria-pressed='true'],[data-invitta-secondary-action][data-state='selected'],[data-invitta-secondary-action].is-selected{background-color:var(--inv-30,#40362E)!important;border-color:var(--inv-10,#B99654)!important;color:var(--inv-60,#F7F0E7)!important;box-shadow:inset 0 0 0 2px var(--inv-10,#B99654);outline:2px solid var(--inv-10,#B99654)!important;outline-offset:3px;}",
+      "[data-invitta-generated-whatsapp]{display:inline-flex!important;align-items:center!important;justify-content:center!important;margin-top:1rem!important;padding:.8rem 1.2rem!important;font:inherit!important;letter-spacing:.08em!important;}",
+      "section#rsvp input[type='radio'],section[id*='rsvp'] input[type='radio'],section[id*='confirm'] input[type='radio']{accent-color:var(--inv-10,#B99654)!important;}",
+      "section#rsvp input[type='radio']:focus-visible,section[id*='rsvp'] input[type='radio']:focus-visible,section[id*='confirm'] input[type='radio']:focus-visible{outline:2px solid var(--inv-10,#B99654)!important;outline-offset:3px;}"
+    ].join("");
+    document.head.appendChild(style);
+  }
+
+  function markAccessibleActions() {
+    Array.from(document.querySelectorAll("a, button, input[type='submit'], input[type='button']")).forEach(function (element) {
+      var label = (element.textContent || element.value || element.getAttribute("aria-label") || "").trim();
+      var isPrimary = /AGREGAR\s+AL\s+CALENDARIO|CONFIRMAR|WHATSAPP|ENVIAR\s+(?:CONFIRMACI[OÓ]N|RESPUESTA)|S[IÍ],?\s*ASISTIR|ACEPTAR/i.test(label) ||
+        (element.matches("form button[type='submit'], form input[type='submit']") && !/NO\s+ASISTIR|NO\s+PODR|DECLINAR|RECHAZAR/i.test(label));
+      var isSecondary = /NO\s+ASISTIR|NO\s+PODR|DECLINAR|RECHAZAR/i.test(label);
+      if (isPrimary) element.dataset.invittaPrimaryAction = "true";
+      if (isSecondary) element.dataset.invittaSecondaryAction = "true";
+    });
   }
 
   function confirmationMessage() {
@@ -1824,14 +1881,25 @@
     delete root.dataset.invittaPalette;
     if (!palette) return;
 
-    function luminance(hex) {
-      var cleanHex = hex.replace("#", "");
-      return ((parseInt(cleanHex.slice(0, 2), 16) * 299) +
-        (parseInt(cleanHex.slice(2, 4), 16) * 587) +
-        (parseInt(cleanHex.slice(4, 6), 16) * 114)) / 1000;
+    function contrastRatio(first, second) {
+      function channel(value) {
+        value = value / 255;
+        return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+      }
+      function luminance(hex) {
+        var cleanHex = hex.replace("#", "");
+        return (channel(parseInt(cleanHex.slice(0, 2), 16)) * 0.2126) +
+          (channel(parseInt(cleanHex.slice(2, 4), 16)) * 0.7152) +
+          (channel(parseInt(cleanHex.slice(4, 6), 16)) * 0.0722);
+      }
+      var one = luminance(first);
+      var two = luminance(second);
+      return (Math.max(one, two) + 0.05) / (Math.min(one, two) + 0.05);
     }
 
-    var accentText = luminance(palette.accent) < 145 ? palette.base : palette.support;
+    var accentText = contrastRatio(palette.base, palette.accent) >= contrastRatio(palette.support, palette.accent)
+      ? palette.base
+      : palette.support;
     root.dataset.invittaPalette = data.palettePreset;
     root.style.setProperty("--inv-60", palette.base);
     root.style.setProperty("--inv-30", palette.support);
@@ -2379,6 +2447,7 @@
     applying = true;
     ensureDynamicCasingStyles();
     ensureMusicControlStyles();
+    ensureActionAccessibilityStyles();
     replaceText(document.body);
     applyLocationContent();
     cleanRsvpMessageLabels();
@@ -2397,6 +2466,7 @@
     applyGuestData();
     applyVipAccessPass();
     applyConfirmationContacts();
+    markAccessibleActions();
     applyTypographyScales(false);
     hideLegacyGuestAdmin();
     restoreCanonicalNameCasing();
