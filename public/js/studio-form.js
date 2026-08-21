@@ -338,6 +338,11 @@ function serializeConfirmationNumbers(primary, secondary) {
     .join("|");
 }
 
+function isValidConfirmationPhone(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  return digits.length >= 10 && digits.length <= 15;
+}
+
 // ── RFC-032: Opciones de Regalo (Mesas de regalos y Datos bancarios) ──
 
 /**
@@ -2377,6 +2382,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     clearMediaError("photo");
     clearMediaError("music");
     clearMediaError("custom-font");
+
+    const publishInput = document.getElementById("published");
+    const rsvpEnabled = getSectionVisibilityControls().rsvp;
+    const confirmationPhoneInput = document.getElementById("whatsapp_number");
+    if (publishInput?.checked && rsvpEnabled && !isValidConfirmationPhone(confirmationPhoneInput?.value)) {
+      errorAlert.textContent = "Para publicar una invitación con RSVP, agrega un WhatsApp de confirmación válido (10 a 15 dígitos).";
+      errorAlert.style.display = "block";
+      confirmationPhoneInput?.setAttribute("aria-invalid", "true");
+      confirmationPhoneInput?.focus();
+      return;
+    }
+    confirmationPhoneInput?.removeAttribute("aria-invalid");
     setSavingState(true);
 
     updateWeddingNameFields();
