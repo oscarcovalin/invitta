@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-audio-contrast-20260821";
+  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "section-title-fix-20260821-2";
 
   var data = window.INVITATION_DATA;
   if (!data || !data.templateId) return;
@@ -75,6 +75,11 @@
 
     elementScales.forEach(function(scale, element) {
       if (typographyScaledElements.has(element)) return;
+      if (element.getAttribute("data-invitta-section-title") === "true" ||
+          element.hasAttribute("data-invitta-section-title") ||
+          (element.closest && element.closest("[data-invitta-section-title='true']"))) {
+        return;
+      }
       typographyOriginalFontSizes.set(element, {
         value: element.style.getPropertyValue("font-size"),
         priority: element.style.getPropertyPriority("font-size")
@@ -1054,31 +1059,87 @@
     }
   }
 
+  function findInnermostTextBearingElement(el, targetText) {
+    if (!el || !el.children) return null;
+    var normTarget = normalizeTextForLookup(targetText);
+    for (var i = 0; i < el.children.length; i++) {
+      var child = el.children[i];
+      if (child.matches && child.matches("svg, path, img, [data-invitta-accent]")) continue;
+      var childNorm = normalizeTextForLookup(child.textContent || "");
+      if (childNorm === normTarget && childNorm.length > 0) {
+        var deeper = findInnermostTextBearingElement(child, targetText);
+        return deeper || child;
+      }
+    }
+    return el;
+  }
+
+  function markKnownSectionTitleElement(el) {
+    if (!el || !el.textContent) return false;
+    if (el.matches && el.matches(".eyebrow, label, button, .button, .btn, .badge, .invitta-gallery-eyebrow, [data-invitta-font-role='label'], [data-invitta-font-role='body'], #music-player-bottom-bar, #music-player-bottom-bar *, #music-player-container, #music-player-container *, .music-player, .music-player *, #inv-music-player, #inv-music-player *, nav, nav *")) {
+      return false;
+    }
+
+    var text = (el.textContent || "").trim();
+    var key = normalizeTextForLookup(text);
+
+    if (SECTION_TITLE_COPY.hasOwnProperty(key)) {
+      var targetNode = findInnermostTextBearingElement(el, text) || el;
+      targetNode.setAttribute("data-invitta-section-title", "true");
+      targetNode.style.setProperty("text-transform", "none", "important");
+      targetNode.style.setProperty("font-size", "clamp(22px, 5.8vw, 30px)", "important");
+      targetNode.style.setProperty("line-height", "1.2", "important");
+      targetNode.style.setProperty("letter-spacing", "0", "important");
+      targetNode.style.setProperty("transform", "none", "important");
+      targetNode.style.setProperty("scale", "1", "important");
+      targetNode.style.setProperty("opacity", "1", "important");
+      applySectionTitleCopy(targetNode);
+      return true;
+    }
+
+    for (var i = 0; i < el.childNodes.length; i++) {
+      var node = el.childNodes[i];
+      if (node.nodeType === 3) {
+        var nodeRaw = (node.nodeValue || "").trim();
+        var nodeKey = normalizeTextForLookup(nodeRaw);
+        if (nodeKey && SECTION_TITLE_COPY.hasOwnProperty(nodeKey)) {
+          el.setAttribute("data-invitta-section-title", "true");
+          el.style.setProperty("text-transform", "none", "important");
+          el.style.setProperty("font-size", "clamp(22px, 5.8vw, 30px)", "important");
+          el.style.setProperty("line-height", "1.2", "important");
+          el.style.setProperty("letter-spacing", "0", "important");
+          el.style.setProperty("transform", "none", "important");
+          el.style.setProperty("scale", "1", "important");
+          el.style.setProperty("opacity", "1", "important");
+          applySectionTitleCopy(el);
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   function markSectionTitles() {
     if (!isRealStudioInvitation() || !document.body) return;
 
-    var sectionTitleSelectors = [
-      "[data-invitta-font-role='section-title']",
-      ".section-title h1, .section-title h2, .section-title h3, .section-title",
-      ".inv-section-title, .invitta-section-title, .invitta-gallery-title",
-      ".family-main-title, .family-role-title, .script-title",
-      "#family h2, #family h3, #honors h2, #honors h3",
-      "#locations h2, #details h2, #itinerary h2, .itinerary-section h2",
-      "#registry h2, .registry-title, #dress-code h2, .dress-code-title",
-      "#rsvp h2, .rsvp-title, #gifts h2, .gifts-title",
-      "#countdown h2, #countdown h3, #date h2, #date h3, #date-section h2, #date-section h3"
+    var candidateContainers = [
+      "#family", "#honors", "#locations", "#details", "#itinerary", ".itinerary-section",
+      "#registry", "#dress-code", "#rsvp", "#gifts", "#countdown", "#date", "#date-section",
+      ".section-title", ".inv-section-title", ".invitta-section-title", ".family-section"
     ];
 
-    sectionTitleSelectors.forEach(function (sel) {
-      safeQuerySelectorAll(sel).forEach(function (el) {
-        if (!el) return;
-        if (el.matches && el.matches(".eyebrow, label, button, .button, .btn, .badge, .invitta-gallery-eyebrow, [data-invitta-font-role='label'], [data-invitta-font-role='body'], #music-player-bottom-bar *, #music-player-container *, .music-player *, #inv-music-player *, nav, nav *")) {
-          return;
-        }
-        el.setAttribute("data-invitta-section-title", "true");
-        el.style.setProperty("text-transform", "none", "important");
-        applySectionTitleCopy(el);
+    candidateContainers.forEach(function (containerSel) {
+      safeQuerySelectorAll(containerSel).forEach(function (container) {
+        var elements = container.querySelectorAll("h1, h2, h3, h4, h5, h6, .family-role-title, .family-main-title, .script-title, .section-title, p, span, div");
+        elements.forEach(function (el) {
+          markKnownSectionTitleElement(el);
+        });
       });
+    });
+
+    safeQuerySelectorAll("[data-invitta-font-role='section-title'], .inv-section-title, .invitta-section-title, .invitta-gallery-title, .family-role-title").forEach(function (el) {
+      markKnownSectionTitleElement(el);
     });
   }
 
@@ -2481,6 +2542,7 @@
     try { applyGuestData(); } catch (e) {}
     try { applyVipAccessPass(); } catch (e) {}
     try { applyConfirmationContacts(); } catch (e) {}
+    try { markSectionTitles(); } catch (e) {}
     try { applyTypographyScales(false); } catch (e) {}
     try { markSectionTitles(); } catch (e) {}
     try { applyThemeHooks(); } catch (e) {}
