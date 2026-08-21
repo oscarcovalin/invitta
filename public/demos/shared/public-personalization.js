@@ -42,6 +42,13 @@
   }
 
   function applyTypographyScales(refresh) {
+    // Scales were calculated from computed styles and then written back as
+    // inline !important values. That freezes responsive editorial type, so
+    // native templates remain authoritative during visual recovery.
+    typographyScaledElements.forEach(restoreTypographyScale);
+    typographyScaledElements.clear();
+    return;
+
     // A scale of 1 must be a true no-op. Writing an inline !important value
     // even at 1x freezes the native hierarchy of a template (especially
     // editorial titles) and prevents its responsive CSS from working.
@@ -310,22 +317,18 @@
       if (!node.nodeValue || !node.nodeValue.trim()) continue;
       var parentName = node.parentElement ? node.parentElement.tagName : "";
       if (parentName === "SCRIPT" || parentName === "STYLE" || parentName === "TEXTAREA") continue;
-      var value = node.nodeValue;
-      var replaced = false;
+      // Demo names are also present in testimonials, guest examples and
+      // supporting copy. Only replace a complete, leaf editorial label;
+      // substring replacement turns those unrelated places into duplicates.
+      if (!node.parentElement || node.parentElement.children.length !== 0) continue;
+      var value = node.nodeValue.trim();
+      if (/^Hecho con amor para\s+(?:Mariana\s*&\s*Diego|Ana Camila\s*&\s*Carlos(?:\s+Zavala\s*&\s+Gonz[aá]lez)?|Ana Camila Zavala|Mary Carmen Arevalo)$/i.test(value)) {
+        value = "Hecho con amor para " + clean(data.celebrantName);
+      }
       replacements.forEach(function (pair) {
-        if (pair[2]) {
-          if (value.trim() === pair[0]) {
-            value = value.replace(pair[0], pair[1]);
-            replaced = true;
-          }
-          return;
-        }
-        if (value.indexOf(pair[0]) !== -1) {
-          value = value.split(pair[0]).join(pair[1]);
-          replaced = true;
-        }
+        if (value === pair[0]) value = pair[1];
       });
-      if (value !== node.nodeValue) {
+      if (value !== node.nodeValue.trim()) {
         node.nodeValue = value;
         if (node.parentElement) {
           node.parentElement.setAttribute("data-invitta-dynamic-text", "true");
@@ -357,6 +360,26 @@
       if (!kind) return;
       element.dataset.invittaFamilyTitle = kind;
       if (!element.dataset.invittaFontRole) element.dataset.invittaFontRole = "section-title";
+    });
+  }
+
+  function restoreCanonicalNameCasing() {
+    var name = clean(data.celebrantName);
+    if (!name) return;
+    var parts = isWedding
+      ? name.split(/\s*(?:&|\by\b)\s*/i).filter(Boolean)
+      : [name];
+    var canonical = [name].concat(parts);
+
+    Array.from(document.querySelectorAll("[data-invitta-dynamic-text]")).forEach(function(element) {
+      var visible = clean(element.textContent);
+      var match = canonical.find(function(candidate) {
+        return visible.toLocaleLowerCase() === candidate.toLocaleLowerCase();
+      });
+      if (match && visible !== match) element.textContent = match;
+      if (/^Hecho con amor para\b/i.test(visible) && visible.toLocaleLowerCase().indexOf(parts[0].toLocaleLowerCase()) !== -1) {
+        element.textContent = "Hecho con amor para " + name;
+      }
     });
   }
 
@@ -621,6 +644,31 @@
       });
       return;
     }
+
+    // Reuse the template's own slots. This retains each template's original
+    // composition, parallax, lightbox and responsive behavior instead of
+    // placing a generic Invitta grid over its gallery.
+    Array.from(document.images).forEach(function(img) {
+      var original = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
+      var index = getOriginalGalleryIndex(original);
+      // Some native lightboxes include the stock hero as their first gallery
+      // slide. It is still a gallery slot there, not the cover image.
+      if (index < 0 && isGalleryContainer(img) && isDemoHeroAsset(original)) index = 0;
+      if (index < 0) return;
+
+      var photoUrl = gallery[index % gallery.length];
+      if (!img.dataset.invittaOriginalSrc) img.dataset.invittaOriginalSrc = original;
+      img.dataset.invittaPersonalized = "true";
+      img.dataset.invittaPersonalizedSrc = photoUrl;
+      if (img.parentElement && img.parentElement.tagName.toLowerCase() === "picture") {
+        img.parentElement.querySelectorAll("source").forEach(function(sourceEl) {
+          sourceEl.srcset = photoUrl;
+        });
+      }
+      img.removeAttribute("srcset");
+      if (img.src !== photoUrl) img.src = photoUrl;
+    });
+    return;
 
     // Si no existe sección de galería en la plantilla y hay fotos reales, crear invitta-gallery-section
     if (gallerySections.length === 0 && gallery.length > 0) {
@@ -1398,6 +1446,15 @@
 
   function applyThemeHooks() {
     var root = document.documentElement;
+    var existingStyle = document.getElementById("invitta-visual-customization");
+    if (existingStyle) existingStyle.remove();
+
+    // Native CSS owns typography, contrast and palette during recovery.
+    // Generic font and color variables made unrelated templates share the
+    // same appearance and were the source of the lost editorial hierarchy.
+    delete root.dataset.invittaTheme;
+    return;
+
     var palettePresets = {
       champagne: {
         surface: "#F7F0E7",
@@ -1695,7 +1752,7 @@
     root.style.setProperty("--inv-input-border", inputBorder);
     root.style.setProperty("--text-color", textOn60);
 
-    var existingStyle = document.getElementById("invitta-visual-customization");
+    existingStyle = document.getElementById("invitta-visual-customization");
     if (existingStyle) existingStyle.remove();
 
     // Recovery rule: tokens are data, not a second stylesheet. The previous
@@ -1820,7 +1877,6 @@
     ensureDynamicCasingStyles();
     ensureMusicControlStyles();
     replaceText(document.body);
-    ensureFamilyTitleStyles();
     markFamilySectionTitles();
     applyHeroImage();
     applyGalleryImages();
@@ -1836,6 +1892,7 @@
     applyConfirmationContacts();
     applyTypographyScales(false);
     hideLegacyGuestAdmin();
+    restoreCanonicalNameCasing();
     applying = false;
   }
 
