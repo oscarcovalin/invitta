@@ -962,7 +962,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=casing-music-topbar-20260820";
+    bridge.src = "/demos/shared/public-personalization.js?v=recovery-native-visuals-20260821";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 
@@ -1591,104 +1591,6 @@ function renderDefaultTemplate(inv) {
     return musicArtist || musicTitle;
   }
 
-  function forceMusicPlayerStyles(player) {
-    if (!player) return;
-  
-    player.style.setProperty("position", "fixed", "important");
-    player.style.setProperty("left", "0", "important");
-    player.style.setProperty("right", "0", "important");
-    player.style.setProperty("bottom", "0", "important");
-    player.style.setProperty("z-index", "99999", "important");
-    player.style.setProperty("display", "flex", "important");
-    player.style.setProperty("align-items", "center", "important");
-    player.style.setProperty("justify-content", "space-between", "important");
-    player.style.setProperty("gap", "1rem", "important");
-    player.style.setProperty("min-height", "78px", "important");
-    player.style.setProperty("width", "100%", "important");
-    player.style.setProperty("box-sizing", "border-box", "important");
-    player.style.setProperty("padding", "0.8rem 1rem calc(0.8rem + env(safe-area-inset-bottom))", "important");
-    player.style.setProperty("background", "rgba(7, 7, 7, 0.97)", "important");
-    player.style.setProperty("color", "#fff", "important");
-    player.style.setProperty("box-shadow", "0 -14px 28px rgba(0,0,0,.28)", "important");
-  }
-  
-  function forceMusicPlayerChildStyles() {
-    const left = document.querySelector("#inv-music-player .inv-music-left");
-    const logo = document.querySelector("#inv-music-player .inv-music-logo");
-    const logoText = document.querySelector("#inv-music-player .inv-music-logo span");
-    const meta = document.querySelector("#inv-music-player .inv-music-meta");
-    const title = document.querySelector("#inv-music-title");
-    const artist = document.querySelector("#inv-music-artist");
-    const toggle = document.querySelector("#inv-music-toggle");
-  
-    if (left) {
-      left.style.setProperty("display", "flex", "important");
-      left.style.setProperty("align-items", "center", "important");
-      left.style.setProperty("gap", "0.85rem", "important");
-      left.style.setProperty("min-width", "0", "important");
-      left.style.setProperty("flex", "1", "important");
-    }
-  
-    if (logo) {
-      logo.style.setProperty("width", "56px", "important");
-      logo.style.setProperty("height", "56px", "important");
-      logo.style.setProperty("border-radius", "999px", "important");
-      logo.style.setProperty("border", "1px solid rgba(212, 181, 122, 0.65)", "important");
-      logo.style.setProperty("display", "grid", "important");
-      logo.style.setProperty("place-items", "center", "important");
-      logo.style.setProperty("color", "#d4b57a", "important");
-      logo.style.setProperty("flex", "0 0 auto", "important");
-      logo.style.setProperty("background", "rgba(255,255,255,0.03)", "important");
-    }
-  
-    if (logoText) {
-      logoText.style.setProperty("font-size", "1.35rem", "important");
-      logoText.style.setProperty("line-height", "1", "important");
-      logoText.style.setProperty("color", "#d4b57a", "important");
-    }
-  
-    if (meta) {
-      meta.style.setProperty("min-width", "0", "important");
-      meta.style.setProperty("text-align", "left", "important");
-    }
-  
-    if (title) {
-      title.style.setProperty("margin", "0", "important");
-      title.style.setProperty("color", "#fff", "important");
-      title.style.setProperty("font-size", "1rem", "important");
-      title.style.setProperty("line-height", "1.2", "important");
-      title.style.setProperty("white-space", "nowrap", "important");
-      title.style.setProperty("overflow", "hidden", "important");
-      title.style.setProperty("text-overflow", "ellipsis", "important");
-    }
-  
-    if (artist) {
-      artist.style.setProperty("display", "block", "important");
-      artist.style.setProperty("margin-top", "0.15rem", "important");
-      artist.style.setProperty("color", "rgba(255,255,255,0.82)", "important");
-      artist.style.setProperty("font-size", "0.82rem", "important");
-      artist.style.setProperty("line-height", "1.2", "important");
-      artist.style.setProperty("white-space", "nowrap", "important");
-      artist.style.setProperty("overflow", "hidden", "important");
-      artist.style.setProperty("text-overflow", "ellipsis", "important");
-    }
-  
-    if (toggle) {
-      toggle.style.setProperty("width", "58px", "important");
-      toggle.style.setProperty("height", "58px", "important");
-      toggle.style.setProperty("border", "none", "important");
-      toggle.style.setProperty("background", "transparent", "important");
-      toggle.style.setProperty("color", "#fff", "important");
-      toggle.style.setProperty("font-size", "2rem", "important");
-      toggle.style.setProperty("display", "grid", "important");
-      toggle.style.setProperty("place-items", "center", "important");
-      toggle.style.setProperty("cursor", "pointer", "important");
-      toggle.style.setProperty("flex", "0 0 auto", "important");
-      toggle.style.setProperty("padding", "0", "important");
-      toggle.style.setProperty("margin", "0", "important");
-    }
-  }
-
   function escapeHtml(unsafe) {
     return (unsafe || "").toString()
       .replace(/&/g, "&amp;")
@@ -1822,9 +1724,9 @@ function renderDefaultTemplate(inv) {
       document.body.appendChild(player);
     }
 
-    player.style.setProperty("display", "flex", "important");
-    forceMusicPlayerStyles(player);
-    forceMusicPlayerChildStyles();
+    // The generic invitation keeps its own stylesheet. Demo templates render
+    // inside their own document and must never inherit a forced black player.
+    player.style.display = "flex";
     
     const logoContainer = player.querySelector(".inv-music-logo, .inv-music-brand, .inv-music-brand-fallback");
     if (logoContainer) {

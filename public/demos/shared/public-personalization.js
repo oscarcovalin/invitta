@@ -42,6 +42,14 @@
   }
 
   function applyTypographyScales(refresh) {
+    // A scale of 1 must be a true no-op. Writing an inline !important value
+    // even at 1x freezes the native hierarchy of a template (especially
+    // editorial titles) and prevents its responsive CSS from working.
+    var hasOverrides = typographyRoleOrder.some(function(target) {
+      return Math.abs(typographyScaleFor(target) - 1) > 0.001;
+    });
+    if (!hasOverrides) return;
+
     if (refresh) {
       typographyScaledElements.forEach(restoreTypographyScale);
       typographyScaledElements.clear();
@@ -229,6 +237,11 @@
     var ceremony = data.ceremony || {};
     var reception = data.reception || {};
     var formats = dateFormats(data.eventDate);
+
+    // This bridge is only mounted by the public renderer. Keep replacement
+    // data-bound: template demo copy is never a source of public invitation
+    // data and an empty studio field must not revive a demo value.
+    if (!isRealStudioInvitation()) return list;
 
     (defaults.names || []).forEach(function (item) { addReplacement(list, item, name); });
     addHeroNameReplacements(list, name);
@@ -458,7 +471,10 @@
     } else {
       // En invitaciones reales sin foto principal: ocultar los placeholders demo de portada
       heroImages.forEach(function (img) {
-        img.style.setProperty("display", "none", "important");
+        var source = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
+        if (isDemoHeroAsset(source)) {
+          img.style.setProperty("display", "none", "important");
+        }
       });
 
       heroBgElements.forEach(function (el) {
@@ -1653,6 +1669,13 @@
 
     var existingStyle = document.getElementById("invitta-visual-customization");
     if (existingStyle) existingStyle.remove();
+
+    // Recovery rule: tokens are data, not a second stylesheet. The previous
+    // generic selectors recolored headers, body copy, cards, photos and music
+    // players across unrelated template DOMs. Native template CSS remains the
+    // single authority until a template-specific adapter opts into these tokens.
+    delete root.dataset.invittaTheme;
+    return;
 
     if (!palette && !data.titleColor && !data.bodyColor && !data.accentColor) return;
 
