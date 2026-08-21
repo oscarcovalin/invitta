@@ -425,6 +425,59 @@
     });
   }
 
+  function applyEditorialCoverMeta() {
+    var name = clean(data.celebrantName);
+    var formats = dateFormats(data.eventDate);
+    if (!name || !formats) return;
+
+    if (!document.getElementById("invitta-editorial-cover-meta")) {
+      var style = document.createElement("style");
+      style.id = "invitta-editorial-cover-meta";
+      style.textContent = [
+        "[data-invitta-editorial-event]{display:block!important;margin-bottom:clamp(.65rem,3vw,1.1rem)!important;color:var(--inv-10,currentColor)!important;font-family:var(--font-sans,Arial,sans-serif)!important;font-size:clamp(.58rem,2.4vw,.76rem)!important;font-weight:600!important;letter-spacing:.24em!important;line-height:1.35!important;text-transform:uppercase!important;}",
+        "[data-invitta-editorial-date]{display:block!important;margin-top:clamp(.7rem,3vw,1.15rem)!important;color:var(--inv-10,currentColor)!important;font-family:var(--font-sans,Arial,sans-serif)!important;font-size:clamp(.58rem,2.4vw,.76rem)!important;font-weight:600!important;letter-spacing:.2em!important;line-height:1.45!important;text-align:inherit!important;text-transform:uppercase!important;}"
+      ].join("\n");
+      document.head.appendChild(style);
+    }
+
+    var coverName = Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
+      return element.offsetParent !== null;
+    });
+    if (!coverName) return;
+    var hero = coverName.closest("#hero,#cover,#portada,#inv-hero,[class*='hero'],[class*='cover']") || coverName.parentElement;
+    if (!hero) return;
+
+    var eventTitle = clean(data.eventTitle).toLocaleLowerCase();
+    Array.from(hero.querySelectorAll("p,span,h1,h2,h3,h4")).forEach(function(element) {
+      if (element.children.length !== 0) return;
+      var value = clean(element.textContent).toLocaleLowerCase();
+      if (value && (value === eventTitle || /^(?:mis quince a[nñ]os|nuestra boda|xv aniversario)$/i.test(value))) {
+        element.dataset.invittaEditorialEvent = "true";
+        if (!element.dataset.invittaFontRole) element.dataset.invittaFontRole = "main-title";
+      }
+    });
+
+    var dateText = formats.dotted.toLocaleUpperCase("es-MX");
+    var existingDate = Array.from(hero.querySelectorAll("#event-date,.hero__date,.inv-hero-date,[data-invitta-event-date],[data-invitta-editorial-date]")).find(function(element) {
+      return element.offsetParent !== null;
+    });
+    if (existingDate) {
+      existingDate.textContent = dateText;
+      existingDate.dataset.invittaEditorialDate = "true";
+      if (!existingDate.dataset.invittaFontRole) existingDate.dataset.invittaFontRole = "label";
+      return;
+    }
+
+    // Some React templates omit a hero date entirely. Add only that missing
+    // datum directly after the real name; never duplicate an existing date.
+    var date = document.createElement("p");
+    date.className = "invitta-editorial-cover-date";
+    date.dataset.invittaEditorialDate = "true";
+    date.dataset.invittaFontRole = "label";
+    date.textContent = dateText;
+    coverName.insertAdjacentElement("afterend", date);
+  }
+
   function applyPlumNoirWeddingAdapter() {
     if (templateId !== "boda-midnight-gold-vip" || !isWedding) return;
     var couple = clean(data.celebrantName)
@@ -2585,6 +2638,7 @@
     restoreCanonicalNameCasing();
     applyPlumNoirWeddingAdapter();
     applyCoverNameSizing();
+    applyEditorialCoverMeta();
     applyTypographyScales(false);
     hideUnsupportedPlumNoirSamples();
     applyItineraryHeading();
