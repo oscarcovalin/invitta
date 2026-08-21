@@ -42,12 +42,11 @@
   }
 
   function applyTypographyScales(refresh) {
-    // Scales were calculated from computed styles and then written back as
-    // inline !important values. That freezes responsive editorial type, so
-    // native templates remain authoritative during visual recovery.
+    // A scale is only written when Studio has an explicit override. This
+    // preserves native responsive typography at 100%, while making the
+    // per-role size controls effective at 75–150%.
     typographyScaledElements.forEach(restoreTypographyScale);
     typographyScaledElements.clear();
-    return;
 
     // A scale of 1 must be a true no-op. Writing an inline !important value
     // even at 1x freezes the native hierarchy of a template (especially
@@ -2582,11 +2581,11 @@
     applyVipAccessPass();
     applyConfirmationContacts();
     markAccessibleActions();
-    applyTypographyScales(false);
     hideLegacyGuestAdmin();
     restoreCanonicalNameCasing();
     applyPlumNoirWeddingAdapter();
     applyCoverNameSizing();
+    applyTypographyScales(false);
     hideUnsupportedPlumNoirSamples();
     applyItineraryHeading();
     normalizeLocationHeading();
