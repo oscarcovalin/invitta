@@ -432,7 +432,18 @@
 
       <div id="studio-package-summary" class="studio-package-summary" aria-live="polite"></div>
 
-      <div class="form-row">
+      <div class="form-row" id="wedding-couple-fields" hidden>
+        <div class="form-group">
+          <label for="bride_name">Nombre de la novia</label>
+          <input type="text" id="bride_name" class="form-control" placeholder="Ej: Alicia García">
+        </div>
+        <div class="form-group">
+          <label for="groom_name">Nombre del novio</label>
+          <input type="text" id="groom_name" class="form-control" placeholder="Ej: Gonzalo Pérez">
+        </div>
+      </div>
+
+      <div class="form-row" id="honoree-name-field">
         <div class="form-group" style="width: 100%;">
           <label for="honoree_name">Nombre que aparecerá debajo del título</label>
           <input type="text" id="honoree_name" class="form-control" placeholder="Ej: Paola García">
@@ -447,6 +458,14 @@
         <div class="form-group">
           <label for="event_time">Hora del Evento</label>
           <input type="time" id="event_time" class="form-control">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="width: 100%;">
+          <label for="dress_code">Código de Vestimenta</label>
+          <input type="text" id="dress_code" class="form-control" placeholder="Ej: Formal, etiqueta, cóctel o casual elegante">
+          <p class="form-help">Solo se mostrará en las plantillas que incluyan esta sección.</p>
         </div>
       </div>
       
@@ -1151,13 +1170,9 @@
       </div>
 
       <div class="form-row">
-        <div class="form-group">
+        <div class="form-group" style="width: 100%;">
           <label for="instagram_hashtag">Hashtag de Instagram</label>
           <input type="text" id="instagram_hashtag" class="form-control" placeholder="#MisXVPaola">
-        </div>
-        <div class="form-group">
-          <label for="dress_code">Código de Vestimenta</label>
-          <input type="text" id="dress_code" class="form-control" placeholder="Formal / Etiqueta">
         </div>
       </div>
       <h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Cierre y agradecimiento</h2>

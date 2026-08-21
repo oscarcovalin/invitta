@@ -383,6 +383,61 @@
     });
   }
 
+  function applyPlumNoirWeddingAdapter() {
+    if (templateId !== "boda-midnight-gold-vip" || !isWedding) return;
+    var couple = clean(data.celebrantName)
+      .split(/\s*(?:&|\by\b)\s*/i)
+      .map(function(part) { return part.trim(); })
+      .filter(Boolean);
+    if (couple.length < 2) return;
+
+    // Midnight's source contains two hero name treatments. The compact one
+    // duplicates the large editorial treatment on mobile, so the adapter
+    // retains the latter and fills it from the two explicit wedding names.
+    Array.from(document.querySelectorAll("h2")).forEach(function(heading) {
+      if (/font-serif/.test(heading.className || "") && /text-2xl|text-3xl/.test(heading.className || "")) {
+        var text = clean(heading.textContent);
+        if (/^(?:Ana Camila\s*&\s*Carlos|Alicia\s+(?:&|y)\s+Gonzalo)$/i.test(text)) {
+          heading.style.setProperty("display", "none", "important");
+        }
+      }
+    });
+
+    var editorialHeading = document.querySelector("h2.font-display");
+    if (!editorialHeading) return;
+    var pieces = Array.from(editorialHeading.querySelectorAll("span"));
+    if (pieces[0]) pieces[0].textContent = couple[0];
+    if (pieces[1]) pieces[1].textContent = "& " + couple[1];
+    if (pieces[2]) {
+      pieces[2].textContent = "";
+      pieces[2].style.setProperty("display", "none", "important");
+    }
+  }
+
+  function hideSectionWithHeading(headingText) {
+    var heading = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, span, p")).find(function (element) {
+      return clean(element.textContent) === headingText;
+    });
+    var section = heading && heading.closest("section");
+    if (section) section.style.setProperty("display", "none", "important");
+  }
+
+  function hideUnsupportedPlumNoirSamples() {
+    if (templateId !== "boda-midnight-gold-vip") return;
+
+    // These modules ship with static demonstration records. Invitta has no
+    // persisted data model for collaborative albums or lodging yet, therefore
+    // they must not be published as event content.
+    hideSectionWithHeading("Álbum Colaborativo");
+    hideSectionWithHeading("Sugerencias de Hospedaje");
+
+    // The agenda is configurable in Studio. Without entries, avoid showing
+    // the template's fictional schedule.
+    if (!Array.isArray(data.itinerary) || data.itinerary.length === 0) {
+      hideSectionWithHeading("PROGRAMACIÓN");
+    }
+  }
+
   function isPhotoUrl(url) {
     return /\.(?:png|jpe?g|webp)(?:\?|$)/i.test(url || "") && !/(logo|icon|qr|section_bg|wedding_bg)/i.test(url || "");
   }
@@ -551,7 +606,14 @@
       if (isGalleryContainer(img)) return;
       var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
       if (isDemoGalleryAsset(src)) {
-        img.style.setProperty("display", "none", "important");
+        // Hiding only the image leaves a framed, empty rectangle behind.
+        // Hide the standalone editorial media block with it.
+        var wrapper = img.closest(".cursor-zoom-in, .cursor-pointer, figure, .group, [class*='gallery-item']");
+        if (wrapper && wrapper !== document.body) {
+          wrapper.style.setProperty("display", "none", "important");
+        } else {
+          img.style.setProperty("display", "none", "important");
+        }
       }
     });
   }
@@ -651,12 +713,25 @@
     Array.from(document.images).forEach(function(img) {
       var original = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
       var index = getOriginalGalleryIndex(original);
+      var gallerySlot = img.closest(".cursor-zoom-in, [class*='gallery-item'], figure, li");
+      var belongsToGallery = Boolean(img.closest("#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i]"));
+
       // Some native lightboxes include the stock hero as their first gallery
-      // slide. It is still a gallery slot there, not the cover image.
-      if (index < 0 && isGalleryContainer(img) && isDemoHeroAsset(original)) index = 0;
+      // slide. It must not become an additional gallery photograph.
+      if (index < 0 && belongsToGallery && isDemoHeroAsset(original)) {
+        if (gallerySlot) gallerySlot.style.setProperty("display", "none", "important");
+        return;
+      }
       if (index < 0) return;
 
-      var photoUrl = gallery[index % gallery.length];
+      // A native demo may have more slots than the client purchased or
+      // uploaded. Hide the surplus slots instead of cycling their photos.
+      if (belongsToGallery && index >= gallery.length) {
+        if (gallerySlot) gallerySlot.style.setProperty("display", "none", "important");
+        return;
+      }
+
+      var photoUrl = gallery[index];
       if (!img.dataset.invittaOriginalSrc) img.dataset.invittaOriginalSrc = original;
       img.dataset.invittaPersonalized = "true";
       img.dataset.invittaPersonalizedSrc = photoUrl;
@@ -898,6 +973,24 @@
         }
       });
     });
+  }
+
+  // A dress-code section belongs to the template.  Do not leave the template's
+  // sample "FORMAL" content visible when the host has not supplied one.
+  function applyDressCode() {
+    var dressCode = clean(data.dressCode);
+    var title = Array.from(document.querySelectorAll("span, p, h1, h2, h3, h4, h5, h6")).find(function (element) {
+      return /C[ÓO]DIGO DE VESTIMENTA/i.test(clean(element.textContent));
+    });
+    if (!title) return;
+
+    var section = title.closest("section");
+    if (!dressCode) {
+      if (section) section.style.setProperty("display", "none", "important");
+      return;
+    }
+
+    if (section) section.style.removeProperty("display");
   }
 
   function applyLinks() {
@@ -1885,6 +1978,7 @@
     applyCustomBackground(data);
     applyAudio();
     applyOptionalContent();
+    applyDressCode();
     applyGiftOptions();
     applyLinks();
     applyGuestData();
@@ -1893,6 +1987,8 @@
     applyTypographyScales(false);
     hideLegacyGuestAdmin();
     restoreCanonicalNameCasing();
+    applyPlumNoirWeddingAdapter();
+    hideUnsupportedPlumNoirSamples();
     applying = false;
   }
 

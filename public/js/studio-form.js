@@ -136,6 +136,36 @@ function splitLegacyXvHeading(title, honoreeName, eventType) {
   return { title: eventTitle || "Mis XV Años", honoree };
 }
 
+function splitWeddingCoupleName(value) {
+  const parts = String(value || "")
+    .split(/\s*(?:&|\by\b)\s*/i)
+    .map(part => part.trim())
+    .filter(Boolean);
+  return { bride: parts[0] || "", groom: parts.slice(1).join(" ") || "" };
+}
+
+function getWeddingCoupleName() {
+  const bride = document.getElementById("bride_name")?.value.trim() || "";
+  const groom = document.getElementById("groom_name")?.value.trim() || "";
+  return [bride, groom].filter(Boolean).join(" & ");
+}
+
+function updateWeddingNameFields() {
+  const isWedding = document.getElementById("event_type")?.value === "boda";
+  const coupleFields = document.getElementById("wedding-couple-fields");
+  const legacyField = document.getElementById("honoree-name-field");
+  const bride = document.getElementById("bride_name");
+  const groom = document.getElementById("groom_name");
+  const combined = document.getElementById("honoree_name");
+
+  if (coupleFields) coupleFields.hidden = !isWedding;
+  if (legacyField) legacyField.hidden = isWedding;
+  if (bride) bride.required = isWedding;
+  if (groom) groom.required = isWedding;
+
+  if (isWedding && combined) combined.value = getWeddingCoupleName();
+}
+
 function updateTemplateOptions(options = { preserveLegacyNull: false, preferredTemplateId: null }) {
   const eventType = document.getElementById("event_type").value;
   const templateSelect = document.getElementById("template_id");
@@ -191,6 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
     et.addEventListener("change", () => {
       // El usuario cambió explícitamente el tipo de evento
       updateTemplateOptions({ preserveLegacyNull: false });
+      updateWeddingNameFields();
     });
   }
 
@@ -1165,6 +1196,15 @@ function setupStudioVisualPreview() {
     .filter(Boolean)
     .forEach(input => input.addEventListener("input", updatePreview));
 
+  ["bride_name", "groom_name"]
+    .map(id => document.getElementById(id))
+    .filter(Boolean)
+    .forEach(input => input.addEventListener("input", () => {
+      const combined = document.getElementById("honoree_name");
+      if (combined) combined.value = getWeddingCoupleName();
+      updatePreview();
+    }));
+
   document.getElementById("event_type")?.addEventListener("change", updatePreview);
   updatePreview();
 }
@@ -1615,6 +1655,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     form.style.display = "block";
   }
 
+  updateWeddingNameFields();
   setupStudioVisualPreview();
   setupGiftOptionListeners();
 
@@ -2105,6 +2146,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         preferredTemplateId: originalTemplateId 
     });
     document.getElementById("honoree_name").value = heroFields.honoree;
+    const savedCouple = splitWeddingCoupleName(heroFields.honoree);
+    const brideName = document.getElementById("bride_name");
+    const groomName = document.getElementById("groom_name");
+    if (brideName) brideName.value = savedCouple.bride;
+    if (groomName) groomName.value = savedCouple.groom;
+    updateWeddingNameFields();
     document.getElementById("event_date").value = data.event_date || "";
     document.getElementById("event_time").value = data.event_time || "";
     document.getElementById("welcome_text").value = data.welcome_text || "";
@@ -2298,6 +2345,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     clearMediaError("music");
     clearMediaError("custom-font");
     setSavingState(true);
+
+    updateWeddingNameFields();
 
     const slugInput = document.getElementById("slug");
     const slugToUse = normalizeSlug(slugInput.value || currentSlug);
