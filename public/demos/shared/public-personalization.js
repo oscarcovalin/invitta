@@ -481,9 +481,8 @@
   function isHeroMedia(element) {
     if (!element || !element.closest) return false;
     return Boolean(element.closest(
-      "#hero, [id*='hero' i], [id*='cover' i], [id*='portada' i], " +
-      "[class*='hero' i], [class*='cover' i], [class*='portada' i], " +
-      ".hero, .cover, .inv-hero, #inv-hero, [data-hero-img], [data-hero-bg]"
+      "#hero, #cover, #portada, #inv-hero, .hero, .cover, .portada, " +
+      ".inv-hero, .inv-hero-bg, [data-hero-img], [data-hero-bg]"
     ));
   }
 
@@ -764,6 +763,12 @@
         return;
       }
       if (index < 0) return;
+
+      // Several templates reuse gallery assets as decorative backgrounds in
+      // countdowns and editorial sections. They are not gallery slots: never
+      // inject an uploaded event photo there, otherwise the same image leaks
+      // into unrelated sections and appears duplicated.
+      if (!belongsToGallery) return;
 
       // A native demo may have more slots than the client purchased or
       // uploaded. Hide the surplus slots instead of cycling their photos.
