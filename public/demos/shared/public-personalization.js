@@ -335,6 +335,31 @@
     }
   }
 
+  function ensureFamilyTitleStyles() {
+    if (document.getElementById("invitta-family-title-styles")) return;
+    var style = document.createElement("style");
+    style.id = "invitta-family-title-styles";
+    style.textContent = [
+      "[data-invitta-family-title] { display:block; margin-bottom:0.85rem; font-family:var(--font-sans, Arial, sans-serif) !important; font-size:clamp(10px, 2.4vw, 12px) !important; font-weight:600 !important; letter-spacing:0.28em !important; line-height:1.45 !important; text-transform:uppercase !important; }"
+    ].join("\\n");
+    document.head.appendChild(style);
+  }
+
+  function markFamilySectionTitles() {
+    Array.from(document.querySelectorAll("h1,h2,h3,h4,h5,h6,p,.section-title,.inv-section-title")).forEach(function(element) {
+      var label = clean(element.textContent).replace(/\\s+/g, " ");
+      var kind = "";
+      if (/^(?:padres(?: del| de la| de los)?|con la bendici[oó]n de nuestras familias)/i.test(label)) {
+        kind = "parents";
+      } else if (/^(?:nuestros? )?padrinos(?: de honor)?$/i.test(label)) {
+        kind = "godparents";
+      }
+      if (!kind) return;
+      element.dataset.invittaFamilyTitle = kind;
+      if (!element.dataset.invittaFontRole) element.dataset.invittaFontRole = "section-title";
+    });
+  }
+
   function isPhotoUrl(url) {
     return /\.(?:png|jpe?g|webp)(?:\?|$)/i.test(url || "") && !/(logo|icon|qr|section_bg|wedding_bg)/i.test(url || "");
   }
@@ -653,7 +678,10 @@
       if (!grid) {
         grid = document.createElement("div");
         grid.className = "invitta-gallery-grid";
-        var inner = sec.querySelector(".section__inner, .max-w-4xl, .max-w-5xl, .max-w-6xl, .max-w-[1500px], .max-w-[1600px], .container, .space-y-16") || sec;
+        // Tailwind arbitrary-value class names contain brackets, which must be
+        // escaped in querySelector. An invalid selector here aborted the whole
+        // personalization pass and left the native demo copy and media intact.
+        var inner = sec.querySelector(".section__inner, .max-w-4xl, .max-w-5xl, .max-w-6xl, .max-w-\\[1500px\\], .max-w-\\[1600px\\], .container, .space-y-16") || sec;
         inner.appendChild(grid);
       }
 
@@ -1792,6 +1820,8 @@
     ensureDynamicCasingStyles();
     ensureMusicControlStyles();
     replaceText(document.body);
+    ensureFamilyTitleStyles();
+    markFamilySectionTitles();
     applyHeroImage();
     applyGalleryImages();
     applyInternalEditorialImages();
