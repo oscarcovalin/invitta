@@ -2365,7 +2365,11 @@
       "html[data-invitta-palette] #music-player .music-player__track span,html[data-invitta-palette] #music-player .music-player__toggle{color:var(--inv-10)!important;}",
       "html[data-invitta-palette] #music-player .music-player__track strong,html[data-invitta-palette] #music-player .music-player__track small{color:var(--inv-30)!important;}",
       "html[data-invitta-palette] #music-player .music-player__toggle{border-color:var(--inv-10)!important;}",
-      "[data-invitta-dress-code-title]{font-size:clamp(2.25rem,10vw,4.25rem)!important;font-weight:400!important;letter-spacing:-.045em!important;line-height:.92!important;max-width:10ch!important;margin-left:auto!important;margin-right:auto!important;text-wrap:balance!important;}"
+      "html[data-invitta-palette] #countdown{background-color:var(--inv-60)!important;color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #countdown h1,html[data-invitta-palette] #countdown h2,html[data-invitta-palette] #countdown h3,html[data-invitta-palette] #countdown h4,html[data-invitta-palette] #countdown p,html[data-invitta-palette] #countdown span{color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #countdown [class*='text-sage']{color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #countdown [class*='bg-sage']{background-color:var(--inv-10)!important;}",
+      "[data-invitta-dress-code-title]{font-size:clamp(1.75rem,8vw,3.25rem)!important;font-weight:400!important;letter-spacing:-.045em!important;line-height:1!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important;white-space:nowrap!important;text-wrap:nowrap!important;}"
     ].join("");
     document.head.appendChild(style);
   }
