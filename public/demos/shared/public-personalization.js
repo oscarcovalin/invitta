@@ -991,6 +991,74 @@
     }
 
     if (section) section.style.removeProperty("display");
+    if (!section) return;
+
+    // The heading and its supporting copy retain their template classes. This
+    // changes content only, preserving each template's editorial typography.
+    var heading = section.querySelector("h1, h2, h3, h4, h5, h6");
+    if (heading && heading.children.length === 0) {
+      heading.textContent = dressCode;
+      heading.setAttribute("data-invitta-dynamic-text", "true");
+      heading.style.setProperty("text-transform", "none", "important");
+    }
+
+    var leaves = Array.from(section.querySelectorAll("p, span, div")).filter(function (element) {
+      return element.children.length === 0;
+    });
+    var detail = leaves.find(function (element) {
+      return /^(?:traje|vestido|etiqueta|c[oó]ctel|cocktail)/i.test(clean(element.textContent));
+    });
+    var childrenMessage = leaves.find(function (element) {
+      var value = clean(element.textContent);
+      return /(niñ|n[ií]ñ|j[oó]venes|adultos)/i.test(value) && /(agradecemos|comprensi[oó]n|dedicado|evento)/i.test(value);
+    });
+    var childrenBadge = leaves.find(function (element) {
+      return /^(?:✦\s*)?(?:evento\s+sin\s+niñ[oa]s|solo\s+adultos|no\s+niñ[oa]s)$/i.test(clean(element.textContent));
+    });
+    var detailsCopy = clean(data.dressCodeDetails);
+    var childrenNote = clean(data.childrenNote);
+    var childrenLabel = clean(data.childrenLabel);
+
+    if (detail) {
+      if (detailsCopy) {
+        detail.textContent = detailsCopy;
+        detail.setAttribute("data-invitta-dynamic-text", "true");
+        detail.style.setProperty("text-transform", "none", "important");
+        detail.style.removeProperty("display");
+      } else {
+        detail.style.setProperty("display", "none", "important");
+      }
+    }
+
+    if (childrenMessage) {
+      if (childrenNote) {
+        childrenMessage.textContent = childrenNote;
+        childrenMessage.setAttribute("data-invitta-dynamic-text", "true");
+        childrenMessage.style.setProperty("text-transform", "none", "important");
+        childrenMessage.style.removeProperty("display");
+      } else {
+        childrenMessage.style.setProperty("display", "none", "important");
+      }
+    }
+
+    if (childrenBadge) {
+      var badgeContainer = childrenBadge.parentElement;
+      if (childrenLabel) {
+        childrenBadge.textContent = childrenLabel;
+        childrenBadge.setAttribute("data-invitta-dynamic-text", "true");
+        childrenBadge.style.setProperty("text-transform", "none", "important");
+        if (badgeContainer) badgeContainer.style.removeProperty("display");
+      } else if (badgeContainer) {
+        badgeContainer.style.setProperty("display", "none", "important");
+      }
+    }
+
+    // When both optional children messages are absent, hide their shared
+    // container so a decorative border or blank vertical gap cannot remain.
+    if (!childrenNote && !childrenLabel && (childrenMessage || childrenBadge)) {
+      var supportingCopy = (childrenMessage || childrenBadge).parentElement;
+      if (supportingCopy) supportingCopy.style.setProperty("display", "none", "important");
+    }
   }
 
   function applyLinks() {

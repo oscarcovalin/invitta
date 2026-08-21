@@ -2218,6 +2218,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("reception_map_url").value = data.reception_map_url || "";
     loadGiftOptions(data);
     document.getElementById("dress_code").value = data.dress_code || "";
+    document.getElementById("dress_code_details").value = data.dress_code_details || "";
+    document.getElementById("children_note").value = data.children_note || "";
+    document.getElementById("children_label").value = data.children_label || "";
     const confirmationNumbers = parseConfirmationNumbers(data.whatsapp_number);
     document.getElementById("whatsapp_number").value = confirmationNumbers[0] || "";
     document.getElementById("whatsapp_number_secondary").value = confirmationNumbers[1] || "";
@@ -2608,6 +2611,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       gift_options: finalGiftOptions,
       gift_table_url: legacyGiftTableUrl,
       dress_code: document.getElementById("dress_code").value,
+      dress_code_details: document.getElementById("dress_code_details").value || null,
+      children_note: document.getElementById("children_note").value || null,
+      children_label: document.getElementById("children_label").value || null,
       whatsapp_number: serializeConfirmationNumbers(
         document.getElementById("whatsapp_number").value,
         document.getElementById("whatsapp_number_secondary").value

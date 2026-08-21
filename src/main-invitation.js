@@ -837,6 +837,9 @@ function buildPublicTemplateData(inv, template) {
         musicTitle: cleanString(inv.music_title, 120),
         musicArtist: cleanString(inv.music_artist, 120),
         dressCode: cleanString(inv.dress_code, 120),
+        dressCodeDetails: cleanString(inv.dress_code_details, 280),
+        childrenNote: cleanString(inv.children_note, 500),
+        childrenLabel: cleanString(inv.children_label, 120),
         giftOptions: giftOptions,
         giftTableUrl: giftTableUrl,
         instagramHashtag: cleanString(inv.instagram_hashtag, 120),
@@ -962,7 +965,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=recovery-native-visuals-20260821";
+    bridge.src = "/demos/shared/public-personalization.js?v=dress-copy-20260821";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 
