@@ -383,6 +383,45 @@
     });
   }
 
+  function applyCoverNameSizing() {
+    if (!clean(data.celebrantName)) return;
+    if (!document.getElementById("invitta-cover-name-sizing")) {
+      var style = document.createElement("style");
+      style.id = "invitta-cover-name-sizing";
+      style.textContent = [
+        "[data-invitta-cover-name-size]{font-size:clamp(2.8rem,13vw,6rem)!important;line-height:.92!important;letter-spacing:clamp(-.055em,-.02em,-.012em)!important;max-inline-size:calc(100vw - 2rem)!important;margin-inline:auto!important;overflow-wrap:anywhere!important;text-wrap:balance!important;}",
+        "[data-invitta-cover-name-size] [data-invitta-cover-name-size]{font-size:inherit!important;line-height:inherit!important;letter-spacing:inherit!important;}",
+        "@media(min-width:768px){[data-invitta-cover-name-size]{font-size:clamp(3.75rem,7.5vw,7.25rem)!important;max-inline-size:min(92vw,960px)!important;}}"
+      ].join("");
+      document.head.appendChild(style);
+    }
+
+    var fullName = clean(data.celebrantName);
+    var nameParts = isWedding
+      ? fullName.split(/\s*(?:&|\by\b)\s*/i).filter(Boolean)
+      : [fullName];
+    var structuralSelector = [
+      ".hero__name", "#celebrant-name", ".inv-hero-name", ".couple-names", ".couple-name", ".honoree-name",
+      "[data-invitta-font-role='cover-name']", "[data-invitta-font-role='name']"
+    ].join(",");
+
+    document.querySelectorAll(structuralSelector).forEach(function(element) {
+      element.dataset.invittaCoverNameSize = "true";
+    });
+
+    // A few React-based templates provide no stable class for the hero name.
+    // Match only an exact celebrant/couple name in a display heading, so names
+    // in parents, RSVP or the closing never inherit the cover scale.
+    Array.from(document.querySelectorAll("h1,h2,h3,span")).forEach(function(element) {
+      var visible = clean(element.textContent);
+      var isExactFullName = visible.toLocaleLowerCase() === fullName.toLocaleLowerCase();
+      var isHeroNamePart = nameParts.some(function(part) {
+        return visible.toLocaleLowerCase() === clean(part).toLocaleLowerCase();
+      }) && (element.tagName !== "SPAN" || element.closest("#hero,#cover,#portada,#inv-hero,[class*='hero'],[class*='cover']"));
+      if (isExactFullName || isHeroNamePart) element.dataset.invittaCoverNameSize = "true";
+    });
+  }
+
   function applyPlumNoirWeddingAdapter() {
     if (templateId !== "boda-midnight-gold-vip" || !isWedding) return;
     var couple = clean(data.celebrantName)
@@ -2480,6 +2519,7 @@
     hideLegacyGuestAdmin();
     restoreCanonicalNameCasing();
     applyPlumNoirWeddingAdapter();
+    applyCoverNameSizing();
     hideUnsupportedPlumNoirSamples();
     applyItineraryHeading();
     normalizeLocationHeading();
