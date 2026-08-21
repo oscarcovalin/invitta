@@ -575,7 +575,47 @@
       ".invitta-gallery-item { position: relative; overflow: hidden; border-radius: 10px; margin: 0; padding: 0; background: var(--inv-30, rgba(0,0,0,0.05)); aspect-ratio: 4 / 5; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }",
       ".invitta-gallery-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); }",
       ".invitta-gallery-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }",
-      ".invitta-gallery-item:hover .invitta-gallery-img { transform: scale(1.04); }"
+      ".invitta-gallery-item:hover .invitta-gallery-img { transform: scale(1.04); }",
+      "",
+      "/* Rose Champagne Safe Grid & Real Studio Gallery Safety Styles */",
+      "html[data-invitta-real-studio=\"true\"] #invitta-gallery-section[data-invitta-gallery-layout=\"safe-grid\"] {",
+      "  position: relative !important;",
+      "  inset: auto !important;",
+      "  transform: none !important;",
+      "  width: 100% !important;",
+      "  height: auto !important;",
+      "  overflow: visible !important;",
+      "  z-index: auto !important;",
+      "  padding: 32px 18px;",
+      "  box-sizing: border-box;",
+      "}",
+      "html[data-invitta-real-studio=\"true\"] #invitta-gallery-section .invitta-gallery-grid {",
+      "  position: relative !important;",
+      "  display: grid !important;",
+      "  grid-template-columns: repeat(2, minmax(0,1fr));",
+      "  gap: 12px;",
+      "  width: 100%;",
+      "}",
+      "html[data-invitta-real-studio=\"true\"] #invitta-gallery-section .invitta-gallery-grid[data-count='1'] {",
+      "  grid-template-columns: minmax(0, 1fr) !important;",
+      "  max-width: 440px;",
+      "  margin: 0 auto;",
+      "}",
+      "html[data-invitta-real-studio=\"true\"] #invitta-gallery-section .invitta-gallery-item {",
+      "  position: relative !important;",
+      "  inset: auto !important;",
+      "  transform: none !important;",
+      "  width: 100% !important;",
+      "  height: auto !important;",
+      "  aspect-ratio: 4 / 5;",
+      "}",
+      "html[data-invitta-real-studio=\"true\"] #invitta-gallery-section .invitta-gallery-img {",
+      "  position: static !important;",
+      "  width: 100% !important;",
+      "  height: 100% !important;",
+      "  object-fit: cover;",
+      "  transform: none !important;",
+      "}"
     ].join("\n");
     document.head.appendChild(style);
   }
@@ -604,6 +644,94 @@
     document.body.appendChild(overlay);
   }
 
+  function findReceptionSection() {
+    var selectors = [
+      "#reception",
+      "#recepcion",
+      "#venue",
+      "#salon",
+      "#salón",
+      ".inv-reception-section",
+      "[data-section='reception']",
+      "[data-invitta-section='reception']",
+      "[data-invitta-section='locations']",
+      "section#locations",
+      "#locations",
+      "section#details",
+      "#details"
+    ];
+    for (var i = 0; i < selectors.length; i++) {
+      var el = safeQuerySelector(selectors[i]);
+      if (el && el.parentElement && !el.closest("#invitta-gallery-section, [data-invitta-owned-gallery='true'], #hero, #family, #honors, #countdown, #rsvp, footer")) {
+        return el;
+      }
+    }
+    return null;
+  }
+
+  function placeGallerySection(gallerySection) {
+    if (!gallerySection) return;
+
+    var reception = findReceptionSection();
+    if (reception && reception.parentElement) {
+      if (reception.nextElementSibling !== gallerySection) {
+        reception.insertAdjacentElement("afterend", gallerySection);
+      }
+      return;
+    }
+
+    // Fallback 1: después de ceremonia si existe
+    var ceremony = safeQuerySelector("section#ceremony, section#ceremonia, #ceremony, #ceremonia, .inv-ceremony-section, [data-section='ceremony']");
+    if (ceremony && ceremony.parentElement && !ceremony.closest("#invitta-gallery-section")) {
+      if (ceremony.nextElementSibling !== gallerySection) {
+        ceremony.insertAdjacentElement("afterend", gallerySection);
+      }
+      return;
+    }
+
+    // Fallback 2: antes de dress code
+    var dressCode = safeQuerySelector("#dress-code, #dresscode, .dress-code, [id*='dress-code'], [id*='dresscode']");
+    if (dressCode && dressCode.parentElement && !dressCode.closest("#invitta-gallery-section")) {
+      if (dressCode.previousElementSibling !== gallerySection) {
+        dressCode.parentElement.insertBefore(gallerySection, dressCode);
+      }
+      return;
+    }
+
+    // Fallback 3: antes de RSVP / confirmación
+    var rsvp = safeQuerySelector("#rsvp, #confirm, [id*='rsvp'], [id*='confirm']");
+    if (rsvp && rsvp.parentElement && !rsvp.closest("#invitta-gallery-section")) {
+      if (rsvp.previousElementSibling !== gallerySection) {
+        rsvp.parentElement.insertBefore(gallerySection, rsvp);
+      }
+      return;
+    }
+
+    // Fallback 4: antes del pase
+    var pass = safeQuerySelector("[data-invitta-vip-access], #personalized-pass, [id*='pass'], [id*='pase']");
+    if (pass && pass.parentElement && !pass.closest("#invitta-gallery-section")) {
+      if (pass.previousElementSibling !== gallerySection) {
+        pass.parentElement.insertBefore(gallerySection, pass);
+      }
+      return;
+    }
+
+    // Fallback 5: antes del footer
+    var footer = safeQuerySelector("footer, [id*='footer']");
+    if (footer && footer.parentElement && !footer.closest("#invitta-gallery-section")) {
+      if (footer.previousElementSibling !== gallerySection) {
+        footer.parentElement.insertBefore(gallerySection, footer);
+      }
+      return;
+    }
+
+    // Fallback 6: final de main/body
+    var target = safeQuerySelector("#inv-content, main, .main-content, #root > div") || document.body;
+    if (target && target.lastElementChild !== gallerySection) {
+      target.appendChild(gallerySection);
+    }
+  }
+
   function applyGalleryImages() {
     if (!isRealStudioInvitation()) return;
 
@@ -627,10 +755,15 @@
     var maxGalleryCount = isPremium ? 10 : 4;
     gallery = gallery.slice(0, maxGalleryCount);
 
-    // Ocultar galerías demo de la plantilla
+    var isRoseChampagne = templateId === "xv-rose-gold-premium" ||
+                          rendererTemplateId === "xv-rose-gold-premium" ||
+                          templateId === "rose-champagne";
+
+    // Ocultar galerías y collages demo de la plantilla
     var demoGallerySections = safeQuerySelectorAll(
       "#gallery, [id='gallery']:not([data-invitta-owned-gallery]), [id='galeria'], [id='galería'], " +
-      ".inv-moments-section, .inv-gallery-section:not([data-invitta-owned-gallery]), #inv-gallery-section:not([data-invitta-owned-gallery])"
+      ".inv-moments-section, .inv-gallery-section:not([data-invitta-owned-gallery]), #inv-gallery-section:not([data-invitta-owned-gallery]), " +
+      "#photo-grid:not([data-invitta-owned-gallery])"
     );
     demoGallerySections.forEach(function (sec) {
       sec.style.setProperty("display", "none", "important");
@@ -684,14 +817,14 @@
       inner.appendChild(grid);
 
       ownedSec.appendChild(inner);
+    }
 
-      var anchor = safeQuerySelector("#rsvp, #confirm, [id*='rsvp'], [id*='confirm'], #gifts, #registry, [data-invitta-vip-access], footer");
-      if (anchor && anchor.parentElement) {
-        anchor.parentElement.insertBefore(ownedSec, anchor);
-      } else {
-        var target = safeQuerySelector("#inv-content, main, .main-content") || document.body;
-        target.appendChild(ownedSec);
-      }
+    placeGallerySection(ownedSec);
+
+    if (isRoseChampagne) {
+      ownedSec.setAttribute("data-invitta-gallery-layout", "safe-grid");
+    } else {
+      ownedSec.removeAttribute("data-invitta-gallery-layout");
     }
 
     var grid = safeQuerySelector(".invitta-gallery-grid", ownedSec);
@@ -770,9 +903,161 @@
       "#inv-title, #inv-hero-title, .inv-hero-title, .inv-main-title, ",
       "[data-invitta-font-role='cover-name'], [data-invitta-font-role='name'], ",
       "[data-invitta-font-role='main-title'], [data-invitta-font-role='title'] ",
-      "{ text-transform: none !important; }"
-    ].join("");
+      "{ text-transform: none !important; }",
+      "",
+      "html[data-invitta-real-studio=\"true\"] [data-invitta-section-title], ",
+      "html[data-invitta-real-studio=\"true\"] [data-invitta-font-role=\"section-title\"], ",
+      "html[data-invitta-real-studio=\"true\"] .section-title, ",
+      "html[data-invitta-real-studio=\"true\"] .inv-section-title, ",
+      "html[data-invitta-real-studio=\"true\"] .invitta-section-title {",
+      "  text-transform: none !important;",
+      "  letter-spacing: normal;",
+      "}"
+    ].join("\n");
     document.head.appendChild(style);
+  }
+
+  var SECTION_TITLE_COPY = {
+    "MIS PADRINOS DE HONOR": "Mis Padrinos de Honor",
+    "NUESTROS PADRINOS DE HONOR": "Nuestros Padrinos de Honor",
+    "MIS PADRINOS": "Mis Padrinos",
+    "NUESTROS PADRINOS": "Nuestros Padrinos",
+    "PADRINOS": "Padrinos",
+    "PADRINOS DE VELACIÓN": "Padrinos de Velación",
+    "PADRINOS DE VELACION": "Padrinos de Velación",
+    "PADRES Y PADRINOS": "Padres y Padrinos",
+    "PADRES DE LA NOVIA": "Padres de la Novia",
+    "PADRES DEL NOVIO": "Padres del Novio",
+    "CON LA BENDICIÓN DE MIS PADRES": "Con la Bendición de Mis Padres",
+    "CON LA BENDICION DE MIS PADRES": "Con la Bendición de Mis Padres",
+    "CON LA BENDICIÓN DE NUESTROS PADRES": "Con la Bendición de Nuestros Padres",
+    "CON LA BENDICION DE NUESTROS PADRES": "Con la Bendición de Nuestros Padres",
+    "CON LA BENDICIÓN DE DIOS Y MIS PADRES": "Con la Bendición de Dios y Mis Padres",
+    "CON LA BENDICION DE DIOS Y MIS PADRES": "Con la Bendición de Dios y Mis Padres",
+    "MI CHAMBELÁN DE HONOR": "Mi Chambelán de Honor",
+    "MI CHAMBELAN DE HONOR": "Mi Chambelán de Honor",
+    "CHAMBELÁN DE HONOR": "Chambelán de Honor",
+    "CHAMBELAN DE HONOR": "Chambelán de Honor",
+
+    "DETALLES DEL EVENTO": "Detalles del Evento",
+    "UBICACIONES DEL EVENTO": "Ubicaciones del Evento",
+    "¿DÓNDE CELEBRAREMOS?": "¿Dónde Celebraremos?",
+    "¿DONDE CELEBRAREMOS?": "¿Dónde Celebraremos?",
+    "DONDE CELEBRAREMOS": "Dónde Celebraremos",
+    "SOLEMNIDAD & FESTEJO": "Solemnidad & Festejo",
+    "SOLEMNIDAD Y FESTEJO": "Solemnidad y Festejo",
+    "CEREMONIA RELIGIOSA": "Ceremonia Religiosa",
+    "SANTA CEREMONIA": "Santa Ceremonia",
+    "01 / SANTA CEREMONIA": "01 / Santa Ceremonia",
+    "02 / LA RECEPCIÓN": "02 / La Recepción",
+    "02 / LA RECEPCION": "02 / La Recepción",
+    "SALÓN DE RECEPCIÓN": "Salón de Recepción",
+    "SALON DE RECEPCION": "Salón de Recepción",
+    "RECEPCIÓN": "Recepción",
+    "RECEPCION": "Recepción",
+    "LA RECEPCIÓN": "La Recepción",
+    "LA RECEPCION": "La Recepción",
+
+    "CÓDIGO DE VESTIMENTA": "Código de Vestimenta",
+    "CODIGO DE VESTIMENTA": "Código de Vestimenta",
+    "FORMAL / ELEGANTE": "Formal / Elegante",
+
+    "MESA DE REGALOS": "Mesa de Regalos",
+    "SUGERENCIAS DE REGALO": "Sugerencias de Regalo",
+    "LLUVIA DE SOBRES": "Lluvia de Sobres",
+    "AGRADECEMOS SU GESTO": "Agradecemos su Gesto",
+
+    "ITINERARIO": "Itinerario",
+    "ITINERARIO DEL EVENTO": "Itinerario del Evento",
+    "PROGRAMACIÓN": "Programación",
+    "PROGRAMACION": "Programación",
+    "PROGRAMA": "Programa",
+    "PARA MIS QUINCE AÑOS": "para Mis Quince Años",
+
+    "GALERÍA DE FOTOS": "Galería de Fotos",
+    "GALERIA DE FOTOS": "Galería de Fotos",
+    "GALERÍA EDITORIAL": "Galería Editorial",
+    "GALERIA EDITORIAL": "Galería Editorial",
+    "BOOK EDITORIAL": "Book Editorial",
+    "BOOK FOTOGRÁFICO": "Book Fotográfico",
+    "BOOK FOTOGRAFICO": "Book Fotográfico",
+    "NUESTRA GALERÍA": "Nuestra Galería",
+    "NUESTRA GALERIA": "Nuestra Galería",
+    "GALERÍA DE MOMENTOS": "Galería de Momentos",
+    "GALERIA DE MOMENTOS": "Galería de Momentos",
+    "MOMENTOS INOLVIDABLES": "Momentos Inolvidables",
+
+    "CONFIRMAR ASISTENCIA": "Confirmar Asistencia",
+    "CONFIRMA TU ASISTENCIA": "Confirma tu Asistencia",
+    "CONFIRMACIÓN DE ASISTENCIA": "Confirmación de Asistencia",
+    "CONFIRMACION DE ASISTENCIA": "Confirmación de Asistencia",
+    "ACOMPÁÑAME A CELEBRAR": "Acompáñame a Celebrar",
+    "ACOMPAÑAME A CELEBRAR": "Acompáñame a Celebrar",
+    "ACOMPÁÑANOS A CELEBRAR": "Acompáñanos a Celebrar",
+    "ACOMPAÑANOS A CELEBRAR": "Acompáñanos a Celebrar",
+    "SUSCRIPCIÓN RSVP": "Suscripción RSVP",
+    "SUSCRIPCION RSVP": "Suscripción RSVP",
+    "PASE DE INVITACIÓN": "Pase de Invitación",
+    "PASE DE INVITACION": "Pase de Invitación",
+    "AGRADECIMIENTO SINCERO": "Agradecimiento Sincero",
+    "HOSPEDAJE SUGERIDO": "Hospedaje Sugerido",
+
+    "GUARDA LA FECHA ESPECIAL": "Guarda la Fecha Especial",
+    "TE ESPERO EL DÍA": "Te Espero el Día",
+    "TE ESPERO EL DIA": "Te Espero el Día"
+  };
+
+  function normalizeTextForLookup(text) {
+    if (!text || typeof text !== "string") return "";
+    return text.trim().toUpperCase().replace(/\s+/g, " ");
+  }
+
+  function applySectionTitleCopy(el) {
+    if (!el) return;
+    for (var i = 0; i < el.childNodes.length; i++) {
+      var child = el.childNodes[i];
+      if (child.nodeType === 3) {
+        var raw = (child.nodeValue || "").trim();
+        if (raw) {
+          var key = normalizeTextForLookup(raw);
+          if (SECTION_TITLE_COPY.hasOwnProperty(key)) {
+            var match = child.nodeValue.match(/^(\s*).*?(\s*)$/);
+            var lead = match ? match[1] : "";
+            var trail = match ? match[2] : "";
+            child.nodeValue = lead + SECTION_TITLE_COPY[key] + trail;
+          }
+        }
+      } else if (child.nodeType === 1 && !child.matches("svg, path, img, [data-invitta-accent]")) {
+        applySectionTitleCopy(child);
+      }
+    }
+  }
+
+  function markSectionTitles() {
+    if (!isRealStudioInvitation() || !document.body) return;
+
+    var sectionTitleSelectors = [
+      "[data-invitta-font-role='section-title']",
+      ".section-title h1, .section-title h2, .section-title h3, .section-title",
+      ".inv-section-title, .invitta-section-title, .invitta-gallery-title",
+      ".family-main-title, .family-role-title, .script-title",
+      "#family h2, #family h3, #honors h2, #honors h3",
+      "#locations h2, #details h2, #itinerary h2, .itinerary-section h2",
+      "#registry h2, .registry-title, #dress-code h2, .dress-code-title",
+      "#rsvp h2, .rsvp-title, #gifts h2, .gifts-title"
+    ];
+
+    sectionTitleSelectors.forEach(function (sel) {
+      safeQuerySelectorAll(sel).forEach(function (el) {
+        if (!el) return;
+        if (el.matches && el.matches(".eyebrow, label, button, .button, .btn, .badge, .invitta-gallery-eyebrow, [data-invitta-font-role='label'], [data-invitta-font-role='body']")) {
+          return;
+        }
+        el.setAttribute("data-invitta-section-title", "true");
+        el.style.setProperty("text-transform", "none", "important");
+        applySectionTitleCopy(el);
+      });
+    });
   }
 
   function ensureMusicControlStyles() {
@@ -2005,6 +2290,7 @@
     try { applyVipAccessPass(); } catch (e) {}
     try { applyConfirmationContacts(); } catch (e) {}
     try { applyTypographyScales(false); } catch (e) {}
+    try { markSectionTitles(); } catch (e) {}
     try { applyThemeHooks(); } catch (e) {}
     try { hideLegacyGuestAdmin(); } catch (e) {}
     try { outputDebugInfo(); } catch (e) {}
