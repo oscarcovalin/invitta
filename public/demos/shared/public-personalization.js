@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-hotfix5-20260820";
+  window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION = "rfc032-034-hotfix6-20260820";
 
   var data = window.INVITATION_DATA;
   if (!data || !data.templateId) return;
@@ -417,25 +417,31 @@
     var style = document.createElement("style");
     style.id = "invitta-hero-photo-style";
     style.textContent = [
-      "html[data-invitta-real-studio=\"true\"] .invitta-hero-photo {",
-      "  width: 100%;",
-      "  min-height: 360px;",
+      "html[data-invitta-real-studio=\"true\"] #invitta-owned-hero-section {",
       "  display: block !important;",
-      "  position: relative;",
-      "  overflow: hidden;",
+      "  width: 100%;",
+      "  min-height: 380px;",
       "  background: #111;",
-      "  margin: 0 auto 32px;",
+      "  overflow: hidden;",
+      "  position: relative;",
+      "  margin: 0 0 32px 0;",
+      "  padding: 0;",
       "  box-sizing: border-box;",
-      "  text-align: center;",
       "}",
-      "html[data-invitta-real-studio=\"true\"] .invitta-hero-photo img {",
-      "  width: 100%;",
-      "  height: 100%;",
-      "  min-height: 360px;",
-      "  max-height: 82vh;",
-      "  object-fit: cover;",
+      "html[data-invitta-real-studio=\"true\"] #invitta-owned-hero-section img {",
       "  display: block !important;",
+      "  width: 100%;",
+      "  height: 420px;",
+      "  object-fit: cover;",
       "  margin: 0 auto;",
+      "}",
+      "@media (max-width: 640px) {",
+      "  html[data-invitta-real-studio=\"true\"] #invitta-owned-hero-section {",
+      "    min-height: 360px;",
+      "  }",
+      "  html[data-invitta-real-studio=\"true\"] #invitta-owned-hero-section img {",
+      "    height: 360px;",
+      "  }",
       "}"
     ].join("\n");
     document.head.appendChild(style);
@@ -454,7 +460,7 @@
       ".hero img, .cover img, .inv-hero img, #inv-hero img, #inv-hero-img, [data-hero-img]"
     ).filter(function (img) {
       if (isGalleryContainer(img)) return false;
-      if (img.dataset.invittaOwnedHero === "true" || (img.closest && img.closest("[data-invitta-owned-hero='true']"))) return false;
+      if (img.closest && img.closest("#invitta-owned-hero-section, [data-invitta-owned-hero='true']")) return false;
       var src = img.currentSrc || img.src || "";
       if (/(logo|icon|qr|section_bg|wedding_bg)/i.test(src)) return false;
       return true;
@@ -462,7 +468,7 @@
 
     Array.from(document.images).forEach(function (img) {
       if (isGalleryContainer(img)) return;
-      if (img.dataset.invittaOwnedHero === "true" || (img.closest && img.closest("[data-invitta-owned-hero='true']"))) return;
+      if (img.closest && img.closest("#invitta-owned-hero-section, [data-invitta-owned-hero='true']")) return;
       var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
       if (isDemoHeroAsset(src) && demoHeroImages.indexOf(img) === -1) {
         demoHeroImages.push(img);
@@ -475,6 +481,7 @@
       ".hero, .cover, .inv-hero, .inv-hero-bg, #inv-hero, #inv-hero-bg, [data-hero-bg]"
     ).filter(function (el) {
       if (isGalleryContainer(el)) return false;
+      if (el.id === "invitta-owned-hero-section" || (el.closest && el.closest("#invitta-owned-hero-section"))) return false;
       return true;
     });
 
@@ -491,15 +498,15 @@
       }
     });
 
-    var ownedHero = safeQuerySelector("[data-invitta-owned-hero='true']");
+    var ownedSec = safeQuerySelector("#invitta-owned-hero-section, [data-invitta-owned-hero='true']");
 
     if (heroUrl && (heroUrl.startsWith("http://") || heroUrl.startsWith("https://"))) {
       ensureHeroStyles();
 
-      if (!ownedHero) {
-        ownedHero = document.createElement("div");
-        ownedHero.className = "invitta-hero-photo";
-        ownedHero.setAttribute("data-invitta-owned-hero", "true");
+      if (!ownedSec) {
+        ownedSec = document.createElement("section");
+        ownedSec.id = "invitta-owned-hero-section";
+        ownedSec.setAttribute("data-invitta-owned-hero", "true");
 
         var ownedImg = document.createElement("img");
         ownedImg.className = "invitta-hero-img";
@@ -507,27 +514,23 @@
         ownedImg.alt = "Foto principal";
         ownedImg.loading = "eager";
         ownedImg.dataset.invittaPersonalized = "true";
-        ownedHero.appendChild(ownedImg);
+        ownedSec.appendChild(ownedImg);
 
-        // Insertar justo después del header/nav principal o al inicio del primer main/section
-        var headerOrNav = safeQuerySelector("header, nav, [class*='nav' i]:not(.invitta-gallery-item):not(.invitta-gift-card), .navbar");
-        var mainContainer = safeQuerySelector("main, #inv-content, .main-content, #app, #root");
-
+        // Insertar después del header/nav principal si existe; si no, como primer hijo de body
+        var headerOrNav = safeQuerySelector("header, nav, .navbar");
         if (headerOrNav && headerOrNav.parentElement) {
-          headerOrNav.parentElement.insertBefore(ownedHero, headerOrNav.nextSibling);
-        } else if (mainContainer) {
-          mainContainer.insertBefore(ownedHero, mainContainer.firstChild);
+          headerOrNav.parentElement.insertBefore(ownedSec, headerOrNav.nextSibling);
         } else if (document.body) {
-          document.body.insertBefore(ownedHero, document.body.firstChild);
+          document.body.insertBefore(ownedSec, document.body.firstChild);
         }
       } else {
-        var existingImg = safeQuerySelector("img", ownedHero);
+        var existingImg = safeQuerySelector("img", ownedSec);
         if (existingImg && existingImg.src !== heroUrl) {
           existingImg.src = heroUrl;
         }
       }
     } else {
-      if (ownedHero) ownedHero.remove();
+      if (ownedSec) ownedSec.remove();
     }
   }
 
@@ -1826,6 +1829,63 @@
   }
 
 
+  function parseColorLuminance(colorStr) {
+    if (!colorStr || typeof colorStr !== "string") return null;
+    var trimmed = colorStr.trim().toLowerCase();
+    if (trimmed === "transparent" || trimmed === "rgba(0, 0, 0, 0)") return null;
+
+    if (trimmed.startsWith("#")) {
+      var hex = trimmed.slice(1);
+      if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      if (hex.length >= 6) {
+        var r = parseInt(hex.substr(0, 2), 16) / 255;
+        var g = parseInt(hex.substr(2, 2), 16) / 255;
+        var b = parseInt(hex.substr(4, 2), 16) / 255;
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      }
+    }
+
+    var rgb = trimmed.match(/\d+/g);
+    if (rgb && rgb.length >= 3) {
+      var rVal = parseInt(rgb[0], 10) / 255;
+      var gVal = parseInt(rgb[1], 10) / 255;
+      var bVal = parseInt(rgb[2], 10) / 255;
+      return 0.2126 * rVal + 0.7152 * gVal + 0.0722 * bVal;
+    }
+    return null;
+  }
+
+  function markRealStudioContrastSurfaces() {
+    if (!isRealStudioInvitation() || !document.body) return;
+
+    var containers = safeQuerySelectorAll(
+      "section, main > div, article, .section, .inv-section, " +
+      ".bg-black, .bg-ink, .bg-charcoal, [class*='bg-dark'], [class*='bg-black'], [class*='bg-ink']"
+    );
+
+    containers.forEach(function (el) {
+      if (el.id === "invitta-owned-hero-section" || el.id === "invitta-gallery-section") return;
+      var className = el.className || "";
+      var isExplicitDarkClass = /(bg-black|bg-ink|bg-charcoal|bg-dark)/i.test(className);
+      var isExplicitLightClass = /(bg-paper|bg-cream|bg-ivory|bg-white)/i.test(className);
+
+      var bg = "";
+      try {
+        bg = (window.getComputedStyle ? window.getComputedStyle(el).backgroundColor : "") || el.style.backgroundColor || "";
+      } catch (e) {}
+
+      var lum = parseColorLuminance(bg);
+
+      if (isExplicitDarkClass || (lum !== null && lum < 0.45)) {
+        el.setAttribute("data-invitta-dark-surface", "true");
+        el.removeAttribute("data-invitta-light-surface");
+      } else if (isExplicitLightClass || (lum !== null && lum >= 0.45)) {
+        el.setAttribute("data-invitta-light-surface", "true");
+        el.removeAttribute("data-invitta-dark-surface");
+      }
+    });
+  }
+
   function ensureRealStudioContrastStyles() {
     if (!isRealStudioInvitation()) return;
     if (document.getElementById("invitta-real-studio-contrast")) return;
@@ -1836,61 +1896,45 @@
       "  --inv-readable-dark: #1f1b18;",
       "  --inv-readable-light: #fffaf2;",
       "}",
-      "html[data-invitta-real-studio=\"true\"] .bg-black,",
-      "html[data-invitta-real-studio=\"true\"] .bg-ink,",
-      "html[data-invitta-real-studio=\"true\"] .bg-charcoal,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-black\"],",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ink\"],",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-dark\"] {",
-      "  color: var(--inv-readable-light) !important;",
+      "html[data-invitta-real-studio=\"true\"] [data-invitta-dark-surface=\"true\"] {",
+      "  color: #fffaf2 !important;",
       "}",
-      "html[data-invitta-real-studio=\"true\"] .bg-black p,",
-      "html[data-invitta-real-studio=\"true\"] .bg-ink p,",
-      "html[data-invitta-real-studio=\"true\"] .bg-charcoal p,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-black\"] p,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ink\"] p,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-dark\"] p {",
-      "  color: var(--inv-readable-light) !important;",
-      "  opacity: 0.92 !important;",
+      "html[data-invitta-real-studio=\"true\"] [data-invitta-dark-surface=\"true\"] :where(",
+      "  h1, h2, h3, h4, h5, h6,",
+      "  p, span, small, strong, em,",
+      "  li, label, time, blockquote",
+      "):not(button):not(.button):not(.invitta-gift-button):not(.btn):not(.badge):not(.inv-btn):not(svg):not(path):not(img):not([data-invitta-accent]) {",
+      "  color: #fffaf2 !important;",
+      "  opacity: 0.94 !important;",
       "}",
-      "html[data-invitta-real-studio=\"true\"] .bg-black h1,",
-      "html[data-invitta-real-studio=\"true\"] .bg-black h2,",
-      "html[data-invitta-real-studio=\"true\"] .bg-black h3,",
-      "html[data-invitta-real-studio=\"true\"] .bg-ink h1,",
-      "html[data-invitta-real-studio=\"true\"] .bg-ink h2,",
-      "html[data-invitta-real-studio=\"true\"] .bg-ink h3,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-black\"] h1,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-black\"] h2,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-black\"] h3,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ink\"] h1,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ink\"] h2,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ink\"] h3,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-dark\"] h1,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-dark\"] h2,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-dark\"] h3 {",
-      "  color: var(--inv-readable-light) !important;",
+      "html[data-invitta-real-studio=\"true\"] [data-invitta-dark-surface=\"true\"] :where(",
+      "  .text-clay,",
+      "  .text-sage,",
+      "  .text-olive,",
+      "  .text-gold,",
+      "  .text-muted,",
+      "  .text-ink,",
+      "  .text-on-surface-variant,",
+      "  [class*=\"text-\"]",
+      "):not(button):not(.button):not(.invitta-gift-button):not(.btn):not(.badge):not(.inv-btn):not(svg):not(path):not(img):not([data-invitta-accent]):not([class*=\"btn\"]) {",
+      "  color: #fffaf2 !important;",
+      "  opacity: 0.94 !important;",
       "}",
-      "html[data-invitta-real-studio=\"true\"] .bg-paper,",
-      "html[data-invitta-real-studio=\"true\"] .bg-cream,",
-      "html[data-invitta-real-studio=\"true\"] .bg-ivory,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-paper\"],",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-cream\"],",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ivory\"] {",
-      "  color: var(--inv-readable-dark) !important;",
+      "html[data-invitta-real-studio=\"true\"] [data-invitta-light-surface=\"true\"] {",
+      "  color: #1f1b18 !important;",
       "}",
-      "html[data-invitta-real-studio=\"true\"] .bg-paper p,",
-      "html[data-invitta-real-studio=\"true\"] .bg-cream p,",
-      "html[data-invitta-real-studio=\"true\"] .bg-ivory p,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-paper\"] p,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-cream\"] p,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"bg-ivory\"] p {",
-      "  color: var(--inv-readable-dark) !important;",
-      "  opacity: 0.92 !important;",
+      "html[data-invitta-real-studio=\"true\"] [data-invitta-light-surface=\"true\"] :where(",
+      "  h1, h2, h3, h4, h5, h6,",
+      "  p, span, small, strong, em,",
+      "  li, label, time, blockquote",
+      "):not(button):not(.button):not(.invitta-gift-button):not(.btn):not(.badge):not(.inv-btn):not(svg):not(path):not(img):not([data-invitta-accent]) {",
+      "  color: #1f1b18 !important;",
+      "  opacity: 0.94 !important;",
       "}",
       "html[data-invitta-real-studio=\"true\"] input:not([type='checkbox']):not([type='radio']):not([type='submit']),",
       "html[data-invitta-real-studio=\"true\"] textarea,",
       "html[data-invitta-real-studio=\"true\"] select {",
-      "  color: var(--inv-readable-dark) !important;",
+      "  color: #1f1b18 !important;",
       "  background-color: #ffffff !important;",
       "  border: 1px solid rgba(0, 0, 0, 0.28) !important;",
       "}",
@@ -1899,13 +1943,10 @@
       "  color: #6b635b !important;",
       "  opacity: 0.85 !important;",
       "}",
-      "html[data-invitta-real-studio=\"true\"] .music-player,",
-      "html[data-invitta-real-studio=\"true\"] [class*=\"music\"],",
-      "html[data-invitta-real-studio=\"true\"] #inv-music-player,",
-      "html[data-invitta-real-studio=\"true\"] #music-player-bottom-bar,",
-      "html[data-invitta-real-studio=\"true\"] #invitta-audio-control,",
-      "html[data-invitta-real-studio=\"true\"] .inv-music-dock {",
-      "  color: var(--inv-readable-light) !important;",
+      "html[data-invitta-real-studio=\"true\"] [data-invitta-dark-surface=\"true\"] [class*=\"music\"] :where(span, p, small),",
+      "html[data-invitta-real-studio=\"true\"] [class*=\"music\"] :where(span, p, small) {",
+      "  color: #fffaf2 !important;",
+      "  opacity: 0.92 !important;",
       "}"
     ].join("\n");
     document.head.appendChild(style);
@@ -1918,15 +1959,17 @@
         search += " " + (window.parent.location.search || "");
       }
       if (/debug=invitta/i.test(search)) {
+        var heroSec = document.getElementById("invitta-owned-hero-section");
+        var heroImg = heroSec ? heroSec.querySelector("img") : null;
         console.log("INVIITA DEBUG:", {
           version: window.__INVITTA_PUBLIC_PERSONALIZATION_VERSION,
-          isRealStudio: isRealStudioInvitation(),
+          realStudio: isRealStudioInvitation(),
           mainPhotoUrl: data.mainPhotoUrl || null,
-          ownedHeroImgCount: document.querySelectorAll("[data-invitta-owned-hero='true'] img").length,
+          darkSurfacesCount: document.querySelectorAll("[data-invitta-dark-surface='true']").length,
           contrastStyleExists: !!document.querySelector("#invitta-real-studio-contrast"),
-          realStudioFlag: document.documentElement.getAttribute("data-invitta-real-studio"),
-          galleryUrlsCount: Array.isArray(data.galleryUrls) ? data.galleryUrls.length : 0,
-          ownedGalleryImgCount: document.querySelectorAll(".invitta-gallery-img").length,
+          ownedHeroExists: !!heroSec,
+          ownedHeroImgSrc: heroImg ? heroImg.src : null,
+          galleryDomCount: document.querySelectorAll(".invitta-gallery-img").length,
           giftOptionsCount: Array.isArray(data.giftOptions) ? data.giftOptions.length : 0
         });
       }
@@ -1947,6 +1990,7 @@
     try { ensureDynamicCasingStyles(); } catch (e) {}
     try { ensureMusicControlStyles(); } catch (e) {}
     try { ensureRealStudioContrastStyles(); } catch (e) {}
+    try { markRealStudioContrastSurfaces(); } catch (e) {}
     try { replaceText(document.body); } catch (e) {}
     try { applyHeroImage(); } catch (e) {}
     try { applyGalleryImages(); } catch (e) {}
