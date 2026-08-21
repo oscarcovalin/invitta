@@ -414,6 +414,32 @@
     }
   }
 
+  function cleanRsvpMessageLabels() {
+    // A legacy RSVP label interpolated the celebrant using a literal "$".
+    // Limit the repair to the congratulation label so currency or other
+    // meaningful symbols elsewhere in an invitation remain untouched.
+    Array.from(document.querySelectorAll("label, p, span, h1, h2, h3, h4, h5, h6")).forEach(function(element) {
+      if (element.children.length !== 0) return;
+      var value = element.textContent || "";
+      if (!/mensaje de felicitaci[oó]n/i.test(value) || value.indexOf("$") === -1) return;
+      var corrected = value.replace(/\$\s*(?=[A-Za-zÁÉÍÓÚÜÑáéíóúüñ])/g, "");
+      if (corrected === value) return;
+      element.textContent = corrected;
+      element.setAttribute("data-invitta-dynamic-text", "true");
+    });
+  }
+
+  function applyItineraryHeading() {
+    // Keep each template's native heading class and editorial typography;
+    // only replace its generic copy with the product-wide section name.
+    Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, span")).forEach(function(element) {
+      if (element.children.length !== 0) return;
+      if (clean(element.textContent) !== "PROGRAMACIÓN") return;
+      element.textContent = "Minuto a Minuto";
+      element.setAttribute("data-invitta-dynamic-text", "true");
+    });
+  }
+
   function hideSectionWithHeading(headingText) {
     var heading = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, span, p")).find(function (element) {
       return clean(element.textContent) === headingText;
@@ -435,6 +461,7 @@
     // the template's fictional schedule.
     if (!Array.isArray(data.itinerary) || data.itinerary.length === 0) {
       hideSectionWithHeading("PROGRAMACIÓN");
+      hideSectionWithHeading("Minuto a Minuto");
     }
   }
 
@@ -448,6 +475,15 @@
       "#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i], " +
       "[class*='gallery' i], [class*='galeria' i], [class*='galería' i], " +
       ".inv-moments-section, .inv-gallery-section, #inv-gallery-section, [id*='photo-grid' i]"
+    ));
+  }
+
+  function isHeroMedia(element) {
+    if (!element || !element.closest) return false;
+    return Boolean(element.closest(
+      "#hero, [id*='hero' i], [id*='cover' i], [id*='portada' i], " +
+      "[class*='hero' i], [class*='cover' i], [class*='portada' i], " +
+      ".hero, .cover, .inv-hero, #inv-hero, [data-hero-img], [data-hero-bg]"
     ));
   }
 
@@ -596,6 +632,7 @@
     // Eliminar imágenes de stock demo usadas como fondo en secciones internas
     Array.from(document.querySelectorAll("[style*='background-image']")).forEach(function (el) {
       if (isGalleryContainer(el)) return;
+      if (isHeroMedia(el)) return;
       var bg = el.style.backgroundImage || "";
       if (isDemoGalleryAsset(bg) || isDemoHeroAsset(bg)) {
         el.style.setProperty("background-image", "none", "important");
@@ -604,6 +641,7 @@
 
     Array.from(document.images).forEach(function (img) {
       if (isGalleryContainer(img)) return;
+      if (isHeroMedia(img)) return;
       var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
       if (isDemoGalleryAsset(src)) {
         // Hiding only the image leaves a framed, empty rectangle behind.
@@ -711,6 +749,9 @@
     // composition, parallax, lightbox and responsive behavior instead of
     // placing a generic Invitta grid over its gallery.
     Array.from(document.images).forEach(function(img) {
+      // Some Élégance assets use a gallery-style filename for the cover photo.
+      // The hero is owned exclusively by applyHeroImage(), never by gallery slots.
+      if (isHeroMedia(img)) return;
       var original = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
       var index = getOriginalGalleryIndex(original);
       var gallerySlot = img.closest(".cursor-zoom-in, [class*='gallery-item'], figure, li");
@@ -2038,6 +2079,7 @@
     ensureDynamicCasingStyles();
     ensureMusicControlStyles();
     replaceText(document.body);
+    cleanRsvpMessageLabels();
     markFamilySectionTitles();
     applyHeroImage();
     applyGalleryImages();
@@ -2057,6 +2099,7 @@
     restoreCanonicalNameCasing();
     applyPlumNoirWeddingAdapter();
     hideUnsupportedPlumNoirSamples();
+    applyItineraryHeading();
     applying = false;
   }
 
