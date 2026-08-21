@@ -407,6 +407,7 @@
 
     document.querySelectorAll(structuralSelector).forEach(function(element) {
       element.dataset.invittaCoverNameSize = "true";
+      if (!element.dataset.invittaFontRole) element.dataset.invittaFontRole = "cover-name";
     });
 
     // A few React-based templates provide no stable class for the hero name.
@@ -418,7 +419,10 @@
       var isHeroNamePart = nameParts.some(function(part) {
         return visible.toLocaleLowerCase() === clean(part).toLocaleLowerCase();
       }) && (element.tagName !== "SPAN" || element.closest("#hero,#cover,#portada,#inv-hero,[class*='hero'],[class*='cover']"));
-      if (isExactFullName || isHeroNamePart) element.dataset.invittaCoverNameSize = "true";
+      if (isExactFullName || isHeroNamePart) {
+        element.dataset.invittaCoverNameSize = "true";
+        if (!element.dataset.invittaFontRole) element.dataset.invittaFontRole = "cover-name";
+      }
     });
   }
 
@@ -2392,6 +2396,69 @@
     }
   }
 
+  function applyTypographyRoleOverrides() {
+    // Uploaded fonts are selected per text role in Studio. Keep those rules
+    // separate from the global preset adapter so a custom font only changes
+    // the zone chosen by the user and preserves each template's own layout.
+    var roleConfig = data.typographyRoles || {};
+    var typographyFonts = Array.isArray(data.typographyFonts) ? data.typographyFonts.slice(0, 4) : [];
+    if (!typographyFonts.length && data.customFontUrl) {
+      typographyFonts = [{ id: "font-legacy-custom", name: data.customFontName || "Tipografía personalizada", url: data.customFontUrl }];
+    }
+
+    var customFontFamilies = {};
+    var fontFaces = typographyFonts.map(function(font) {
+      if (!font || !font.url) return "";
+      var safeId = String(font.id || "custom").replace(/[^A-Za-z0-9_-]/g, "");
+      var family = "InvittaUserFont_" + (safeId || "custom");
+      var extension = String(font.url).split("?")[0].split(".").pop().toLowerCase();
+      var format = extension === "woff2" ? "woff2" : extension === "woff" ? "woff" : extension === "otf" ? "opentype" : "truetype";
+      customFontFamilies[font.id] = family;
+      return '@font-face{font-family:"' + family + '";src:url(' + JSON.stringify(font.url) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
+    }).filter(Boolean);
+
+    var fontFaceStyle = document.getElementById("invitta-custom-font-face");
+    if (!fontFaceStyle) {
+      fontFaceStyle = document.createElement("style");
+      fontFaceStyle.id = "invitta-custom-font-face";
+      document.head.appendChild(fontFaceStyle);
+    }
+    fontFaceStyle.textContent = fontFaces.join("\n");
+
+    var presets = {
+      classic: { display: '"Cormorant Garamond", "Playfair Display", Georgia, serif', body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif' },
+      romantic: { display: '"Great Vibes", "Cormorant Garamond", cursive', body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif' },
+      editorial: { display: '"Playfair Display", "Cormorant Garamond", Georgia, serif', body: '"Hanken Grotesk", "Montserrat", Arial, sans-serif' },
+      minimal: { display: '"Montserrat", "Hanken Grotesk", Arial, sans-serif', body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif' },
+      luxury: { display: '"Playfair Display", "Cormorant Garamond", Georgia, serif', body: '"Hanken Grotesk", "Montserrat", Arial, sans-serif' },
+      signature: { display: '"Allura", "Great Vibes", cursive', body: '"Montserrat", Arial, sans-serif' },
+      couture: { display: '"Parisienne", "Great Vibes", cursive', body: '"Playfair Display", Georgia, serif' }
+    };
+    var roleStyle = document.getElementById("invitta-typography-roles");
+    if (!roleStyle) {
+      roleStyle = document.createElement("style");
+      roleStyle.id = "invitta-typography-roles";
+      document.head.appendChild(roleStyle);
+    }
+
+    roleStyle.textContent = typographyRoleOrder.map(function(role) {
+      var source = roleConfig[role] && roleConfig[role].font || "inherit";
+      // Inherit intentionally emits no rule: the native template typography
+      // remains authoritative until Studio has a concrete role selection.
+      if (source === "inherit") return "";
+      var customFamily = customFontFamilies[source] || (source === "custom" && typographyFonts[0] ? customFontFamilies[typographyFonts[0].id] : "");
+      var selected = customFamily
+        ? { display: '"' + customFamily + '", "Cormorant Garamond", Georgia, serif', body: '"' + customFamily + '", "Montserrat", Arial, sans-serif' }
+        : presets[source];
+      if (!selected || !typographyRoleSelectors[role]) return "";
+      var family = role === "body" || role === "labels" ? selected.body : selected.display;
+      var scopedSelectors = typographyRoleSelectors[role].split(",").map(function(selector) {
+        return "html body " + selector.trim();
+      }).join(",");
+      return scopedSelectors + "{font-family:" + family + "!important;}";
+    }).join("\n");
+  }
+
   function applyTemplateTypography() {
     // Typography is an explicit Studio choice. The default "classic" keeps
     // the native design untouched; a selected preset changes families only,
@@ -2553,6 +2620,7 @@
   applyThemeHooks();
   applyTemplatePaletteAdapter();
   applyTemplateTypography();
+  applyTypographyRoleOverrides();
   applyTypographyScales(true);
   installClickBridge();
   applyAll();
