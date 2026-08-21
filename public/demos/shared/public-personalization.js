@@ -910,8 +910,21 @@
       "html[data-invitta-real-studio=\"true\"] .section-title, ",
       "html[data-invitta-real-studio=\"true\"] .inv-section-title, ",
       "html[data-invitta-real-studio=\"true\"] .invitta-section-title {",
+      "  font-size: clamp(18px, 4.8vw, 24px) !important;",
+      "  line-height: 1.25 !important;",
+      "  letter-spacing: normal !important;",
       "  text-transform: none !important;",
-      "  letter-spacing: normal;",
+      "}",
+      "",
+      "@media (max-width: 390px) {",
+      "  html[data-invitta-real-studio=\"true\"] [data-invitta-section-title], ",
+      "  html[data-invitta-real-studio=\"true\"] [data-invitta-font-role=\"section-title\"], ",
+      "  html[data-invitta-real-studio=\"true\"] .section-title, ",
+      "  html[data-invitta-real-studio=\"true\"] .inv-section-title, ",
+      "  html[data-invitta-real-studio=\"true\"] .invitta-section-title {",
+      "    font-size: 18px !important;",
+      "    line-height: 1.3 !important;",
+      "  }",
       "}"
     ].join("\n");
     document.head.appendChild(style);
