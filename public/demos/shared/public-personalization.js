@@ -887,6 +887,43 @@
     });
   }
 
+  var sectionAdapters = {
+    "xv-elegance-basic": {
+      family: ["#family"], locations: ["#locations"], itinerary: [], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-container"]
+    },
+    "boda-classic-basic": {
+      family: ["#family"], locations: ["#locations"], itinerary: [], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-container"]
+    },
+    "xv-rose-gold-premium": {
+      family: ["#honors"], locations: ["#details"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-bottom-bar"]
+    },
+    "xv-champagne-rose-vip": {
+      family: ["#honors"], locations: ["#details"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-bottom-bar"]
+    },
+    "boda-golden-romance-premium": {
+      family: ["#honors"], locations: ["#details"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-bottom-bar"]
+    },
+    "boda-midnight-gold-vip": {
+      family: ["#honors"], locations: ["#details"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-bottom-bar"]
+    }
+  };
+
+  function applySectionVisibility() {
+    if (!isRealStudioInvitation()) return;
+    var visibility = data.sectionVisibility || {};
+    var adapter = sectionAdapters[templateId] || {};
+    Object.keys(adapter).forEach(function(key) {
+      if (visibility[key] !== false) return;
+      adapter[key].forEach(function(selector) {
+        document.querySelectorAll(selector).forEach(function(section) {
+          section.hidden = true;
+          section.style.setProperty("display", "none", "important");
+          section.dataset.invittaSectionHidden = "true";
+        });
+      });
+    });
+  }
+
   function applySectionBackgrounds() {
     var backgrounds = data.sectionBackgrounds || {};
     var sections = {
@@ -1656,10 +1693,61 @@
     var existingStyle = document.getElementById("invitta-visual-customization");
     if (existingStyle) existingStyle.remove();
 
-    // Native CSS owns typography, contrast and palette during recovery.
-    // Generic font and color variables made unrelated templates share the
-    // same appearance and were the source of the lost editorial hierarchy.
+    // A palette has exactly three semantic colors: 60% base, 30% readable
+    // contrast and 10% accent. Native template CSS remains in charge of every
+    // layout, photograph, parallax layer, animation and type treatment.
+    var palettePresets = {
+      champagne: { base: "#F7F0E7", support: "#40362E", accent: "#B99654" },
+      rose: { base: "#FAF0F0", support: "#704853", accent: "#C88A97" },
+      sage: { base: "#F1F3EC", support: "#405144", accent: "#718067" },
+      emerald: { base: "#F0F4EF", support: "#1F493B", accent: "#1E6A52" },
+      midnight: { base: "#1C1920", support: "#F6EAD2", accent: "#C5A355" },
+      "terracotta-sand": { base: "#F4E6D8", support: "#512F28", accent: "#D26345" },
+      "plum-olive": { base: "#EEEBDD", support: "#3D1831", accent: "#7A7D45" },
+      "opal-blue": { base: "#EAF2F4", support: "#263B5B", accent: "#8B79A8" },
+      "emerald-jewel": { base: "#E8EFEA", support: "#0E3B31", accent: "#C19A3C" },
+      "celestial-navy": { base: "#0C1630", support: "#F5EBD5", accent: "#D6AF4B" }
+    };
+    var palette = palettePresets[data.palettePreset];
+    var paletteVariables = [
+      "--inv-60", "--inv-30", "--inv-10", "--inv-on-accent",
+      "--color-background", "--color-paper", "--color-surface",
+      "--color-surface-container-low", "--color-surface-container-lowest",
+      "--color-ink", "--color-on-background", "--color-on-surface",
+      "--color-on-surface-variant", "--color-primary", "--color-sage",
+      "--color-champagne-gold", "--color-outline-variant"
+    ];
+    paletteVariables.forEach(function(name) { root.style.removeProperty(name); });
     delete root.dataset.invittaTheme;
+    delete root.dataset.invittaPalette;
+    if (!palette) return;
+
+    function luminance(hex) {
+      var cleanHex = hex.replace("#", "");
+      return ((parseInt(cleanHex.slice(0, 2), 16) * 299) +
+        (parseInt(cleanHex.slice(2, 4), 16) * 587) +
+        (parseInt(cleanHex.slice(4, 6), 16) * 114)) / 1000;
+    }
+
+    var accentText = luminance(palette.accent) < 145 ? palette.base : palette.support;
+    root.dataset.invittaPalette = data.palettePreset;
+    root.style.setProperty("--inv-60", palette.base);
+    root.style.setProperty("--inv-30", palette.support);
+    root.style.setProperty("--inv-10", palette.accent);
+    root.style.setProperty("--inv-on-accent", accentText);
+    root.style.setProperty("--color-background", palette.base);
+    root.style.setProperty("--color-paper", palette.base);
+    root.style.setProperty("--color-surface", palette.base);
+    root.style.setProperty("--color-surface-container-low", palette.base);
+    root.style.setProperty("--color-surface-container-lowest", palette.base);
+    root.style.setProperty("--color-ink", palette.support);
+    root.style.setProperty("--color-on-background", palette.support);
+    root.style.setProperty("--color-on-surface", palette.support);
+    root.style.setProperty("--color-on-surface-variant", palette.support);
+    root.style.setProperty("--color-primary", palette.accent);
+    root.style.setProperty("--color-sage", palette.accent);
+    root.style.setProperty("--color-champagne-gold", palette.accent);
+    root.style.setProperty("--color-outline-variant", palette.accent);
     return;
 
     var palettePresets = {
@@ -2089,6 +2177,7 @@
     applyHeroImage();
     applyGalleryImages();
     applyInternalEditorialImages();
+    applySectionVisibility();
     applySectionBackgrounds();
     applyCustomBackground(data);
     applyAudio();

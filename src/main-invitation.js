@@ -761,6 +761,19 @@ function normalizeSectionBackgrounds(val) {
     }, {});
 }
 
+function normalizeSectionVisibility(val) {
+    var allowed = ["family", "locations", "itinerary", "gallery", "registry", "rsvp", "music"];
+    var parsed = val;
+    if (typeof val === "string") {
+        try { parsed = JSON.parse(val); } catch(e) { parsed = {}; }
+    }
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) parsed = {};
+    return allowed.reduce(function(result, key) {
+        result[key] = parsed[key] !== false;
+        return result;
+    }, {});
+}
+
 function normalizeConfirmationPhones(val) {
     return String(val || "")
         .split(/[|,;\n]+/)
@@ -862,6 +875,7 @@ function buildPublicTemplateData(inv, template) {
         typographyScales: normalizeTypographyScales(inv.custom_font_targets),
         typographyRoles: normalizeTypographyRoles(inv.custom_font_targets, typographyFonts),
         visualTheme: cleanString(inv.visual_theme, 60),
+        sectionVisibility: normalizeSectionVisibility(inv.section_visibility),
         sectionBackgrounds: normalizeSectionBackgrounds(inv.section_backgrounds),
         backgroundImageUrl: safeHttpsUrl(inv.background_image_url),
         bgEnabled: Boolean(inv.bg_enabled),
@@ -965,7 +979,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=media-cleanup-20260821";
+    bridge.src = "/demos/shared/public-personalization.js?v=composition-tokens-20260821";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

@@ -38,6 +38,35 @@ function hasActiveTemplates(eventType) {
 }
 
 const SECTION_BACKGROUND_KEYS = ["hero", "family", "locations", "gallery", "rsvp"];
+const OPTIONAL_SECTION_KEYS = ["family", "locations", "itinerary", "gallery", "registry", "rsvp", "music"];
+
+function normalizeSectionVisibility(value) {
+  let parsed = value;
+  if (typeof parsed === "string") {
+    try { parsed = JSON.parse(parsed); } catch (error) { parsed = {}; }
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) parsed = {};
+  return OPTIONAL_SECTION_KEYS.reduce((result, key) => {
+    result[key] = parsed[key] !== false;
+    return result;
+  }, {});
+}
+
+function setSectionVisibilityControls(value) {
+  const visibility = normalizeSectionVisibility(value);
+  OPTIONAL_SECTION_KEYS.forEach(key => {
+    const input = document.querySelector(`[name="section_visibility"][value="${key}"]`);
+    if (input) input.checked = visibility[key];
+  });
+}
+
+function getSectionVisibilityControls() {
+  return OPTIONAL_SECTION_KEYS.reduce((result, key) => {
+    const input = document.querySelector(`[name="section_visibility"][value="${key}"]`);
+    result[key] = !input || input.checked;
+    return result;
+  }, {});
+}
 
 function getSelectedTemplateSectionBackgroundKeys() {
   const templateId = document.getElementById("template_id")?.value;
@@ -2189,6 +2218,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (bodyColor) bodyColor.value = data.body_color || "";
     const accentColor = document.getElementById("accent_color");
     if (accentColor) accentColor.value = data.accent_color || "";
+    setSectionVisibilityControls(data.section_visibility);
     const customFontUrl = document.getElementById("customFontUrl");
     const customFontName = document.getElementById("customFontName");
     if (customFontUrl) customFontUrl.value = data.custom_font_url || "";
@@ -2602,6 +2632,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       title_color: document.getElementById("title_color") ? document.getElementById("title_color").value || null : null,
       body_color: document.getElementById("body_color") ? document.getElementById("body_color").value || null : null,
       accent_color: document.getElementById("accent_color") ? document.getElementById("accent_color").value || null : null,
+      section_visibility: getSectionVisibilityControls(),
       ceremony_name: document.getElementById("ceremony_name").value,
       ceremony_address: document.getElementById("ceremony_address").value,
       ceremony_map_url: document.getElementById("ceremony_map_url").value,

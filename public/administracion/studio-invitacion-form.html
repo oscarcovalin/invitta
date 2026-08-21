@@ -994,7 +994,7 @@
           <p class="studio-field-hint">La paleta se aplica a fondos, detalles y acentos sin cambiar la plantilla.</p>
         </div>
 
-        <div class="form-row">
+        <div class="form-row studio-legacy-visual-control" aria-hidden="true">
           <div class="form-group">
             <label for="title_color">Color de titulos</label>
             <select id="title_color" name="title_color" class="form-control">
@@ -1029,7 +1029,26 @@
             </select>
           </div>
         </div>
-        <p class="studio-field-hint studio-visual-customization-note">Deja cualquier selector en “Color del diseno” para mantener ese elemento intacto.</p>
+        <p class="studio-field-hint studio-visual-customization-note">Cada paleta usa tres colores con proporción 60 / 30 / 10: base, lectura y acento.</p>
+      </section>
+
+      <section class="studio-visual-customization" aria-labelledby="section-visibility-title">
+        <div class="studio-visual-customization-heading">
+          <div>
+            <span class="studio-visual-kicker">Composición</span>
+            <h3 id="section-visibility-title">Secciones de la invitación</h3>
+          </div>
+          <p>Activa únicamente los bloques que tendrá esta invitación. El diseño, parallax y animaciones de la plantilla se conservan.</p>
+        </div>
+        <div class="form-row">
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="family" checked> Padres y padrinos</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="locations" checked> Ubicaciones</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="itinerary" checked> Minuto a minuto</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="gallery" checked> Galería</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="registry" checked> Regalos</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="rsvp" checked> Confirmación RSVP</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="music" checked> Reproductor de música</label>
+        </div>
       </section>
 
       <h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Ubicaciones</h2>
