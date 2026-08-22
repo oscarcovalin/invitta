@@ -526,6 +526,38 @@
     }
   }
 
+  function applyGoldenRomanceWeddingAdapter() {
+    if (templateId !== "boda-golden-romance-premium" || !isWedding) return;
+
+    // 1. In the opening envelope, remove any injected duplicate date element
+    // and restore native card typography on the envelope heading.
+    var envelope = document.querySelector(".fixed.inset-0.z-\\[100\\], div[class*='z-[100]']");
+    if (envelope) {
+      Array.from(envelope.querySelectorAll(".invitta-editorial-cover-date, [data-invitta-editorial-date]")).forEach(function(el) {
+        el.remove();
+      });
+      var envelopeHeading = envelope.querySelector("h2");
+      if (envelopeHeading) {
+        delete envelopeHeading.dataset.invittaCoverNameSize;
+        envelopeHeading.removeAttribute("data-invitta-cover-name-size");
+      }
+      var envelopeTitle = envelope.querySelector("span.font-serif.italic");
+      if (envelopeTitle) {
+        delete envelopeTitle.dataset.invittaEditorialEvent;
+        envelopeTitle.removeAttribute("data-invitta-editorial-event");
+      }
+    }
+
+    // 2. In #hero, retain native staggered layout without cover-sizing centering override.
+    var heroHeading = document.querySelector("#hero h2.font-display");
+    if (heroHeading) {
+      Array.from(heroHeading.querySelectorAll("span")).forEach(function(span) {
+        delete span.dataset.invittaCoverNameSize;
+        span.removeAttribute("data-invitta-cover-name-size");
+      });
+    }
+  }
+
   function cleanRsvpMessageLabels() {
     // A legacy RSVP label interpolated the celebrant using a literal "$".
     // Limit the repair to the congratulation label so currency or other
@@ -2660,6 +2692,7 @@
     applyPlumNoirWeddingAdapter();
     applyCoverNameSizing();
     applyEditorialCoverMeta();
+    applyGoldenRomanceWeddingAdapter();
     applyTypographyScales(false);
     hideUnsupportedPlumNoirSamples();
     applyItineraryHeading();
