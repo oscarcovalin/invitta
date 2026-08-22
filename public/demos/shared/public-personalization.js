@@ -529,8 +529,19 @@
   function applyGoldenRomanceWeddingAdapter() {
     if (templateId !== "boda-golden-romance-premium" || !isWedding) return;
 
-    // 1. In the opening envelope, remove any injected duplicate date element
-    // and restore native card typography on the envelope heading.
+    var coupleNames = isWedding
+      ? clean(data.celebrantName).split(/\s*(?:&|\by\b|\+)\s*/i).filter(Boolean)
+      : [clean(data.celebrantName)];
+
+    // 1. Wax seal initials in envelope
+    var initials = "MD";
+    if (coupleNames.length >= 2) {
+      initials = (coupleNames[0][0] + coupleNames[1][0]).toLocaleUpperCase("es-MX");
+    } else if (coupleNames.length === 1 && coupleNames[0]) {
+      var parts = coupleNames[0].split(/\s+/);
+      initials = (parts[0][0] + (parts[1] ? parts[1][0] : "")).toLocaleUpperCase("es-MX");
+    }
+
     var envelope = document.querySelector(".fixed.inset-0.z-\\[100\\], div[class*='z-[100]']");
     if (envelope) {
       Array.from(envelope.querySelectorAll(".invitta-editorial-cover-date, [data-invitta-editorial-date]")).forEach(function(el) {
@@ -546,15 +557,100 @@
         delete envelopeTitle.dataset.invittaEditorialEvent;
         envelopeTitle.removeAttribute("data-invitta-editorial-event");
       }
+      var sealSpan = Array.from(envelope.querySelectorAll("span")).find(function(s) {
+        return /^[A-Z&]{2,3}$/.test((s.textContent || "").trim()) && s.closest(".rounded-full");
+      });
+      if (sealSpan) {
+        sealSpan.textContent = initials;
+      }
     }
 
-    // 2. In #hero, retain native staggered layout without cover-sizing centering override.
-    var heroHeading = document.querySelector("#hero h2.font-display");
-    if (heroHeading) {
-      Array.from(heroHeading.querySelectorAll("span")).forEach(function(span) {
-        delete span.dataset.invittaCoverNameSize;
-        span.removeAttribute("data-invitta-cover-name-size");
+    // 2 & 3. Hero styling: Elevate "Nuestra Boda" and position date under groom
+    var hero = document.querySelector("#hero");
+    if (hero) {
+      Array.from(hero.querySelectorAll(".invitta-editorial-cover-date, [data-invitta-editorial-date]")).forEach(function(el) {
+        el.remove();
       });
+
+      var heroKicker = hero.querySelector("span.text-subheading-caps");
+      if (heroKicker) {
+        heroKicker.style.setProperty("font-size", "clamp(0.72rem, 2.2vw, 0.88rem)", "important");
+        heroKicker.style.setProperty("font-weight", "600", "important");
+        heroKicker.style.setProperty("letter-spacing", "0.38em", "important");
+        heroKicker.style.setProperty("color", "var(--color-sage, #ab8478)", "important");
+      }
+
+      var heroHeading = hero.querySelector("h2.font-display");
+      if (heroHeading) {
+        Array.from(heroHeading.querySelectorAll("span")).forEach(function(span) {
+          delete span.dataset.invittaCoverNameSize;
+          span.removeAttribute("data-invitta-cover-name-size");
+        });
+
+        var formats = dateFormats(data.eventDate);
+        if (formats) {
+          var dateText = formats.dotted.toLocaleUpperCase("es-MX");
+          var existingHeroDate = hero.querySelector(".invitta-golden-hero-date");
+          if (!existingHeroDate) {
+            existingHeroDate = document.createElement("p");
+            existingHeroDate.className = "invitta-golden-hero-date font-sans text-xs md:text-sm uppercase tracking-[0.26em] text-[#6b5853] font-medium mt-4 block md:ml-24";
+            heroHeading.insertAdjacentElement("afterend", existingHeroDate);
+          }
+          existingHeroDate.textContent = dateText;
+        }
+      }
+    }
+
+    // 4. Native Gallery with Parallax
+    var gallerySection = document.querySelector("#gallery");
+    if (gallerySection) {
+      var injectedGrid = gallerySection.querySelector(".invitta-gallery-grid");
+      if (injectedGrid) injectedGrid.remove();
+
+      var nativeItems = Array.from(gallerySection.querySelectorAll(".group"));
+      var realGallery = Array.isArray(data.galleryUrls) && data.galleryUrls.length
+        ? data.galleryUrls
+        : (Array.isArray(data.gallery) ? data.gallery : []);
+
+      if (realGallery.length && nativeItems.length) {
+        nativeItems.forEach(function(item, idx) {
+          if (idx < realGallery.length) {
+            item.style.removeProperty("display");
+            var photoUrl = realGallery[idx];
+            Array.from(item.querySelectorAll("img")).forEach(function(img) {
+              img.src = photoUrl;
+              img.dataset.invittaPersonalized = "true";
+              img.dataset.invittaPersonalizedSrc = photoUrl;
+            });
+          } else {
+            item.style.setProperty("display", "none", "important");
+          }
+        });
+      }
+    }
+
+    // 5. Studio Contracting Message at Footer
+    if (data.studioCtaEnabled !== false) {
+      var footer = document.querySelector("footer");
+      if (footer && !footer.querySelector(".invitta-studio-contracting-cta")) {
+        var phone = clean(data.studioWhatsapp || data.whatsapp).replace(/\D/g, "") || "525566790073";
+        var ctaText = clean(data.studioCtaText) || "Quiero una invitación así";
+        var ctaMsg = clean(data.studioCtaMessage) || "Hola, vi esta invitación digital y me interesa contratar una para mi evento.";
+        var ctaUrl = "https://wa.me/" + phone + "?text=" + encodeURIComponent(ctaMsg);
+
+        var ctaBox = document.createElement("div");
+        ctaBox.className = "invitta-studio-contracting-cta flex flex-col items-center text-center space-y-4 pt-4 border-t border-outline-variant/20 w-full max-w-md mx-auto";
+        ctaBox.innerHTML = '<p class="font-sans text-xs uppercase tracking-[0.22em] text-[#6b5853] font-medium">¿Te gustaría una invitación como esta?</p>' +
+          '<a href="' + ctaUrl + '" target="_blank" rel="noopener noreferrer" class="px-8 py-3.5 border border-sage text-sage hover:bg-sage hover:text-paper text-[11px] tracking-[0.25em] font-semibold uppercase transition-all duration-300 rounded-xs inline-flex items-center gap-2">' +
+          '<span>' + ctaText + '</span><span class="material-symbols-outlined text-sm">chat</span></a>';
+
+        var copyright = footer.querySelector("p");
+        if (copyright) {
+          footer.insertBefore(ctaBox, copyright);
+        } else {
+          footer.appendChild(ctaBox);
+        }
+      }
     }
   }
 
@@ -992,6 +1088,8 @@
         btn.style.removeProperty("display");
       }
     });
+
+    if (templateId === "boda-golden-romance-premium") return;
 
     gallerySections.forEach(function (sec) {
       var demoItems = sec.querySelectorAll(".grid > *, .gallery > *, [class*='grid'] > *, [class*='gallery']:not(.invitta-gallery-grid)");
