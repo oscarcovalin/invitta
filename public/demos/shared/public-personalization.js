@@ -6,6 +6,15 @@
 
   var templateId = data.templateId;
   var rendererTemplateId = data.rendererTemplateId || templateId;
+
+  function isTemplate() {
+    for (var i = 0; i < arguments.length; i++) {
+      var id = arguments[i];
+      if (templateId === id || rendererTemplateId === id) return true;
+    }
+    return false;
+  }
+
   var isWedding = data.eventType === "boda";
   var isMilestoneBirthday = data.eventType === "cumpleanos" && /(?:^|\D)50(?:\D|$)/.test(clean(data.eventTitle));
   var applying = false;
@@ -82,56 +91,63 @@
     });
   }
 
-  var defaults = {
-    "xv-elegance-basic": {
-      names: ["Ana Camila Zavala", "Ana Camila"],
-      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-      godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
-      dates: ["12 Diciembre 2026"],
-      ceremonyTime: ["3:00 P.M."],
-      receptionTime: ["9:00 P.M."]
-    },
-    "xv-rose-gold-premium": {
-      names: ["Mary Carmen Arevalo", "Mary Carmen"],
-      parents: ["José Ángel Arévalo G.", "Luisa María Saavedra D."],
-      godparents: ["Julio Arévalo G.", "Martha Caballero H."],
-      dates: ["28 Noviembre 2026", "28 · Noviembre · 2026"],
-      ceremonyTime: ["6:00 P.M.", "18:00 P.M."],
-      receptionTime: ["8:00 P.M.", "20:00 P.M."]
-    },
-    "xv-champagne-rose-vip": {
-      names: ["Ana Camila Zavala Almazán", "Ana Camila Zavala", "Ana Camila"],
-      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-      godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
-      dates: ["12 Diciembre 2026"],
-      ceremonyTime: ["3:00 P.M."],
-      receptionTime: ["9:00 P.M."]
-    },
-    "boda-classic-basic": {
-      names: ["Mariana & Diego"],
-      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-      godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
-      dates: ["12 Diciembre 2026"],
-      ceremonyTime: ["3:00 P.M."],
-      receptionTime: ["9:00 P.M."]
-    },
-    "boda-golden-romance-premium": {
-      names: ["Mariana & Diego"],
-      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-      godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
-      dates: ["12 Diciembre 2026", "12 · Diciembre · 2026"],
-      ceremonyTime: ["3:00 P.M."],
-      receptionTime: ["9:00 P.M."]
-    },
-    "boda-midnight-gold-vip": {
-      names: ["Ana Camila & Carlos Zavala & González", "Ana Camila & Carlos", "Ana Camila"],
-      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-      godparents: ["Patricia & Alejandro Farrera"],
-      dates: ["12 Diciembre 2026"],
-      ceremonyTime: ["3:00 P.M."],
-      receptionTime: ["9:00 P.M."]
-    }
-  }[rendererTemplateId] || {};
+  var defaults = (function () {
+    var map = {
+      "xv-elegance-basic": {
+        names: ["Ana Camila Zavala", "Ana Camila"],
+        parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+        godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
+        dates: ["12 Diciembre 2026"],
+        ceremonyTime: ["3:00 P.M."],
+        receptionTime: ["9:00 P.M."]
+      },
+      "xv-rose-gold-premium": {
+        names: ["Mary Carmen Arevalo", "Mary Carmen"],
+        parents: ["José Ángel Arévalo G.", "Luisa María Saavedra D."],
+        godparents: ["Julio Arévalo G.", "Martha Caballero H."],
+        dates: ["28 Noviembre 2026", "28 · Noviembre · 2026"],
+        ceremonyTime: ["6:00 P.M.", "18:00 P.M."],
+        receptionTime: ["8:00 P.M.", "20:00 P.M."]
+      },
+      "xv-champagne-rose-vip": {
+        names: ["Ana Camila Zavala Almazán", "Ana Camila Zavala", "Ana Camila"],
+        parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+        godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
+        dates: ["12 Diciembre 2026"],
+        ceremonyTime: ["3:00 P.M."],
+        receptionTime: ["9:00 P.M."]
+      },
+      "boda-classic-basic": {
+        names: ["Mariana & Diego"],
+        parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+        godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
+        dates: ["12 Diciembre 2026"],
+        ceremonyTime: ["3:00 P.M."],
+        receptionTime: ["9:00 P.M."]
+      },
+      "boda-golden-romance-premium": {
+        names: ["Mariana & Diego"],
+        parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+        godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
+        dates: ["12 Diciembre 2026", "12 · Diciembre · 2026"],
+        ceremonyTime: ["3:00 P.M."],
+        receptionTime: ["9:00 P.M."]
+      },
+      "boda-midnight-gold-vip": {
+        names: ["Ana Camila & Carlos Zavala & González", "Ana Camila & Carlos", "Ana Camila"],
+        parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+        godparents: ["Patricia & Alejandro Farrera"],
+        dates: ["12 Diciembre 2026"],
+        ceremonyTime: ["3:00 P.M."],
+        receptionTime: ["9:00 P.M."]
+      }
+    };
+    map["xv-premium-2"] = map["xv-rose-gold-premium"];
+    map["xv-vip-3"] = map["xv-champagne-rose-vip"];
+    map["xv-elegance"] = map["xv-elegance-basic"];
+    map["boda-premium-1"] = map["boda-midnight-gold-vip"];
+    return map[rendererTemplateId] || map[templateId] || {};
+  })();
 
   function clean(value) {
     return typeof value === "string" ? value.trim() : "";
@@ -217,16 +233,16 @@
     }
 
     var parts = personNameParts(name);
-    if (templateId === "xv-elegance-basic") {
+    if (isTemplate("xv-elegance-basic", "xv-elegance")) {
       addExactReplacement(list, "Ana", parts.first);
       addExactReplacement(list, "Camila", parts.middle);
       addExactReplacement(list, "Zavala", parts.last);
-    } else if (templateId === "xv-rose-gold-premium") {
+    } else if (isTemplate("xv-rose-gold-premium", "xv-premium-2")) {
       addExactReplacement(list, "Mary", parts.first);
       addExactReplacement(list, "Carmen", parts.middle); // Handle split Carmen
       addExactReplacement(list, "Arevalo", parts.last); // In case it renders Arevalo
       addExactReplacement(list, "Mary Carmen", parts.firstTwo || parts.first);
-    } else if (templateId === "xv-champagne-rose-vip") {
+    } else if (isTemplate("xv-champagne-rose-vip", "xv-vip-3")) {
       addExactReplacement(list, "Ana", parts.first);
       addExactReplacement(list, "Camila", parts.middle);
       addExactReplacement(list, "Zavala", parts.last);
