@@ -187,10 +187,16 @@ function updateWeddingNameFields() {
   const groom = document.getElementById("groom_name");
   const combined = document.getElementById("honoree_name");
 
+  const weddingParents = document.getElementById("wedding-parents-fields");
+  const generalParents = document.getElementById("general-parents-fields");
+
   if (coupleFields) coupleFields.hidden = !isWedding;
   if (legacyField) legacyField.hidden = isWedding;
   if (bride) bride.required = isWedding;
   if (groom) groom.required = isWedding;
+
+  if (weddingParents) weddingParents.hidden = !isWedding;
+  if (generalParents) generalParents.hidden = isWedding;
 
   if (isWedding && combined) combined.value = getWeddingCoupleName();
 }
@@ -2190,8 +2196,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("event_time").value = data.event_time || "";
     document.getElementById("welcome_text").value = data.welcome_text || "";
     
-    document.getElementById("father_name").value = data.father_name || "";
-    document.getElementById("mother_name").value = data.mother_name || "";
+    const brideFatherInput = document.getElementById("bride_father_name");
+    const brideMotherInput = document.getElementById("bride_mother_name");
+    const groomFatherInput = document.getElementById("groom_father_name");
+    const groomMotherInput = document.getElementById("groom_mother_name");
+    const fatherInput = document.getElementById("father_name");
+    const motherInput = document.getElementById("mother_name");
+    const legacyNotice = document.getElementById("wedding-legacy-notice");
+
+    const hasExplicitWeddingParents = Boolean(
+      data.bride_father_name || data.bride_mother_name ||
+      data.groom_father_name || data.groom_mother_name
+    );
+
+    if (brideFatherInput) brideFatherInput.value = data.bride_father_name || "";
+    if (brideMotherInput) brideMotherInput.value = data.bride_mother_name || "";
+    if (groomFatherInput) groomFatherInput.value = data.groom_father_name || "";
+    if (groomMotherInput) groomMotherInput.value = data.groom_mother_name || "";
+
+    if (fatherInput) fatherInput.value = data.father_name || "";
+    if (motherInput) motherInput.value = data.mother_name || "";
+
+    if (legacyNotice) {
+      if (data.event_type === "boda" && !hasExplicitWeddingParents && (data.father_name || data.mother_name)) {
+        const legacyNames = [data.father_name, data.mother_name].filter(Boolean).join(" & ");
+        legacyNotice.textContent = `Esta invitación contiene datos de padres en formato anterior (${legacyNames}). Asigna los nombres a Padres de la Novia o Padres del Novio si deseas clasificarlos.`;
+        legacyNotice.style.display = "block";
+      } else {
+        legacyNotice.style.display = "none";
+        legacyNotice.textContent = "";
+      }
+    }
     document.getElementById("instagram_hashtag").value = data.instagram_hashtag || "";
     document.getElementById("thankYouTitle").value = data.thank_you_title || "";
     document.getElementById("thankYouMessage").value = data.thank_you_message || "";
@@ -2628,8 +2663,28 @@ document.addEventListener("DOMContentLoaded", async () => {
       event_date: document.getElementById("event_date").value || null,
       event_time: document.getElementById("event_time").value || null,
       welcome_text: document.getElementById("welcome_text").value,
-      father_name: document.getElementById("father_name").value || null,
-      mother_name: document.getElementById("mother_name").value || null,
+      father_name: (() => {
+        if (eventType !== "boda") return document.getElementById("father_name")?.value.trim() || null;
+        const bf = document.getElementById("bride_father_name")?.value.trim();
+        const bm = document.getElementById("bride_mother_name")?.value.trim();
+        const gf = document.getElementById("groom_father_name")?.value.trim();
+        const gm = document.getElementById("groom_mother_name")?.value.trim();
+        if (bf || bm || gf || gm) return bf || null;
+        return document.getElementById("father_name")?.value.trim() || null;
+      })(),
+      mother_name: (() => {
+        if (eventType !== "boda") return document.getElementById("mother_name")?.value.trim() || null;
+        const bf = document.getElementById("bride_father_name")?.value.trim();
+        const bm = document.getElementById("bride_mother_name")?.value.trim();
+        const gf = document.getElementById("groom_father_name")?.value.trim();
+        const gm = document.getElementById("groom_mother_name")?.value.trim();
+        if (bf || bm || gf || gm) return bm || null;
+        return document.getElementById("mother_name")?.value.trim() || null;
+      })(),
+      bride_father_name: eventType === "boda" ? (document.getElementById("bride_father_name")?.value.trim() || null) : null,
+      bride_mother_name: eventType === "boda" ? (document.getElementById("bride_mother_name")?.value.trim() || null) : null,
+      groom_father_name: eventType === "boda" ? (document.getElementById("groom_father_name")?.value.trim() || null) : null,
+      groom_mother_name: eventType === "boda" ? (document.getElementById("groom_mother_name")?.value.trim() || null) : null,
       instagram_hashtag: document.getElementById("instagram_hashtag").value || null,
       thank_you_title: document.getElementById("thankYouTitle").value || "Con cariño",
       thank_you_message: document.getElementById("thankYouMessage").value || "Gracias por ser parte de mis XV años",
@@ -2734,6 +2789,23 @@ document.addEventListener("DOMContentLoaded", async () => {
       const compatiblePayload = { ...payload };
       delete compatiblePayload.typography_fonts;
       if (missingGiftOptionsColumn) delete compatiblePayload.gift_options;
+      result = await saveInvitationPayload(compatiblePayload);
+    }
+
+    // Fallback: si las columnas de padres de boda no existen aún en BD (PGRST204 estricto)
+    const missingWeddingParentsColumn = result.error &&
+      result.error.code === "PGRST204" &&
+      /bride_father_name|bride_mother_name|groom_father_name|groom_mother_name/i.test(
+        (result.error.message || "") + " " + (result.error.details || "") + " " + (result.error.hint || "")
+      );
+    if (missingWeddingParentsColumn) {
+      const compatiblePayload = { ...payload };
+      delete compatiblePayload.bride_father_name;
+      delete compatiblePayload.bride_mother_name;
+      delete compatiblePayload.groom_father_name;
+      delete compatiblePayload.groom_mother_name;
+      if (missingGiftOptionsColumn) delete compatiblePayload.gift_options;
+      if (missingTypographyColumn) delete compatiblePayload.typography_fonts;
       result = await saveInvitationPayload(compatiblePayload);
     }
 

@@ -336,6 +336,7 @@
       // supporting copy. Only replace a complete, leaf editorial label;
       // substring replacement turns those unrelated places into duplicates.
       if (!node.parentElement || node.parentElement.children.length !== 0) continue;
+      if (isWedding && node.parentElement.closest("#family, #honors")) continue;
       var value = node.nodeValue.trim();
       if (/^Hecho con amor para\s+(?:Mariana\s*&\s*Diego|Ana Camila\s*&\s*Carlos(?:\s+Zavala\s*&\s+Gonz[aá]lez)?|Ana Camila Zavala|Mary Carmen Arevalo)$/i.test(value)) {
         value = "Hecho con amor para " + clean(data.celebrantName);
@@ -2760,6 +2761,188 @@
     document.head.appendChild(style);
   }
 
+
+  var WEDDING_FAMILY_STYLES = {
+    classic: {
+      containerClass: "space-y-6",
+      headingClass: "font-sans text-[11px] tracking-[0.3em] text-sage uppercase font-semibold flex items-center gap-4",
+      lineClass: "w-10 h-px bg-sage/40",
+      listClass: "flex flex-col gap-3 pl-4 md:pl-8",
+      nameClass: "font-serif text-2xl md:text-3xl text-ink font-light",
+      ampClass: "font-serif text-2xl italic text-sage text-center w-20",
+      offsetClass: "pl-6 md:pl-12"
+    },
+    golden: {
+      containerClass: "space-y-6",
+      headingClass: "text-subheading-caps text-sage tracking-[0.25em] flex items-center gap-4",
+      lineClass: "w-8 h-px bg-sage/50",
+      listClass: "flex flex-col gap-4",
+      nameClass: "font-display font-light text-2xl md:text-3.5xl text-ink leading-tight",
+      ampClass: "font-serif-accent italic text-sage text-2xl pl-12",
+      offsetClass: "pl-16"
+    }
+  };
+
+  function normalizeWeddingParents(sourceData) {
+    var wp = sourceData.weddingParents || {};
+    var wpBride = wp.bride || {};
+    var wpGroom = wp.groom || {};
+    var wpLegacy = wp.legacy || {};
+
+    var brideFather = clean(wpBride.father || sourceData.brideFatherName || sourceData.bride_father_name || (sourceData.brideParents && sourceData.brideParents.father));
+    var brideMother = clean(wpBride.mother || sourceData.brideMotherName || sourceData.bride_mother_name || (sourceData.brideParents && sourceData.brideParents.mother));
+    var groomFather = clean(wpGroom.father || sourceData.groomFatherName || sourceData.groom_father_name || (sourceData.groomParents && sourceData.groomParents.father));
+    var groomMother = clean(wpGroom.mother || sourceData.groomMotherName || sourceData.groom_mother_name || (sourceData.groomParents && sourceData.groomParents.mother));
+
+    var hasExplicitParents = Boolean(brideFather || brideMother || groomFather || groomMother);
+
+    var legacyParents = Array.isArray(sourceData.parents) ? sourceData.parents.filter(Boolean) : [];
+    var legacyFather = clean(wpLegacy.father || sourceData.father_name || sourceData.fatherName || legacyParents[0]);
+    var legacyMother = clean(wpLegacy.mother || sourceData.mother_name || sourceData.motherName || legacyParents[1]);
+
+    var godparents = Array.isArray(sourceData.godparents)
+      ? sourceData.godparents.map(function (gp) {
+          return typeof gp === "string" ? gp.trim() : (gp && gp.name ? gp.name.trim() : "");
+        }).filter(Boolean)
+      : [];
+
+    return {
+      bride: { father: brideFather, mother: brideMother },
+      groom: { father: groomFather, mother: groomMother },
+      legacy: { father: !hasExplicitParents ? legacyFather : "", mother: !hasExplicitParents ? legacyMother : "" },
+      hasExplicitParents: hasExplicitParents,
+      hasLegacyParents: !hasExplicitParents && Boolean(legacyFather || legacyMother),
+      godparents: godparents
+    };
+  }
+
+  function createWeddingFamilyBlock(options) {
+    var title = options.title;
+    var people = options.people || [];
+    var style = options.style || WEDDING_FAMILY_STYLES.classic;
+    var isFirst = options.isFirst !== false;
+
+    var validPeople = people.filter(Boolean);
+    if (validPeople.length === 0) return null;
+
+    var block = document.createElement("div");
+    block.className = style.containerClass + (!isFirst && style === WEDDING_FAMILY_STYLES.golden ? " pt-6" : "");
+
+    var h3 = document.createElement("h3");
+    h3.className = style.headingClass;
+    h3.innerHTML = '<span class="' + style.lineClass + '"></span>' + title;
+    block.appendChild(h3);
+
+    var listDiv = document.createElement("div");
+    listDiv.className = style.listClass;
+
+    if (validPeople.length === 2) {
+      var s1 = document.createElement("span");
+      s1.className = style.nameClass;
+      s1.textContent = validPeople[0];
+      listDiv.appendChild(s1);
+
+      var sAmp = document.createElement("span");
+      sAmp.className = style.ampClass;
+      sAmp.textContent = "&";
+      listDiv.appendChild(sAmp);
+
+      var s2 = document.createElement("span");
+      s2.className = style.nameClass + " " + style.offsetClass;
+      s2.textContent = validPeople[1];
+      listDiv.appendChild(s2);
+    } else {
+      validPeople.forEach(function (personName, idx) {
+        var s = document.createElement("span");
+        s.className = style.nameClass + (idx > 0 ? " pt-1" : "");
+        s.textContent = personName;
+        listDiv.appendChild(s);
+      });
+    }
+
+    block.appendChild(listDiv);
+    return block;
+  }
+
+  function applyClassicWeddingFamily(model) {
+    var sec = document.querySelector("#family");
+    if (!sec) return;
+
+    var hasAny = model.hasExplicitParents || model.hasLegacyParents || model.godparents.length > 0;
+    if (!hasAny) {
+      sec.style.setProperty("display", "none", "important");
+      return;
+    }
+    sec.style.removeProperty("display");
+
+    var col = sec.querySelector(".md\\:col-span-7") || sec.querySelector(".space-y-20") || sec.querySelector(".grid > div:first-child");
+    if (!col) return;
+    col.innerHTML = "";
+
+    var style = WEDDING_FAMILY_STYLES.classic;
+    if (model.hasExplicitParents) {
+      var brideBlock = createWeddingFamilyBlock({ title: "Padres de la Novia", people: [model.bride.father, model.bride.mother], style: style });
+      if (brideBlock) col.appendChild(brideBlock);
+
+      var groomBlock = createWeddingFamilyBlock({ title: "Padres del Novio", people: [model.groom.father, model.groom.mother], style: style });
+      if (groomBlock) col.appendChild(groomBlock);
+    } else if (model.hasLegacyParents) {
+      var legBlock = createWeddingFamilyBlock({ title: "Nuestros Padres", people: [model.legacy.father, model.legacy.mother], style: style });
+      if (legBlock) col.appendChild(legBlock);
+    }
+
+    if (model.godparents.length > 0) {
+      var gpBlock = createWeddingFamilyBlock({ title: "Nuestros Padrinos", people: model.godparents, style: style });
+      if (gpBlock) col.appendChild(gpBlock);
+    }
+  }
+
+  function applyGoldenWeddingFamily(model) {
+    var sec = document.querySelector("#honors");
+    if (!sec) return;
+
+    var hasAny = model.hasExplicitParents || model.hasLegacyParents || model.godparents.length > 0;
+    if (!hasAny) {
+      sec.style.setProperty("display", "none", "important");
+      return;
+    }
+    sec.style.removeProperty("display");
+
+    var col = sec.querySelector(".md\\:col-span-7") || sec.querySelector(".space-y-20") || sec.querySelector(".grid > div:first-child");
+    if (!col) return;
+    col.innerHTML = "";
+
+    var style = WEDDING_FAMILY_STYLES.golden;
+    var isFirst = true;
+
+    if (model.hasExplicitParents) {
+      var brideBlock = createWeddingFamilyBlock({ title: "Padres de la Novia", people: [model.bride.father, model.bride.mother], style: style, isFirst: isFirst });
+      if (brideBlock) { col.appendChild(brideBlock); isFirst = false; }
+
+      var groomBlock = createWeddingFamilyBlock({ title: "Padres del Novio", people: [model.groom.father, model.groom.mother], style: style, isFirst: isFirst });
+      if (groomBlock) { col.appendChild(groomBlock); isFirst = false; }
+    } else if (model.hasLegacyParents) {
+      var legBlock = createWeddingFamilyBlock({ title: "Con la bendición de nuestras familias", people: [model.legacy.father, model.legacy.mother], style: style, isFirst: isFirst });
+      if (legBlock) { col.appendChild(legBlock); isFirst = false; }
+    }
+
+    if (model.godparents.length > 0) {
+      var gpBlock = createWeddingFamilyBlock({ title: "Nuestros Padrinos de Honor", people: model.godparents, style: style, isFirst: isFirst });
+      if (gpBlock) col.appendChild(gpBlock);
+    }
+  }
+
+  function applyWeddingParents() {
+    if (!isWedding) return;
+    var model = normalizeWeddingParents(data);
+
+    if (isTemplate("boda-classic-basic")) {
+      applyClassicWeddingFamily(model);
+    } else if (isTemplate("boda-golden-romance-premium", "boda-midnight-gold-vip", "boda-premium-1")) {
+      applyGoldenWeddingFamily(model);
+    }
+  }
+
   function applyAll() {
     if (applying || !document.body) return;
     applying = true;
@@ -2767,6 +2950,7 @@
     ensureMusicControlStyles();
     ensureActionAccessibilityStyles();
     replaceText(document.body);
+    applyWeddingParents();
     applyLocationContent();
     cleanRsvpMessageLabels();
     markFamilySectionTitles();

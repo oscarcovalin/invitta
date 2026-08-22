@@ -793,9 +793,24 @@ function findReceptionTime(inv) {
 }
 
 function buildPublicTemplateData(inv, template) {
-    var parents = (inv.father_name || inv.mother_name)
-        ? [cleanString(inv.father_name, 120), cleanString(inv.mother_name, 120)].filter(Boolean)
-        : normalizeStringArray(inv.parents);
+    var isWedding = cleanString(inv.event_type, 30) === "boda" || template.kind === "boda";
+    var brideFather = cleanString(inv.bride_father_name, 120);
+    var brideMother = cleanString(inv.bride_mother_name, 120);
+    var groomFather = cleanString(inv.groom_father_name, 120);
+    var groomMother = cleanString(inv.groom_mother_name, 120);
+    var legacyFather = cleanString(inv.father_name, 120);
+    var legacyMother = cleanString(inv.mother_name, 120);
+
+    var hasExplicitWeddingParents = Boolean(brideFather || brideMother || groomFather || groomMother);
+
+    var parents = isWedding
+        ? (hasExplicitWeddingParents
+            ? [brideFather, brideMother, groomFather, groomMother].filter(Boolean)
+            : [legacyFather, legacyMother].filter(Boolean))
+        : ((legacyFather || legacyMother)
+            ? [legacyFather, legacyMother].filter(Boolean)
+            : normalizeStringArray(inv.parents));
+
     var confirmationPhones = normalizeConfirmationPhones(inv.whatsapp_number);
     var typographyFonts = normalizeTypographyFontLibrary(
         inv.typography_fonts,
@@ -822,6 +837,23 @@ function buildPublicTemplateData(inv, template) {
         eventTime: cleanString(inv.event_time || inv.ceremony_time, 60),
         quote: cleanString(inv.welcome_text || inv.quote, 800),
         parents: parents,
+        father_name: legacyFather,
+        mother_name: legacyMother,
+        bride_father_name: brideFather,
+        bride_mother_name: brideMother,
+        groom_father_name: groomFather,
+        groom_mother_name: groomMother,
+        brideFatherName: brideFather,
+        brideMotherName: brideMother,
+        groomFatherName: groomFather,
+        groomMotherName: groomMother,
+        brideParents: { father: brideFather, mother: brideMother },
+        groomParents: { father: groomFather, mother: groomMother },
+        weddingParents: {
+            bride: { father: brideFather, mother: brideMother },
+            groom: { father: groomFather, mother: groomMother },
+            legacy: { father: !hasExplicitWeddingParents ? legacyFather : "", mother: !hasExplicitWeddingParents ? legacyMother : "" }
+        },
         godparents: normalizeGodparents(inv.godparents),
         ceremony: {
             name: cleanString(inv.ceremony_name, 160),
@@ -1211,21 +1243,48 @@ function renderDefaultTemplate(inv) {
     setText("inv-welcome", inv.welcome_text || "");
 
     /* Padres y Padrinos */
-    var hasParents = inv.father_name || inv.mother_name;
+    var isWedding = cleanString(inv.event_type, 30) === "boda";
+    var brideFather = cleanString(inv.bride_father_name, 120);
+    var brideMother = cleanString(inv.bride_mother_name, 120);
+    var groomFather = cleanString(inv.groom_father_name, 120);
+    var groomMother = cleanString(inv.groom_mother_name, 120);
+    var legacyFather = cleanString(inv.father_name, 120);
+    var legacyMother = cleanString(inv.mother_name, 120);
+
+    var hasExplicitWedding = isWedding && Boolean(brideFather || brideMother || groomFather || groomMother);
+    var hasLegacyParents = Boolean(legacyFather || legacyMother);
     var hasGodparents = inv.godparents && inv.godparents.length > 0;
-    toggle("inv-parents-block", hasParents || hasGodparents);
-    
-    if (inv.father_name) {
-      setText("inv-father-name", inv.father_name);
-      show("inv-father-name");
-    } else {
-      hide("inv-father-name");
+
+    var hasAnyParents = isWedding ? (hasExplicitWedding || hasLegacyParents) : hasLegacyParents;
+    toggle("inv-parents-block", hasAnyParents || hasGodparents);
+
+    var parentsTitle = document.getElementById("inv-parents-title");
+    if (parentsTitle) {
+      parentsTitle.textContent = isWedding ? "Con la bendición de nuestras familias" : "Con la bendición de mis padres";
     }
-    if (inv.mother_name) {
-      setText("inv-mother-name", inv.mother_name);
-      show("inv-mother-name");
+
+    if (isWedding && hasExplicitWedding) {
+      hide("inv-parents-list");
+      show("inv-wedding-parents");
+
+      var hasBride = Boolean(brideFather || brideMother);
+      toggle("inv-bride-parents-block", hasBride);
+      if (brideFather) { setText("inv-bride-father-name", brideFather); show("inv-bride-father-name"); } else hide("inv-bride-father-name");
+      if (brideMother) { setText("inv-bride-mother-name", brideMother); show("inv-bride-mother-name"); } else hide("inv-bride-mother-name");
+
+      var hasGroom = Boolean(groomFather || groomMother);
+      toggle("inv-groom-parents-block", hasGroom);
+      if (groomFather) { setText("inv-groom-father-name", groomFather); show("inv-groom-father-name"); } else hide("inv-groom-father-name");
+      if (groomMother) { setText("inv-groom-mother-name", groomMother); show("inv-groom-mother-name"); } else hide("inv-groom-mother-name");
     } else {
-      hide("inv-mother-name");
+      hide("inv-wedding-parents");
+      if (hasLegacyParents) {
+        show("inv-parents-list");
+        if (legacyFather) { setText("inv-father-name", legacyFather); show("inv-father-name"); } else hide("inv-father-name");
+        if (legacyMother) { setText("inv-mother-name", legacyMother); show("inv-mother-name"); } else hide("inv-mother-name");
+      } else {
+        hide("inv-parents-list");
+      }
     }
 
     if (hasGodparents) {
