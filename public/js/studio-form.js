@@ -2688,6 +2688,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       music_url: finalMusicUrl,
       // ── Configuración avanzada de fondo (Fase 2B) ──
       bg_enabled: document.getElementById("bg_enabled")?.checked === true,
+      bg_image_opacity: Math.round(Number(document.getElementById("bg_image_opacity")?.value ?? 18)) / 100,
       bg_overlay_enabled: document.getElementById("bg_overlay_enabled")?.checked !== false,
       bg_overlay_color: document.getElementById("bg_overlay_color")?.value || "#000000",
       bg_overlay_opacity: Math.round(Number(document.getElementById("bg_overlay_opacity")?.value ?? 35)) / 100,
@@ -2743,7 +2744,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     if (missingBgColumns) {
       const compatiblePayload = { ...payload };
-      ["bg_enabled", "bg_overlay_enabled", "bg_overlay_color",
+      ["bg_enabled", "bg_image_opacity", "bg_overlay_enabled", "bg_overlay_color",
        "bg_overlay_opacity", "bg_position", "bg_size", "bg_blur"].forEach(k => delete compatiblePayload[k]);
       if (missingGiftOptionsColumn) delete compatiblePayload.gift_options;
       result = await saveInvitationPayload(compatiblePayload);
@@ -2874,6 +2875,14 @@ function loadBackgroundConfig(data) {
     bgOverlayEnabled.checked = data.bg_overlay_enabled !== false;
   }
 
+  const bgImageOpacity = document.getElementById("bg_image_opacity");
+  const bgImageOpacityDisplay = document.getElementById("bg_image_opacity_display");
+  if (bgImageOpacity) {
+    const pct = Math.round((data.bg_image_opacity ?? 0.18) * 100);
+    bgImageOpacity.value = pct;
+    if (bgImageOpacityDisplay) bgImageOpacityDisplay.value = `${pct}%`;
+  }
+
   const bgOverlayColor = document.getElementById("bg_overlay_color");
   if (bgOverlayColor) {
     bgOverlayColor.value = data.bg_overlay_color || "#000000";
@@ -2927,6 +2936,8 @@ function updateBgNoImageNotice() {
 document.addEventListener("DOMContentLoaded", () => {
   const bgEnabled = document.getElementById("bg_enabled");
   const bgControls = document.getElementById("bg-controls");
+  const bgImageOpacity = document.getElementById("bg_image_opacity");
+  const bgImageOpacityDisplay = document.getElementById("bg_image_opacity_display");
   const bgOverlayOpacity = document.getElementById("bg_overlay_opacity");
   const bgOpacityDisplay = document.getElementById("bg_overlay_opacity_display");
   const bgBlur = document.getElementById("bg_blur");
@@ -2945,6 +2956,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (bgOverlayOpacity && bgOpacityDisplay) {
     bgOverlayOpacity.addEventListener("input", () => {
       bgOpacityDisplay.value = `${bgOverlayOpacity.value}%`;
+    });
+  }
+
+  if (bgImageOpacity && bgImageOpacityDisplay) {
+    bgImageOpacity.addEventListener("input", () => {
+      bgImageOpacityDisplay.value = `${bgImageOpacity.value}%`;
     });
   }
 

@@ -879,6 +879,7 @@ function buildPublicTemplateData(inv, template) {
         sectionBackgrounds: normalizeSectionBackgrounds(inv.section_backgrounds),
         backgroundImageUrl: safeHttpsUrl(inv.background_image_url),
         bgEnabled: Boolean(inv.bg_enabled),
+        bgImageOpacity: Number(inv.bg_image_opacity ?? 0.18),
         bgOverlayEnabled: inv.bg_overlay_enabled !== false,
         bgOverlayColor: normalizeHexColor(inv.bg_overlay_color) || "#000000",
         bgOverlayOpacity: Number(inv.bg_overlay_opacity ?? 0.35),
@@ -979,7 +980,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=centered-cover-and-background-layer-20260821";
+    bridge.src = "/demos/shared/public-personalization.js?v=decorative-background-overlay-20260821";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 

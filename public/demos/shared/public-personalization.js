@@ -2409,6 +2409,8 @@
     
     var opacity = Number(data.bgOverlayOpacity);
     opacity = (isNaN(opacity) || opacity < 0) ? 0.35 : Math.min(opacity, 1);
+    var imageOpacity = Number(data.bgImageOpacity);
+    imageOpacity = (isNaN(imageOpacity) || imageOpacity < 0) ? 0.18 : Math.min(imageOpacity, 0.6);
     
     var blur = Number(data.bgBlur);
     blur = (isNaN(blur) || blur < 0) ? 0 : Math.min(blur, 20);
@@ -2425,6 +2427,7 @@
     }
     
     root.style.setProperty("--inv-custom-bg-image", "url('" + data.backgroundImageUrl + "')");
+    root.style.setProperty("--inv-custom-bg-image-opacity", imageOpacity);
     root.style.setProperty("--inv-custom-bg-position", position);
     root.style.setProperty("--inv-custom-bg-size", size);
     root.style.setProperty("--inv-custom-bg-overlay-color", color);
@@ -2438,7 +2441,7 @@
       style.id = "invitta-custom-background-style";
       style.textContent = 
         "body.invitta-custom-bg { position:relative; isolation:isolate; background:transparent!important; }\n" +
-        "body.invitta-custom-bg::before { content: ''; position: fixed; inset: -24px; z-index: 0; pointer-events: none; " +
+        "body.invitta-custom-bg::before { content: ''; position: fixed; inset: -24px; z-index: 3; pointer-events: none; opacity:var(--inv-custom-bg-image-opacity); mix-blend-mode:multiply; " +
         "background-image: var(--inv-custom-bg-image); background-size: var(--inv-custom-bg-size); " +
         "background-position: var(--inv-custom-bg-position); background-repeat: no-repeat; " +
         "filter: blur(var(--inv-custom-bg-blur)); transform: scale(1.03); }\n" +

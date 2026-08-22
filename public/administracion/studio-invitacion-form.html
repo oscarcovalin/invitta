@@ -692,6 +692,11 @@
             <div class="media-error" id="background-error"></div>
           </div>
 
+          <div class="form-group">
+            <label for="bg_image_opacity">Opacidad de imagen decorativa: <output id="bg_image_opacity_display">18%</output></label>
+            <input type="range" id="bg_image_opacity" min="0" max="60" value="18" step="2" class="form-control" aria-label="Opacidad de la imagen decorativa">
+            <p class="media-hint">La imagen se superpone como una acuarela. Manténla baja para conservar la lectura.</p>
+          </div>
 
           <label class="studio-bg-toggle" for="bg_overlay_enabled">
             <input type="checkbox" id="bg_overlay_enabled" checked>
@@ -1342,7 +1347,7 @@
   <script src="/js/studio-auth.js?v=studio-recovery-20260718"></script>
   <!-- Lógica del Formulario -->
   <script src="/assets/js/invitta-templates.js?v=milestone-template-20260814"></script>
-  <script src="/js/studio-form.js?v=required-rsvp-whatsapp-20260821"></script>
+  <script src="/js/studio-form.js?v=decorative-background-opacity-20260821"></script>
 
 </body>
 </html>
