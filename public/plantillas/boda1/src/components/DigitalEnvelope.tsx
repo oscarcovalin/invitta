@@ -36,7 +36,7 @@ export function DigitalEnvelope({ onOpen }: DigitalEnvelopeProps) {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(201,159,83,0.16),transparent_54%),linear-gradient(145deg,#0b0d16,#151a2b)]" />
       <div className="pointer-events-none absolute inset-5 border border-[#d9b66c]/15 md:inset-9" />
       <div className="relative w-full max-w-[560px] [perspective:1400px]">
-        <motion.article initial={{ opacity: 0, y: 18, scale: 0.97 }} animate={isCardExtracted ? { opacity: 1, y: "-64%", scale: 1 } : { opacity: 1, y: 12, scale: 0.97 }} transition={{ duration: 1.15, ease: [0.16, 1, 0.3, 1] }} className="absolute inset-x-[8%] top-[10%] z-20 min-h-[255px] bg-[#f7efe0] px-7 py-8 text-center text-[#252b3d] shadow-[0_26px_65px_rgba(0,0,0,0.45)] md:min-h-[290px] md:px-12 md:py-10">
+        <motion.article initial={{ opacity: 0, y: 18, scale: 0.97 }} animate={isCardExtracted ? { opacity: 1, y: "-64%", scale: 1 } : { opacity: 1, y: 12, scale: 0.97 }} transition={{ duration: 1.15, ease: [0.16, 1, 0.3, 1] }} className={`absolute inset-x-[8%] top-[10%] min-h-[255px] bg-[#f7efe0] px-7 py-8 text-center text-[#252b3d] shadow-[0_26px_65px_rgba(0,0,0,0.45)] md:min-h-[290px] md:px-12 md:py-10 ${isCardExtracted ? "z-50" : "z-20"}`}>
           <div className="pointer-events-none absolute inset-3 border border-[#b8954f]/45" />
           <div className="relative flex min-h-[190px] flex-col items-center justify-center gap-3 md:min-h-[220px]">
             <span className="text-[9px] font-semibold uppercase tracking-[0.36em] text-[#7a6237]">Invitación</span><span className="h-px w-9 bg-[#b8954f]/70" />
