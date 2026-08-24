@@ -1,7 +1,33 @@
 import { useState, useEffect } from "react";
 
-export function Countdown() {
-  const targetDate = new Date("2026-12-12T15:00:00-06:00").getTime(); // Chihuahua/Mexico time
+type CountdownProps = {
+  eventDate?: string;
+  eventTime?: string;
+  coupleName?: string;
+  ceremonyName?: string;
+  receptionName?: string;
+  location?: string;
+};
+
+function toEventTimestamp(date?: string, time?: string) {
+  if (!date) return new Date("2026-12-12T15:00:00-06:00").getTime();
+  const match = String(time || "15:00").match(/(\d{1,2}):(\d{2})/);
+  let hours = match ? Number(match[1]) : 15;
+  const minutes = match ? Number(match[2]) : 0;
+  if (/p\.m\./i.test(time || "") && hours < 12) hours += 12;
+  if (/a\.m\./i.test(time || "") && hours === 12) hours = 0;
+  const parsed = new Date(`${date.slice(0, 10)}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`);
+  return Number.isNaN(parsed.getTime()) ? new Date("2026-12-12T15:00:00-06:00").getTime() : parsed.getTime();
+}
+
+function toIcsTimestamp(timestamp: number) {
+  const date = new Date(timestamp);
+  const part = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}${part(date.getMonth() + 1)}${part(date.getDate())}T${part(date.getHours())}${part(date.getMinutes())}00`;
+}
+
+export function Countdown({ eventDate, eventTime, coupleName = "Ana Camila y Carlos", ceremonyName = "", receptionName = "", location = "" }: CountdownProps) {
+  const targetDate = toEventTimestamp(eventDate, eventTime);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -35,11 +61,11 @@ export function Countdown() {
 
   const downloadIcs = () => {
     const event = {
-      title: "Boda de Ana Camila y Carlos",
-      description: "Acompáñanos a celebrar la hermosa unión de Ana Camila y Carlos. Ceremonia: Parroquia Sagrado Corazón de Jesús. Recepción: Cantabria Salón de Eventos.",
-      location: "Cantabria Salón de Eventos, Chihuahua, Chih.",
-      start: "20261212T150000",
-      end: "20261213T020000",
+      title: `Boda de ${coupleName}`,
+      description: `Acompáñanos a celebrar la unión de ${coupleName}.${ceremonyName ? ` Ceremonia: ${ceremonyName}.` : ""}${receptionName ? ` Recepción: ${receptionName}.` : ""}`,
+      location,
+      start: toIcsTimestamp(targetDate),
+      end: toIcsTimestamp(targetDate + 7 * 60 * 60 * 1000),
     };
 
     const icsContent = [
@@ -59,7 +85,7 @@ export function Countdown() {
     const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "Boda_Ana_Camila_y_Carlos.ics";
+    link.download = `Boda_${coupleName.replace(/[^A-Za-z0-9]+/g, "_") || "Invitta"}.ics`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
