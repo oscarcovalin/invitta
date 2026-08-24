@@ -213,6 +213,73 @@ function updateWeddingNameFields() {
   if (isWedding && combined) combined.value = getWeddingCoupleName();
 }
 
+function syncEventTimeFromSelects() {
+  const hourSelect = document.getElementById("event_hour");
+  const minuteSelect = document.getElementById("event_minute");
+  const timeInput = document.getElementById("event_time");
+  if (!timeInput) return;
+
+  const hour = hourSelect?.value || "";
+  const minute = minuteSelect?.value || "";
+
+  // Remove legacy option if standard or empty value selected
+  if (minuteSelect && ["", "00", "15", "30", "45"].includes(minute)) {
+    const legacyOpt = minuteSelect.querySelector('option[data-legacy="true"]');
+    if (legacyOpt) legacyOpt.remove();
+  }
+
+  if (hour && minute) {
+    timeInput.value = `${hour}:${minute}`;
+  } else {
+    timeInput.value = "";
+  }
+}
+
+function setEventTimeSelects(rawTime) {
+  const hourSelect = document.getElementById("event_hour");
+  const minuteSelect = document.getElementById("event_minute");
+  const timeInput = document.getElementById("event_time");
+
+  if (timeInput) timeInput.value = rawTime || "";
+  if (!hourSelect || !minuteSelect) return;
+
+  // Clean existing legacy option before setting
+  const prevLegacy = minuteSelect.querySelector('option[data-legacy="true"]');
+  if (prevLegacy) prevLegacy.remove();
+
+  if (!rawTime) {
+    hourSelect.value = "";
+    minuteSelect.value = "";
+    return;
+  }
+
+  // Tolerate HH:MM and HH:MM:SS
+  const parts = String(rawTime).trim().split(":");
+  const hh = parts[0] ? parts[0].padStart(2, "0") : "";
+  const mm = parts[1] ? parts[1].padStart(2, "0") : "";
+
+  hourSelect.value = (hh && Number(hh) >= 0 && Number(hh) <= 23) ? hh : "";
+
+  if (!mm) {
+    minuteSelect.value = "";
+  } else if (["00", "15", "30", "45"].includes(mm)) {
+    minuteSelect.value = mm;
+  } else {
+    const legacyOption = document.createElement("option");
+    legacyOption.value = mm;
+    legacyOption.textContent = `${mm} (guardado)`;
+    legacyOption.dataset.legacy = "true";
+    minuteSelect.appendChild(legacyOption);
+    minuteSelect.value = mm;
+  }
+
+  if (hourSelect.value && minuteSelect.value) {
+    timeInput.value = `${hourSelect.value}:${minuteSelect.value}`;
+  } else if (!rawTime) {
+    timeInput.value = "";
+  }
+}
+
 function updateTemplateOptions(options = { preserveLegacyNull: false, preferredTemplateId: null }) {
   const eventType = document.getElementById("event_type").value;
   const templateSelect = document.getElementById("template_id");
@@ -279,6 +346,15 @@ document.addEventListener("DOMContentLoaded", () => {
       updateSectionBackgroundControls();
     });
   }
+
+  const hourSelect = document.getElementById("event_hour");
+  const minuteSelect = document.getElementById("event_minute");
+  const handleTimeChange = () => {
+    syncEventTimeFromSelects();
+    if (typeof updatePreview === "function") updatePreview();
+  };
+  hourSelect?.addEventListener("change", handleTimeChange);
+  minuteSelect?.addEventListener("change", handleTimeChange);
 });
 
 function parseItineraryText(text) {
@@ -2205,7 +2281,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (groomName) groomName.value = savedCouple.groom;
     updateWeddingNameFields();
     document.getElementById("event_date").value = data.event_date || "";
-    document.getElementById("event_time").value = data.event_time || "";
+    setEventTimeSelects(data.event_time || "");
     document.getElementById("welcome_text").value = data.welcome_text || "";
     
     const brideFatherInput = document.getElementById("bride_father_name");
@@ -2228,6 +2304,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (fatherInput) fatherInput.value = data.father_name || "";
     if (motherInput) motherInput.value = data.mother_name || "";
+
+    const honorWitnessInput = document.getElementById("honor_witness_name");
+    if (honorWitnessInput) honorWitnessInput.value = data.honor_witness_name || "";
 
     if (legacyNotice) {
       if (data.event_type === "boda" && !hasExplicitWeddingParents && (data.father_name || data.mother_name)) {
@@ -2697,6 +2776,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       bride_mother_name: eventType === "boda" ? (document.getElementById("bride_mother_name")?.value.trim() || null) : null,
       groom_father_name: eventType === "boda" ? (document.getElementById("groom_father_name")?.value.trim() || null) : null,
       groom_mother_name: eventType === "boda" ? (document.getElementById("groom_mother_name")?.value.trim() || null) : null,
+      honor_witness_name: eventType === "boda" ? (document.getElementById("honor_witness_name")?.value.trim() || null) : null,
       instagram_hashtag: document.getElementById("instagram_hashtag").value || null,
       thank_you_title: document.getElementById("thankYouTitle").value || "Con cariño",
       thank_you_message: document.getElementById("thankYouMessage").value || "Gracias por ser parte de mis XV años",
@@ -2818,6 +2898,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       delete compatiblePayload.groom_mother_name;
       if (missingGiftOptionsColumn) delete compatiblePayload.gift_options;
       if (missingTypographyColumn) delete compatiblePayload.typography_fonts;
+      result = await saveInvitationPayload(compatiblePayload);
+    }
+
+    // Fallback: si la columna honor_witness_name no existe aún en BD (PGRST204 estricto)
+    const missingHonorWitnessColumn = result.error &&
+      result.error.code === "PGRST204" &&
+      /honor_witness_name/i.test(
+        (result.error.message || "") + " " + (result.error.details || "") + " " + (result.error.hint || "")
+      );
+    if (missingHonorWitnessColumn) {
+      const compatiblePayload = { ...payload };
+      delete compatiblePayload.honor_witness_name;
+      if (missingGiftOptionsColumn) delete compatiblePayload.gift_options;
+      if (missingTypographyColumn) delete compatiblePayload.typography_fonts;
+      if (missingWeddingParentsColumn) {
+        delete compatiblePayload.bride_father_name;
+        delete compatiblePayload.bride_mother_name;
+        delete compatiblePayload.groom_father_name;
+        delete compatiblePayload.groom_mother_name;
+      }
       result = await saveInvitationPayload(compatiblePayload);
     }
 

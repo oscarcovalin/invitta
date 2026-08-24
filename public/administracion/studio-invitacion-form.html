@@ -453,14 +453,52 @@
         </div>
       </div>
 
+
       <div class="form-row">
         <div class="form-group">
           <label for="event_date">Fecha del Evento</label>
           <input type="date" id="event_date" class="form-control" required>
         </div>
         <div class="form-group">
-          <label for="event_time">Hora del Evento</label>
-          <input type="time" id="event_time" class="form-control">
+          <label>Hora del Evento</label>
+          <input type="hidden" id="event_time" name="event_time">
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <select id="event_hour" class="form-control" style="flex: 1;" aria-label="Hora">
+              <option value="">Hora</option>
+              <option value="00">00</option>
+              <option value="01">01</option>
+              <option value="02">02</option>
+              <option value="03">03</option>
+              <option value="04">04</option>
+              <option value="05">05</option>
+              <option value="06">06</option>
+              <option value="07">07</option>
+              <option value="08">08</option>
+              <option value="09">09</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+              <option value="21">21</option>
+              <option value="22">22</option>
+              <option value="23">23</option>
+            </select>
+            <span style="font-weight: 600; color: var(--text-color, #333); font-size: 16px;">:</span>
+            <select id="event_minute" class="form-control" style="flex: 1;" aria-label="Minutos">
+              <option value="">Min</option>
+              <option value="00">00</option>
+              <option value="15">15</option>
+              <option value="30">30</option>
+              <option value="45">45</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -498,7 +536,7 @@
         <div id="wedding-legacy-notice" style="display:none; margin-bottom:14px; padding:10px 14px; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; color:#92400e; font-size:12px; line-height:1.5;"></div>
         <div style="margin-bottom: 18px;">
           <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--primary-color); margin-bottom: 10px; font-weight: 600;">
-            👰 Padres de la Novia
+            Padres de la Novia
           </h3>
           <div class="form-row">
             <div class="form-group">
@@ -514,7 +552,7 @@
 
         <div style="margin-bottom: 18px;">
           <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--primary-color); margin-bottom: 10px; font-weight: 600;">
-            🤵 Padres del Novio
+            Padres del Novio
           </h3>
           <div class="form-row">
             <div class="form-group">
@@ -525,6 +563,13 @@
               <label for="groom_mother_name">Madre del Novio</label>
               <input type="text" id="groom_mother_name" class="form-control" placeholder="Ej: Carmen Gómez">
             </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <div class="form-group">
+            <label for="honor_witness_name">Testigo de Honor (Opcional)</label>
+            <input type="text" id="honor_witness_name" name="honor_witness_name" class="form-control" placeholder="Ej: Alejandro Ruiz">
           </div>
         </div>
       </div>

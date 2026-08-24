@@ -2806,13 +2806,21 @@
         }).filter(Boolean)
       : [];
 
+    var honorWitnessName = clean(
+      sourceData.honor_witness_name ||
+      sourceData.honorWitnessName ||
+      (sourceData.witnesses && sourceData.witnesses.name)
+    );
+
     return {
       bride: { father: brideFather, mother: brideMother },
       groom: { father: groomFather, mother: groomMother },
       legacy: { father: !hasExplicitParents ? legacyFather : "", mother: !hasExplicitParents ? legacyMother : "" },
       hasExplicitParents: hasExplicitParents,
       hasLegacyParents: !hasExplicitParents && Boolean(legacyFather || legacyMother),
-      godparents: godparents
+      godparents: godparents,
+      honorWitnessName: honorWitnessName,
+      hasHonorWitness: Boolean(honorWitnessName)
     };
   }
 
@@ -2868,14 +2876,14 @@
     var sec = document.querySelector("#family");
     if (!sec) return;
 
-    var hasAny = model.hasExplicitParents || model.hasLegacyParents || model.godparents.length > 0;
+    var hasAny = model.hasExplicitParents || model.hasLegacyParents || model.godparents.length > 0 || model.hasHonorWitness;
     if (!hasAny) {
       sec.style.setProperty("display", "none", "important");
       return;
     }
     sec.style.removeProperty("display");
 
-    var col = sec.querySelector(".md\\:col-span-7") || sec.querySelector(".space-y-20") || sec.querySelector(".grid > div:first-child");
+    var col = sec.querySelector(".md\\:col-span-7") || sec.querySelector(".space-y-12") || sec.querySelector(".grid > div:first-child");
     if (!col) return;
     col.innerHTML = "";
 
@@ -2895,13 +2903,34 @@
       var gpBlock = createWeddingFamilyBlock({ title: "Nuestros Padrinos", people: model.godparents, style: style });
       if (gpBlock) col.appendChild(gpBlock);
     }
+
+    var rightCol = sec.querySelector(".md\\:col-span-5");
+    if (rightCol) {
+      if (model.hasHonorWitness) {
+        rightCol.style.removeProperty("display");
+        var nameHeading = rightCol.querySelector(".font-serif, h3");
+        if (nameHeading) {
+          nameHeading.textContent = model.honorWitnessName;
+        } else {
+          var walker = document.createTreeWalker(rightCol, NodeFilter.SHOW_TEXT);
+          var tn;
+          while ((tn = walker.nextNode())) {
+            if (/Carlos González Farrera/i.test(tn.nodeValue)) {
+              tn.nodeValue = model.honorWitnessName;
+            }
+          }
+        }
+      } else {
+        rightCol.style.setProperty("display", "none", "important");
+      }
+    }
   }
 
   function applyGoldenWeddingFamily(model) {
     var sec = document.querySelector("#honors");
     if (!sec) return;
 
-    var hasAny = model.hasExplicitParents || model.hasLegacyParents || model.godparents.length > 0;
+    var hasAny = model.hasExplicitParents || model.hasLegacyParents || model.godparents.length > 0 || model.hasHonorWitness;
     if (!hasAny) {
       sec.style.setProperty("display", "none", "important");
       return;
@@ -2929,6 +2958,27 @@
     if (model.godparents.length > 0) {
       var gpBlock = createWeddingFamilyBlock({ title: "Nuestros Padrinos de Honor", people: model.godparents, style: style, isFirst: isFirst });
       if (gpBlock) col.appendChild(gpBlock);
+    }
+
+    var rightCol = sec.querySelector(".md\\:col-span-5");
+    if (rightCol) {
+      if (model.hasHonorWitness) {
+        rightCol.style.removeProperty("display");
+        var nameSpan = rightCol.querySelector(".font-display, h3 + span, span.text-ink");
+        if (nameSpan) {
+          nameSpan.textContent = model.honorWitnessName;
+        } else {
+          var walker = document.createTreeWalker(rightCol, NodeFilter.SHOW_TEXT);
+          var tn;
+          while ((tn = walker.nextNode())) {
+            if (/Carlos González Farrera/i.test(tn.nodeValue)) {
+              tn.nodeValue = model.honorWitnessName;
+            }
+          }
+        }
+      } else {
+        rightCol.style.setProperty("display", "none", "important");
+      }
     }
   }
 

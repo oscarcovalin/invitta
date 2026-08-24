@@ -798,6 +798,7 @@ function buildPublicTemplateData(inv, template) {
     var brideMother = cleanString(inv.bride_mother_name, 120);
     var groomFather = cleanString(inv.groom_father_name, 120);
     var groomMother = cleanString(inv.groom_mother_name, 120);
+    var honorWitnessName = cleanString(inv.honor_witness_name, 120);
     var legacyFather = cleanString(inv.father_name, 120);
     var legacyMother = cleanString(inv.mother_name, 120);
 
@@ -847,6 +848,8 @@ function buildPublicTemplateData(inv, template) {
         brideMotherName: brideMother,
         groomFatherName: groomFather,
         groomMotherName: groomMother,
+        honorWitnessName: honorWitnessName,
+        honor_witness_name: honorWitnessName,
         brideParents: { father: brideFather, mother: brideMother },
         groomParents: { father: groomFather, mother: groomMother },
         weddingParents: {
