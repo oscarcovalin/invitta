@@ -466,6 +466,7 @@
     // Match only an exact celebrant/couple name in a display heading, so names
     // in parents, RSVP or the closing never inherit the cover scale.
     Array.from(document.querySelectorAll("h1,h2,h3,span")).forEach(function(element) {
+      if (element.dataset.invittaMidnightCouplePiece === "true") return;
       var visible = clean(element.textContent);
       var isExactFullName = visible.toLocaleLowerCase() === fullName.toLocaleLowerCase();
       var isHeroNamePart = nameParts.some(function(part) {
@@ -494,7 +495,11 @@
       document.head.appendChild(style);
     }
 
-    var coverName = Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
+    // Midnight Gold renders each member of the couple in a separate span. Its
+    // date must follow the complete couple block, not the first member.
+    var isMidnightWedding = templateId === "boda-midnight-gold-vip" && isWedding;
+    var midnightCouple = isMidnightWedding ? document.querySelector("#hero h2[data-invitta-midnight-couple]") : null;
+    var coverName = midnightCouple || Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
       return element.offsetParent !== null;
     });
     if (!coverName) return;
@@ -519,6 +524,9 @@
       existingDate.textContent = dateText;
       existingDate.dataset.invittaEditorialDate = "true";
       if (!existingDate.dataset.invittaFontRole) existingDate.dataset.invittaFontRole = "label";
+      if (midnightCouple && existingDate.previousElementSibling !== midnightCouple) {
+        midnightCouple.insertAdjacentElement("afterend", existingDate);
+      }
       return;
     }
 
@@ -552,14 +560,72 @@
       }
     });
 
-    var editorialHeading = document.querySelector("h2.font-display");
+    var editorialHeading = document.querySelector("#hero h2.font-display");
     if (!editorialHeading) return;
     var pieces = Array.from(editorialHeading.querySelectorAll("span"));
     if (pieces[0]) pieces[0].textContent = couple[0];
-    if (pieces[1]) pieces[1].textContent = "& " + couple[1];
+    if (pieces[1]) pieces[1].textContent = "&";
     if (pieces[2]) {
-      pieces[2].textContent = "";
-      pieces[2].style.setProperty("display", "none", "important");
+      pieces[2].textContent = couple[1];
+      pieces[2].style.removeProperty("display");
+    }
+    editorialHeading.dataset.invittaMidnightCouple = "true";
+    editorialHeading.dataset.invittaCoverNameSize = "true";
+    editorialHeading.dataset.invittaFontRole = "cover-name";
+    pieces.forEach(function(piece) {
+      piece.dataset.invittaMidnightCouplePiece = "true";
+      piece.removeAttribute("data-invitta-cover-name-size");
+    });
+
+    // Keep the source's editorial hierarchy, but make each line flow in
+    // normal document order at phone widths. This is intentionally scoped to
+    // Midnight Gold so other renderers retain their native hero layouts.
+    if (!document.getElementById("invitta-midnight-couple-layout")) {
+      var style = document.createElement("style");
+      style.id = "invitta-midnight-couple-layout";
+      style.textContent = [
+        "#hero h2[data-invitta-midnight-couple]{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:clamp(.12rem,1vw,.4rem)!important;max-width:100%!important;}",
+        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]{display:block!important;margin:0!important;max-width:100%!important;overflow-wrap:anywhere!important;text-wrap:balance!important;}",
+        "@media(max-width:767px){#hero h2[data-invitta-midnight-couple]{gap:.2rem!important;line-height:1!important;}#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(1),#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(3){font-size:clamp(2.55rem,12.4vw,3.2rem)!important;line-height:.96!important;letter-spacing:-.035em!important;}#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(2){font-size:clamp(2rem,10vw,2.8rem)!important;line-height:.8!important;}}"
+      ].join("");
+      document.head.appendChild(style);
+    }
+
+    // The animated envelope is compiled with a static demo monogram (AC).
+    // Replace only its wax-seal label with initials derived from real Studio
+    // names; no demo fallback is left on a published invitation.
+    var initials = (couple[0].charAt(0) + couple[1].charAt(0)).toLocaleUpperCase("es-MX");
+    Array.from(document.querySelectorAll(".fixed span")).forEach(function(element) {
+      if (clean(element.textContent) === "AC" && element.closest(".fixed")) {
+        element.textContent = initials;
+        element.dataset.invittaDynamicText = "true";
+      }
+    });
+
+    // The opening overlay and the hero coexist briefly while React animates.
+    // Keep the hero out of that transition so its large text never appears
+    // behind the card and wax seal. The mutation observer restores it once
+    // the envelope has left the document.
+    var envelope = document.querySelector(".fixed.inset-0.z-\\[120\\], .fixed[class*='z-[120]']");
+    var hero = document.getElementById("hero");
+    if (hero) hero.style.visibility = envelope ? "hidden" : "";
+
+    if (envelope) {
+      var envelopeName = envelope.querySelector("h2.font-serif");
+      if (envelopeName) {
+        envelopeName.textContent = couple.join(" & ");
+        envelopeName.style.setProperty("display", "block", "important");
+        envelopeName.dataset.invittaDynamicText = "true";
+      }
+      if (!document.getElementById("invitta-midnight-envelope-layout")) {
+        var envelopeStyle = document.createElement("style");
+        envelopeStyle.id = "invitta-midnight-envelope-layout";
+        envelopeStyle.textContent = [
+          ".fixed[class*='z-[120]'] h2.font-serif{max-width:82%;margin-inline:auto!important;text-wrap:balance!important;line-height:1.08!important;}",
+          "@media(max-width:767px){.fixed[class*='z-[120]'] h2.font-serif{font-size:clamp(1.15rem,6vw,1.55rem)!important;}.fixed[class*='z-[120]'] h3.font-serif{font-size:clamp(1.3rem,7vw,1.8rem)!important;}}"
+        ].join("");
+        document.head.appendChild(envelopeStyle);
+      }
     }
   }
 
@@ -935,8 +1001,19 @@
       var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
       if (isDemoGalleryAsset(src)) {
         // Hiding only the image leaves a framed, empty rectangle behind.
-        // Hide the standalone editorial media block with it.
-        var wrapper = img.closest(".cursor-zoom-in, .cursor-pointer, figure, .group, [class*='gallery-item']");
+        // Midnight's dress-code art has an outer responsive half-column, so
+        // hide that column rather than its inner image wrapper.
+        var wrapper = null;
+        var ancestor = img.parentElement;
+        while (ancestor && ancestor !== document.body) {
+          var classes = typeof ancestor.className === "string" ? ancestor.className : "";
+          if (/(?:^|\s)w-full(?:\s|$)/.test(classes) && /(?:^|\s)md:w-1\/2(?:\s|$)/.test(classes)) {
+            wrapper = ancestor;
+            break;
+          }
+          ancestor = ancestor.parentElement;
+        }
+        if (!wrapper) wrapper = img.closest(".cursor-zoom-in, .cursor-pointer, figure, .group, [class*='gallery-item']");
         if (wrapper && wrapper !== document.body) {
           wrapper.style.setProperty("display", "none", "important");
         } else {
@@ -1286,12 +1363,8 @@
         var style = document.createElement("style");
         style.id = "invitta-no-music-style";
         style.textContent = [
-          "#music-player-container, #music-player-bottom-bar, #inv-music-player, #music-player, ",
-          "[id*='music-player' i], [class*='music-player' i], .music-bar, .music-floating-btn, ",
-          "button[aria-label*='música' i], button[title*='música' i], button[aria-label*='musica' i], button[title*='musica' i], ",
-          "[id*='music-toggle' i], [id*='music-mute' i], [id*='music-volume' i], [class*='music-toggle' i], ",
-          "[class*='floating-music' i], [class*='audio-btn' i], [class*='sound-btn' i] ",
-          "{ display: none !important; }"
+          "#music-player-container, #music-player-bottom-bar, #inv-music-player, #music-player, [class*='music-player' i]{opacity:.72!important;}",
+          "html[data-invitta-no-music] [id*='music-toggle' i], html[data-invitta-no-music] [id*='music-mute' i], html[data-invitta-no-music] [id*='music-volume' i]{pointer-events:none!important;cursor:not-allowed!important;}"
         ].join("");
         document.head.appendChild(style);
       }
@@ -1312,6 +1385,13 @@
       "[class*='floating-music' i], [class*='audio-btn' i], [class*='sound-btn' i]"
     );
 
+    if (data.sectionVisibility && data.sectionVisibility.music === false) {
+      musicContainers.forEach(function (el) {
+        el.style.setProperty("display", "none", "important");
+      });
+      return;
+    }
+
     if (!data.musicUrl) {
       document.querySelectorAll("audio").forEach(function (audio) {
         try {
@@ -1323,9 +1403,18 @@
       });
 
       musicContainers.forEach(function (el) {
-        el.style.setProperty("display", "none", "important");
+        el.style.removeProperty("display");
       });
-      document.body.classList.remove("has-music-player");
+      document.querySelectorAll("#music-player-bottom-bar span, #music-player-container span, #inv-music-player span").forEach(function (label) {
+        if (/M[uú]sica Pausada|M[uú]sica de Fondo/i.test(clean(label.textContent))) {
+          label.textContent = "Música no configurada";
+        }
+      });
+      document.querySelectorAll("#music-toggle-play-btn, #music-mute-toggle-btn, #music-volume-slider").forEach(function(control) {
+        control.setAttribute("disabled", "disabled");
+        control.setAttribute("aria-disabled", "true");
+        control.setAttribute("title", "La pareja aún no ha configurado música para esta invitación.");
+      });
       return;
     }
 
