@@ -392,6 +392,8 @@
         <h1 id="page-title">Crear Invitación</h1>
       </div>
       <div class="header-actions">
+        <input type="file" id="client-intake-file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+        <button type="button" id="import-client-intake" class="btn btn-secondary">Importar formulario del cliente</button>
         <a href="/administracion/studio-dashboard.html" class="btn btn-secondary">Volver al Dashboard</a>
       </div>
     </div>
@@ -1459,6 +1461,8 @@
   <script src="/js/studio-auth.js?v=studio-recovery-20260718"></script>
   <!-- Lógica del Formulario -->
   <script src="/assets/js/invitta-templates.js?v=milestone-template-20260814"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="/js/studio-client-intake-import.js?v=client-intake-20260824"></script>
   <script src="/js/studio-form.js?v=decorative-background-opacity-20260821"></script>
 
 </body>
