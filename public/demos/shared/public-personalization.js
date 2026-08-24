@@ -153,6 +153,12 @@
     return typeof value === "string" ? value.trim() : "";
   }
 
+  function normalizeGodparentName(item) {
+    if (typeof item === "string") return clean(item);
+    if (item && typeof item === "object") return clean(item.name || item.fullName || "");
+    return "";
+  }
+
   function parseDate(value) {
     if (!value) return null;
     var date = new Date(value + (value.length === 10 ? "T12:00:00" : ""));
@@ -199,35 +205,65 @@
     if (from && from !== to) list.push([from, to]);
   }
 
-  function addExactReplacement(list, from, to) {
-    from = clean(from);
-    to = to === undefined || to === null ? "" : String(to).trim();
-    if (from && from !== to) list.push([from, to, true]);
+  function personNameParts(name) {
+    var cleanName = clean(name);
+    if (!cleanName) return { first: "", middle: "", last: "", full: "", firstTwo: "", remainder: "" };
+
+    var tokens = cleanName.split(/\s+/).filter(Boolean);
+    if (tokens.length === 1) {
+      return { first: tokens[0], middle: "", last: "", full: cleanName, firstTwo: tokens[0], remainder: "" };
+    }
+
+    if (tokens.length === 2) {
+      return { first: tokens[0], middle: "", last: tokens[1], full: cleanName, firstTwo: cleanName, remainder: tokens[1] };
+    }
+
+    if (tokens.length === 3) {
+      return {
+        first: tokens[0],
+        middle: tokens[1],
+        last: tokens[2],
+        full: cleanName,
+        firstTwo: tokens[0] + " " + tokens[1],
+        remainder: tokens[2]
+      };
+    }
+
+    return {
+      first: tokens[0],
+      middle: tokens[1],
+      last: tokens.slice(2).join(" "),
+      full: cleanName,
+      firstTwo: tokens[0] + " " + tokens[1],
+      remainder: tokens.slice(2).join(" ")
+    };
   }
 
-  function personNameParts(value) {
-    var words = clean(value).split(/\s+/).filter(Boolean);
+  function addExactReplacement(list, from, to) {
+    from = clean(from);
+    to = clean(to);
+    if (from && from !== to) list.push([from, to]);
+  }
+
+  function weddingCoupleNames(name) {
+    var couple = clean(name).split(/\s*(?:&|\by\b)\s*/i).filter(Boolean);
     return {
-      first: words[0] || "",
-      middle: words.length > 2 ? words.slice(1, -1).join(" ") : (words[1] || ""),
-      last: words.length > 2 ? words[words.length - 1] : "",
-      firstTwo: words.slice(0, Math.min(2, words.length)).join(" "),
-      remainder: words.slice(Math.min(2, words.length)).join(" "),
-      given: words.length > 1 ? words.slice(0, -1).join(" ") : (words[0] || ""),
-      surname: words.length > 1 ? words[words.length - 1] : ""
+      bride: couple[0] || "",
+      groom: couple[1] || ""
     };
   }
 
   function addHeroNameReplacements(list, name) {
+    if (!name) return;
+
     if (isWedding) {
-      var couple = clean(name).split(/\s*(?:&|\by\b)\s*/i).filter(Boolean);
-      var bride = personNameParts(couple[0] || name);
-      var groom = personNameParts(couple[1] || "");
-      addExactReplacement(list, "Mariana", bride.given || bride.first);
-      addExactReplacement(list, "Diego", groom.given || groom.first);
-      addExactReplacement(list, "Ana Camila", bride.given || bride.first);
-      addExactReplacement(list, "Carlos", groom.given || groom.first); // Fix for split nodes
-      addExactReplacement(list, "& Carlos", groom.given ? "& " + groom.given : ""); // Legacy
+      var couple = weddingCoupleNames(name);
+      var bride = personNameParts(couple.bride);
+      var groom = personNameParts(couple.groom);
+
+      addExactReplacement(list, "Mariana", bride.first || "Mariana");
+      addExactReplacement(list, "Diego", groom.first || "Diego");
+      addExactReplacement(list, "& Diego", groom.given ? "& " + groom.given : ""); // Legacy
       addExactReplacement(list, "Zavala & González", [bride.surname, groom.surname].filter(Boolean).join(" & "));
       return;
     }
@@ -255,7 +291,7 @@
     var list = [];
     var name = clean(data.celebrantName);
     var parents = Array.isArray(data.parents) ? data.parents.filter(Boolean) : [];
-    var godparents = Array.isArray(data.godparents) ? data.godparents.filter(function (item) { return item && item.name; }) : [];
+    var godparents = Array.isArray(data.godparents) ? data.godparents.map(normalizeGodparentName).filter(Boolean) : [];
     var ceremony = data.ceremony || {};
     var reception = data.reception || {};
     var formats = dateFormats(data.eventDate);
@@ -269,7 +305,7 @@
     addHeroNameReplacements(list, name);
     (defaults.parents || []).forEach(function (item, index) { addReplacement(list, item, parents[index] || parents[0]); });
     (defaults.godparents || []).forEach(function (item, index) {
-      addReplacement(list, item, (godparents[index] || godparents[0] || {}).name);
+      addReplacement(list, item, godparents[index] || "");
     });
 
     addReplacement(list, "Nuestra Boda", data.eventTitle);
@@ -2801,9 +2837,7 @@
     var legacyMother = clean(wpLegacy.mother || sourceData.mother_name || sourceData.motherName || legacyParents[1]);
 
     var godparents = Array.isArray(sourceData.godparents)
-      ? sourceData.godparents.map(function (gp) {
-          return typeof gp === "string" ? gp.trim() : (gp && gp.name ? gp.name.trim() : "");
-        }).filter(Boolean)
+      ? sourceData.godparents.map(normalizeGodparentName).filter(Boolean)
       : [];
 
     var honorWitnessName = clean(
@@ -2993,6 +3027,68 @@
     }
   }
 
+  function applyXvFamily() {
+    if (isWedding) return;
+    if (!isTemplate("xv-elegance-basic", "xv-elegance", "xv-champagne-rose-vip", "xv-vip-3")) return;
+
+    var sec = document.querySelector("#family, #honors");
+    if (!sec) return;
+
+    var parents = Array.isArray(data.parents) ? data.parents.map(clean).filter(Boolean) : [];
+    if (parents.length === 0 && (data.father_name || data.mother_name || data.fatherName || data.motherName)) {
+      parents = [clean(data.father_name || data.fatherName), clean(data.mother_name || data.motherName)].filter(Boolean);
+    }
+    var godparents = Array.isArray(data.godparents) ? data.godparents.map(normalizeGodparentName).filter(Boolean) : [];
+    var chambelan = clean(data.chambelanName || (data.chambelan && data.chambelan.name) || (typeof data.chambelan === "string" ? data.chambelan : "") || "");
+
+    var hasAny = parents.length > 0 || godparents.length > 0 || Boolean(chambelan);
+    if (!hasAny) {
+      sec.style.setProperty("display", "none", "important");
+      return;
+    }
+    sec.style.removeProperty("display");
+
+    var isVip = isTemplate("xv-champagne-rose-vip", "xv-vip-3");
+    var style = isVip ? WEDDING_FAMILY_STYLES.golden : WEDDING_FAMILY_STYLES.classic;
+    var col = sec.querySelector(".md\\:col-span-7") || sec.querySelector(".space-y-20") || sec.querySelector(".grid > div:first-child");
+    if (!col) return;
+    col.innerHTML = "";
+
+    var isFirst = true;
+    if (parents.length > 0) {
+      var parentsTitle = isVip ? "Con la bendición de mis padres" : "Con la bendición de Dios y mis padres";
+      var parentsBlock = createWeddingFamilyBlock({ title: parentsTitle, people: parents, style: style, isFirst: isFirst });
+      if (parentsBlock) { col.appendChild(parentsBlock); isFirst = false; }
+    }
+
+    if (godparents.length > 0) {
+      var gpTitle = isVip ? "Mis Padrinos de Honor" : "Mis Padrinos";
+      var gpBlock = createWeddingFamilyBlock({ title: gpTitle, people: godparents, style: style, isFirst: isFirst });
+      if (gpBlock) { col.appendChild(gpBlock); isFirst = false; }
+    }
+
+    var rightCol = sec.querySelector(".md\\:col-span-5");
+    if (rightCol) {
+      if (chambelan) {
+        rightCol.style.removeProperty("display");
+        var nameSpan = rightCol.querySelector(".font-display, .font-serif, h3, span.text-ink");
+        if (nameSpan) {
+          nameSpan.textContent = chambelan;
+        } else {
+          var walker = document.createTreeWalker(rightCol, NodeFilter.SHOW_TEXT);
+          var tn;
+          while ((tn = walker.nextNode())) {
+            if (/Carlos González Farrera/i.test(tn.nodeValue)) {
+              tn.nodeValue = chambelan;
+            }
+          }
+        }
+      } else {
+        rightCol.style.setProperty("display", "none", "important");
+      }
+    }
+  }
+
   function applyAll() {
     if (applying || !document.body) return;
     applying = true;
@@ -3001,6 +3097,7 @@
     ensureActionAccessibilityStyles();
     replaceText(document.body);
     applyWeddingParents();
+    applyXvFamily();
     applyLocationContent();
     cleanRsvpMessageLabels();
     markFamilySectionTitles();
