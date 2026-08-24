@@ -6,6 +6,15 @@
 
   var templateId = data.templateId;
   var rendererTemplateId = data.rendererTemplateId || templateId;
+
+  function isTemplate() {
+    for (var i = 0; i < arguments.length; i++) {
+      var id = arguments[i];
+      if (templateId === id || rendererTemplateId === id) return true;
+    }
+    return false;
+  }
+
   var isWedding = data.eventType === "boda";
   var isMilestoneBirthday = data.eventType === "cumpleanos" && /(?:^|\D)50(?:\D|$)/.test(clean(data.eventTitle));
   var applying = false;
@@ -42,6 +51,20 @@
   }
 
   function applyTypographyScales(refresh) {
+    // A scale is only written when Studio has an explicit override. This
+    // preserves native responsive typography at 100%, while making the
+    // per-role size controls effective at 75–150%.
+    typographyScaledElements.forEach(restoreTypographyScale);
+    typographyScaledElements.clear();
+
+    // A scale of 1 must be a true no-op. Writing an inline !important value
+    // even at 1x freezes the native hierarchy of a template (especially
+    // editorial titles) and prevents its responsive CSS from working.
+    var hasOverrides = typographyRoleOrder.some(function(target) {
+      return Math.abs(typographyScaleFor(target) - 1) > 0.001;
+    });
+    if (!hasOverrides) return;
+
     if (refresh) {
       typographyScaledElements.forEach(restoreTypographyScale);
       typographyScaledElements.clear();
@@ -68,59 +91,72 @@
     });
   }
 
-  var defaults = {
-    "xv-elegance-basic": {
-      names: ["Ana Camila Zavala", "Ana Camila"],
-      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-      godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
-      dates: ["12 Diciembre 2026"],
-      ceremonyTime: ["3:00 P.M."],
-      receptionTime: ["9:00 P.M."]
-    },
-    "xv-rose-gold-premium": {
-      names: ["Mary Carmen Arevalo", "Mary Carmen"],
-      parents: ["José Ángel Arévalo G.", "Luisa María Saavedra D."],
-      godparents: ["Julio Arévalo G.", "Martha Caballero H."],
-      dates: ["28 Noviembre 2026", "28 · Noviembre · 2026"],
-      ceremonyTime: ["6:00 P.M.", "18:00 P.M."],
-      receptionTime: ["8:00 P.M.", "20:00 P.M."]
-    },
-    "xv-champagne-rose-vip": {
-      names: ["Ana Camila Zavala Almazán", "Ana Camila Zavala", "Ana Camila"],
-      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-      godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
-      dates: ["12 Diciembre 2026"],
-      ceremonyTime: ["3:00 P.M."],
-      receptionTime: ["9:00 P.M."]
-    },
-    "boda-classic-basic": {
-      names: ["Mariana & Diego"],
-      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-      godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
-      dates: ["12 Diciembre 2026"],
-      ceremonyTime: ["3:00 P.M."],
-      receptionTime: ["9:00 P.M."]
-    },
-    "boda-golden-romance-premium": {
-      names: ["Mariana & Diego"],
-      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-      godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
-      dates: ["12 Diciembre 2026", "12 · Diciembre · 2026"],
-      ceremonyTime: ["3:00 P.M."],
-      receptionTime: ["9:00 P.M."]
-    },
-    "boda-midnight-gold-vip": {
-      names: ["Ana Camila & Carlos Zavala & González", "Ana Camila & Carlos", "Ana Camila"],
-      parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
-      godparents: ["Patricia & Alejandro Farrera"],
-      dates: ["12 Diciembre 2026"],
-      ceremonyTime: ["3:00 P.M."],
-      receptionTime: ["9:00 P.M."]
-    }
-  }[rendererTemplateId] || {};
+  var defaults = (function () {
+    var map = {
+      "xv-elegance-basic": {
+        names: ["Ana Camila Zavala", "Ana Camila"],
+        parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+        godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
+        dates: ["12 Diciembre 2026"],
+        ceremonyTime: ["3:00 P.M."],
+        receptionTime: ["9:00 P.M."]
+      },
+      "xv-rose-gold-premium": {
+        names: ["Mary Carmen Arevalo", "Mary Carmen"],
+        parents: ["José Ángel Arévalo G.", "Luisa María Saavedra D."],
+        godparents: ["Julio Arévalo G.", "Martha Caballero H."],
+        dates: ["28 Noviembre 2026", "28 · Noviembre · 2026"],
+        ceremonyTime: ["6:00 P.M.", "18:00 P.M."],
+        receptionTime: ["8:00 P.M.", "20:00 P.M."]
+      },
+      "xv-champagne-rose-vip": {
+        names: ["Ana Camila Zavala Almazán", "Ana Camila Zavala", "Ana Camila"],
+        parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+        godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
+        dates: ["12 Diciembre 2026"],
+        ceremonyTime: ["3:00 P.M."],
+        receptionTime: ["9:00 P.M."]
+      },
+      "boda-classic-basic": {
+        names: ["Mariana & Diego"],
+        parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+        godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
+        dates: ["12 Diciembre 2026"],
+        ceremonyTime: ["3:00 P.M."],
+        receptionTime: ["9:00 P.M."]
+      },
+      "boda-golden-romance-premium": {
+        names: ["Mariana & Diego"],
+        parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+        godparents: ["Diana Almanza García", "Enrique O'Farrill Zúñiga"],
+        dates: ["12 Diciembre 2026", "12 · Diciembre · 2026"],
+        ceremonyTime: ["3:00 P.M."],
+        receptionTime: ["9:00 P.M."]
+      },
+      "boda-midnight-gold-vip": {
+        names: ["Ana Camila & Carlos Zavala & González", "Ana Camila & Carlos", "Ana Camila"],
+        parents: ["Susana Almazán Bernal", "César Roberto Zavala"],
+        godparents: ["Patricia & Alejandro Farrera"],
+        dates: ["12 Diciembre 2026"],
+        ceremonyTime: ["3:00 P.M."],
+        receptionTime: ["9:00 P.M."]
+      }
+    };
+    map["xv-premium-2"] = map["xv-rose-gold-premium"];
+    map["xv-vip-3"] = map["xv-champagne-rose-vip"];
+    map["xv-elegance"] = map["xv-elegance-basic"];
+    map["boda-premium-1"] = map["boda-midnight-gold-vip"];
+    return map[rendererTemplateId] || map[templateId] || {};
+  })();
 
   function clean(value) {
     return typeof value === "string" ? value.trim() : "";
+  }
+
+  function normalizeGodparentName(item) {
+    if (typeof item === "string") return clean(item);
+    if (item && typeof item === "object") return clean(item.name || item.fullName || "");
+    return "";
   }
 
   function parseDate(value) {
@@ -169,50 +205,80 @@
     if (from && from !== to) list.push([from, to]);
   }
 
-  function addExactReplacement(list, from, to) {
-    from = clean(from);
-    to = to === undefined || to === null ? "" : String(to).trim();
-    if (from && from !== to) list.push([from, to, true]);
+  function personNameParts(name) {
+    var cleanName = clean(name);
+    if (!cleanName) return { first: "", middle: "", last: "", full: "", firstTwo: "", remainder: "" };
+
+    var tokens = cleanName.split(/\s+/).filter(Boolean);
+    if (tokens.length === 1) {
+      return { first: tokens[0], middle: "", last: "", full: cleanName, firstTwo: tokens[0], remainder: "" };
+    }
+
+    if (tokens.length === 2) {
+      return { first: tokens[0], middle: "", last: tokens[1], full: cleanName, firstTwo: cleanName, remainder: tokens[1] };
+    }
+
+    if (tokens.length === 3) {
+      return {
+        first: tokens[0],
+        middle: tokens[1],
+        last: tokens[2],
+        full: cleanName,
+        firstTwo: tokens[0] + " " + tokens[1],
+        remainder: tokens[2]
+      };
+    }
+
+    return {
+      first: tokens[0],
+      middle: tokens[1],
+      last: tokens.slice(2).join(" "),
+      full: cleanName,
+      firstTwo: tokens[0] + " " + tokens[1],
+      remainder: tokens.slice(2).join(" ")
+    };
   }
 
-  function personNameParts(value) {
-    var words = clean(value).split(/\s+/).filter(Boolean);
+  function addExactReplacement(list, from, to) {
+    from = clean(from);
+    to = clean(to);
+    if (from && from !== to) list.push([from, to]);
+  }
+
+  function weddingCoupleNames(name) {
+    var couple = clean(name).split(/\s*(?:&|\by\b)\s*/i).filter(Boolean);
     return {
-      first: words[0] || "",
-      middle: words.length > 2 ? words.slice(1, -1).join(" ") : (words[1] || ""),
-      last: words.length > 2 ? words[words.length - 1] : "",
-      firstTwo: words.slice(0, Math.min(2, words.length)).join(" "),
-      remainder: words.slice(Math.min(2, words.length)).join(" "),
-      given: words.length > 1 ? words.slice(0, -1).join(" ") : (words[0] || ""),
-      surname: words.length > 1 ? words[words.length - 1] : ""
+      bride: couple[0] || "",
+      groom: couple[1] || ""
     };
   }
 
   function addHeroNameReplacements(list, name) {
+    if (!name) return;
+
     if (isWedding) {
-      var couple = clean(name).split(/\s*(?:&|\by\b)\s*/i).filter(Boolean);
-      var bride = personNameParts(couple[0] || name);
-      var groom = personNameParts(couple[1] || "");
-      addExactReplacement(list, "Mariana", bride.given || bride.first);
-      addExactReplacement(list, "Diego", groom.given || groom.first);
-      addExactReplacement(list, "Ana Camila", bride.given || bride.first);
-      addExactReplacement(list, "Carlos", groom.given || groom.first); // Fix for split nodes
-      addExactReplacement(list, "& Carlos", groom.given ? "& " + groom.given : ""); // Legacy
+      var couple = weddingCoupleNames(name);
+      var bride = personNameParts(couple.bride);
+      var groom = personNameParts(couple.groom);
+
+      addExactReplacement(list, "Mariana", bride.first || "Mariana");
+      addExactReplacement(list, "Diego", groom.first || "Diego");
+      addExactReplacement(list, "& Diego", groom.given ? "& " + groom.given : ""); // Legacy
       addExactReplacement(list, "Zavala & González", [bride.surname, groom.surname].filter(Boolean).join(" & "));
       return;
     }
 
     var parts = personNameParts(name);
-    if (templateId === "xv-elegance-basic") {
+    if (isTemplate("xv-elegance-basic", "xv-elegance")) {
       addExactReplacement(list, "Ana", parts.first);
       addExactReplacement(list, "Camila", parts.middle);
       addExactReplacement(list, "Zavala", parts.last);
-    } else if (templateId === "xv-rose-gold-premium") {
+    } else if (isTemplate("xv-rose-gold-premium", "xv-premium-2")) {
       addExactReplacement(list, "Mary", parts.first);
       addExactReplacement(list, "Carmen", parts.middle); // Handle split Carmen
       addExactReplacement(list, "Arevalo", parts.last); // In case it renders Arevalo
       addExactReplacement(list, "Mary Carmen", parts.firstTwo || parts.first);
-    } else if (templateId === "xv-champagne-rose-vip") {
+    } else if (isTemplate("xv-champagne-rose-vip", "xv-vip-3")) {
       addExactReplacement(list, "Ana", parts.first);
       addExactReplacement(list, "Camila", parts.middle);
       addExactReplacement(list, "Zavala", parts.last);
@@ -225,16 +291,21 @@
     var list = [];
     var name = clean(data.celebrantName);
     var parents = Array.isArray(data.parents) ? data.parents.filter(Boolean) : [];
-    var godparents = Array.isArray(data.godparents) ? data.godparents.filter(function (item) { return item && item.name; }) : [];
+    var godparents = Array.isArray(data.godparents) ? data.godparents.map(normalizeGodparentName).filter(Boolean) : [];
     var ceremony = data.ceremony || {};
     var reception = data.reception || {};
     var formats = dateFormats(data.eventDate);
+
+    // This bridge is only mounted by the public renderer. Keep replacement
+    // data-bound: template demo copy is never a source of public invitation
+    // data and an empty studio field must not revive a demo value.
+    if (!isRealStudioInvitation()) return list;
 
     (defaults.names || []).forEach(function (item) { addReplacement(list, item, name); });
     addHeroNameReplacements(list, name);
     (defaults.parents || []).forEach(function (item, index) { addReplacement(list, item, parents[index] || parents[0]); });
     (defaults.godparents || []).forEach(function (item, index) {
-      addReplacement(list, item, (godparents[index] || godparents[0] || {}).name);
+      addReplacement(list, item, godparents[index] || "");
     });
 
     addReplacement(list, "Nuestra Boda", data.eventTitle);
@@ -297,28 +368,391 @@
       if (!node.nodeValue || !node.nodeValue.trim()) continue;
       var parentName = node.parentElement ? node.parentElement.tagName : "";
       if (parentName === "SCRIPT" || parentName === "STYLE" || parentName === "TEXTAREA") continue;
-      var value = node.nodeValue;
-      var replaced = false;
+      // Demo names are also present in testimonials, guest examples and
+      // supporting copy. Only replace a complete, leaf editorial label;
+      // substring replacement turns those unrelated places into duplicates.
+      if (!node.parentElement || node.parentElement.children.length !== 0) continue;
+      if (isWedding && node.parentElement.closest("#family, #honors")) continue;
+      var value = node.nodeValue.trim();
+      if (/^Hecho con amor para\s+(?:Mariana\s*&\s*Diego|Ana Camila\s*&\s*Carlos(?:\s+Zavala\s*&\s+Gonz[aá]lez)?|Ana Camila Zavala|Mary Carmen Arevalo)$/i.test(value)) {
+        value = "Hecho con amor para " + clean(data.celebrantName);
+      }
       replacements.forEach(function (pair) {
-        if (pair[2]) {
-          if (value.trim() === pair[0]) {
-            value = value.replace(pair[0], pair[1]);
-            replaced = true;
-          }
-          return;
-        }
-        if (value.indexOf(pair[0]) !== -1) {
-          value = value.split(pair[0]).join(pair[1]);
-          replaced = true;
-        }
+        if (value === pair[0]) value = pair[1];
       });
-      if (value !== node.nodeValue) {
+      if (value !== node.nodeValue.trim()) {
         node.nodeValue = value;
         if (node.parentElement) {
           node.parentElement.setAttribute("data-invitta-dynamic-text", "true");
           node.parentElement.style.setProperty("text-transform", "none", "important");
         }
       }
+    }
+  }
+
+  function ensureFamilyTitleStyles() {
+    if (document.getElementById("invitta-family-title-styles")) return;
+    var style = document.createElement("style");
+    style.id = "invitta-family-title-styles";
+    style.textContent = [
+      "[data-invitta-family-title] { display:block; margin-bottom:0.85rem; font-family:var(--font-sans, Arial, sans-serif) !important; font-size:clamp(10px, 2.4vw, 12px) !important; font-weight:600 !important; letter-spacing:0.28em !important; line-height:1.45 !important; text-transform:uppercase !important; }"
+    ].join("\\n");
+    document.head.appendChild(style);
+  }
+
+  function markFamilySectionTitles() {
+    Array.from(document.querySelectorAll("h1,h2,h3,h4,h5,h6,p,.section-title,.inv-section-title")).forEach(function(element) {
+      var label = clean(element.textContent).replace(/\\s+/g, " ");
+      var kind = "";
+      if (/^(?:padres(?: del| de la| de los)?|con la bendici[oó]n de nuestras familias)/i.test(label)) {
+        kind = "parents";
+      } else if (/^(?:nuestros? )?padrinos(?: de honor)?$/i.test(label)) {
+        kind = "godparents";
+      }
+      if (!kind) return;
+      element.dataset.invittaFamilyTitle = kind;
+      if (!element.dataset.invittaFontRole) element.dataset.invittaFontRole = "section-title";
+    });
+  }
+
+  function restoreCanonicalNameCasing() {
+    var name = clean(data.celebrantName);
+    if (!name) return;
+    var parts = isWedding
+      ? name.split(/\s*(?:&|\by\b)\s*/i).filter(Boolean)
+      : [name];
+    var canonical = [name].concat(parts);
+
+    Array.from(document.querySelectorAll("[data-invitta-dynamic-text]")).forEach(function(element) {
+      var visible = clean(element.textContent);
+      var match = canonical.find(function(candidate) {
+        return visible.toLocaleLowerCase() === candidate.toLocaleLowerCase();
+      });
+      if (match && visible !== match) element.textContent = match;
+      if (/^Hecho con amor para\b/i.test(visible) && visible.toLocaleLowerCase().indexOf(parts[0].toLocaleLowerCase()) !== -1) {
+        element.textContent = "Hecho con amor para " + name;
+      }
+    });
+  }
+
+  function applyCoverNameSizing() {
+    if (!clean(data.celebrantName)) return;
+    if (!document.getElementById("invitta-cover-name-sizing")) {
+      var style = document.createElement("style");
+      style.id = "invitta-cover-name-sizing";
+      style.textContent = [
+        "[data-invitta-cover-name-size]{font-size:clamp(2.8rem,13vw,6rem)!important;line-height:.92!important;letter-spacing:clamp(-.055em,-.02em,-.012em)!important;max-inline-size:calc(100vw - 2rem)!important;margin-inline:auto!important;overflow-wrap:anywhere!important;text-wrap:balance!important;}",
+        "[data-invitta-cover-name-size] [data-invitta-cover-name-size]{font-size:inherit!important;line-height:inherit!important;letter-spacing:inherit!important;}",
+        "@media(min-width:768px){[data-invitta-cover-name-size]{font-size:clamp(3.75rem,7.5vw,7.25rem)!important;max-inline-size:min(92vw,960px)!important;}}"
+      ].join("");
+      document.head.appendChild(style);
+    }
+
+    var fullName = clean(data.celebrantName);
+    var nameParts = isWedding
+      ? fullName.split(/\s*(?:&|\by\b)\s*/i).filter(Boolean)
+      : [fullName];
+    var structuralSelector = [
+      ".hero__name", "#celebrant-name", ".inv-hero-name", ".couple-names", ".couple-name", ".honoree-name",
+      "[data-invitta-font-role='cover-name']", "[data-invitta-font-role='name']"
+    ].join(",");
+
+    document.querySelectorAll(structuralSelector).forEach(function(element) {
+      element.dataset.invittaCoverNameSize = "true";
+      if (!element.dataset.invittaFontRole) element.dataset.invittaFontRole = "cover-name";
+    });
+
+    // A few React-based templates provide no stable class for the hero name.
+    // Match only an exact celebrant/couple name in a display heading, so names
+    // in parents, RSVP or the closing never inherit the cover scale.
+    Array.from(document.querySelectorAll("h1,h2,h3,span")).forEach(function(element) {
+      var visible = clean(element.textContent);
+      var isExactFullName = visible.toLocaleLowerCase() === fullName.toLocaleLowerCase();
+      var isHeroNamePart = nameParts.some(function(part) {
+        return visible.toLocaleLowerCase() === clean(part).toLocaleLowerCase();
+      }) && (element.tagName !== "SPAN" || element.closest("#hero,#cover,#portada,#inv-hero,[class*='hero'],[class*='cover']"));
+      if (isExactFullName || isHeroNamePart) {
+        element.dataset.invittaCoverNameSize = "true";
+        if (!element.dataset.invittaFontRole) element.dataset.invittaFontRole = "cover-name";
+      }
+    });
+  }
+
+  function applyEditorialCoverMeta() {
+    var name = clean(data.celebrantName);
+    var formats = dateFormats(data.eventDate);
+    if (!name || !formats) return;
+
+    if (!document.getElementById("invitta-editorial-cover-meta")) {
+      var style = document.createElement("style");
+      style.id = "invitta-editorial-cover-meta";
+      style.textContent = [
+        "[data-invitta-editorial-event]{display:block!important;width:100%!important;align-self:center!important;margin-bottom:clamp(.65rem,3vw,1.1rem)!important;color:var(--inv-10,currentColor)!important;font-family:var(--font-sans,Arial,sans-serif)!important;font-size:clamp(.58rem,2.4vw,.76rem)!important;font-weight:600!important;letter-spacing:.24em!important;line-height:1.35!important;text-align:center!important;text-transform:uppercase!important;}",
+        "[data-invitta-editorial-date]{display:block!important;width:100%!important;align-self:center!important;margin-top:clamp(.7rem,3vw,1.15rem)!important;color:var(--inv-10,currentColor)!important;font-family:var(--font-sans,Arial,sans-serif)!important;font-size:clamp(.58rem,2.4vw,.76rem)!important;font-weight:600!important;letter-spacing:.2em!important;line-height:1.45!important;text-align:center!important;text-transform:uppercase!important;}",
+        "#hero #event-date,#cover #event-date,#portada #event-date,#inv-hero #event-date,.hero__date,.inv-hero-date{width:100%!important;align-self:center!important;text-align:center!important;}"
+      ].join("\n");
+      document.head.appendChild(style);
+    }
+
+    var coverName = Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
+      return element.offsetParent !== null;
+    });
+    if (!coverName) return;
+    var hero = coverName.closest("#hero,#cover,#portada,#inv-hero,[class*='hero'],[class*='cover']") || coverName.parentElement;
+    if (!hero) return;
+
+    var eventTitle = clean(data.eventTitle).toLocaleLowerCase();
+    Array.from(hero.querySelectorAll("p,span,h1,h2,h3,h4")).forEach(function(element) {
+      if (element.children.length !== 0) return;
+      var value = clean(element.textContent).toLocaleLowerCase();
+      if (value && (value === eventTitle || /^(?:mis quince a[nñ]os|nuestra boda|xv aniversario)$/i.test(value))) {
+        element.dataset.invittaEditorialEvent = "true";
+        if (!element.dataset.invittaFontRole) element.dataset.invittaFontRole = "main-title";
+      }
+    });
+
+    var dateText = formats.dotted.toLocaleUpperCase("es-MX");
+    var existingDate = Array.from(hero.querySelectorAll("#event-date,.hero__date,.inv-hero-date,[data-invitta-event-date],[data-invitta-editorial-date]")).find(function(element) {
+      return element.offsetParent !== null;
+    });
+    if (existingDate) {
+      existingDate.textContent = dateText;
+      existingDate.dataset.invittaEditorialDate = "true";
+      if (!existingDate.dataset.invittaFontRole) existingDate.dataset.invittaFontRole = "label";
+      return;
+    }
+
+    // Some React templates omit a hero date entirely. Add only that missing
+    // datum directly after the real name; never duplicate an existing date.
+    var date = document.createElement("p");
+    date.className = "invitta-editorial-cover-date";
+    date.dataset.invittaEditorialDate = "true";
+    date.dataset.invittaFontRole = "label";
+    date.textContent = dateText;
+    coverName.insertAdjacentElement("afterend", date);
+  }
+
+  function applyPlumNoirWeddingAdapter() {
+    if (templateId !== "boda-midnight-gold-vip" || !isWedding) return;
+    var couple = clean(data.celebrantName)
+      .split(/\s*(?:&|\by\b)\s*/i)
+      .map(function(part) { return part.trim(); })
+      .filter(Boolean);
+    if (couple.length < 2) return;
+
+    // Midnight's source contains two hero name treatments. The compact one
+    // duplicates the large editorial treatment on mobile, so the adapter
+    // retains the latter and fills it from the two explicit wedding names.
+    Array.from(document.querySelectorAll("h2")).forEach(function(heading) {
+      if (/font-serif/.test(heading.className || "") && /text-2xl|text-3xl/.test(heading.className || "")) {
+        var text = clean(heading.textContent);
+        if (/^(?:Ana Camila\s*&\s*Carlos|Alicia\s+(?:&|y)\s+Gonzalo)$/i.test(text)) {
+          heading.style.setProperty("display", "none", "important");
+        }
+      }
+    });
+
+    var editorialHeading = document.querySelector("h2.font-display");
+    if (!editorialHeading) return;
+    var pieces = Array.from(editorialHeading.querySelectorAll("span"));
+    if (pieces[0]) pieces[0].textContent = couple[0];
+    if (pieces[1]) pieces[1].textContent = "& " + couple[1];
+    if (pieces[2]) {
+      pieces[2].textContent = "";
+      pieces[2].style.setProperty("display", "none", "important");
+    }
+  }
+
+  function applyGoldenRomanceWeddingAdapter() {
+    if (templateId !== "boda-golden-romance-premium" || !isWedding) return;
+
+    var coupleNames = isWedding
+      ? clean(data.celebrantName).split(/\s*(?:&|\by\b|\+)\s*/i).filter(Boolean)
+      : [clean(data.celebrantName)];
+
+    // 1. Wax seal initials in envelope
+    var initials = "MD";
+    if (coupleNames.length >= 2) {
+      initials = (coupleNames[0][0] + coupleNames[1][0]).toLocaleUpperCase("es-MX");
+    } else if (coupleNames.length === 1 && coupleNames[0]) {
+      var parts = coupleNames[0].split(/\s+/);
+      initials = (parts[0][0] + (parts[1] ? parts[1][0] : "")).toLocaleUpperCase("es-MX");
+    }
+
+    var envelope = document.querySelector(".fixed.inset-0.z-\\[100\\], div[class*='z-[100]']");
+    if (envelope) {
+      Array.from(envelope.querySelectorAll(".invitta-editorial-cover-date, [data-invitta-editorial-date]")).forEach(function(el) {
+        el.remove();
+      });
+      var envelopeHeading = envelope.querySelector("h2");
+      if (envelopeHeading) {
+        delete envelopeHeading.dataset.invittaCoverNameSize;
+        envelopeHeading.removeAttribute("data-invitta-cover-name-size");
+      }
+      var envelopeTitle = envelope.querySelector("span.font-serif.italic");
+      if (envelopeTitle) {
+        delete envelopeTitle.dataset.invittaEditorialEvent;
+        envelopeTitle.removeAttribute("data-invitta-editorial-event");
+      }
+      var sealSpan = Array.from(envelope.querySelectorAll("span")).find(function(s) {
+        return /^[A-Z&]{2,3}$/.test((s.textContent || "").trim()) && s.closest(".rounded-full");
+      });
+      if (sealSpan) {
+        sealSpan.textContent = initials;
+      }
+    }
+
+    // 2 & 3. Hero styling: Elevate "Nuestra Boda" and position date under groom
+    var hero = document.querySelector("#hero");
+    if (hero) {
+      Array.from(hero.querySelectorAll(".invitta-editorial-cover-date, [data-invitta-editorial-date]")).forEach(function(el) {
+        el.remove();
+      });
+
+      var heroKicker = hero.querySelector("span.text-subheading-caps");
+      if (heroKicker) {
+        heroKicker.style.setProperty("font-size", "clamp(0.72rem, 2.2vw, 0.88rem)", "important");
+        heroKicker.style.setProperty("font-weight", "600", "important");
+        heroKicker.style.setProperty("letter-spacing", "0.38em", "important");
+        heroKicker.style.setProperty("color", "var(--color-sage, #ab8478)", "important");
+      }
+
+      var heroHeading = hero.querySelector("h2.font-display");
+      if (heroHeading) {
+        Array.from(heroHeading.querySelectorAll("span")).forEach(function(span) {
+          delete span.dataset.invittaCoverNameSize;
+          span.removeAttribute("data-invitta-cover-name-size");
+        });
+
+        var formats = dateFormats(data.eventDate);
+        if (formats) {
+          var dateText = formats.dotted.toLocaleUpperCase("es-MX");
+          var existingHeroDate = hero.querySelector(".invitta-golden-hero-date");
+          if (!existingHeroDate) {
+            existingHeroDate = document.createElement("p");
+            existingHeroDate.className = "invitta-golden-hero-date font-sans text-xs md:text-sm uppercase tracking-[0.26em] text-[#6b5853] font-medium mt-4 block md:ml-24";
+            heroHeading.insertAdjacentElement("afterend", existingHeroDate);
+          }
+          existingHeroDate.textContent = dateText;
+        }
+      }
+    }
+
+    // 4. Native Gallery with Parallax
+    var gallerySection = document.querySelector("#gallery");
+    if (gallerySection) {
+      var injectedGrid = gallerySection.querySelector(".invitta-gallery-grid");
+      if (injectedGrid) injectedGrid.remove();
+
+      var nativeItems = Array.from(gallerySection.querySelectorAll(".group"));
+      var realGallery = Array.isArray(data.galleryUrls) && data.galleryUrls.length
+        ? data.galleryUrls
+        : (Array.isArray(data.gallery) ? data.gallery : []);
+
+      if (realGallery.length && nativeItems.length) {
+        nativeItems.forEach(function(item, idx) {
+          if (idx < realGallery.length) {
+            item.style.removeProperty("display");
+            var photoUrl = realGallery[idx];
+            Array.from(item.querySelectorAll("img")).forEach(function(img) {
+              img.src = photoUrl;
+              img.dataset.invittaPersonalized = "true";
+              img.dataset.invittaPersonalizedSrc = photoUrl;
+            });
+          } else {
+            item.style.setProperty("display", "none", "important");
+          }
+        });
+      }
+    }
+
+    // 5. Studio Contracting Message at Footer
+    if (data.studioCtaEnabled !== false) {
+      var footer = document.querySelector("footer");
+      if (footer && !footer.querySelector(".invitta-studio-contracting-cta")) {
+        var phone = clean(data.studioWhatsapp || data.whatsapp).replace(/\D/g, "") || "525566790073";
+        var ctaText = clean(data.studioCtaText) || "Quiero una invitación así";
+        var ctaMsg = clean(data.studioCtaMessage) || "Hola, vi esta invitación digital y me interesa contratar una para mi evento.";
+        var ctaUrl = "https://wa.me/" + phone + "?text=" + encodeURIComponent(ctaMsg);
+
+        var ctaBox = document.createElement("div");
+        ctaBox.className = "invitta-studio-contracting-cta flex flex-col items-center text-center space-y-4 pt-4 border-t border-outline-variant/20 w-full max-w-md mx-auto";
+        ctaBox.innerHTML = '<p class="font-sans text-xs uppercase tracking-[0.22em] text-[#6b5853] font-medium">¿Te gustaría una invitación como esta?</p>' +
+          '<a href="' + ctaUrl + '" target="_blank" rel="noopener noreferrer" class="px-8 py-3.5 border border-sage text-sage hover:bg-sage hover:text-paper text-[11px] tracking-[0.25em] font-semibold uppercase transition-all duration-300 rounded-xs inline-flex items-center gap-2">' +
+          '<span>' + ctaText + '</span><span class="material-symbols-outlined text-sm">chat</span></a>';
+
+        var copyright = footer.querySelector("p");
+        if (copyright) {
+          footer.insertBefore(ctaBox, copyright);
+        } else {
+          footer.appendChild(ctaBox);
+        }
+      }
+    }
+  }
+
+  function cleanRsvpMessageLabels() {
+    // A legacy RSVP label interpolated the celebrant using a literal "$".
+    // Limit the repair to the congratulation label so currency or other
+    // meaningful symbols elsewhere in an invitation remain untouched.
+    Array.from(document.querySelectorAll("label, p, span, h1, h2, h3, h4, h5, h6")).forEach(function(element) {
+      if (element.children.length !== 0) return;
+      var value = element.textContent || "";
+      if (!/mensaje de felicitaci[oó]n/i.test(value) || value.indexOf("$") === -1) return;
+      var corrected = value.replace(/\$\s*(?=[A-Za-zÁÉÍÓÚÜÑáéíóúüñ])/g, "");
+      if (corrected === value) return;
+      element.textContent = corrected;
+      element.setAttribute("data-invitta-dynamic-text", "true");
+    });
+  }
+
+  function applyItineraryHeading() {
+    // Keep each template's native heading class and editorial typography;
+    // only replace its generic copy with the product-wide section name.
+    Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, span")).forEach(function(element) {
+      if (element.children.length !== 0) return;
+      if (clean(element.textContent) !== "PROGRAMACIÓN") return;
+      element.textContent = "Minuto a Minuto";
+      element.setAttribute("data-invitta-dynamic-text", "true");
+    });
+  }
+
+  function normalizeLocationHeading() {
+    // This is product copy, not a style override. Preserve each template's
+    // own element, font and animation while keeping the section title
+    // consistently capitalized across every invitation.
+    Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, span")).forEach(function(element) {
+      if (element.children.length !== 0) return;
+      if (clean(element.textContent).toLocaleLowerCase("es-MX") !== "¿dónde celebraremos?") return;
+      element.textContent = "¿Dónde Celebraremos?";
+      element.setAttribute("data-invitta-dynamic-text", "true");
+    });
+  }
+
+  function hideSectionWithHeading(headingText) {
+    var heading = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6, span, p")).find(function (element) {
+      return clean(element.textContent) === headingText;
+    });
+    var section = heading && heading.closest("section");
+    if (section) section.style.setProperty("display", "none", "important");
+  }
+
+  function hideUnsupportedPlumNoirSamples() {
+    // These modules ship with static demonstration records. Invitta has no
+    // persisted data model for collaborative albums or lodging yet, therefore
+    // they must not be published as event content.
+    var collaborativeAlbum = document.getElementById("collaborative-album");
+    if (collaborativeAlbum) collaborativeAlbum.style.setProperty("display", "none", "important");
+    hideSectionWithHeading("Álbum Colaborativo");
+    hideSectionWithHeading("Sugerencias de Hospedaje");
+
+    if (templateId !== "boda-midnight-gold-vip") return;
+
+    // The agenda is configurable in Studio. Without entries, avoid showing
+    // the template's fictional schedule.
+    if (!Array.isArray(data.itinerary) || data.itinerary.length === 0) {
+      hideSectionWithHeading("PROGRAMACIÓN");
+      hideSectionWithHeading("Minuto a Minuto");
     }
   }
 
@@ -332,6 +766,14 @@
       "#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i], " +
       "[class*='gallery' i], [class*='galeria' i], [class*='galería' i], " +
       ".inv-moments-section, .inv-gallery-section, #inv-gallery-section, [id*='photo-grid' i]"
+    ));
+  }
+
+  function isHeroMedia(element) {
+    if (!element || !element.closest) return false;
+    return Boolean(element.closest(
+      "#hero, #cover, #portada, #inv-hero, .hero, .cover, .portada, " +
+      ".inv-hero, .inv-hero-bg, [data-hero-img], [data-hero-bg]"
     ));
   }
 
@@ -458,7 +900,10 @@
     } else {
       // En invitaciones reales sin foto principal: ocultar los placeholders demo de portada
       heroImages.forEach(function (img) {
-        img.style.setProperty("display", "none", "important");
+        var source = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
+        if (isDemoHeroAsset(source)) {
+          img.style.setProperty("display", "none", "important");
+        }
       });
 
       heroBgElements.forEach(function (el) {
@@ -477,6 +922,7 @@
     // Eliminar imágenes de stock demo usadas como fondo en secciones internas
     Array.from(document.querySelectorAll("[style*='background-image']")).forEach(function (el) {
       if (isGalleryContainer(el)) return;
+      if (isHeroMedia(el)) return;
       var bg = el.style.backgroundImage || "";
       if (isDemoGalleryAsset(bg) || isDemoHeroAsset(bg)) {
         el.style.setProperty("background-image", "none", "important");
@@ -485,9 +931,17 @@
 
     Array.from(document.images).forEach(function (img) {
       if (isGalleryContainer(img)) return;
+      if (isHeroMedia(img)) return;
       var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
       if (isDemoGalleryAsset(src)) {
-        img.style.setProperty("display", "none", "important");
+        // Hiding only the image leaves a framed, empty rectangle behind.
+        // Hide the standalone editorial media block with it.
+        var wrapper = img.closest(".cursor-zoom-in, .cursor-pointer, figure, .group, [class*='gallery-item']");
+        if (wrapper && wrapper !== document.body) {
+          wrapper.style.setProperty("display", "none", "important");
+        } else {
+          img.style.setProperty("display", "none", "important");
+        }
       }
     });
   }
@@ -581,6 +1035,53 @@
       return;
     }
 
+    // Reuse the template's own slots. This retains each template's original
+    // composition, parallax, lightbox and responsive behavior instead of
+    // placing a generic Invitta grid over its gallery.
+    Array.from(document.images).forEach(function(img) {
+      // Some Élégance assets use a gallery-style filename for the cover photo.
+      // The hero is owned exclusively by applyHeroImage(), never by gallery slots.
+      if (isHeroMedia(img)) return;
+      var original = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
+      var index = getOriginalGalleryIndex(original);
+      var gallerySlot = img.closest(".cursor-zoom-in, [class*='gallery-item'], figure, li");
+      var belongsToGallery = Boolean(img.closest("#gallery, [id*='gallery' i], [id*='galeria' i], [id*='galería' i]"));
+
+      // Some native lightboxes include the stock hero as their first gallery
+      // slide. It must not become an additional gallery photograph.
+      if (index < 0 && belongsToGallery && isDemoHeroAsset(original)) {
+        if (gallerySlot) gallerySlot.style.setProperty("display", "none", "important");
+        return;
+      }
+      if (index < 0) return;
+
+      // Several templates reuse gallery assets as decorative backgrounds in
+      // countdowns and editorial sections. They are not gallery slots: never
+      // inject an uploaded event photo there, otherwise the same image leaks
+      // into unrelated sections and appears duplicated.
+      if (!belongsToGallery) return;
+
+      // A native demo may have more slots than the client purchased or
+      // uploaded. Hide the surplus slots instead of cycling their photos.
+      if (belongsToGallery && index >= gallery.length) {
+        if (gallerySlot) gallerySlot.style.setProperty("display", "none", "important");
+        return;
+      }
+
+      var photoUrl = gallery[index];
+      if (!img.dataset.invittaOriginalSrc) img.dataset.invittaOriginalSrc = original;
+      img.dataset.invittaPersonalized = "true";
+      img.dataset.invittaPersonalizedSrc = photoUrl;
+      if (img.parentElement && img.parentElement.tagName.toLowerCase() === "picture") {
+        img.parentElement.querySelectorAll("source").forEach(function(sourceEl) {
+          sourceEl.srcset = photoUrl;
+        });
+      }
+      img.removeAttribute("srcset");
+      if (img.src !== photoUrl) img.src = photoUrl;
+    });
+    return;
+
     // Si no existe sección de galería en la plantilla y hay fotos reales, crear invitta-gallery-section
     if (gallerySections.length === 0 && gallery.length > 0) {
       var newSec = document.createElement("section");
@@ -625,6 +1126,8 @@
       }
     });
 
+    if (templateId === "boda-golden-romance-premium") return;
+
     gallerySections.forEach(function (sec) {
       var demoItems = sec.querySelectorAll(".grid > *, .gallery > *, [class*='grid'] > *, [class*='gallery']:not(.invitta-gallery-grid)");
       demoItems.forEach(function (item) {
@@ -637,7 +1140,10 @@
       if (!grid) {
         grid = document.createElement("div");
         grid.className = "invitta-gallery-grid";
-        var inner = sec.querySelector(".section__inner, .max-w-4xl, .max-w-5xl, .max-w-6xl, .max-w-[1500px], .max-w-[1600px], .container, .space-y-16") || sec;
+        // Tailwind arbitrary-value class names contain brackets, which must be
+        // escaped in querySelector. An invalid selector here aborted the whole
+        // personalization pass and left the native demo copy and media intact.
+        var inner = sec.querySelector(".section__inner, .max-w-4xl, .max-w-5xl, .max-w-6xl, .max-w-\\[1500px\\], .max-w-\\[1600px\\], .container, .space-y-16") || sec;
         inner.appendChild(grid);
       }
 
@@ -671,6 +1177,55 @@
           grid.appendChild(item);
         });
       }
+    });
+  }
+
+  var sectionAdapters = {
+    "xv-elegance-basic": {
+      family: ["#family"], locations: ["#locations"], itinerary: [], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-container"]
+    },
+    "boda-classic-basic": {
+      family: ["#family"], locations: ["#locations"], itinerary: [], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-container"]
+    },
+    "xv-rose-gold-premium": {
+      family: ["#honors"], locations: ["#details"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-bottom-bar"]
+    },
+    "xv-champagne-rose-vip": {
+      family: ["#honors"], locations: ["#details"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-bottom-bar"]
+    },
+    "boda-golden-romance-premium": {
+      family: ["#honors"], locations: ["#details"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-bottom-bar"]
+    },
+    "boda-midnight-gold-vip": {
+      family: ["#honors"], locations: ["#details"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player-bottom-bar"]
+    },
+    "cumpleanos-general-basic": {
+      family: ["#family"], locations: ["#location-cards"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player"]
+    },
+    "cumpleanos-50-sorpresa": {
+      family: ["#family"], locations: ["#location-cards"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player"]
+    },
+    "bautizo-general-basic": {
+      family: ["#family"], locations: ["#location-cards"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player"]
+    },
+    "otro-general-basic": {
+      family: ["#family"], locations: ["#location-cards"], itinerary: ["#itinerary"], gallery: ["#gallery"], registry: ["#registry"], rsvp: ["#rsvp"], music: ["#music-player"]
+    }
+  };
+
+  function applySectionVisibility() {
+    if (!isRealStudioInvitation()) return;
+    var visibility = data.sectionVisibility || {};
+    var adapter = sectionAdapters[templateId] || {};
+    Object.keys(adapter).forEach(function(key) {
+      if (visibility[key] !== false) return;
+      adapter[key].forEach(function(selector) {
+        document.querySelectorAll(selector).forEach(function(section) {
+          section.hidden = true;
+          section.style.setProperty("display", "none", "important");
+          section.dataset.invittaSectionHidden = "true";
+        });
+      });
     });
   }
 
@@ -806,6 +1361,166 @@
         }
       });
     });
+  }
+
+  // A dress-code section belongs to the template.  Do not leave the template's
+  // sample "FORMAL" content visible when the host has not supplied one.
+  function applyDressCode() {
+    var dressCode = clean(data.dressCode);
+    var title = Array.from(document.querySelectorAll("span, p, h1, h2, h3, h4, h5, h6")).find(function (element) {
+      return /C[ÓO]DIGO DE VESTIMENTA/i.test(clean(element.textContent));
+    });
+    if (!title) return;
+
+    var section = title.closest("section");
+    if (!dressCode) {
+      if (section) section.style.setProperty("display", "none", "important");
+      return;
+    }
+
+    if (section) section.style.removeProperty("display");
+    if (!section) return;
+
+    // The heading and its supporting copy retain their template classes. This
+    // changes content only, preserving each template's editorial typography.
+    var heading = section.querySelector("h1, h2, h3, h4, h5, h6");
+    if (heading && heading.children.length === 0) {
+      heading.textContent = dressCode;
+      heading.setAttribute("data-invitta-dynamic-text", "true");
+      heading.setAttribute("data-invitta-dress-code-title", "true");
+      heading.style.setProperty("text-transform", "none", "important");
+    }
+
+    var leaves = Array.from(section.querySelectorAll("p, span, div")).filter(function (element) {
+      return element.children.length === 0;
+    });
+    var detail = leaves.find(function (element) {
+      return /^(?:traje|vestido|etiqueta|c[oó]ctel|cocktail)/i.test(clean(element.textContent));
+    });
+    var childrenMessage = leaves.find(function (element) {
+      var value = clean(element.textContent);
+      return /(niñ|n[ií]ñ|j[oó]venes|adultos)/i.test(value) && /(agradecemos|comprensi[oó]n|dedicado|evento)/i.test(value);
+    });
+    var childrenBadge = leaves.find(function (element) {
+      return /^(?:✦\s*)?(?:evento\s+sin\s+niñ[oa]s|solo\s+adultos|no\s+niñ[oa]s)$/i.test(clean(element.textContent));
+    });
+    var detailsCopy = clean(data.dressCodeDetails);
+    var childrenNote = clean(data.childrenNote);
+    var childrenLabel = clean(data.childrenLabel);
+
+    if (detail) {
+      if (detailsCopy) {
+        detail.textContent = detailsCopy;
+        detail.setAttribute("data-invitta-dynamic-text", "true");
+        detail.style.setProperty("text-transform", "none", "important");
+        detail.style.removeProperty("display");
+      } else {
+        detail.style.setProperty("display", "none", "important");
+      }
+    }
+
+    if (childrenMessage) {
+      if (childrenNote) {
+        childrenMessage.textContent = childrenNote;
+        childrenMessage.setAttribute("data-invitta-dynamic-text", "true");
+        childrenMessage.style.setProperty("text-transform", "none", "important");
+        childrenMessage.style.removeProperty("display");
+      } else {
+        childrenMessage.style.setProperty("display", "none", "important");
+      }
+    }
+
+    if (childrenBadge) {
+      var badgeContainer = childrenBadge.parentElement;
+      if (childrenLabel) {
+        childrenBadge.textContent = childrenLabel;
+        childrenBadge.setAttribute("data-invitta-dynamic-text", "true");
+        childrenBadge.style.setProperty("text-transform", "none", "important");
+        if (badgeContainer) badgeContainer.style.removeProperty("display");
+      } else if (badgeContainer) {
+        badgeContainer.style.setProperty("display", "none", "important");
+      }
+    }
+
+    // When both optional children messages are absent, hide their shared
+    // container so a decorative border or blank vertical gap cannot remain.
+    if (!childrenNote && !childrenLabel && (childrenMessage || childrenBadge)) {
+      var supportingCopy = (childrenMessage || childrenBadge).parentElement;
+      if (supportingCopy) supportingCopy.style.setProperty("display", "none", "important");
+    }
+  }
+
+  function locationCardFor(details, expression) {
+    var heading = Array.from(details.querySelectorAll("h1, h2, h3, h4")).find(function(element) {
+      return expression.test(clean(element.textContent));
+    });
+    if (!heading) return null;
+    return heading.closest(".bg-paper, .card, article, [class*='border']") || heading.parentElement;
+  }
+
+  function applyLocationCard(card, location) {
+    if (!card) return false;
+    var hasContent = Boolean(location && (clean(location.name) || clean(location.address) || clean(location.mapUrl)));
+    if (!hasContent) {
+      card.style.setProperty("display", "none", "important");
+      return false;
+    }
+
+    card.style.removeProperty("display");
+    var name = card.querySelector("p.font-semibold, [data-invitta-location-name]");
+    if (name) {
+      if (clean(location.name)) {
+        name.textContent = location.name;
+        name.setAttribute("data-invitta-location-name", "true");
+        name.setAttribute("data-invitta-dynamic-text", "true");
+        name.style.removeProperty("display");
+      } else {
+        name.style.setProperty("display", "none", "important");
+      }
+    }
+    var address = Array.from(card.querySelectorAll("p")).find(function(element) {
+      return element !== name && (/opacity-|font-sans/.test(element.className || "") || element.querySelector("br"));
+    });
+    if (address) {
+      if (clean(location.address)) {
+        address.textContent = location.address;
+        address.setAttribute("data-invitta-dynamic-text", "true");
+        address.style.setProperty("white-space", "pre-line");
+        address.style.removeProperty("display");
+      } else {
+        address.style.setProperty("display", "none", "important");
+      }
+    }
+    var mapLink = Array.from(card.querySelectorAll("a, button")).find(function(element) {
+      return /C[ÓO]MO LLEGAR/.test(element.textContent || "");
+    });
+    if (mapLink) {
+      if (clean(location.mapUrl)) {
+        if (mapLink.tagName === "A") mapLink.href = location.mapUrl;
+        mapLink.dataset.invittaUrl = location.mapUrl;
+        mapLink.style.removeProperty("display");
+      } else {
+        mapLink.style.setProperty("display", "none", "important");
+      }
+    }
+    return true;
+  }
+
+  function applyLocationContent() {
+    // Premium and VIP templates ship with two filled sample cards. A real
+    // invitation must show only saved ceremony/reception data, never those
+    // samples or their empty framed remnants.
+    var details = document.getElementById("details");
+    if (!details || !isRealStudioInvitation()) return;
+    var ceremonyCard = locationCardFor(details, /ceremonia|iglesia/i);
+    var receptionCard = locationCardFor(details, /recepci[oó]n|sal[oó]n/i);
+    var hasCeremony = applyLocationCard(ceremonyCard, data.ceremony || {});
+    var hasReception = applyLocationCard(receptionCard, data.reception || {});
+    if (!hasCeremony && !hasReception && (ceremonyCard || receptionCard)) {
+      details.style.setProperty("display", "none", "important");
+    } else if (hasCeremony || hasReception) {
+      details.style.removeProperty("display");
+    }
   }
 
   function applyLinks() {
@@ -1260,12 +1975,49 @@
   function applyConfirmationContacts() {
     var phones = Array.isArray(data.confirmationPhones)
       ? data.confirmationPhones.filter(Boolean).slice(0, 2)
-      : [data.whatsapp].filter(Boolean);
+      : [];
+    // `whatsapp` already includes the studio number as a safe fallback in
+    // buildPublicTemplateData().  Keep it when the event itself has no phone.
+    if (!phones.length && data.whatsapp) phones = [data.whatsapp];
     if (!phones.length) return;
 
     var whatsappActions = Array.from(document.querySelectorAll("a, button")).filter(function (element) {
       return /WHATSAPP/i.test(element.textContent || "");
     });
+
+    // Some native templates never included a WhatsApp action.  The public
+    // bridge owns this single fallback so every invitation offers the same
+    // confirmation route when an event has a confirmation number configured.
+    var visibleWhatsappActions = whatsappActions.filter(function (element) {
+      return !element.hidden && element.offsetParent !== null;
+    });
+    if (!visibleWhatsappActions.length && !document.querySelector("[data-invitta-generated-whatsapp]")) {
+      var rsvpSection = document.querySelector("#rsvp, [data-invitta-rsvp], [data-rsvp], [id*='rsvp'], [id*='confirm'], [class*='rsvp'], [class*='confirm']");
+      if (!rsvpSection) {
+        var rsvpRadio = Array.from(document.querySelectorAll("input[type='radio']")).find(function (element) {
+          return element.offsetParent !== null;
+        });
+        rsvpSection = rsvpRadio && (rsvpRadio.closest("form, section, article, [role='region'], [class*='rsvp'], [class*='confirm']") || rsvpRadio.parentElement);
+      }
+      if (!rsvpSection) {
+        var rsvpTrigger = Array.from(document.querySelectorAll("a, button")).find(function (element) {
+          return /CONFIRMAR|RSVP/i.test(element.textContent || "");
+        });
+        rsvpSection = rsvpTrigger && (rsvpTrigger.closest("form, section, article, [role='region'], [class*='rsvp'], [class*='confirm']") || rsvpTrigger.parentElement);
+      }
+
+      if (rsvpSection) {
+        var generatedAction = document.createElement("button");
+        generatedAction.type = "button";
+        generatedAction.textContent = "CONFIRMAR POR WHATSAPP";
+        generatedAction.dataset.invittaGeneratedWhatsapp = "true";
+        generatedAction.dataset.invittaPhone = phones[0];
+        generatedAction.setAttribute("aria-label", "Confirmar asistencia por WhatsApp");
+        var actionHost = rsvpSection.querySelector("form") || rsvpSection;
+        actionHost.appendChild(generatedAction);
+        whatsappActions.push(generatedAction);
+      }
+    }
 
     whatsappActions.forEach(function (element) {
       if (!element.dataset.invittaPhone) element.dataset.invittaPhone = phones[0];
@@ -1281,6 +2033,35 @@
     secondary.setAttribute("aria-label", "Confirmar con el segundo contacto");
     secondary.textContent = "CONFIRMAR CON SEGUNDO CONTACTO";
     primary.insertAdjacentElement("afterend", secondary);
+  }
+
+  function ensureActionAccessibilityStyles() {
+    if (document.getElementById("invitta-action-accessibility")) return;
+    var style = document.createElement("style");
+    style.id = "invitta-action-accessibility";
+    style.textContent = [
+      "[data-invitta-primary-action]{background-color:var(--inv-30,#40362E)!important;border-color:var(--inv-10,#B99654)!important;color:var(--inv-60,#F7F0E7)!important;}",
+      "[data-invitta-primary-action] *{color:inherit!important;}",
+      "[data-invitta-primary-action]:hover,[data-invitta-primary-action]:focus-visible,[data-invitta-primary-action]:active,[data-invitta-primary-action][aria-pressed='true'],[data-invitta-primary-action][data-state='selected'],[data-invitta-primary-action].is-selected{background-color:var(--inv-30,#40362E)!important;border-color:var(--inv-10,#B99654)!important;color:var(--inv-60,#F7F0E7)!important;box-shadow:inset 0 0 0 2px var(--inv-10,#B99654);outline:2px solid var(--inv-10,#B99654)!important;outline-offset:3px;}",
+      "[data-invitta-primary-action]:hover *,[data-invitta-primary-action]:focus-visible *,[data-invitta-primary-action]:active *,[data-invitta-primary-action][aria-pressed='true'] *,[data-invitta-primary-action][data-state='selected'] *{color:inherit!important;}",
+      "[data-invitta-secondary-action]{background-color:transparent!important;border-color:var(--inv-10,#B99654)!important;color:var(--inv-30,#40362E)!important;}",
+      "[data-invitta-secondary-action]:hover,[data-invitta-secondary-action]:focus-visible,[data-invitta-secondary-action]:active,[data-invitta-secondary-action][aria-pressed='true'],[data-invitta-secondary-action][data-state='selected'],[data-invitta-secondary-action].is-selected{background-color:var(--inv-30,#40362E)!important;border-color:var(--inv-10,#B99654)!important;color:var(--inv-60,#F7F0E7)!important;box-shadow:inset 0 0 0 2px var(--inv-10,#B99654);outline:2px solid var(--inv-10,#B99654)!important;outline-offset:3px;}",
+      "[data-invitta-generated-whatsapp]{display:inline-flex!important;align-items:center!important;justify-content:center!important;margin-top:1rem!important;padding:.8rem 1.2rem!important;font:inherit!important;letter-spacing:.08em!important;}",
+      "section#rsvp input[type='radio'],section[id*='rsvp'] input[type='radio'],section[id*='confirm'] input[type='radio']{accent-color:var(--inv-10,#B99654)!important;}",
+      "section#rsvp input[type='radio']:focus-visible,section[id*='rsvp'] input[type='radio']:focus-visible,section[id*='confirm'] input[type='radio']:focus-visible{outline:2px solid var(--inv-10,#B99654)!important;outline-offset:3px;}"
+    ].join("");
+    document.head.appendChild(style);
+  }
+
+  function markAccessibleActions() {
+    Array.from(document.querySelectorAll("a, button, input[type='submit'], input[type='button']")).forEach(function (element) {
+      var label = (element.textContent || element.value || element.getAttribute("aria-label") || "").trim();
+      var isPrimary = /AGREGAR\s+AL\s+CALENDARIO|CONFIRMAR|WHATSAPP|ENVIAR\s+(?:CONFIRMACI[OÓ]N|RESPUESTA)|S[IÍ],?\s*ASISTIR|ACEPTAR/i.test(label) ||
+        (element.matches("form button[type='submit'], form input[type='submit']") && !/NO\s+ASISTIR|NO\s+PODR|DECLINAR|RECHAZAR/i.test(label));
+      var isSecondary = /NO\s+ASISTIR|NO\s+PODR|DECLINAR|RECHAZAR/i.test(label);
+      if (isPrimary) element.dataset.invittaPrimaryAction = "true";
+      if (isSecondary) element.dataset.invittaSecondaryAction = "true";
+    });
   }
 
   function confirmationMessage() {
@@ -1354,6 +2135,88 @@
 
   function applyThemeHooks() {
     var root = document.documentElement;
+    var existingStyle = document.getElementById("invitta-visual-customization");
+    if (existingStyle) existingStyle.remove();
+
+    // A palette has exactly three semantic colors: 60% base, 30% readable
+    // contrast and 10% accent. Native template CSS remains in charge of every
+    // layout, photograph, parallax layer, animation and type treatment.
+    var palettePresets = {
+      champagne: { base: "#F7F0E7", support: "#40362E", accent: "#B99654" },
+      rose: { base: "#FAF0F0", support: "#704853", accent: "#C88A97" },
+      sage: { base: "#F1F3EC", support: "#405144", accent: "#718067" },
+      emerald: { base: "#F0F4EF", support: "#1F493B", accent: "#1E6A52" },
+      midnight: { base: "#1C1920", support: "#F6EAD2", accent: "#C5A355" },
+      "terracotta-sand": { base: "#F4E6D8", support: "#512F28", accent: "#D26345" },
+      "plum-olive": { base: "#EEEBDD", support: "#3D1831", accent: "#7A7D45" },
+      "opal-blue": { base: "#EAF2F4", support: "#263B5B", accent: "#8B79A8" },
+      "emerald-jewel": { base: "#E8EFEA", support: "#0E3B31", accent: "#C19A3C" },
+      "celestial-navy": { base: "#0C1630", support: "#F5EBD5", accent: "#D6AF4B" }
+    };
+    var palette = palettePresets[data.palettePreset];
+    var paletteVariables = [
+      "--inv-60", "--inv-30", "--inv-10", "--inv-on-accent",
+      "--color-background", "--color-paper", "--color-surface",
+      "--color-surface-container-low", "--color-surface-container-lowest",
+      "--color-ink", "--color-on-background", "--color-on-surface",
+      "--color-on-surface-variant", "--color-primary", "--color-sage",
+      "--color-champagne-gold", "--color-outline-variant",
+      "--invitta-surface", "--invitta-card", "--invitta-title",
+      "--invitta-body", "--invitta-accent", "--inv-button-text", "--inv-overlay"
+    ];
+    paletteVariables.forEach(function(name) { root.style.removeProperty(name); });
+    delete root.dataset.invittaTheme;
+    delete root.dataset.invittaPalette;
+    if (!palette) return;
+
+    function contrastRatio(first, second) {
+      function channel(value) {
+        value = value / 255;
+        return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+      }
+      function luminance(hex) {
+        var cleanHex = hex.replace("#", "");
+        return (channel(parseInt(cleanHex.slice(0, 2), 16)) * 0.2126) +
+          (channel(parseInt(cleanHex.slice(2, 4), 16)) * 0.7152) +
+          (channel(parseInt(cleanHex.slice(4, 6), 16)) * 0.0722);
+      }
+      var one = luminance(first);
+      var two = luminance(second);
+      return (Math.max(one, two) + 0.05) / (Math.min(one, two) + 0.05);
+    }
+
+    var accentText = contrastRatio(palette.base, palette.accent) >= contrastRatio(palette.support, palette.accent)
+      ? palette.base
+      : palette.support;
+    root.dataset.invittaPalette = data.palettePreset;
+    root.style.setProperty("--inv-60", palette.base);
+    root.style.setProperty("--inv-30", palette.support);
+    root.style.setProperty("--inv-10", palette.accent);
+    root.style.setProperty("--inv-on-accent", accentText);
+    root.style.setProperty("--color-background", palette.base);
+    root.style.setProperty("--color-paper", palette.base);
+    root.style.setProperty("--color-surface", palette.base);
+    root.style.setProperty("--color-surface-container-low", palette.base);
+    root.style.setProperty("--color-surface-container-lowest", palette.base);
+    root.style.setProperty("--color-ink", palette.support);
+    root.style.setProperty("--color-on-background", palette.support);
+    root.style.setProperty("--color-on-surface", palette.support);
+    root.style.setProperty("--color-on-surface-variant", palette.support);
+    root.style.setProperty("--color-primary", palette.accent);
+    root.style.setProperty("--color-sage", palette.accent);
+    root.style.setProperty("--color-champagne-gold", palette.accent);
+    root.style.setProperty("--color-outline-variant", palette.accent);
+    // The general-event renderer intentionally has its own semantic tokens.
+    // Feed it the same three colors instead of leaving its fixed defaults.
+    root.style.setProperty("--invitta-surface", palette.base);
+    root.style.setProperty("--invitta-card", palette.base);
+    root.style.setProperty("--invitta-title", palette.support);
+    root.style.setProperty("--invitta-body", palette.support);
+    root.style.setProperty("--invitta-accent", palette.accent);
+    root.style.setProperty("--inv-button-text", accentText);
+    root.style.setProperty("--inv-overlay", "rgba(0,0,0,0.28)");
+    return;
+
     var palettePresets = {
       champagne: {
         surface: "#F7F0E7",
@@ -1651,8 +2514,15 @@
     root.style.setProperty("--inv-input-border", inputBorder);
     root.style.setProperty("--text-color", textOn60);
 
-    var existingStyle = document.getElementById("invitta-visual-customization");
+    existingStyle = document.getElementById("invitta-visual-customization");
     if (existingStyle) existingStyle.remove();
+
+    // Recovery rule: tokens are data, not a second stylesheet. The previous
+    // generic selectors recolored headers, body copy, cards, photos and music
+    // players across unrelated template DOMs. Native template CSS remains the
+    // single authority until a template-specific adapter opts into these tokens.
+    delete root.dataset.invittaTheme;
+    return;
 
     if (!palette && !data.titleColor && !data.bodyColor && !data.accentColor) return;
 
@@ -1722,6 +2592,8 @@
     
     var opacity = Number(data.bgOverlayOpacity);
     opacity = (isNaN(opacity) || opacity < 0) ? 0.35 : Math.min(opacity, 1);
+    var imageOpacity = Number(data.bgImageOpacity);
+    imageOpacity = (isNaN(imageOpacity) || imageOpacity < 0) ? 0.18 : Math.min(imageOpacity, 0.6);
     
     var blur = Number(data.bgBlur);
     blur = (isNaN(blur) || blur < 0) ? 0 : Math.min(blur, 20);
@@ -1738,6 +2610,7 @@
     }
     
     root.style.setProperty("--inv-custom-bg-image", "url('" + data.backgroundImageUrl + "')");
+    root.style.setProperty("--inv-custom-bg-image-opacity", imageOpacity);
     root.style.setProperty("--inv-custom-bg-position", position);
     root.style.setProperty("--inv-custom-bg-size", size);
     root.style.setProperty("--inv-custom-bg-overlay-color", color);
@@ -1750,39 +2623,509 @@
       var style = document.createElement("style");
       style.id = "invitta-custom-background-style";
       style.textContent = 
-        "body.invitta-custom-bg { background: transparent !important; }\n" +
-        "body.invitta-custom-bg::before { content: ''; position: fixed; inset: -24px; z-index: -2; pointer-events: none; " +
+        "body.invitta-custom-bg { position:relative; isolation:isolate; background:transparent!important; }\n" +
+        "body.invitta-custom-bg::before { content: ''; position: fixed; inset: -24px; z-index: 3; pointer-events: none; opacity:var(--inv-custom-bg-image-opacity); mix-blend-mode:multiply; " +
         "background-image: var(--inv-custom-bg-image); background-size: var(--inv-custom-bg-size); " +
         "background-position: var(--inv-custom-bg-position); background-repeat: no-repeat; " +
         "filter: blur(var(--inv-custom-bg-blur)); transform: scale(1.03); }\n" +
-        "body.invitta-custom-bg::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; " +
+        "body.invitta-custom-bg::after { content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none; " +
         "background: var(--inv-custom-bg-overlay-color); opacity: var(--inv-custom-bg-overlay-opacity); }\n" +
-        "body.invitta-custom-bg #inv-content { position: relative; z-index: 1; }";
+        "body.invitta-custom-bg > * { position:relative; z-index:2; }\n" +
+        "body.invitta-custom-bg #root,body.invitta-custom-bg #app,body.invitta-custom-bg #inv-content { background-color:transparent!important; }";
       document.head.appendChild(style);
     }
   }
 
+  function applyTypographyRoleOverrides() {
+    // Uploaded fonts are selected per text role in Studio. Keep those rules
+    // separate from the global preset adapter so a custom font only changes
+    // the zone chosen by the user and preserves each template's own layout.
+    var roleConfig = data.typographyRoles || {};
+    var typographyFonts = Array.isArray(data.typographyFonts) ? data.typographyFonts.slice(0, 4) : [];
+    if (!typographyFonts.length && data.customFontUrl) {
+      typographyFonts = [{ id: "font-legacy-custom", name: data.customFontName || "Tipografía personalizada", url: data.customFontUrl }];
+    }
+
+    var customFontFamilies = {};
+    var fontFaces = typographyFonts.map(function(font) {
+      if (!font || !font.url) return "";
+      var safeId = String(font.id || "custom").replace(/[^A-Za-z0-9_-]/g, "");
+      var family = "InvittaUserFont_" + (safeId || "custom");
+      var extension = String(font.url).split("?")[0].split(".").pop().toLowerCase();
+      var format = extension === "woff2" ? "woff2" : extension === "woff" ? "woff" : extension === "otf" ? "opentype" : "truetype";
+      customFontFamilies[font.id] = family;
+      return '@font-face{font-family:"' + family + '";src:url(' + JSON.stringify(font.url) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
+    }).filter(Boolean);
+
+    var fontFaceStyle = document.getElementById("invitta-custom-font-face");
+    if (!fontFaceStyle) {
+      fontFaceStyle = document.createElement("style");
+      fontFaceStyle.id = "invitta-custom-font-face";
+      document.head.appendChild(fontFaceStyle);
+    }
+    fontFaceStyle.textContent = fontFaces.join("\n");
+
+    var presets = {
+      classic: { display: '"Cormorant Garamond", "Playfair Display", Georgia, serif', body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif' },
+      romantic: { display: '"Great Vibes", "Cormorant Garamond", cursive', body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif' },
+      editorial: { display: '"Playfair Display", "Cormorant Garamond", Georgia, serif', body: '"Hanken Grotesk", "Montserrat", Arial, sans-serif' },
+      minimal: { display: '"Montserrat", "Hanken Grotesk", Arial, sans-serif', body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif' },
+      luxury: { display: '"Playfair Display", "Cormorant Garamond", Georgia, serif', body: '"Hanken Grotesk", "Montserrat", Arial, sans-serif' },
+      signature: { display: '"Allura", "Great Vibes", cursive', body: '"Montserrat", Arial, sans-serif' },
+      couture: { display: '"Parisienne", "Great Vibes", cursive', body: '"Playfair Display", Georgia, serif' }
+    };
+    var roleStyle = document.getElementById("invitta-typography-roles");
+    if (!roleStyle) {
+      roleStyle = document.createElement("style");
+      roleStyle.id = "invitta-typography-roles";
+      document.head.appendChild(roleStyle);
+    }
+
+    roleStyle.textContent = typographyRoleOrder.map(function(role) {
+      var source = roleConfig[role] && roleConfig[role].font || "inherit";
+      // Inherit intentionally emits no rule: the native template typography
+      // remains authoritative until Studio has a concrete role selection.
+      if (source === "inherit") return "";
+      var customFamily = customFontFamilies[source] || (source === "custom" && typographyFonts[0] ? customFontFamilies[typographyFonts[0].id] : "");
+      var selected = customFamily
+        ? { display: '"' + customFamily + '", "Cormorant Garamond", Georgia, serif', body: '"' + customFamily + '", "Montserrat", Arial, sans-serif' }
+        : presets[source];
+      if (!selected || !typographyRoleSelectors[role]) return "";
+      var family = role === "body" || role === "labels" ? selected.body : selected.display;
+      var scopedSelectors = typographyRoleSelectors[role].split(",").map(function(selector) {
+        return "html body " + selector.trim();
+      }).join(",");
+      return scopedSelectors + "{font-family:" + family + "!important;}";
+    }).join("\n");
+  }
+
+  function applyTemplateTypography() {
+    // Typography is an explicit Studio choice. The default "classic" keeps
+    // the native design untouched; a selected preset changes families only,
+    // never the template's responsive sizes, spacing, or motion.
+    var root = document.documentElement;
+    var style = document.getElementById("invitta-template-typography");
+    if (style) style.remove();
+    delete root.dataset.invittaFontPreset;
+
+    var selectedPreset = data.fontPreset;
+    if (!selectedPreset || selectedPreset === "classic") return;
+    var presets = {
+      romantic: { display: '"Great Vibes", "Cormorant Garamond", cursive', body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif' },
+      editorial: { display: '"Playfair Display", "Cormorant Garamond", Georgia, serif', body: '"Hanken Grotesk", "Montserrat", Arial, sans-serif' },
+      minimal: { display: '"Montserrat", "Hanken Grotesk", Arial, sans-serif', body: '"Montserrat", "Hanken Grotesk", Arial, sans-serif' },
+      luxury: { display: '"Playfair Display", "Cormorant Garamond", Georgia, serif', body: '"Hanken Grotesk", "Montserrat", Arial, sans-serif' },
+      signature: { display: '"Allura", "Great Vibes", cursive', body: '"Montserrat", Arial, sans-serif' },
+      couture: { display: '"Parisienne", "Great Vibes", cursive', body: '"Playfair Display", Georgia, serif' }
+    };
+    var fonts = presets[selectedPreset];
+    if (selectedPreset === "custom") {
+      var customFont = (Array.isArray(data.typographyFonts) && data.typographyFonts[0]) ||
+        (data.customFontUrl ? { id: "legacy", url: data.customFontUrl } : null);
+      if (customFont && customFont.url) {
+        var safeId = String(customFont.id || "custom").replace(/[^A-Za-z0-9_-]/g, "");
+        var family = "InvittaUserFont_" + (safeId || "custom");
+        var extension = customFont.url.split("?")[0].split(".").pop().toLowerCase();
+        var format = extension === "woff2" ? "woff2" : extension === "woff" ? "woff" : extension === "otf" ? "opentype" : "truetype";
+        var customStyle = document.createElement("style");
+        customStyle.textContent = '@font-face{font-family:"' + family + '";src:url(' + JSON.stringify(customFont.url) + ') format("' + format + '");font-style:normal;font-weight:400;font-display:swap;}';
+        document.head.appendChild(customStyle);
+        fonts = { display: '"' + family + '", "Cormorant Garamond", Georgia, serif', body: '"' + family + '", "Montserrat", Arial, sans-serif' };
+      }
+    }
+    if (!fonts) return;
+
+    root.dataset.invittaFontPreset = selectedPreset;
+    root.style.setProperty("--font-display", fonts.display);
+    root.style.setProperty("--font-serif", fonts.display);
+    root.style.setProperty("--font-sans", fonts.body);
+    var fontLink = document.getElementById("invitta-template-fonts");
+    if (!fontLink) {
+      fontLink = document.createElement("link");
+      fontLink.id = "invitta-template-fonts";
+      fontLink.rel = "stylesheet";
+      fontLink.href = "https://fonts.googleapis.com/css2?family=Allura&family=Great+Vibes&family=Hanken+Grotesk:wght@400..700&family=Montserrat:wght@400..700&family=Parisienne&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap";
+      document.head.appendChild(fontLink);
+    }
+
+    // Restrict the adapter to invitation content. In particular, it does not
+    // touch the header, player controls, QR artwork or native layout helpers.
+    var sections = "#hero,#cover,#portada,#inv-hero,#family,#honors,#details,#locations,#itinerary,#gallery,#registry,#rsvp";
+    var headingSelectors = sections.split(",").map(function(section) {
+      return section + " h1," + section + " h2," + section + " h3," + section + " .font-display," + section + " .font-serif";
+    }).join(",");
+    var bodySelectors = sections.split(",").map(function(section) {
+      return section + " p," + section + " li," + section + " blockquote";
+    }).join(",");
+    style = document.createElement("style");
+    style.id = "invitta-template-typography";
+    style.textContent = headingSelectors + "{font-family:" + fonts.display + "!important;}" +
+      bodySelectors + "{font-family:" + fonts.body + "!important;}";
+    document.head.appendChild(style);
+  }
+
+  function applyTemplatePaletteAdapter() {
+    // These are the few legacy premium/VIP surfaces that use literal utility
+    // colors instead of the native tokens. Scope them tightly so palettes do
+    // not overwrite imagery, parallax, animations, or ordinary template CSS.
+    var existing = document.getElementById("invitta-template-palette-adapter");
+    if (existing) existing.remove();
+    if (!data.palettePreset) return;
+    var style = document.createElement("style");
+    style.id = "invitta-template-palette-adapter";
+    style.textContent = [
+      "html[data-invitta-palette] #itinerary{background-color:var(--inv-60)!important;color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #itinerary h1,html[data-invitta-palette] #itinerary h2,html[data-invitta-palette] #itinerary h3,html[data-invitta-palette] #itinerary h4,html[data-invitta-palette] #itinerary p,html[data-invitta-palette] #itinerary li{color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #itinerary .text-sage,html[data-invitta-palette] #itinerary .text-champagne-gold,html[data-invitta-palette] #itinerary .text-primary{color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #itinerary .bg-paper,html[data-invitta-palette] #itinerary .bg-surface-container-low,html[data-invitta-palette] #itinerary .bg-surface-container-lowest{background-color:var(--inv-60)!important;}",
+      "html[data-invitta-palette] #music-player-bottom-bar,html[data-invitta-palette] #music-player-container{background-color:var(--inv-60)!important;border-color:var(--inv-10)!important;color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #music-player-bottom-bar p,html[data-invitta-palette] #music-player-bottom-bar span,html[data-invitta-palette] #music-player-bottom-bar button,html[data-invitta-palette] #music-player-container p,html[data-invitta-palette] #music-player-container span,html[data-invitta-palette] #music-player-container button{color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #music-player-bottom-bar .text-sage,html[data-invitta-palette] #music-player-bottom-bar .text-champagne-gold,html[data-invitta-palette] #music-player-container .text-sage,html[data-invitta-palette] #music-player-container .text-champagne-gold{color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #music-toggle-play-btn{background-color:var(--inv-30)!important;border-color:var(--inv-10)!important;color:var(--inv-60)!important;}",
+      "html[data-invitta-palette] #music-toggle-play-btn>span{color:var(--inv-60)!important;}",
+      "html[data-invitta-palette] #music-player-bottom-bar input,html[data-invitta-palette] #music-player-container input{accent-color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #music-player{background-color:var(--inv-60)!important;border-color:var(--inv-10)!important;color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #music-player .music-player__track span,html[data-invitta-palette] #music-player .music-player__toggle{color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #music-player .music-player__track strong,html[data-invitta-palette] #music-player .music-player__track small{color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #music-player .music-player__toggle{border-color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #countdown{background-color:var(--inv-60)!important;color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #countdown h1,html[data-invitta-palette] #countdown h2,html[data-invitta-palette] #countdown h3,html[data-invitta-palette] #countdown h4,html[data-invitta-palette] #countdown p,html[data-invitta-palette] #countdown span{color:var(--inv-30)!important;}",
+      "html[data-invitta-palette] #countdown [class*='text-sage']{color:var(--inv-10)!important;}",
+      "html[data-invitta-palette] #countdown [class*='bg-sage']{background-color:var(--inv-10)!important;}",
+      "[data-invitta-dress-code-title]{font-size:clamp(1.75rem,8vw,3.25rem)!important;font-weight:400!important;letter-spacing:-.045em!important;line-height:1!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important;white-space:nowrap!important;text-wrap:nowrap!important;}"
+    ].join("");
+    document.head.appendChild(style);
+  }
+
+
+  var WEDDING_FAMILY_STYLES = {
+    classic: {
+      containerClass: "space-y-6",
+      headingClass: "font-sans text-[11px] tracking-[0.3em] text-sage uppercase font-semibold flex items-center gap-4",
+      lineClass: "w-10 h-px bg-sage/40",
+      listClass: "flex flex-col gap-3 pl-4 md:pl-8",
+      nameClass: "font-serif text-2xl md:text-3xl text-ink font-light",
+      ampClass: "font-serif text-2xl italic text-sage text-center w-20",
+      offsetClass: "pl-6 md:pl-12"
+    },
+    golden: {
+      containerClass: "space-y-6",
+      headingClass: "text-subheading-caps text-sage tracking-[0.25em] flex items-center gap-4",
+      lineClass: "w-8 h-px bg-sage/50",
+      listClass: "flex flex-col gap-4",
+      nameClass: "font-display font-light text-2xl md:text-3.5xl text-ink leading-tight",
+      ampClass: "font-serif-accent italic text-sage text-2xl pl-12",
+      offsetClass: "pl-16"
+    }
+  };
+
+  function normalizeWeddingParents(sourceData) {
+    var wp = sourceData.weddingParents || {};
+    var wpBride = wp.bride || {};
+    var wpGroom = wp.groom || {};
+    var wpLegacy = wp.legacy || {};
+
+    var brideFather = clean(wpBride.father || sourceData.brideFatherName || sourceData.bride_father_name || (sourceData.brideParents && sourceData.brideParents.father));
+    var brideMother = clean(wpBride.mother || sourceData.brideMotherName || sourceData.bride_mother_name || (sourceData.brideParents && sourceData.brideParents.mother));
+    var groomFather = clean(wpGroom.father || sourceData.groomFatherName || sourceData.groom_father_name || (sourceData.groomParents && sourceData.groomParents.father));
+    var groomMother = clean(wpGroom.mother || sourceData.groomMotherName || sourceData.groom_mother_name || (sourceData.groomParents && sourceData.groomParents.mother));
+
+    var hasExplicitParents = Boolean(brideFather || brideMother || groomFather || groomMother);
+
+    var legacyParents = Array.isArray(sourceData.parents) ? sourceData.parents.filter(Boolean) : [];
+    var legacyFather = clean(wpLegacy.father || sourceData.father_name || sourceData.fatherName || legacyParents[0]);
+    var legacyMother = clean(wpLegacy.mother || sourceData.mother_name || sourceData.motherName || legacyParents[1]);
+
+    var godparents = Array.isArray(sourceData.godparents)
+      ? sourceData.godparents.map(normalizeGodparentName).filter(Boolean)
+      : [];
+
+    var honorWitnessName = clean(
+      sourceData.honor_witness_name ||
+      sourceData.honorWitnessName ||
+      (sourceData.witnesses && sourceData.witnesses.name)
+    );
+
+    return {
+      bride: { father: brideFather, mother: brideMother },
+      groom: { father: groomFather, mother: groomMother },
+      legacy: { father: !hasExplicitParents ? legacyFather : "", mother: !hasExplicitParents ? legacyMother : "" },
+      hasExplicitParents: hasExplicitParents,
+      hasLegacyParents: !hasExplicitParents && Boolean(legacyFather || legacyMother),
+      godparents: godparents,
+      honorWitnessName: honorWitnessName,
+      hasHonorWitness: Boolean(honorWitnessName)
+    };
+  }
+
+  function createWeddingFamilyBlock(options) {
+    var title = options.title;
+    var people = options.people || [];
+    var style = options.style || WEDDING_FAMILY_STYLES.classic;
+    var isFirst = options.isFirst !== false;
+
+    var validPeople = people.filter(Boolean);
+    if (validPeople.length === 0) return null;
+
+    var block = document.createElement("div");
+    block.className = style.containerClass + (!isFirst && style === WEDDING_FAMILY_STYLES.golden ? " pt-6" : "");
+
+    var h3 = document.createElement("h3");
+    h3.className = style.headingClass;
+    h3.innerHTML = '<span class="' + style.lineClass + '"></span>' + title;
+    block.appendChild(h3);
+
+    var listDiv = document.createElement("div");
+    listDiv.className = style.listClass;
+
+    if (validPeople.length === 2) {
+      var s1 = document.createElement("span");
+      s1.className = style.nameClass;
+      s1.textContent = validPeople[0];
+      listDiv.appendChild(s1);
+
+      var sAmp = document.createElement("span");
+      sAmp.className = style.ampClass;
+      sAmp.textContent = "&";
+      listDiv.appendChild(sAmp);
+
+      var s2 = document.createElement("span");
+      s2.className = style.nameClass + " " + style.offsetClass;
+      s2.textContent = validPeople[1];
+      listDiv.appendChild(s2);
+    } else {
+      validPeople.forEach(function (personName, idx) {
+        var s = document.createElement("span");
+        s.className = style.nameClass + (idx > 0 ? " pt-1" : "");
+        s.textContent = personName;
+        listDiv.appendChild(s);
+      });
+    }
+
+    block.appendChild(listDiv);
+    return block;
+  }
+
+  function applyClassicWeddingFamily(model) {
+    var sec = document.querySelector("#family");
+    if (!sec) return;
+
+    var hasAny = model.hasExplicitParents || model.hasLegacyParents || model.godparents.length > 0 || model.hasHonorWitness;
+    if (!hasAny) {
+      sec.style.setProperty("display", "none", "important");
+      return;
+    }
+    sec.style.removeProperty("display");
+
+    var col = sec.querySelector(".md\\:col-span-7") || sec.querySelector(".space-y-12") || sec.querySelector(".grid > div:first-child");
+    if (!col) return;
+    col.innerHTML = "";
+
+    var style = WEDDING_FAMILY_STYLES.classic;
+    if (model.hasExplicitParents) {
+      var brideBlock = createWeddingFamilyBlock({ title: "Padres de la Novia", people: [model.bride.father, model.bride.mother], style: style });
+      if (brideBlock) col.appendChild(brideBlock);
+
+      var groomBlock = createWeddingFamilyBlock({ title: "Padres del Novio", people: [model.groom.father, model.groom.mother], style: style });
+      if (groomBlock) col.appendChild(groomBlock);
+    } else if (model.hasLegacyParents) {
+      var legBlock = createWeddingFamilyBlock({ title: "Nuestros Padres", people: [model.legacy.father, model.legacy.mother], style: style });
+      if (legBlock) col.appendChild(legBlock);
+    }
+
+    if (model.godparents.length > 0) {
+      var gpBlock = createWeddingFamilyBlock({ title: "Nuestros Padrinos", people: model.godparents, style: style });
+      if (gpBlock) col.appendChild(gpBlock);
+    }
+
+    var rightCol = sec.querySelector(".md\\:col-span-5");
+    if (rightCol) {
+      if (model.hasHonorWitness) {
+        rightCol.style.removeProperty("display");
+        var nameHeading = rightCol.querySelector(".font-serif, h3");
+        if (nameHeading) {
+          nameHeading.textContent = model.honorWitnessName;
+        } else {
+          var walker = document.createTreeWalker(rightCol, NodeFilter.SHOW_TEXT);
+          var tn;
+          while ((tn = walker.nextNode())) {
+            if (/Carlos González Farrera/i.test(tn.nodeValue)) {
+              tn.nodeValue = model.honorWitnessName;
+            }
+          }
+        }
+      } else {
+        rightCol.style.setProperty("display", "none", "important");
+      }
+    }
+  }
+
+  function applyGoldenWeddingFamily(model) {
+    var sec = document.querySelector("#honors");
+    if (!sec) return;
+
+    var hasAny = model.hasExplicitParents || model.hasLegacyParents || model.godparents.length > 0 || model.hasHonorWitness;
+    if (!hasAny) {
+      sec.style.setProperty("display", "none", "important");
+      return;
+    }
+    sec.style.removeProperty("display");
+
+    var col = sec.querySelector(".md\\:col-span-7") || sec.querySelector(".space-y-20") || sec.querySelector(".grid > div:first-child");
+    if (!col) return;
+    col.innerHTML = "";
+
+    var style = WEDDING_FAMILY_STYLES.golden;
+    var isFirst = true;
+
+    if (model.hasExplicitParents) {
+      var brideBlock = createWeddingFamilyBlock({ title: "Padres de la Novia", people: [model.bride.father, model.bride.mother], style: style, isFirst: isFirst });
+      if (brideBlock) { col.appendChild(brideBlock); isFirst = false; }
+
+      var groomBlock = createWeddingFamilyBlock({ title: "Padres del Novio", people: [model.groom.father, model.groom.mother], style: style, isFirst: isFirst });
+      if (groomBlock) { col.appendChild(groomBlock); isFirst = false; }
+    } else if (model.hasLegacyParents) {
+      var legBlock = createWeddingFamilyBlock({ title: "Con la bendición de nuestras familias", people: [model.legacy.father, model.legacy.mother], style: style, isFirst: isFirst });
+      if (legBlock) { col.appendChild(legBlock); isFirst = false; }
+    }
+
+    if (model.godparents.length > 0) {
+      var gpBlock = createWeddingFamilyBlock({ title: "Nuestros Padrinos de Honor", people: model.godparents, style: style, isFirst: isFirst });
+      if (gpBlock) col.appendChild(gpBlock);
+    }
+
+    var rightCol = sec.querySelector(".md\\:col-span-5");
+    if (rightCol) {
+      if (model.hasHonorWitness) {
+        rightCol.style.removeProperty("display");
+        var nameSpan = rightCol.querySelector(".font-display, h3 + span, span.text-ink");
+        if (nameSpan) {
+          nameSpan.textContent = model.honorWitnessName;
+        } else {
+          var walker = document.createTreeWalker(rightCol, NodeFilter.SHOW_TEXT);
+          var tn;
+          while ((tn = walker.nextNode())) {
+            if (/Carlos González Farrera/i.test(tn.nodeValue)) {
+              tn.nodeValue = model.honorWitnessName;
+            }
+          }
+        }
+      } else {
+        rightCol.style.setProperty("display", "none", "important");
+      }
+    }
+  }
+
+  function applyWeddingParents() {
+    if (!isWedding) return;
+    var model = normalizeWeddingParents(data);
+
+    if (isTemplate("boda-classic-basic")) {
+      applyClassicWeddingFamily(model);
+    } else if (isTemplate("boda-golden-romance-premium", "boda-midnight-gold-vip", "boda-premium-1")) {
+      applyGoldenWeddingFamily(model);
+    }
+  }
+
+  function applyXvFamily() {
+    if (isWedding) return;
+    if (!isTemplate("xv-elegance-basic", "xv-elegance", "xv-champagne-rose-vip", "xv-vip-3")) return;
+
+    var sec = document.querySelector("#family, #honors");
+    if (!sec) return;
+
+    var parents = Array.isArray(data.parents) ? data.parents.map(clean).filter(Boolean) : [];
+    if (parents.length === 0 && (data.father_name || data.mother_name || data.fatherName || data.motherName)) {
+      parents = [clean(data.father_name || data.fatherName), clean(data.mother_name || data.motherName)].filter(Boolean);
+    }
+    var godparents = Array.isArray(data.godparents) ? data.godparents.map(normalizeGodparentName).filter(Boolean) : [];
+    var chambelan = clean(data.chambelanName || (data.chambelan && data.chambelan.name) || (typeof data.chambelan === "string" ? data.chambelan : "") || "");
+
+    var hasAny = parents.length > 0 || godparents.length > 0 || Boolean(chambelan);
+    if (!hasAny) {
+      sec.style.setProperty("display", "none", "important");
+      return;
+    }
+    sec.style.removeProperty("display");
+
+    var isVip = isTemplate("xv-champagne-rose-vip", "xv-vip-3");
+    var style = isVip ? WEDDING_FAMILY_STYLES.golden : WEDDING_FAMILY_STYLES.classic;
+    var col = sec.querySelector(".md\\:col-span-7") || sec.querySelector(".space-y-20") || sec.querySelector(".grid > div:first-child");
+    if (!col) return;
+    col.innerHTML = "";
+
+    var isFirst = true;
+    if (parents.length > 0) {
+      var parentsTitle = isVip ? "Con la bendición de mis padres" : "Con la bendición de Dios y mis padres";
+      var parentsBlock = createWeddingFamilyBlock({ title: parentsTitle, people: parents, style: style, isFirst: isFirst });
+      if (parentsBlock) { col.appendChild(parentsBlock); isFirst = false; }
+    }
+
+    if (godparents.length > 0) {
+      var gpTitle = isVip ? "Mis Padrinos de Honor" : "Mis Padrinos";
+      var gpBlock = createWeddingFamilyBlock({ title: gpTitle, people: godparents, style: style, isFirst: isFirst });
+      if (gpBlock) { col.appendChild(gpBlock); isFirst = false; }
+    }
+
+    var rightCol = sec.querySelector(".md\\:col-span-5");
+    if (rightCol) {
+      if (chambelan) {
+        rightCol.style.removeProperty("display");
+        var nameSpan = rightCol.querySelector(".font-display, .font-serif, h3, span.text-ink");
+        if (nameSpan) {
+          nameSpan.textContent = chambelan;
+        } else {
+          var walker = document.createTreeWalker(rightCol, NodeFilter.SHOW_TEXT);
+          var tn;
+          while ((tn = walker.nextNode())) {
+            if (/Carlos González Farrera/i.test(tn.nodeValue)) {
+              tn.nodeValue = chambelan;
+            }
+          }
+        }
+      } else {
+        rightCol.style.setProperty("display", "none", "important");
+      }
+    }
+  }
 
   function applyAll() {
     if (applying || !document.body) return;
     applying = true;
     ensureDynamicCasingStyles();
     ensureMusicControlStyles();
+    ensureActionAccessibilityStyles();
     replaceText(document.body);
+    applyWeddingParents();
+    applyXvFamily();
+    applyLocationContent();
+    cleanRsvpMessageLabels();
+    markFamilySectionTitles();
     applyHeroImage();
     applyGalleryImages();
     applyInternalEditorialImages();
+    applySectionVisibility();
     applySectionBackgrounds();
     applyCustomBackground(data);
     applyAudio();
     applyOptionalContent();
+    applyDressCode();
     applyGiftOptions();
     applyLinks();
     applyGuestData();
     applyVipAccessPass();
     applyConfirmationContacts();
-    applyTypographyScales(false);
+    markAccessibleActions();
     hideLegacyGuestAdmin();
+    restoreCanonicalNameCasing();
+    applyPlumNoirWeddingAdapter();
+    applyCoverNameSizing();
+    applyEditorialCoverMeta();
+    applyGoldenRomanceWeddingAdapter();
+    applyTypographyScales(false);
+    hideUnsupportedPlumNoirSamples();
+    applyItineraryHeading();
+    normalizeLocationHeading();
     applying = false;
   }
 
@@ -1811,6 +3154,9 @@
   ensureDynamicCasingStyles();
   ensureMusicControlStyles();
   applyThemeHooks();
+  applyTemplatePaletteAdapter();
+  applyTemplateTypography();
+  applyTypographyRoleOverrides();
   applyTypographyScales(true);
   installClickBridge();
   applyAll();

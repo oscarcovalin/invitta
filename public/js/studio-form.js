@@ -38,6 +38,35 @@ function hasActiveTemplates(eventType) {
 }
 
 const SECTION_BACKGROUND_KEYS = ["hero", "family", "locations", "gallery", "rsvp"];
+const OPTIONAL_SECTION_KEYS = ["family", "locations", "itinerary", "gallery", "registry", "rsvp", "music"];
+
+function normalizeSectionVisibility(value) {
+  let parsed = value;
+  if (typeof parsed === "string") {
+    try { parsed = JSON.parse(parsed); } catch (error) { parsed = {}; }
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) parsed = {};
+  return OPTIONAL_SECTION_KEYS.reduce((result, key) => {
+    result[key] = parsed[key] !== false;
+    return result;
+  }, {});
+}
+
+function setSectionVisibilityControls(value) {
+  const visibility = normalizeSectionVisibility(value);
+  OPTIONAL_SECTION_KEYS.forEach(key => {
+    const input = document.querySelector(`[name="section_visibility"][value="${key}"]`);
+    if (input) input.checked = visibility[key];
+  });
+}
+
+function getSectionVisibilityControls() {
+  return OPTIONAL_SECTION_KEYS.reduce((result, key) => {
+    const input = document.querySelector(`[name="section_visibility"][value="${key}"]`);
+    result[key] = !input || input.checked;
+    return result;
+  }, {});
+}
 
 function getSelectedTemplateSectionBackgroundKeys() {
   const templateId = document.getElementById("template_id")?.value;
@@ -136,6 +165,121 @@ function splitLegacyXvHeading(title, honoreeName, eventType) {
   return { title: eventTitle || "Mis XV Años", honoree };
 }
 
+function splitWeddingCoupleName(value) {
+  const parts = String(value || "")
+    .split(/\s*(?:&|\by\b)\s*/i)
+    .map(part => part.trim())
+    .filter(Boolean);
+  return { bride: parts[0] || "", groom: parts.slice(1).join(" ") || "" };
+}
+
+function getWeddingCoupleName() {
+  const bride = document.getElementById("bride_name")?.value.trim() || "";
+  const groom = document.getElementById("groom_name")?.value.trim() || "";
+  return [bride, groom].filter(Boolean).join(" & ");
+}
+
+function updateWeddingNameFields() {
+  const isWedding = document.getElementById("event_type")?.value === "boda";
+  const coupleFields = document.getElementById("wedding-couple-fields");
+  const legacyField = document.getElementById("honoree-name-field");
+  const bride = document.getElementById("bride_name");
+  const groom = document.getElementById("groom_name");
+  const combined = document.getElementById("honoree_name");
+
+  const weddingParents = document.getElementById("wedding-parents-fields");
+  const generalParents = document.getElementById("general-parents-fields");
+
+  if (coupleFields) {
+    coupleFields.hidden = !isWedding;
+    coupleFields.style.display = isWedding ? "" : "none";
+  }
+  if (legacyField) {
+    legacyField.hidden = isWedding;
+    legacyField.style.display = isWedding ? "none" : "";
+  }
+  if (bride) bride.required = isWedding;
+  if (groom) groom.required = isWedding;
+
+  if (weddingParents) {
+    weddingParents.hidden = !isWedding;
+    weddingParents.style.display = isWedding ? "" : "none";
+  }
+  if (generalParents) {
+    generalParents.hidden = isWedding;
+    generalParents.style.display = isWedding ? "none" : "";
+  }
+
+  if (isWedding && combined) combined.value = getWeddingCoupleName();
+}
+
+function syncEventTimeFromSelects() {
+  const hourSelect = document.getElementById("event_hour");
+  const minuteSelect = document.getElementById("event_minute");
+  const timeInput = document.getElementById("event_time");
+  if (!timeInput) return;
+
+  const hour = hourSelect?.value || "";
+  const minute = minuteSelect?.value || "";
+
+  // Remove legacy option if standard or empty value selected
+  if (minuteSelect && ["", "00", "15", "30", "45"].includes(minute)) {
+    const legacyOpt = minuteSelect.querySelector('option[data-legacy="true"]');
+    if (legacyOpt) legacyOpt.remove();
+  }
+
+  if (hour && minute) {
+    timeInput.value = `${hour}:${minute}`;
+  } else {
+    timeInput.value = "";
+  }
+}
+
+function setEventTimeSelects(rawTime) {
+  const hourSelect = document.getElementById("event_hour");
+  const minuteSelect = document.getElementById("event_minute");
+  const timeInput = document.getElementById("event_time");
+
+  if (timeInput) timeInput.value = rawTime || "";
+  if (!hourSelect || !minuteSelect) return;
+
+  // Clean existing legacy option before setting
+  const prevLegacy = minuteSelect.querySelector('option[data-legacy="true"]');
+  if (prevLegacy) prevLegacy.remove();
+
+  if (!rawTime) {
+    hourSelect.value = "";
+    minuteSelect.value = "";
+    return;
+  }
+
+  // Tolerate HH:MM and HH:MM:SS
+  const parts = String(rawTime).trim().split(":");
+  const hh = parts[0] ? parts[0].padStart(2, "0") : "";
+  const mm = parts[1] ? parts[1].padStart(2, "0") : "";
+
+  hourSelect.value = (hh && Number(hh) >= 0 && Number(hh) <= 23) ? hh : "";
+
+  if (!mm) {
+    minuteSelect.value = "";
+  } else if (["00", "15", "30", "45"].includes(mm)) {
+    minuteSelect.value = mm;
+  } else {
+    const legacyOption = document.createElement("option");
+    legacyOption.value = mm;
+    legacyOption.textContent = `${mm} (guardado)`;
+    legacyOption.dataset.legacy = "true";
+    minuteSelect.appendChild(legacyOption);
+    minuteSelect.value = mm;
+  }
+
+  if (hourSelect.value && minuteSelect.value) {
+    timeInput.value = `${hourSelect.value}:${minuteSelect.value}`;
+  } else if (!rawTime) {
+    timeInput.value = "";
+  }
+}
+
 function updateTemplateOptions(options = { preserveLegacyNull: false, preferredTemplateId: null }) {
   const eventType = document.getElementById("event_type").value;
   const templateSelect = document.getElementById("template_id");
@@ -191,6 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
     et.addEventListener("change", () => {
       // El usuario cambió explícitamente el tipo de evento
       updateTemplateOptions({ preserveLegacyNull: false });
+      updateWeddingNameFields();
     });
   }
 
@@ -201,6 +346,15 @@ document.addEventListener("DOMContentLoaded", () => {
       updateSectionBackgroundControls();
     });
   }
+
+  const hourSelect = document.getElementById("event_hour");
+  const minuteSelect = document.getElementById("event_minute");
+  const handleTimeChange = () => {
+    syncEventTimeFromSelects();
+    if (typeof updatePreview === "function") updatePreview();
+  };
+  hourSelect?.addEventListener("change", handleTimeChange);
+  minuteSelect?.addEventListener("change", handleTimeChange);
 });
 
 function parseItineraryText(text) {
@@ -276,6 +430,11 @@ function serializeConfirmationNumbers(primary, secondary) {
     .map(number => String(number || "").trim())
     .filter(Boolean)
     .join("|");
+}
+
+function isValidConfirmationPhone(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  return digits.length >= 10 && digits.length <= 15;
 }
 
 // ── RFC-032: Opciones de Regalo (Mesas de regalos y Datos bancarios) ──
@@ -1165,6 +1324,15 @@ function setupStudioVisualPreview() {
     .filter(Boolean)
     .forEach(input => input.addEventListener("input", updatePreview));
 
+  ["bride_name", "groom_name"]
+    .map(id => document.getElementById(id))
+    .filter(Boolean)
+    .forEach(input => input.addEventListener("input", () => {
+      const combined = document.getElementById("honoree_name");
+      if (combined) combined.value = getWeddingCoupleName();
+      updatePreview();
+    }));
+
   document.getElementById("event_type")?.addEventListener("change", updatePreview);
   updatePreview();
 }
@@ -1615,6 +1783,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     form.style.display = "block";
   }
 
+  updateWeddingNameFields();
   setupStudioVisualPreview();
   setupGiftOptionListeners();
 
@@ -2105,12 +2274,50 @@ document.addEventListener("DOMContentLoaded", async () => {
         preferredTemplateId: originalTemplateId 
     });
     document.getElementById("honoree_name").value = heroFields.honoree;
+    const savedCouple = splitWeddingCoupleName(heroFields.honoree);
+    const brideName = document.getElementById("bride_name");
+    const groomName = document.getElementById("groom_name");
+    if (brideName) brideName.value = savedCouple.bride;
+    if (groomName) groomName.value = savedCouple.groom;
+    updateWeddingNameFields();
     document.getElementById("event_date").value = data.event_date || "";
-    document.getElementById("event_time").value = data.event_time || "";
+    setEventTimeSelects(data.event_time || "");
     document.getElementById("welcome_text").value = data.welcome_text || "";
     
-    document.getElementById("father_name").value = data.father_name || "";
-    document.getElementById("mother_name").value = data.mother_name || "";
+    const brideFatherInput = document.getElementById("bride_father_name");
+    const brideMotherInput = document.getElementById("bride_mother_name");
+    const groomFatherInput = document.getElementById("groom_father_name");
+    const groomMotherInput = document.getElementById("groom_mother_name");
+    const fatherInput = document.getElementById("father_name");
+    const motherInput = document.getElementById("mother_name");
+    const legacyNotice = document.getElementById("wedding-legacy-notice");
+
+    const hasExplicitWeddingParents = Boolean(
+      data.bride_father_name || data.bride_mother_name ||
+      data.groom_father_name || data.groom_mother_name
+    );
+
+    if (brideFatherInput) brideFatherInput.value = data.bride_father_name || "";
+    if (brideMotherInput) brideMotherInput.value = data.bride_mother_name || "";
+    if (groomFatherInput) groomFatherInput.value = data.groom_father_name || "";
+    if (groomMotherInput) groomMotherInput.value = data.groom_mother_name || "";
+
+    if (fatherInput) fatherInput.value = data.father_name || "";
+    if (motherInput) motherInput.value = data.mother_name || "";
+
+    const honorWitnessInput = document.getElementById("honor_witness_name");
+    if (honorWitnessInput) honorWitnessInput.value = data.honor_witness_name || "";
+
+    if (legacyNotice) {
+      if (data.event_type === "boda" && !hasExplicitWeddingParents && (data.father_name || data.mother_name)) {
+        const legacyNames = [data.father_name, data.mother_name].filter(Boolean).join(" & ");
+        legacyNotice.textContent = `Esta invitación contiene datos de padres en formato anterior (${legacyNames}). Asigna los nombres a Padres de la Novia o Padres del Novio si deseas clasificarlos.`;
+        legacyNotice.style.display = "block";
+      } else {
+        legacyNotice.style.display = "none";
+        legacyNotice.textContent = "";
+      }
+    }
     document.getElementById("instagram_hashtag").value = data.instagram_hashtag || "";
     document.getElementById("thankYouTitle").value = data.thank_you_title || "";
     document.getElementById("thankYouMessage").value = data.thank_you_message || "";
@@ -2142,6 +2349,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (bodyColor) bodyColor.value = data.body_color || "";
     const accentColor = document.getElementById("accent_color");
     if (accentColor) accentColor.value = data.accent_color || "";
+    setSectionVisibilityControls(data.section_visibility);
     const customFontUrl = document.getElementById("customFontUrl");
     const customFontName = document.getElementById("customFontName");
     if (customFontUrl) customFontUrl.value = data.custom_font_url || "";
@@ -2171,6 +2379,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("reception_map_url").value = data.reception_map_url || "";
     loadGiftOptions(data);
     document.getElementById("dress_code").value = data.dress_code || "";
+    document.getElementById("dress_code_details").value = data.dress_code_details || "";
+    document.getElementById("children_note").value = data.children_note || "";
+    document.getElementById("children_label").value = data.children_label || "";
     const confirmationNumbers = parseConfirmationNumbers(data.whatsapp_number);
     document.getElementById("whatsapp_number").value = confirmationNumbers[0] || "";
     document.getElementById("whatsapp_number_secondary").value = confirmationNumbers[1] || "";
@@ -2297,7 +2508,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     clearMediaError("photo");
     clearMediaError("music");
     clearMediaError("custom-font");
+
+    const publishInput = document.getElementById("published");
+    const rsvpEnabled = getSectionVisibilityControls().rsvp;
+    const confirmationPhoneInput = document.getElementById("whatsapp_number");
+    if (publishInput?.checked && rsvpEnabled && !isValidConfirmationPhone(confirmationPhoneInput?.value)) {
+      errorAlert.textContent = "Para publicar una invitación con RSVP, agrega un WhatsApp de confirmación válido (10 a 15 dígitos).";
+      errorAlert.style.display = "block";
+      confirmationPhoneInput?.setAttribute("aria-invalid", "true");
+      confirmationPhoneInput?.focus();
+      return;
+    }
+    confirmationPhoneInput?.removeAttribute("aria-invalid");
     setSavingState(true);
+
+    updateWeddingNameFields();
 
     const slugInput = document.getElementById("slug");
     const slugToUse = normalizeSlug(slugInput.value || currentSlug);
@@ -2529,8 +2754,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       event_date: document.getElementById("event_date").value || null,
       event_time: document.getElementById("event_time").value || null,
       welcome_text: document.getElementById("welcome_text").value,
-      father_name: document.getElementById("father_name").value || null,
-      mother_name: document.getElementById("mother_name").value || null,
+      father_name: (() => {
+        if (eventType !== "boda") return document.getElementById("father_name")?.value.trim() || null;
+        const bf = document.getElementById("bride_father_name")?.value.trim();
+        const bm = document.getElementById("bride_mother_name")?.value.trim();
+        const gf = document.getElementById("groom_father_name")?.value.trim();
+        const gm = document.getElementById("groom_mother_name")?.value.trim();
+        if (bf || bm || gf || gm) return bf || null;
+        return document.getElementById("father_name")?.value.trim() || null;
+      })(),
+      mother_name: (() => {
+        if (eventType !== "boda") return document.getElementById("mother_name")?.value.trim() || null;
+        const bf = document.getElementById("bride_father_name")?.value.trim();
+        const bm = document.getElementById("bride_mother_name")?.value.trim();
+        const gf = document.getElementById("groom_father_name")?.value.trim();
+        const gm = document.getElementById("groom_mother_name")?.value.trim();
+        if (bf || bm || gf || gm) return bm || null;
+        return document.getElementById("mother_name")?.value.trim() || null;
+      })(),
+      bride_father_name: eventType === "boda" ? (document.getElementById("bride_father_name")?.value.trim() || null) : null,
+      bride_mother_name: eventType === "boda" ? (document.getElementById("bride_mother_name")?.value.trim() || null) : null,
+      groom_father_name: eventType === "boda" ? (document.getElementById("groom_father_name")?.value.trim() || null) : null,
+      groom_mother_name: eventType === "boda" ? (document.getElementById("groom_mother_name")?.value.trim() || null) : null,
+      honor_witness_name: eventType === "boda" ? (document.getElementById("honor_witness_name")?.value.trim() || null) : null,
       instagram_hashtag: document.getElementById("instagram_hashtag").value || null,
       thank_you_title: document.getElementById("thankYouTitle").value || "Con cariño",
       thank_you_message: document.getElementById("thankYouMessage").value || "Gracias por ser parte de mis XV años",
@@ -2550,6 +2796,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       title_color: document.getElementById("title_color") ? document.getElementById("title_color").value || null : null,
       body_color: document.getElementById("body_color") ? document.getElementById("body_color").value || null : null,
       accent_color: document.getElementById("accent_color") ? document.getElementById("accent_color").value || null : null,
+      section_visibility: getSectionVisibilityControls(),
       ceremony_name: document.getElementById("ceremony_name").value,
       ceremony_address: document.getElementById("ceremony_address").value,
       ceremony_map_url: document.getElementById("ceremony_map_url").value,
@@ -2559,6 +2806,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       gift_options: finalGiftOptions,
       gift_table_url: legacyGiftTableUrl,
       dress_code: document.getElementById("dress_code").value,
+      dress_code_details: document.getElementById("dress_code_details").value || null,
+      children_note: document.getElementById("children_note").value || null,
+      children_label: document.getElementById("children_label").value || null,
       whatsapp_number: serializeConfirmationNumbers(
         document.getElementById("whatsapp_number").value,
         document.getElementById("whatsapp_number_secondary").value
@@ -2585,6 +2835,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       music_url: finalMusicUrl,
       // ── Configuración avanzada de fondo (Fase 2B) ──
       bg_enabled: document.getElementById("bg_enabled")?.checked === true,
+      bg_image_opacity: Math.round(Number(document.getElementById("bg_image_opacity")?.value ?? 18)) / 100,
       bg_overlay_enabled: document.getElementById("bg_overlay_enabled")?.checked !== false,
       bg_overlay_color: document.getElementById("bg_overlay_color")?.value || "#000000",
       bg_overlay_opacity: Math.round(Number(document.getElementById("bg_overlay_opacity")?.value ?? 35)) / 100,
@@ -2633,6 +2884,43 @@ document.addEventListener("DOMContentLoaded", async () => {
       result = await saveInvitationPayload(compatiblePayload);
     }
 
+    // Fallback: si las columnas de padres de boda no existen aún en BD (PGRST204 estricto)
+    const missingWeddingParentsColumn = result.error &&
+      result.error.code === "PGRST204" &&
+      /bride_father_name|bride_mother_name|groom_father_name|groom_mother_name/i.test(
+        (result.error.message || "") + " " + (result.error.details || "") + " " + (result.error.hint || "")
+      );
+    if (missingWeddingParentsColumn) {
+      const compatiblePayload = { ...payload };
+      delete compatiblePayload.bride_father_name;
+      delete compatiblePayload.bride_mother_name;
+      delete compatiblePayload.groom_father_name;
+      delete compatiblePayload.groom_mother_name;
+      if (missingGiftOptionsColumn) delete compatiblePayload.gift_options;
+      if (missingTypographyColumn) delete compatiblePayload.typography_fonts;
+      result = await saveInvitationPayload(compatiblePayload);
+    }
+
+    // Fallback: si la columna honor_witness_name no existe aún en BD (PGRST204 estricto)
+    const missingHonorWitnessColumn = result.error &&
+      result.error.code === "PGRST204" &&
+      /honor_witness_name/i.test(
+        (result.error.message || "") + " " + (result.error.details || "") + " " + (result.error.hint || "")
+      );
+    if (missingHonorWitnessColumn) {
+      const compatiblePayload = { ...payload };
+      delete compatiblePayload.honor_witness_name;
+      if (missingGiftOptionsColumn) delete compatiblePayload.gift_options;
+      if (missingTypographyColumn) delete compatiblePayload.typography_fonts;
+      if (missingWeddingParentsColumn) {
+        delete compatiblePayload.bride_father_name;
+        delete compatiblePayload.bride_mother_name;
+        delete compatiblePayload.groom_father_name;
+        delete compatiblePayload.groom_mother_name;
+      }
+      result = await saveInvitationPayload(compatiblePayload);
+    }
+
     // Fallback: si las columnas bg_* no existen aún en BD (PGRST204)
     const missingBgColumns = result.error && (
       result.error.code === "PGRST204" ||
@@ -2640,7 +2928,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     if (missingBgColumns) {
       const compatiblePayload = { ...payload };
-      ["bg_enabled", "bg_overlay_enabled", "bg_overlay_color",
+      ["bg_enabled", "bg_image_opacity", "bg_overlay_enabled", "bg_overlay_color",
        "bg_overlay_opacity", "bg_position", "bg_size", "bg_blur"].forEach(k => delete compatiblePayload[k]);
       if (missingGiftOptionsColumn) delete compatiblePayload.gift_options;
       result = await saveInvitationPayload(compatiblePayload);
@@ -2771,6 +3059,14 @@ function loadBackgroundConfig(data) {
     bgOverlayEnabled.checked = data.bg_overlay_enabled !== false;
   }
 
+  const bgImageOpacity = document.getElementById("bg_image_opacity");
+  const bgImageOpacityDisplay = document.getElementById("bg_image_opacity_display");
+  if (bgImageOpacity) {
+    const pct = Math.round((data.bg_image_opacity ?? 0.18) * 100);
+    bgImageOpacity.value = pct;
+    if (bgImageOpacityDisplay) bgImageOpacityDisplay.value = `${pct}%`;
+  }
+
   const bgOverlayColor = document.getElementById("bg_overlay_color");
   if (bgOverlayColor) {
     bgOverlayColor.value = data.bg_overlay_color || "#000000";
@@ -2824,6 +3120,8 @@ function updateBgNoImageNotice() {
 document.addEventListener("DOMContentLoaded", () => {
   const bgEnabled = document.getElementById("bg_enabled");
   const bgControls = document.getElementById("bg-controls");
+  const bgImageOpacity = document.getElementById("bg_image_opacity");
+  const bgImageOpacityDisplay = document.getElementById("bg_image_opacity_display");
   const bgOverlayOpacity = document.getElementById("bg_overlay_opacity");
   const bgOpacityDisplay = document.getElementById("bg_overlay_opacity_display");
   const bgBlur = document.getElementById("bg_blur");
@@ -2842,6 +3140,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (bgOverlayOpacity && bgOpacityDisplay) {
     bgOverlayOpacity.addEventListener("input", () => {
       bgOpacityDisplay.value = `${bgOverlayOpacity.value}%`;
+    });
+  }
+
+  if (bgImageOpacity && bgImageOpacityDisplay) {
+    bgImageOpacity.addEventListener("input", () => {
+      bgImageOpacityDisplay.value = `${bgImageOpacity.value}%`;
     });
   }
 

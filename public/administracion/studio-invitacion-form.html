@@ -10,6 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@400;500;600&family=Great+Vibes&family=Montserrat:wght@400;500;600&family=Parisienne&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/studio.css?v=typography-size-controls-20260814">
   <style>
+    [hidden] {
+      display: none !important;
+    }
     /* ── Media Upload Section ── */
     .media-upload-box {
       border: 2px dashed var(--border-color);
@@ -432,12 +435,24 @@
 
       <div id="studio-package-summary" class="studio-package-summary" aria-live="polite"></div>
 
-      <div class="form-row">
+      <div class="form-row" id="wedding-couple-fields" hidden>
+        <div class="form-group">
+          <label for="bride_name">Nombre de la novia</label>
+          <input type="text" id="bride_name" class="form-control" placeholder="Ej: Alicia García">
+        </div>
+        <div class="form-group">
+          <label for="groom_name">Nombre del novio</label>
+          <input type="text" id="groom_name" class="form-control" placeholder="Ej: Gonzalo Pérez">
+        </div>
+      </div>
+
+      <div class="form-row" id="honoree-name-field">
         <div class="form-group" style="width: 100%;">
           <label for="honoree_name">Nombre que aparecerá debajo del título</label>
           <input type="text" id="honoree_name" class="form-control" placeholder="Ej: Paola García">
         </div>
       </div>
+
 
       <div class="form-row">
         <div class="form-group">
@@ -445,12 +460,122 @@
           <input type="date" id="event_date" class="form-control" required>
         </div>
         <div class="form-group">
-          <label for="event_time">Hora del Evento</label>
-          <input type="time" id="event_time" class="form-control">
+          <label>Hora del Evento</label>
+          <input type="hidden" id="event_time" name="event_time">
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <select id="event_hour" class="form-control" style="flex: 1;" aria-label="Hora">
+              <option value="" disabled selected>Hora</option>
+              <option value="00">00</option>
+              <option value="01">01</option>
+              <option value="02">02</option>
+              <option value="03">03</option>
+              <option value="04">04</option>
+              <option value="05">05</option>
+              <option value="06">06</option>
+              <option value="07">07</option>
+              <option value="08">08</option>
+              <option value="09">09</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+              <option value="21">21</option>
+              <option value="22">22</option>
+              <option value="23">23</option>
+            </select>
+            <span style="font-weight: 600; color: var(--text-color, #333); font-size: 16px;">:</span>
+            <select id="event_minute" class="form-control" style="flex: 1;" aria-label="Minutos">
+              <option value="" disabled selected>Minutos</option>
+              <option value="00">00</option>
+              <option value="15">15</option>
+              <option value="30">30</option>
+              <option value="45">45</option>
+            </select>
+          </div>
         </div>
       </div>
-      
+
       <div class="form-row">
+        <div class="form-group" style="width: 100%;">
+          <label for="dress_code">Código de Vestimenta</label>
+          <input type="text" id="dress_code" class="form-control" placeholder="Ej: Formal, etiqueta, cóctel o casual elegante">
+          <p class="form-help">Solo se mostrará en las plantillas que incluyan esta sección. Si queda vacío, la sección no se publica.</p>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dress_code_details">Detalle de vestimenta (opcional)</label>
+          <textarea id="dress_code_details" class="form-control" rows="2" placeholder="Ej: Traje oscuro · Vestido largo o cóctel"></textarea>
+          <p class="form-help">Sustituye cualquier sugerencia de ejemplo de la plantilla. Vacío = no se muestra.</p>
+        </div>
+        <div class="form-group">
+          <label for="children_note">Mensaje sobre menores (opcional)</label>
+          <textarea id="children_note" class="form-control" rows="2" placeholder="Ej: Agradecemos que esta celebración sea solo para adultos."></textarea>
+          <p class="form-help">Vacío = no se muestra.</p>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="width: 100%;">
+          <label for="children_label">Etiqueta breve sobre menores (opcional)</label>
+          <input type="text" id="children_label" class="form-control" placeholder="Ej: Evento solo adultos">
+          <p class="form-help">Es la etiqueta corta, por ejemplo “Evento solo adultos”. Vacío = no se muestra.</p>
+        </div>
+      </div>
+
+      <!-- ── PADRES DE BODA ── -->
+      <div id="wedding-parents-fields" hidden>
+        <div id="wedding-legacy-notice" style="display:none; margin-bottom:14px; padding:10px 14px; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; color:#92400e; font-size:12px; line-height:1.5;"></div>
+        <div style="margin-bottom: 18px;">
+          <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--primary-color); margin-bottom: 10px; font-weight: 600;">
+            Padres de la Novia
+          </h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bride_father_name">Padre de la Novia</label>
+              <input type="text" id="bride_father_name" class="form-control" placeholder="Ej: Roberto García">
+            </div>
+            <div class="form-group">
+              <label for="bride_mother_name">Madre de la Novia</label>
+              <input type="text" id="bride_mother_name" class="form-control" placeholder="Ej: Patricia Morales">
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--primary-color); margin-bottom: 10px; font-weight: 600;">
+            Padres del Novio
+          </h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="groom_father_name">Padre del Novio</label>
+              <input type="text" id="groom_father_name" class="form-control" placeholder="Ej: Fernando Pérez">
+            </div>
+            <div class="form-group">
+              <label for="groom_mother_name">Madre del Novio</label>
+              <input type="text" id="groom_mother_name" class="form-control" placeholder="Ej: Carmen Gómez">
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <div class="form-group">
+            <label for="honor_witness_name">Testigo de Honor (Opcional)</label>
+            <input type="text" id="honor_witness_name" name="honor_witness_name" class="form-control" placeholder="Ej: Alejandro Ruiz">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PADRES EVENTO GENERAL / XV ── -->
+      <div class="form-row" id="general-parents-fields">
         <div class="form-group">
           <label for="father_name">Nombre del Padre (Opcional)</label>
           <input type="text" id="father_name" class="form-control" placeholder="Ej: Juan Pérez">
@@ -652,6 +777,11 @@
             <div class="media-error" id="background-error"></div>
           </div>
 
+          <div class="form-group">
+            <label for="bg_image_opacity">Opacidad de imagen decorativa: <output id="bg_image_opacity_display">18%</output></label>
+            <input type="range" id="bg_image_opacity" min="0" max="60" value="18" step="2" class="form-control" aria-label="Opacidad de la imagen decorativa">
+            <p class="media-hint">La imagen se superpone como una acuarela. Manténla baja para conservar la lectura.</p>
+          </div>
 
           <label class="studio-bg-toggle" for="bg_overlay_enabled">
             <input type="checkbox" id="bg_overlay_enabled" checked>
@@ -954,7 +1084,7 @@
           <p class="studio-field-hint">La paleta se aplica a fondos, detalles y acentos sin cambiar la plantilla.</p>
         </div>
 
-        <div class="form-row">
+        <div class="form-row studio-legacy-visual-control" aria-hidden="true">
           <div class="form-group">
             <label for="title_color">Color de titulos</label>
             <select id="title_color" name="title_color" class="form-control">
@@ -989,7 +1119,26 @@
             </select>
           </div>
         </div>
-        <p class="studio-field-hint studio-visual-customization-note">Deja cualquier selector en “Color del diseno” para mantener ese elemento intacto.</p>
+        <p class="studio-field-hint studio-visual-customization-note">Cada paleta usa tres colores con proporción 60 / 30 / 10: base, lectura y acento.</p>
+      </section>
+
+      <section class="studio-visual-customization" aria-labelledby="section-visibility-title">
+        <div class="studio-visual-customization-heading">
+          <div>
+            <span class="studio-visual-kicker">Composición</span>
+            <h3 id="section-visibility-title">Secciones de la invitación</h3>
+          </div>
+          <p>Activa únicamente los bloques que tendrá esta invitación. El diseño, parallax y animaciones de la plantilla se conservan.</p>
+        </div>
+        <div class="form-row">
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="family" checked> Padres y padrinos</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="locations" checked> Ubicaciones</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="itinerary" checked> Minuto a minuto</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="gallery" checked> Galería</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="registry" checked> Regalos</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="rsvp" checked> Confirmación RSVP</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="music" checked> Reproductor de música</label>
+        </div>
       </section>
 
       <h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Ubicaciones</h2>
@@ -1142,22 +1291,19 @@
         <div class="form-group">
           <label for="whatsapp_number">WhatsApp (Confirmación)</label>
           <input type="text" id="whatsapp_number" class="form-control" placeholder="525512345678">
+          <p class="form-help">Obligatorio para publicar cuando la sección RSVP está activa. Usa de 10 a 15 dígitos, incluido el código de país.</p>
         </div>
         <div class="form-group">
           <label for="whatsapp_number_secondary">Segundo WhatsApp (Opcional)</label>
           <input type="text" id="whatsapp_number_secondary" class="form-control" placeholder="525598765432">
-          <p class="form-help">Solo aparecerá en la invitación cuando tenga un número.</p>
+          <p class="form-help">Contacto alterno opcional para confirmaciones.</p>
         </div>
       </div>
 
       <div class="form-row">
-        <div class="form-group">
+        <div class="form-group" style="width: 100%;">
           <label for="instagram_hashtag">Hashtag de Instagram</label>
           <input type="text" id="instagram_hashtag" class="form-control" placeholder="#MisXVPaola">
-        </div>
-        <div class="form-group">
-          <label for="dress_code">Código de Vestimenta</label>
-          <input type="text" id="dress_code" class="form-control" placeholder="Formal / Etiqueta">
         </div>
       </div>
       <h2 style="margin-top: 30px; margin-bottom: 15px; font-size: 18px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Cierre y agradecimiento</h2>
@@ -1286,7 +1432,7 @@
   <script src="/js/studio-auth.js?v=studio-recovery-20260718"></script>
   <!-- Lógica del Formulario -->
   <script src="/assets/js/invitta-templates.js?v=milestone-template-20260814"></script>
-  <script src="/js/studio-form.js?v=font-library-20260815"></script>
+  <script src="/js/studio-form.js?v=decorative-background-opacity-20260821"></script>
 
 </body>
 </html>

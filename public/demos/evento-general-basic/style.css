@@ -195,7 +195,20 @@ body.theme-milestone-50 {
   .hero__nav { min-height: 58px; background: rgba(251,250,247,.9); }
   .hero__links a:not(:last-child) { display: none; }
   .hero__photo, .hero__veil { grid-column: 1; grid-row: 1; }
-  .hero__content { grid-column: 1; grid-row: 2; min-height: 430px; padding: 4.5rem 2rem; align-items: center; text-align: center; }
+  .hero__content { grid-column: 1; grid-row: 2; min-height: 430px; padding: 4.5rem clamp(1rem, 3.5vw, 1.75rem); align-items: center; text-align: center; }
+  .hero .hero__name,
+  .hero #celebrant-name,
+  .hero [data-invitta-cover-name-size] {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-inline-size: 100% !important;
+    font-size: clamp(2rem, 8.8vw, 3.75rem) !important;
+    letter-spacing: -.03em !important;
+    line-height: 1.02 !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    text-align: center !important;
+  }
   .hero__date { max-width: 330px; }
   #locations h2 { margin-bottom: 2.1rem; font-size: clamp(2.65rem, 12vw, 3.5rem); }
   .cards { grid-template-columns: 1fr; gap: 1rem; }

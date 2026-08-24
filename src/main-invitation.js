@@ -761,6 +761,19 @@ function normalizeSectionBackgrounds(val) {
     }, {});
 }
 
+function normalizeSectionVisibility(val) {
+    var allowed = ["family", "locations", "itinerary", "gallery", "registry", "rsvp", "music"];
+    var parsed = val;
+    if (typeof val === "string") {
+        try { parsed = JSON.parse(val); } catch(e) { parsed = {}; }
+    }
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) parsed = {};
+    return allowed.reduce(function(result, key) {
+        result[key] = parsed[key] !== false;
+        return result;
+    }, {});
+}
+
 function normalizeConfirmationPhones(val) {
     return String(val || "")
         .split(/[|,;\n]+/)
@@ -780,9 +793,25 @@ function findReceptionTime(inv) {
 }
 
 function buildPublicTemplateData(inv, template) {
-    var parents = (inv.father_name || inv.mother_name)
-        ? [cleanString(inv.father_name, 120), cleanString(inv.mother_name, 120)].filter(Boolean)
-        : normalizeStringArray(inv.parents);
+    var isWedding = cleanString(inv.event_type, 30) === "boda" || template.kind === "boda";
+    var brideFather = cleanString(inv.bride_father_name, 120);
+    var brideMother = cleanString(inv.bride_mother_name, 120);
+    var groomFather = cleanString(inv.groom_father_name, 120);
+    var groomMother = cleanString(inv.groom_mother_name, 120);
+    var honorWitnessName = cleanString(inv.honor_witness_name, 120);
+    var legacyFather = cleanString(inv.father_name, 120);
+    var legacyMother = cleanString(inv.mother_name, 120);
+
+    var hasExplicitWeddingParents = Boolean(brideFather || brideMother || groomFather || groomMother);
+
+    var parents = isWedding
+        ? (hasExplicitWeddingParents
+            ? [brideFather, brideMother, groomFather, groomMother].filter(Boolean)
+            : [legacyFather, legacyMother].filter(Boolean))
+        : ((legacyFather || legacyMother)
+            ? [legacyFather, legacyMother].filter(Boolean)
+            : normalizeStringArray(inv.parents));
+
     var confirmationPhones = normalizeConfirmationPhones(inv.whatsapp_number);
     var typographyFonts = normalizeTypographyFontLibrary(
         inv.typography_fonts,
@@ -809,6 +838,25 @@ function buildPublicTemplateData(inv, template) {
         eventTime: cleanString(inv.event_time || inv.ceremony_time, 60),
         quote: cleanString(inv.welcome_text || inv.quote, 800),
         parents: parents,
+        father_name: legacyFather,
+        mother_name: legacyMother,
+        bride_father_name: brideFather,
+        bride_mother_name: brideMother,
+        groom_father_name: groomFather,
+        groom_mother_name: groomMother,
+        brideFatherName: brideFather,
+        brideMotherName: brideMother,
+        groomFatherName: groomFather,
+        groomMotherName: groomMother,
+        honorWitnessName: honorWitnessName,
+        honor_witness_name: honorWitnessName,
+        brideParents: { father: brideFather, mother: brideMother },
+        groomParents: { father: groomFather, mother: groomMother },
+        weddingParents: {
+            bride: { father: brideFather, mother: brideMother },
+            groom: { father: groomFather, mother: groomMother },
+            legacy: { father: !hasExplicitWeddingParents ? legacyFather : "", mother: !hasExplicitWeddingParents ? legacyMother : "" }
+        },
         godparents: normalizeGodparents(inv.godparents),
         ceremony: {
             name: cleanString(inv.ceremony_name, 160),
@@ -837,6 +885,9 @@ function buildPublicTemplateData(inv, template) {
         musicTitle: cleanString(inv.music_title, 120),
         musicArtist: cleanString(inv.music_artist, 120),
         dressCode: cleanString(inv.dress_code, 120),
+        dressCodeDetails: cleanString(inv.dress_code_details, 280),
+        childrenNote: cleanString(inv.children_note, 500),
+        childrenLabel: cleanString(inv.children_label, 120),
         giftOptions: giftOptions,
         giftTableUrl: giftTableUrl,
         instagramHashtag: cleanString(inv.instagram_hashtag, 120),
@@ -859,9 +910,11 @@ function buildPublicTemplateData(inv, template) {
         typographyScales: normalizeTypographyScales(inv.custom_font_targets),
         typographyRoles: normalizeTypographyRoles(inv.custom_font_targets, typographyFonts),
         visualTheme: cleanString(inv.visual_theme, 60),
+        sectionVisibility: normalizeSectionVisibility(inv.section_visibility),
         sectionBackgrounds: normalizeSectionBackgrounds(inv.section_backgrounds),
         backgroundImageUrl: safeHttpsUrl(inv.background_image_url),
         bgEnabled: Boolean(inv.bg_enabled),
+        bgImageOpacity: Number(inv.bg_image_opacity ?? 0.18),
         bgOverlayEnabled: inv.bg_overlay_enabled !== false,
         bgOverlayColor: normalizeHexColor(inv.bg_overlay_color) || "#000000",
         bgOverlayOpacity: Number(inv.bg_overlay_opacity ?? 0.35),
@@ -962,7 +1015,7 @@ function addTemplateBridge(html, templatePath, templateData) {
     doc.body.appendChild(qrLibrary);
 
     var bridge = doc.createElement("script");
-    bridge.src = "/demos/shared/public-personalization.js?v=casing-music-topbar-20260820";
+    bridge.src = "/demos/shared/public-personalization.js?v=decorative-background-overlay-20260821";
     bridge.defer = true;
     doc.body.appendChild(bridge);
 
@@ -1193,21 +1246,48 @@ function renderDefaultTemplate(inv) {
     setText("inv-welcome", inv.welcome_text || "");
 
     /* Padres y Padrinos */
-    var hasParents = inv.father_name || inv.mother_name;
+    var isWedding = cleanString(inv.event_type, 30) === "boda";
+    var brideFather = cleanString(inv.bride_father_name, 120);
+    var brideMother = cleanString(inv.bride_mother_name, 120);
+    var groomFather = cleanString(inv.groom_father_name, 120);
+    var groomMother = cleanString(inv.groom_mother_name, 120);
+    var legacyFather = cleanString(inv.father_name, 120);
+    var legacyMother = cleanString(inv.mother_name, 120);
+
+    var hasExplicitWedding = isWedding && Boolean(brideFather || brideMother || groomFather || groomMother);
+    var hasLegacyParents = Boolean(legacyFather || legacyMother);
     var hasGodparents = inv.godparents && inv.godparents.length > 0;
-    toggle("inv-parents-block", hasParents || hasGodparents);
-    
-    if (inv.father_name) {
-      setText("inv-father-name", inv.father_name);
-      show("inv-father-name");
-    } else {
-      hide("inv-father-name");
+
+    var hasAnyParents = isWedding ? (hasExplicitWedding || hasLegacyParents) : hasLegacyParents;
+    toggle("inv-parents-block", hasAnyParents || hasGodparents);
+
+    var parentsTitle = document.getElementById("inv-parents-title");
+    if (parentsTitle) {
+      parentsTitle.textContent = isWedding ? "Con la bendición de nuestras familias" : "Con la bendición de mis padres";
     }
-    if (inv.mother_name) {
-      setText("inv-mother-name", inv.mother_name);
-      show("inv-mother-name");
+
+    if (isWedding && hasExplicitWedding) {
+      hide("inv-parents-list");
+      show("inv-wedding-parents");
+
+      var hasBride = Boolean(brideFather || brideMother);
+      toggle("inv-bride-parents-block", hasBride);
+      if (brideFather) { setText("inv-bride-father-name", brideFather); show("inv-bride-father-name"); } else hide("inv-bride-father-name");
+      if (brideMother) { setText("inv-bride-mother-name", brideMother); show("inv-bride-mother-name"); } else hide("inv-bride-mother-name");
+
+      var hasGroom = Boolean(groomFather || groomMother);
+      toggle("inv-groom-parents-block", hasGroom);
+      if (groomFather) { setText("inv-groom-father-name", groomFather); show("inv-groom-father-name"); } else hide("inv-groom-father-name");
+      if (groomMother) { setText("inv-groom-mother-name", groomMother); show("inv-groom-mother-name"); } else hide("inv-groom-mother-name");
     } else {
-      hide("inv-mother-name");
+      hide("inv-wedding-parents");
+      if (hasLegacyParents) {
+        show("inv-parents-list");
+        if (legacyFather) { setText("inv-father-name", legacyFather); show("inv-father-name"); } else hide("inv-father-name");
+        if (legacyMother) { setText("inv-mother-name", legacyMother); show("inv-mother-name"); } else hide("inv-mother-name");
+      } else {
+        hide("inv-parents-list");
+      }
     }
 
     if (hasGodparents) {
@@ -1591,104 +1671,6 @@ function renderDefaultTemplate(inv) {
     return musicArtist || musicTitle;
   }
 
-  function forceMusicPlayerStyles(player) {
-    if (!player) return;
-  
-    player.style.setProperty("position", "fixed", "important");
-    player.style.setProperty("left", "0", "important");
-    player.style.setProperty("right", "0", "important");
-    player.style.setProperty("bottom", "0", "important");
-    player.style.setProperty("z-index", "99999", "important");
-    player.style.setProperty("display", "flex", "important");
-    player.style.setProperty("align-items", "center", "important");
-    player.style.setProperty("justify-content", "space-between", "important");
-    player.style.setProperty("gap", "1rem", "important");
-    player.style.setProperty("min-height", "78px", "important");
-    player.style.setProperty("width", "100%", "important");
-    player.style.setProperty("box-sizing", "border-box", "important");
-    player.style.setProperty("padding", "0.8rem 1rem calc(0.8rem + env(safe-area-inset-bottom))", "important");
-    player.style.setProperty("background", "rgba(7, 7, 7, 0.97)", "important");
-    player.style.setProperty("color", "#fff", "important");
-    player.style.setProperty("box-shadow", "0 -14px 28px rgba(0,0,0,.28)", "important");
-  }
-  
-  function forceMusicPlayerChildStyles() {
-    const left = document.querySelector("#inv-music-player .inv-music-left");
-    const logo = document.querySelector("#inv-music-player .inv-music-logo");
-    const logoText = document.querySelector("#inv-music-player .inv-music-logo span");
-    const meta = document.querySelector("#inv-music-player .inv-music-meta");
-    const title = document.querySelector("#inv-music-title");
-    const artist = document.querySelector("#inv-music-artist");
-    const toggle = document.querySelector("#inv-music-toggle");
-  
-    if (left) {
-      left.style.setProperty("display", "flex", "important");
-      left.style.setProperty("align-items", "center", "important");
-      left.style.setProperty("gap", "0.85rem", "important");
-      left.style.setProperty("min-width", "0", "important");
-      left.style.setProperty("flex", "1", "important");
-    }
-  
-    if (logo) {
-      logo.style.setProperty("width", "56px", "important");
-      logo.style.setProperty("height", "56px", "important");
-      logo.style.setProperty("border-radius", "999px", "important");
-      logo.style.setProperty("border", "1px solid rgba(212, 181, 122, 0.65)", "important");
-      logo.style.setProperty("display", "grid", "important");
-      logo.style.setProperty("place-items", "center", "important");
-      logo.style.setProperty("color", "#d4b57a", "important");
-      logo.style.setProperty("flex", "0 0 auto", "important");
-      logo.style.setProperty("background", "rgba(255,255,255,0.03)", "important");
-    }
-  
-    if (logoText) {
-      logoText.style.setProperty("font-size", "1.35rem", "important");
-      logoText.style.setProperty("line-height", "1", "important");
-      logoText.style.setProperty("color", "#d4b57a", "important");
-    }
-  
-    if (meta) {
-      meta.style.setProperty("min-width", "0", "important");
-      meta.style.setProperty("text-align", "left", "important");
-    }
-  
-    if (title) {
-      title.style.setProperty("margin", "0", "important");
-      title.style.setProperty("color", "#fff", "important");
-      title.style.setProperty("font-size", "1rem", "important");
-      title.style.setProperty("line-height", "1.2", "important");
-      title.style.setProperty("white-space", "nowrap", "important");
-      title.style.setProperty("overflow", "hidden", "important");
-      title.style.setProperty("text-overflow", "ellipsis", "important");
-    }
-  
-    if (artist) {
-      artist.style.setProperty("display", "block", "important");
-      artist.style.setProperty("margin-top", "0.15rem", "important");
-      artist.style.setProperty("color", "rgba(255,255,255,0.82)", "important");
-      artist.style.setProperty("font-size", "0.82rem", "important");
-      artist.style.setProperty("line-height", "1.2", "important");
-      artist.style.setProperty("white-space", "nowrap", "important");
-      artist.style.setProperty("overflow", "hidden", "important");
-      artist.style.setProperty("text-overflow", "ellipsis", "important");
-    }
-  
-    if (toggle) {
-      toggle.style.setProperty("width", "58px", "important");
-      toggle.style.setProperty("height", "58px", "important");
-      toggle.style.setProperty("border", "none", "important");
-      toggle.style.setProperty("background", "transparent", "important");
-      toggle.style.setProperty("color", "#fff", "important");
-      toggle.style.setProperty("font-size", "2rem", "important");
-      toggle.style.setProperty("display", "grid", "important");
-      toggle.style.setProperty("place-items", "center", "important");
-      toggle.style.setProperty("cursor", "pointer", "important");
-      toggle.style.setProperty("flex", "0 0 auto", "important");
-      toggle.style.setProperty("padding", "0", "important");
-      toggle.style.setProperty("margin", "0", "important");
-    }
-  }
-
   function escapeHtml(unsafe) {
     return (unsafe || "").toString()
       .replace(/&/g, "&amp;")
@@ -1822,9 +1804,9 @@ function renderDefaultTemplate(inv) {
       document.body.appendChild(player);
     }
 
-    player.style.setProperty("display", "flex", "important");
-    forceMusicPlayerStyles(player);
-    forceMusicPlayerChildStyles();
+    // The generic invitation keeps its own stylesheet. Demo templates render
+    // inside their own document and must never inherit a forced black player.
+    player.style.display = "flex";
     
     const logoContainer = player.querySelector(".inv-music-logo, .inv-music-brand, .inv-music-brand-fallback");
     if (logoContainer) {
@@ -2264,12 +2246,30 @@ function renderDefaultTemplate(inv) {
     // Compatibilidad hacia atras con plantillas antiguas (usan 2 o 4 colores)
     var fallbackPrimary = color10 || color60 || "#cb1823"; // 10 es el acento (primary antiguo)
     var fallbackSecondary = color30 || "#ece5cf";
+    var isDarkSurface = fallbackText === "#fdfbf7";
+
+    // The legacy invitation uses both --inv-text and its older --ink / --muted
+    // variables in the same card. Keep them in the same contrast family so a
+    // dark 60% surface can never receive dark editorial copy.
+    var readingInk = isDarkSurface ? "#FDFBF7" : "#2F2520";
+    var readingMuted = isDarkSurface ? "#D8D1C7" : "#6A5B50";
+    var readableSurface = color30 || (isDarkSurface ? "#17213A" : "#FFFDFC");
+    var readableBorder = isDarkSurface ? "rgba(255,255,255,0.22)" : "rgba(47,37,32,0.16)";
 
     root.style.setProperty("--inv-primary",        fallbackPrimary);
     root.style.setProperty("--inv-primary-light",  hexAlpha(fallbackPrimary, 0.12));
     root.style.setProperty("--inv-primary-border", hexAlpha(fallbackPrimary, 0.30));
     root.style.setProperty("--inv-secondary",      fallbackSecondary);
     root.style.setProperty("--inv-bg",             fallbackBg);
+    root.style.setProperty("--inv-bg-warm",        fallbackBg);
+    root.style.setProperty("--inv-surface",        readableSurface);
+    root.style.setProperty("--inv-text-soft",       readingMuted);
+    root.style.setProperty("--inv-muted",           readingMuted);
+    root.style.setProperty("--inv-border",          readableBorder);
+    root.style.setProperty("--ink",                 readingInk);
+    root.style.setProperty("--muted",               readingMuted);
+    root.style.setProperty("--gold",                fallbackPrimary);
+    root.style.setProperty("--gold-soft",           hexAlpha(fallbackPrimary, isDarkSurface ? 0.48 : 0.28));
   }
 
   /* ¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬ Helpers DOM ¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬ */
