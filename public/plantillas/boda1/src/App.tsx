@@ -57,6 +57,7 @@ type PublicInvitationData = {
   guestToken?: string;
   ceremony?: { name?: string; time?: string; address?: string; mapUrl?: string };
   reception?: { name?: string; time?: string; address?: string; mapUrl?: string };
+  itinerary?: Array<{ time?: string; title?: string; description?: string; iconName?: string }>;
 };
 
 function getInvitationData(): PublicInvitationData {
@@ -82,6 +83,20 @@ function firstLine(value?: string, fallback = "") {
   return value?.trim() || fallback;
 }
 
+function formatInvitationTime(value?: string, fallback = "") {
+  const raw = firstLine(value, fallback);
+  const match = raw.match(/^(\d{1,2}):(\d{2})(?::\d{2})?(?:\s*([AaPp])\.?\s*[Mm]\.?)?$/);
+  if (!match) return raw;
+
+  let hour = Number(match[1]);
+  const minutes = match[2];
+  const explicitPeriod = match[3]?.toLowerCase();
+  if (explicitPeriod === "p" && hour < 12) hour += 12;
+  if (explicitPeriod === "a" && hour === 12) hour = 0;
+  const period = hour >= 12 ? "p. m." : "a. m.";
+  return `${hour % 12 || 12}:${minutes} ${period}`;
+}
+
 export default function App() {
   const invitation = getInvitationData();
   const couple = firstLine(invitation.celebrantName, "Ana Camila & Carlos").split(/\s*(?:&|\by\b)\s*/i).filter(Boolean);
@@ -92,8 +107,18 @@ export default function App() {
   const reception = invitation.reception || {};
   const ceremonyName = firstLine(ceremony.name, "Parroquia Sagrado Corazón de Jesús");
   const receptionName = firstLine(reception.name, "Cantabria Salón de Eventos");
-  const ceremonyTime = firstLine(ceremony.time, "3:00 P.M.");
-  const receptionTime = firstLine(reception.time, "9:00 P.M.");
+  const ceremonyTime = formatInvitationTime(ceremony.time, "15:00");
+  const receptionTime = formatInvitationTime(reception.time, "21:00");
+  const fallbackItinerary = [
+    { time: "16:00", title: "Sesión Fotográfica de Gala", description: "Capturando recuerdos eternos" },
+    { time: "17:00", title: "Ceremonia de Acción de Gracias", description: "Santuario del Sagrado Corazón" },
+    { time: "19:00", title: "Bienvenida y Cóctel", description: "Recibimiento de los invitados en el salón" },
+    { time: "20:30", title: "Vals de Gala y Brindis", description: "Momento estelar junto a mis seres queridos" },
+    { time: "21:00", title: "Banquete de Honor", description: "Cena de gala en el salón principal" },
+    { time: "22:30", title: "Gran Apertura de Pista", description: "Música, baile y diversión inolvidable" }
+  ];
+  const itinerary = invitation.itinerary?.filter(item => item?.title) || fallbackItinerary;
+  const itineraryIcons = [Camera, Church, GlassWater, Sparkles, Heart, Music];
   const coupleForCopy = `${brideName} y ${groomName}`;
   const usesStudioGuestPass = Boolean(invitation.eventDate || invitation.guestToken);
   // Parallax calculations
@@ -1152,45 +1177,8 @@ export default function App() {
 
               {/* Timeline Entries list */}
               <div className="space-y-12 relative">
-                {[
-                  {
-                    time: "16:00 P.M.",
-                    title: "Sesión Fotográfica de Gala",
-                    description: "Capturando recuerdos eternos",
-                    icon: Camera,
-                  },
-                  {
-                    time: "17:00 P.M.",
-                    title: "Ceremonia de Acción de Gracias",
-                    description: "Santuario del Sagrado Corazón",
-                    icon: Church,
-                  },
-                  {
-                    time: "19:00 P.M.",
-                    title: "Bienvenida y Cóctel",
-                    description: "Recibimiento de los invitados en el salón",
-                    icon: GlassWater,
-                  },
-                  {
-                    time: "20:30 P.M.",
-                    title: "Vals de Gala & Brindis",
-                    description: "Momento estelar junto a mis seres queridos",
-                    icon: Sparkles,
-                  },
-                  {
-                    time: "21:00 P.M.",
-                    title: "Banquete de Honor",
-                    description: "Cena de gala en el salón principal",
-                    icon: Heart,
-                  },
-                  {
-                    time: "22:30 P.M.",
-                    title: "Gran Apertura de Pista",
-                    description: "Música, baile y diversión inolvidable",
-                    icon: Music,
-                  }
-                ].map((item, index) => {
-                  const IconComponent = item.icon;
+                {itinerary.map((item, index) => {
+                  const IconComponent = itineraryIcons[index % itineraryIcons.length];
 
                   return (
                     <motion.div 
@@ -1225,7 +1213,7 @@ export default function App() {
                       <div className="pl-8 md:pl-10 flex flex-col justify-center">
                         {/* Time in elegant spaced small font */}
                         <span className="font-mono text-[11px] md:text-xs tracking-[0.2em] text-sage font-semibold">
-                          {item.time}
+                          {formatInvitationTime(item.time)}
                         </span>
                         
                         {/* Title & short description */}
@@ -1234,7 +1222,7 @@ export default function App() {
                         </h3>
                         
                         <p className="font-sans text-[11px] md:text-xs text-ink/60 tracking-wide font-light">
-                          {item.description}
+                          {item.description || ""}
                         </p>
                       </div>
                     </motion.div>
@@ -1384,11 +1372,11 @@ export default function App() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <span className="text-[9px] tracking-widest uppercase font-semibold text-sage">Ceremonia</span>
-                        <p className="text-ink font-semibold pt-1">3:00 P.M. • Sdo. Corazón</p>
+                        <p className="text-ink font-semibold pt-1 leading-snug">{ceremonyTime} • {ceremonyName}</p>
                       </div>
                       <div>
                         <span className="text-[9px] tracking-widest uppercase font-semibold text-sage">Recepción</span>
-                        <p className="text-ink font-semibold pt-1">9:00 P.M. • Cantabria</p>
+                        <p className="text-ink font-semibold pt-1 leading-snug">{receptionTime} • {receptionName}</p>
                       </div>
                     </div>
 
