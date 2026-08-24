@@ -3035,10 +3035,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnRefresh = document.getElementById("studio-preview-refresh");
   const btnNewTab = document.getElementById("studio-preview-newtab");
   const slugInput = document.getElementById("slug");
+  const publishedInput = document.getElementById("published");
 
   function getPreviewUrl(slug) {
     if (!slug) return "";
-    return `/invitacion.html?slug=${encodeURIComponent(slug)}&preview=studio&v=${Date.now()}`;
+    const query = new URLSearchParams({ slug, v: String(Date.now()) });
+    // Published invitations do not need a private preview session. This also
+    // keeps the "Ver invitación" link usable when Studio is opened on a Vercel
+    // preview domain, where browser sessions are intentionally isolated.
+    if (!publishedInput || !publishedInput.checked) query.set("preview", "studio");
+    return `/invitacion.html?${query.toString()}`;
   }
 
   window.__invittaStudio_triggerPreviewRefresh = updatePreview;

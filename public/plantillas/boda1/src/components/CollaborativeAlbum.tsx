@@ -28,6 +28,8 @@ export function CollaborativeAlbum() {
   const [zoomPhoto, setZoomPhoto] = useState<AlbumPhoto | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const invitation = window.INVITATION_DATA || {};
+  const canUpload = Boolean(invitation.invitationSlug && invitation.guestToken);
 
   useEffect(() => {
     const slug = window.INVITATION_DATA?.invitationSlug;
@@ -52,6 +54,7 @@ export function CollaborativeAlbum() {
   };
 
   const processFile = (file: File) => {
+    if (!canUpload) return;
     if (!file.type.startsWith("image/")) {
       alert("Por favor, selecciona únicamente archivos de imagen.");
       return;
@@ -82,11 +85,7 @@ export function CollaborativeAlbum() {
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!previewUrl || !selectedFile) return;
-    const invitation = window.INVITATION_DATA || {};
-    if (!invitation.guestToken || !invitation.invitationSlug) {
-      alert("Abre tu enlace personalizado de invitado para compartir una foto.");
-      return;
-    }
+    if (!canUpload) return;
     setUploading(true);
     setUploadProgress(30);
     try {
@@ -199,6 +198,13 @@ export function CollaborativeAlbum() {
 
             {/* Link copier */}
             <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4">
+              {!canUpload && (
+                <p className="w-full text-center text-[11px] leading-relaxed text-sage/80 border border-champagne-gold/20 bg-paper/60 px-4 py-3">
+                  Para subir una foto, abre el enlace personal que recibiste como invitado.
+                </p>
+              )}
+              {canUpload && (
+                <>
               <button
                 onClick={copyLink}
                 className="w-full py-3 px-6 border border-champagne-gold/30 hover:border-champagne-gold text-champagne-gold text-[10px] tracking-[0.25em] font-semibold uppercase rounded-xs transition-all duration-300 bg-transparent cursor-pointer flex items-center justify-center gap-2 hover:bg-white/5 active:scale-95"
@@ -218,6 +224,8 @@ export function CollaborativeAlbum() {
                   </motion.div>
                 )}
               </AnimatePresence>
+                </>
+              )}
             </div>
 
           </motion.div>
@@ -245,12 +253,23 @@ export function CollaborativeAlbum() {
                   Cargar Fotografía
                 </span>
                 <h3 className="font-serif text-xl md:text-2xl text-ink font-normal">
-                  Sube una foto desde esta pantalla
+                  {canUpload ? "Sube una foto desde esta pantalla" : "Comparte desde tu enlace personal"}
                 </h3>
+                {!canUpload && (
+                  <p className="text-sm leading-relaxed text-on-surface-variant">
+                    Este enlace muestra el álbum. La carga de fotos se habilita únicamente en la invitación personalizada de cada invitado.
+                  </p>
+                )}
               </div>
 
               {/* UPLOAD TRIGGER DRAG-AND-DROP ZONE */}
-              {!previewUrl ? (
+              {!canUpload ? (
+                <div className="mt-6 mb-6 flex flex-col items-center justify-center p-8 border border-sage/20 rounded-xs min-h-[180px] bg-paper/40 text-center">
+                  <Camera className="w-8 h-8 stroke-[1.2] text-sage/60 mb-4" />
+                  <p className="font-serif italic text-sm text-ink/80">La carga está disponible desde tu pase personalizado.</p>
+                  <p className="text-[10px] uppercase tracking-widest text-sage/60 mt-2">Pide al anfitrión tu enlace de invitado</p>
+                </div>
+              ) : !previewUrl ? (
                 <div
                   onDragEnter={handleDrag}
                   onDragOver={handleDrag}
@@ -361,9 +380,9 @@ export function CollaborativeAlbum() {
                 ) : (
                   <button
                     type="submit"
-                    disabled={!previewUrl}
+                    disabled={!canUpload || !previewUrl}
                     className={`w-full py-4 text-[11px] tracking-[0.25em] font-semibold uppercase rounded-xs transition-all duration-500 flex items-center justify-center gap-2 cursor-pointer ${
-                      previewUrl
+                      canUpload && previewUrl
                         ? "bg-primary text-ink hover:bg-champagne-gold hover:text-paper shadow-lg"
                         : "bg-surface-container-low/50 text-on-surface-variant/30 border border-outline-variant/10 cursor-not-allowed"
                     }`}

@@ -39,15 +39,12 @@ import { supabase as db } from './api/supabase-client.js';
   async function loadInvitation() {
     try {
       // console.log("slug recibido:", slug);
+      var hasStudioSession = false;
 
       if (studioPreview) {
         var sessionResult = await db.auth.getSession();
         var session = sessionResult.data && sessionResult.data.session;
-
-        if (sessionResult.error || !session) {
-          showError("La vista previa requiere una sesion activa de Invitta Studio.");
-          return;
-        }
+        hasStudioSession = !sessionResult.error && !!session;
       }
 
       var query = db
@@ -55,7 +52,10 @@ import { supabase as db } from './api/supabase-client.js';
         .select("*")
         .eq("slug", slug);
 
-      if (!studioPreview) {
+      // A draft can only be loaded with the Studio session. If the preview link
+      // is opened outside that session (for example from a Vercel preview URL),
+      // fall back to the already published invitation instead of exposing a draft.
+      if (!studioPreview || !hasStudioSession) {
         query = query.eq("published", true);
       }
 
@@ -74,13 +74,15 @@ import { supabase as db } from './api/supabase-client.js';
       }
 
       if (!data) {
-        showError(studioPreview
+        showError(studioPreview && hasStudioSession
           ? "No se pudo cargar este borrador con la sesion actual."
+          : studioPreview
+            ? "La sesion de Studio no esta disponible y esta invitacion aun no esta publicada."
           : "Invitacion no encontrada o no publicada.");
         return;
       }
 
-      if (!studioPreview && data.expires_at) {
+      if ((!studioPreview || !hasStudioSession) && data.expires_at) {
         var expirationTime = Date.parse(data.expires_at);
         if (Number.isFinite(expirationTime) && expirationTime <= Date.now()) {
           showError("Esta invitacion ya no esta disponible.");
