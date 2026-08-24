@@ -567,6 +567,26 @@ function resolveGiftTableUrl(inv, giftOptions) {
     return "";
 }
 
+function normalizeLodgingOptions(val) {
+    var raw = val;
+    if (typeof raw === "string") {
+        try { raw = JSON.parse(raw); } catch (e) { raw = []; }
+    }
+    if (!Array.isArray(raw)) return [];
+    return raw.map(function(option, index) {
+        if (!option || typeof option !== "object" || option.enabled === false) return null;
+        var name = cleanString(option.name, 160);
+        if (!name) return null;
+        return {
+            id: cleanString(option.id, 50) || ("lodging-" + (index + 1)),
+            name: name,
+            address: cleanString(option.address, 320),
+            phone: cleanString(option.phone, 40),
+            mapUrl: safeHttpsUrl(cleanString(option.map_url || option.mapUrl, 500))
+        };
+    }).filter(Boolean).slice(0, 3);
+}
+
 function normalizeCustomFontTargets(val) {
     var allowed = ["titles", "subtitles", "names", "body"];
     var targets = normalizeStringArray(val).filter(function(target) {
@@ -878,7 +898,7 @@ function buildPublicTemplateData(inv, template) {
         table: cleanString(tableNum, 30),
         invitationSlug: slug,
         guestToken: guestToken,
-        qrAccessEnabled: template.id.endsWith("-vip"),
+        qrAccessEnabled: inv.qr_enabled === true,
         mainPhotoUrl: safeHttpsUrl(inv.main_photo_url),
         galleryUrls: normalizeGalleryUrls(inv.gallery_urls),
         musicUrl: safeHttpsUrl(inv.music_url),
@@ -890,6 +910,8 @@ function buildPublicTemplateData(inv, template) {
         childrenLabel: cleanString(inv.children_label, 120),
         giftOptions: giftOptions,
         giftTableUrl: giftTableUrl,
+        lodgingOptions: normalizeLodgingOptions(inv.lodging_options),
+        sharedAlbumEnabled: inv.shared_album_enabled === true,
         instagramHashtag: cleanString(inv.instagram_hashtag, 120),
         thankYouTitle: cleanString(inv.thank_you_title, 160),
         thankYouMessage: cleanString(inv.thank_you_message, 600),

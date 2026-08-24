@@ -804,13 +804,13 @@
   }
 
   function hideUnsupportedPlumNoirSamples() {
-    // These modules ship with static demonstration records. Invitta has no
-    // persisted data model for collaborative albums or lodging yet, therefore
-    // they must not be published as event content.
+    // Render premium modules only when Studio has supplied persisted content.
+    var hasAlbum = data && data.sharedAlbumEnabled === true && (!data.sectionVisibility || data.sectionVisibility.album !== false);
+    var hasLodging = data && Array.isArray(data.lodgingOptions) && data.lodgingOptions.length > 0 && (!data.sectionVisibility || data.sectionVisibility.lodging !== false);
     var collaborativeAlbum = document.getElementById("collaborative-album");
-    if (collaborativeAlbum) collaborativeAlbum.style.setProperty("display", "none", "important");
-    hideSectionWithHeading("Álbum Colaborativo");
-    hideSectionWithHeading("Sugerencias de Hospedaje");
+    if (!hasAlbum && collaborativeAlbum) collaborativeAlbum.style.setProperty("display", "none", "important");
+    if (!hasAlbum) hideSectionWithHeading("Álbum Colaborativo");
+    if (!hasLodging) hideSectionWithHeading("Sugerencias de Hospedaje");
 
     if (templateId !== "boda-midnight-gold-vip") return;
 

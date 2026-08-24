@@ -1136,6 +1136,8 @@
           <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="itinerary" checked> Minuto a minuto</label>
           <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="gallery" checked> Galería</label>
           <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="registry" checked> Regalos</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="album" checked> Álbum colaborativo</label>
+          <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="lodging" checked> Hospedaje</label>
           <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="rsvp" checked> Confirmación RSVP</label>
           <label class="studio-section-toggle"><input type="checkbox" name="section_visibility" value="music" checked> Reproductor de música</label>
         </div>
@@ -1155,6 +1157,31 @@
         <div class="form-group">
           <label for="ceremony_map_url">URL Mapa Ceremonia</label>
           <input type="url" id="ceremony_map_url" class="form-control" placeholder="https://maps.app.goo.gl/...">
+        </div>
+      </div>
+
+      <div class="studio-gift-section" style="margin-top: 25px; margin-bottom: 25px;">
+        <h3 style="font-size: 16px; color: var(--primary-color); margin-bottom: 6px;">📷 Álbum colaborativo</h3>
+        <p class="form-help" style="margin-top: 0; margin-bottom: 12px;">Los invitados con enlace personalizado podrán compartir fotos. Las imágenes se guardan de forma privada y se muestran sólo dentro de esta invitación.</p>
+        <label class="studio-section-toggle"><input type="checkbox" id="shared_album_enabled"> Activar recuerdos compartidos por los invitados</label>
+      </div>
+
+      <div class="studio-gift-section" style="margin-top: 25px; margin-bottom: 25px;">
+        <h3 style="font-size: 16px; color: var(--primary-color); margin-bottom: 6px;">🏨 Sugerencias de hospedaje</h3>
+        <p class="form-help" style="margin-top: 0; margin-bottom: 16px;">Agrega únicamente las opciones que quieras recomendar. Si no agregas ninguna, esta sección no aparece.</p>
+        <div class="studio-gift-options">
+          <div class="studio-gift-card">
+            <div class="studio-gift-card-header"><label class="studio-gift-toggle" for="lodging_1_enabled"><input type="checkbox" id="lodging_1_enabled"><span class="studio-gift-toggle-title">Hospedaje 1</span></label></div>
+            <div class="studio-gift-card-body"><div class="form-row"><div class="form-group"><label for="lodging_1_name">Nombre</label><input type="text" id="lodging_1_name" class="form-control" placeholder="Ej. Hotel Casa Real"></div><div class="form-group"><label for="lodging_1_phone">Teléfono (opcional)</label><input type="text" id="lodging_1_phone" class="form-control"></div></div><div class="form-row"><div class="form-group"><label for="lodging_1_address">Dirección (opcional)</label><input type="text" id="lodging_1_address" class="form-control"></div><div class="form-group"><label for="lodging_1_map_url">Mapa (opcional)</label><input type="url" id="lodging_1_map_url" class="form-control" placeholder="https://maps.app.goo.gl/..."></div></div></div>
+          </div>
+          <div class="studio-gift-card">
+            <div class="studio-gift-card-header"><label class="studio-gift-toggle" for="lodging_2_enabled"><input type="checkbox" id="lodging_2_enabled"><span class="studio-gift-toggle-title">Hospedaje 2</span></label></div>
+            <div class="studio-gift-card-body"><div class="form-row"><div class="form-group"><label for="lodging_2_name">Nombre</label><input type="text" id="lodging_2_name" class="form-control"></div><div class="form-group"><label for="lodging_2_phone">Teléfono (opcional)</label><input type="text" id="lodging_2_phone" class="form-control"></div></div><div class="form-row"><div class="form-group"><label for="lodging_2_address">Dirección (opcional)</label><input type="text" id="lodging_2_address" class="form-control"></div><div class="form-group"><label for="lodging_2_map_url">Mapa (opcional)</label><input type="url" id="lodging_2_map_url" class="form-control" placeholder="https://maps.app.goo.gl/..."></div></div></div>
+          </div>
+          <div class="studio-gift-card">
+            <div class="studio-gift-card-header"><label class="studio-gift-toggle" for="lodging_3_enabled"><input type="checkbox" id="lodging_3_enabled"><span class="studio-gift-toggle-title">Hospedaje 3</span></label></div>
+            <div class="studio-gift-card-body"><div class="form-row"><div class="form-group"><label for="lodging_3_name">Nombre</label><input type="text" id="lodging_3_name" class="form-control"></div><div class="form-group"><label for="lodging_3_phone">Teléfono (opcional)</label><input type="text" id="lodging_3_phone" class="form-control"></div></div><div class="form-row"><div class="form-group"><label for="lodging_3_address">Dirección (opcional)</label><input type="text" id="lodging_3_address" class="form-control"></div><div class="form-group"><label for="lodging_3_map_url">Mapa (opcional)</label><input type="url" id="lodging_3_map_url" class="form-control" placeholder="https://maps.app.goo.gl/..."></div></div></div>
+          </div>
         </div>
       </div>
 

@@ -38,7 +38,7 @@ function hasActiveTemplates(eventType) {
 }
 
 const SECTION_BACKGROUND_KEYS = ["hero", "family", "locations", "gallery", "rsvp"];
-const OPTIONAL_SECTION_KEYS = ["family", "locations", "itinerary", "gallery", "registry", "rsvp", "music"];
+const OPTIONAL_SECTION_KEYS = ["family", "locations", "itinerary", "gallery", "registry", "album", "lodging", "rsvp", "music"];
 
 function normalizeSectionVisibility(value) {
   let parsed = value;
@@ -623,6 +623,43 @@ function getLegacyGiftTableUrl(giftOptions) {
   if (gift1Enabled && gift1Url) return gift1Url;
 
   return "";
+}
+
+function loadLodgingOptions(data = {}) {
+  const options = Array.isArray(data.lodging_options) ? data.lodging_options : [];
+  for (let index = 1; index <= 3; index += 1) {
+    const option = options.find((item) => item?.id === `lodging-${index}`) || options[index - 1] || {};
+    const enabled = document.getElementById(`lodging_${index}_enabled`);
+    const name = document.getElementById(`lodging_${index}_name`);
+    const address = document.getElementById(`lodging_${index}_address`);
+    const phone = document.getElementById(`lodging_${index}_phone`);
+    const mapUrl = document.getElementById(`lodging_${index}_map_url`);
+    if (enabled) enabled.checked = Boolean(option?.name) && option.enabled !== false;
+    if (name) name.value = option?.name || "";
+    if (address) address.value = option?.address || "";
+    if (phone) phone.value = option?.phone || "";
+    if (mapUrl) mapUrl.value = option?.map_url || option?.mapUrl || "";
+  }
+  const album = document.getElementById("shared_album_enabled");
+  if (album) album.checked = data.shared_album_enabled === true;
+}
+
+function buildLodgingOptions() {
+  const options = [];
+  for (let index = 1; index <= 3; index += 1) {
+    const enabled = document.getElementById(`lodging_${index}_enabled`)?.checked === true;
+    const name = document.getElementById(`lodging_${index}_name`)?.value.trim() || "";
+    if (!enabled || !name) continue;
+    options.push({
+      id: `lodging-${index}`,
+      enabled: true,
+      name,
+      address: document.getElementById(`lodging_${index}_address`)?.value.trim() || "",
+      phone: document.getElementById(`lodging_${index}_phone`)?.value.trim() || "",
+      map_url: document.getElementById(`lodging_${index}_map_url`)?.value.trim() || ""
+    });
+  }
+  return options;
 }
 
 /**
@@ -2352,6 +2389,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const accentColor = document.getElementById("accent_color");
     if (accentColor) accentColor.value = data.accent_color || "";
     setSectionVisibilityControls(data.section_visibility);
+    loadLodgingOptions(data);
     const customFontUrl = document.getElementById("customFontUrl");
     const customFontName = document.getElementById("customFontName");
     if (customFontUrl) customFontUrl.value = data.custom_font_url || "";
@@ -2799,6 +2837,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       body_color: document.getElementById("body_color") ? document.getElementById("body_color").value || null : null,
       accent_color: document.getElementById("accent_color") ? document.getElementById("accent_color").value || null : null,
       section_visibility: getSectionVisibilityControls(),
+      shared_album_enabled: document.getElementById("shared_album_enabled")?.checked === true,
+      lodging_options: buildLodgingOptions(),
       ceremony_name: document.getElementById("ceremony_name").value,
       ceremony_address: document.getElementById("ceremony_address").value,
       ceremony_map_url: document.getElementById("ceremony_map_url").value,
