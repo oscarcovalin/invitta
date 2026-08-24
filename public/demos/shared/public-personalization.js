@@ -601,6 +601,32 @@
         element.dataset.invittaDynamicText = "true";
       }
     });
+
+    // The opening overlay and the hero coexist briefly while React animates.
+    // Keep the hero out of that transition so its large text never appears
+    // behind the card and wax seal. The mutation observer restores it once
+    // the envelope has left the document.
+    var envelope = document.querySelector(".fixed.inset-0.z-\\[120\\], .fixed[class*='z-[120]']");
+    var hero = document.getElementById("hero");
+    if (hero) hero.style.visibility = envelope ? "hidden" : "";
+
+    if (envelope) {
+      var envelopeName = envelope.querySelector("h2.font-serif");
+      if (envelopeName) {
+        envelopeName.textContent = couple.join(" & ");
+        envelopeName.style.setProperty("display", "block", "important");
+        envelopeName.dataset.invittaDynamicText = "true";
+      }
+      if (!document.getElementById("invitta-midnight-envelope-layout")) {
+        var envelopeStyle = document.createElement("style");
+        envelopeStyle.id = "invitta-midnight-envelope-layout";
+        envelopeStyle.textContent = [
+          ".fixed[class*='z-[120]'] h2.font-serif{max-width:82%;margin-inline:auto!important;text-wrap:balance!important;line-height:1.08!important;}",
+          "@media(max-width:767px){.fixed[class*='z-[120]'] h2.font-serif{font-size:clamp(1.15rem,6vw,1.55rem)!important;}.fixed[class*='z-[120]'] h3.font-serif{font-size:clamp(1.3rem,7vw,1.8rem)!important;}}"
+        ].join("");
+        document.head.appendChild(envelopeStyle);
+      }
+    }
   }
 
   function applyGoldenRomanceWeddingAdapter() {
@@ -1337,12 +1363,8 @@
         var style = document.createElement("style");
         style.id = "invitta-no-music-style";
         style.textContent = [
-          "#music-player-container, #music-player-bottom-bar, #inv-music-player, #music-player, ",
-          "[id*='music-player' i], [class*='music-player' i], .music-bar, .music-floating-btn, ",
-          "button[aria-label*='música' i], button[title*='música' i], button[aria-label*='musica' i], button[title*='musica' i], ",
-          "[id*='music-toggle' i], [id*='music-mute' i], [id*='music-volume' i], [class*='music-toggle' i], ",
-          "[class*='floating-music' i], [class*='audio-btn' i], [class*='sound-btn' i] ",
-          "{ display: none !important; }"
+          "#music-player-container, #music-player-bottom-bar, #inv-music-player, #music-player, [class*='music-player' i]{opacity:.72!important;}",
+          "html[data-invitta-no-music] [id*='music-toggle' i], html[data-invitta-no-music] [id*='music-mute' i], html[data-invitta-no-music] [id*='music-volume' i]{pointer-events:none!important;cursor:not-allowed!important;}"
         ].join("");
         document.head.appendChild(style);
       }
@@ -1363,6 +1385,13 @@
       "[class*='floating-music' i], [class*='audio-btn' i], [class*='sound-btn' i]"
     );
 
+    if (data.sectionVisibility && data.sectionVisibility.music === false) {
+      musicContainers.forEach(function (el) {
+        el.style.setProperty("display", "none", "important");
+      });
+      return;
+    }
+
     if (!data.musicUrl) {
       document.querySelectorAll("audio").forEach(function (audio) {
         try {
@@ -1374,9 +1403,18 @@
       });
 
       musicContainers.forEach(function (el) {
-        el.style.setProperty("display", "none", "important");
+        el.style.removeProperty("display");
       });
-      document.body.classList.remove("has-music-player");
+      document.querySelectorAll("#music-player-bottom-bar span, #music-player-container span, #inv-music-player span").forEach(function (label) {
+        if (/M[uú]sica Pausada|M[uú]sica de Fondo/i.test(clean(label.textContent))) {
+          label.textContent = "Música no configurada";
+        }
+      });
+      document.querySelectorAll("#music-toggle-play-btn, #music-mute-toggle-btn, #music-volume-slider").forEach(function(control) {
+        control.setAttribute("disabled", "disabled");
+        control.setAttribute("aria-disabled", "true");
+        control.setAttribute("title", "La pareja aún no ha configurado música para esta invitación.");
+      });
       return;
     }
 
