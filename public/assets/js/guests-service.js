@@ -1,5 +1,5 @@
 (function () {
-    const GUEST_SELECT = "id, evento_id, nombre, familia, email, telefono, mesa, pases_asignados, pases_confirmados, estado, notas, confirmed_at";
+    const GUEST_SELECT = "id, evento_id, qr_token, nombre, familia, email, telefono, mesa, pases_asignados, pases_confirmados, estado, notas, confirmed_at";
     const VALID_STATUSES = ["Confirmado", "Pendiente", "No asistira"];
 
     function formatDate(value) {
@@ -64,6 +64,7 @@
             id: row.id,
             eventId: row.evento_id,
             qr_id: row.id,
+            qr_token: row.qr_token || "",
             name: row.nombre || "",
             family: row.familia || "",
             status: normalizeStatus(row.estado),
