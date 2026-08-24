@@ -49,7 +49,53 @@ const itemVariants = {
   }
 };
 
+type PublicInvitationData = {
+  celebrantName?: string;
+  eventTitle?: string;
+  eventDate?: string;
+  whatsapp?: string;
+  guestToken?: string;
+  ceremony?: { name?: string; time?: string; address?: string; mapUrl?: string };
+  reception?: { name?: string; time?: string; address?: string; mapUrl?: string };
+};
+
+function getInvitationData(): PublicInvitationData {
+  if (typeof window === "undefined") return {};
+  const candidate = (window as Window & { INVITATION_DATA?: PublicInvitationData }).INVITATION_DATA;
+  return candidate && typeof candidate === "object" ? candidate : {};
+}
+
+function formatInvitationDate(value?: string) {
+  if (!value) return null;
+  const date = new Date(`${value.slice(0, 10)}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return null;
+  const parts = new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "long", year: "numeric" }).formatToParts(date);
+  const lookup = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value || "";
+  return {
+    full: `${lookup("day")} ${lookup("month")} ${lookup("year")}`,
+    dayMonth: `${lookup("day")} ${lookup("month")}`,
+    weekday: new Intl.DateTimeFormat("es-MX", { weekday: "long", day: "numeric", month: "long" }).format(date),
+  };
+}
+
+function firstLine(value?: string, fallback = "") {
+  return value?.trim() || fallback;
+}
+
 export default function App() {
+  const invitation = getInvitationData();
+  const couple = firstLine(invitation.celebrantName, "Ana Camila & Carlos").split(/\s*(?:&|\by\b)\s*/i).filter(Boolean);
+  const brideName = couple[0] || "Ana Camila";
+  const groomName = couple[1] || "Carlos";
+  const eventDate = formatInvitationDate(invitation.eventDate);
+  const ceremony = invitation.ceremony || {};
+  const reception = invitation.reception || {};
+  const ceremonyName = firstLine(ceremony.name, "Parroquia Sagrado Corazón de Jesús");
+  const receptionName = firstLine(reception.name, "Cantabria Salón de Eventos");
+  const ceremonyTime = firstLine(ceremony.time, "3:00 P.M.");
+  const receptionTime = firstLine(reception.time, "9:00 P.M.");
+  const coupleForCopy = `${brideName} y ${groomName}`;
+  const usesStudioGuestPass = Boolean(invitation.eventDate || invitation.guestToken);
   // Parallax calculations
   const { scrollY } = useScroll();
   // Hero cover image: move down/up slowly as we scroll to create a classic slow-parallax feel
@@ -246,10 +292,10 @@ export default function App() {
     msgVal?: string,
     tableVal?: string
   ) => {
-    const phone = "526142525050"; // Chihuahua, MX standard number
-    let text = `¡Hola Ana Camila y Carlos! ✨ Quiero confirmar mi asistencia a su Boda. 🌸`;
+    const phone = String(invitation.whatsapp || "").replace(/\D/g, "");
+    let text = `¡Hola ${coupleForCopy}! ✨ Quiero confirmar mi asistencia a su Boda. 🌸`;
     if (nameVal) {
-      text = `¡Hola Ana Camila y Carlos! ✨ Soy *${nameVal}*.\n\n`;
+      text = `¡Hola ${coupleForCopy}! ✨ Soy *${nameVal}*.\n\n`;
       if (attendingVal === true) {
         text += `Confirmo con mucha alegría que *SÍ asistiré* a su hermosa celebración de Boda. 🌸🤍\n`;
         text += `🎟️ Pases solicitados: *${guestsVal || 1}*\n`;
@@ -266,7 +312,7 @@ export default function App() {
         text += `\n💬 Mensaje especial:\n"${msgVal}"`;
       }
     }
-    return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+    return phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` : "#";
   };
 
   const handleWhatsAppRsvp = (e: React.MouseEvent) => {
@@ -534,7 +580,7 @@ export default function App() {
                 className="text-subheading-caps text-left text-[11px] text-ink/80 hover:text-sage tracking-[0.2em] transition-colors py-2 flex items-center gap-3 border-b border-outline-variant/10"
               >
                 <span className="material-symbols-outlined text-sm text-sage">favorite</span>
-                Ana Camila y Carlos
+                {coupleForCopy}
               </button>
               <button 
                 onClick={() => scrollToSection("honors")}
@@ -605,12 +651,12 @@ export default function App() {
             transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
             className="w-full md:w-5/12 flex flex-col justify-center items-start px-margin-mobile md:pl-24 z-10 space-y-8 pt-12 md:pt-0"
           >
-            <span className="text-subheading-caps text-sage tracking-[0.4em] font-medium">Nuestra Boda</span>
+            <span className="text-subheading-caps text-sage tracking-[0.4em] font-medium">{firstLine(invitation.eventTitle, "Nuestra Boda")}</span>
             
             <h2 className="font-display text-ink uppercase flex flex-col select-none">
-              <span className="block text-4xl md:text-5xl font-light leading-none tracking-tight">Ana Camila</span>
-              <span className="block md:ml-12 italic text-sage text-5xl md:text-7xl font-normal leading-none my-1">&amp; Carlos</span>
-              <span className="block md:ml-24 text-4xl md:text-5xl font-light leading-none tracking-tight">Zavala &amp; González</span>
+              <span className="block text-4xl md:text-5xl font-light leading-none tracking-tight">{brideName}</span>
+              <span className="block md:ml-12 italic text-sage text-5xl md:text-7xl font-normal leading-none my-1">&amp;</span>
+              <span className="block md:ml-24 text-4xl md:text-5xl font-light leading-none tracking-tight">{groomName}</span>
             </h2>
 
             <div className="mt-8 md:mt-16 border-l border-outline-variant/40 pl-6 relative before:absolute before:left-[-1px] before:top-0 before:w-px before:h-12 before:bg-sage">
@@ -634,7 +680,7 @@ export default function App() {
           {/* Large Beautiful Cover Photo Side */}
           <ImageReveal
             src={midnightHero}
-            alt="Retrato editorial elegante de Ana Camila y Carlos en su sesión de bodas"
+            alt={`Retrato editorial de ${brideName} y ${groomName}`}
             className="w-full md:w-7/12 h-[65vh] md:h-screen mt-12 md:mt-0 group"
             imageClassName="object-center md:object-right"
             yParallax={yHero}
@@ -764,11 +810,11 @@ export default function App() {
                 Guarda la Fecha Especial
               </h3>
               <span className="font-display font-light text-5xl md:text-7xl block leading-tight tracking-tight">
-                12 Diciembre <br/>
-                <span className="italic text-sage font-normal">2026</span>
+                {eventDate ? eventDate.dayMonth : "12 Diciembre"} <br/>
+                <span className="italic text-sage font-normal">{eventDate ? eventDate.full.split(" ").pop() : "2026"}</span>
               </span>
               <p className="font-sans text-xs text-ink/60 uppercase tracking-widest">
-                Chihuahua, Chihuahua, México
+                {receptionName}
               </p>
             </motion.div>
 
@@ -779,7 +825,7 @@ export default function App() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
             >
-              <Countdown />
+              <Countdown eventDate={invitation.eventDate} eventTime={ceremonyTime} coupleName={`${brideName} y ${groomName}`} ceremonyName={ceremonyName} receptionName={receptionName} location={firstLine(reception.address, "")} />
             </motion.div>
           </div>
         </section>
@@ -822,21 +868,19 @@ export default function App() {
                   <h3 className="font-display text-3xl text-ink font-light">Ceremonia Religiosa</h3>
                   
                   <div className="space-y-3 text-sm md:text-base leading-relaxed text-on-surface-variant font-light">
-                    <p className="font-semibold text-ink text-base">Parroquia Sagrado Corazón de Jesús</p>
+                    <p className="font-semibold text-ink text-base">{ceremonyName}</p>
                     <p className="text-sage font-semibold tracking-[0.2em] uppercase text-xs">
-                      Sábado 12 de Diciembre • 3:00 P.M.
+                      {eventDate ? eventDate.weekday : "Sábado 12 de Diciembre"} • {ceremonyTime}
                     </p>
                     <p className="opacity-80 pt-2 font-sans text-xs md:text-sm">
-                      Blv. Calle 20 de Noviembre y Av. Melchor Ocampo<br/>
-                      Col. Pacífico, C.P. 31030<br/>
-                      Chihuahua, Chihuahua.
+                      {firstLine(ceremony.address, "Blv. Calle 20 de Noviembre y Av. Melchor Ocampo, Col. Pacífico, C.P. 31030 Chihuahua, Chihuahua.")}
                     </p>
                   </div>
                 </div>
 
                 <div className="pt-8 mt-4 flex flex-wrap gap-4 items-center">
                   <a 
-                    href="https://maps.google.com/?q=Parroquia+Sagrado+Corazon+de+Jesus+Chihuahua+Calle+20+de+Noviembre"
+                    href={firstLine(ceremony.mapUrl, "https://maps.google.com/?q=Parroquia+Sagrado+Corazon+de+Jesus+Chihuahua+Calle+20+de+Noviembre")}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-[11px] font-subheading-caps tracking-[0.25em] text-ink hover:text-sage border-b border-ink/45 hover:border-sage pb-1 transition-all"
@@ -866,21 +910,19 @@ export default function App() {
                   <h3 className="font-display text-3xl text-ink font-light">Salón de Recepción</h3>
                   
                   <div className="space-y-3 text-sm md:text-base leading-relaxed text-on-surface-variant font-light">
-                    <p className="font-semibold text-ink text-base">Cantabria Salón de Eventos</p>
+                    <p className="font-semibold text-ink text-base">{receptionName}</p>
                     <p className="text-sage font-semibold tracking-[0.2em] uppercase text-xs">
-                      Sábado 12 de Diciembre • 9:00 P.M.
+                      {eventDate ? eventDate.weekday : "Sábado 12 de Diciembre"} • {receptionTime}
                     </p>
                     <p className="opacity-80 pt-2 font-sans text-xs md:text-sm">
-                      Blv. Col. Sierra Magisterial #6103 esq. con Tejas<br/>
-                      Col. Los Ángeles, C.P. 31380<br/>
-                      Chihuahua, Chihuahua.
+                      {firstLine(reception.address, "Blv. Col. Sierra Magisterial #6103 esq. con Tejas, Col. Los Ángeles, C.P. 31380 Chihuahua, Chihuahua.")}
                     </p>
                   </div>
                 </div>
 
                 <div className="pt-8 mt-4 flex flex-wrap gap-4 items-center">
                   <a 
-                    href="https://maps.google.com/?q=Cantabria+Salon+de+Eventos+Chihuahua+Sierra+Magisterial"
+                    href={firstLine(reception.mapUrl, "https://maps.google.com/?q=Cantabria+Salon+de+Eventos+Chihuahua+Sierra+Magisterial")}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-[11px] font-subheading-caps tracking-[0.25em] text-ink hover:text-sage border-b border-ink/45 hover:border-sage pb-1 transition-all"
@@ -1236,7 +1278,7 @@ export default function App() {
                 Confirmar Asistencia
               </h2>
               <p className="text-xs tracking-widest uppercase text-sage">
-                Agradecemos confirmar antes del 20 de Noviembre, 2026
+                Agradecemos confirmar su asistencia
               </p>
               <div className="w-12 h-[1px] bg-sage/30 mx-auto"></div>
             </motion.div>
@@ -1254,22 +1296,24 @@ export default function App() {
                 >
                   Confirmar RSVP
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRsvpTab("pass");
-                    setHasSearched(false);
-                    setPassSearchQuery("");
-                    setSearchResults([]);
-                  }}
-                  className={`text-xs tracking-widest uppercase font-semibold pb-2 border-b-2 transition-all cursor-pointer ${
-                    rsvpTab === "pass" 
-                      ? "border-sage text-sage font-bold" 
-                      : "border-transparent text-sage/40 hover:text-sage/70"
-                  }`}
-                >
-                  Obtener mi Pase QR
-                </button>
+                {!usesStudioGuestPass && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRsvpTab("pass");
+                      setHasSearched(false);
+                      setPassSearchQuery("");
+                      setSearchResults([]);
+                    }}
+                    className={`text-xs tracking-widest uppercase font-semibold pb-2 border-b-2 transition-all cursor-pointer ${
+                      rsvpTab === "pass"
+                        ? "border-sage text-sage font-bold"
+                        : "border-transparent text-sage/40 hover:text-sage/70"
+                    }`}
+                  >
+                    Obtener mi Pase QR
+                  </button>
+                )}
               </div>
             )}
 
@@ -1369,6 +1413,7 @@ export default function App() {
                     )}
                   </div>
 
+                  {!usesStudioGuestPass && (
                   <div className="pt-4 space-y-4">
                     {rsvpSubmitted.attending ? (
                       /* Elegant QR code pass */
@@ -1435,9 +1480,10 @@ export default function App() {
                       </button>
                     </div>
                   </div>
+                  )}
                 </div>
               </div>
-            ) : rsvpTab === "pass" ? (
+            ) : !usesStudioGuestPass && rsvpTab === "pass" ? (
               /* Beautiful QR Pass Search interface */
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
@@ -1629,7 +1675,7 @@ export default function App() {
                   {/* Dedicatory Message */}
                   <div className="relative group border-b border-outline-variant/35 pb-2">
                     <label className="block text-subheading-caps text-[10px] text-sage mb-2 tracking-[0.2em]">
-                      Mensaje de felicitación para Ana Camila (Opcional)
+                      Mensaje de felicitación para {brideName} (Opcional)
                     </label>
                     <input 
                       type="text" 

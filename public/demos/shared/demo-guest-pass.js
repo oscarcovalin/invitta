@@ -30,7 +30,8 @@
       passes: clampPasses(invitation.passes || firstParam(["p", "pases"])),
       table: clean(String(invitation.table || "")) || firstParam(["m", "mesa"]) || "5",
       token: clean(invitation.guestToken),
-      qrEnabled: invitation.qrAccessEnabled === true
+      qrEnabled: invitation.qrAccessEnabled === true,
+      isStudioInvitation: Boolean(invitation.invitationSlug || invitation.studioInvitationId)
     };
   }
 
@@ -181,6 +182,11 @@
     var data = guestData();
     var anchor = findRsvpSection();
     if (!anchor && renderAttempts < 80) return false;
+
+    // The public invitation has no guest identity. Rendering a placeholder
+    // pass there suggests that a shared QR could grant admission. Only a
+    // personalized URL containing the persisted guest token may show a pass.
+    if (data.isStudioInvitation && !data.token) return true;
 
     limitRsvpOptions(data, anchor);
     fillGuestInputs(data, anchor);

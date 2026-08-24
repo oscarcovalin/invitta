@@ -428,7 +428,13 @@
     const imageEl = $(imageId);
     if (imageEl) {
       imageEl.style.backgroundImage = '';
-      imageEl.innerHTML = '';
+      // QRCode can finish appending its image asynchronously. Render into a
+      // fresh, isolated mount so a repeated click cannot append a second QR
+      // over the one already visible in the modal.
+      const qrMount = document.createElement('div');
+      qrMount.className = 'qr-render-target';
+      qrMount.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;';
+      imageEl.replaceChildren(qrMount);
       imageEl.style.display = 'block';
       if (typeof window.QRCode !== 'function') {
         console.error('[Invitta QR] La libreria local de QR no esta disponible.');
@@ -437,7 +443,7 @@
       }
       const qrSize = Math.max(120, Math.min(220, imageEl.clientWidth || 220));
       try {
-        new window.QRCode(imageEl, {
+        new window.QRCode(qrMount, {
           text: qr.checkinUrl,
           width: qrSize,
           height: qrSize,

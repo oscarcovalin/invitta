@@ -2043,7 +2043,9 @@
       height: 186,
       colorDark: "#171411",
       colorLight: "#ffffff",
-      correctLevel: window.QRCode.CorrectLevel.H
+      // The personalized check-in URL can exceed the capacity of level H on
+      // branded Vercel domains. Level M keeps the pass reliably scannable.
+      correctLevel: window.QRCode.CorrectLevel.M
     });
 
     var anchor = document.querySelector("section#rsvp, section[id*='rsvp'], section[id*='confirm']");
