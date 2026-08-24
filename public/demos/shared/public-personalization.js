@@ -466,6 +466,7 @@
     // Match only an exact celebrant/couple name in a display heading, so names
     // in parents, RSVP or the closing never inherit the cover scale.
     Array.from(document.querySelectorAll("h1,h2,h3,span")).forEach(function(element) {
+      if (element.dataset.invittaMidnightCouplePiece === "true") return;
       var visible = clean(element.textContent);
       var isExactFullName = visible.toLocaleLowerCase() === fullName.toLocaleLowerCase();
       var isHeroNamePart = nameParts.some(function(part) {
@@ -494,7 +495,11 @@
       document.head.appendChild(style);
     }
 
-    var coverName = Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
+    // Midnight Gold renders each member of the couple in a separate span. Its
+    // date must follow the complete couple block, not the first member.
+    var isMidnightWedding = templateId === "boda-midnight-gold-vip" && isWedding;
+    var midnightCouple = isMidnightWedding ? document.querySelector("#hero h2[data-invitta-midnight-couple]") : null;
+    var coverName = midnightCouple || Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
       return element.offsetParent !== null;
     });
     if (!coverName) return;
@@ -519,6 +524,9 @@
       existingDate.textContent = dateText;
       existingDate.dataset.invittaEditorialDate = "true";
       if (!existingDate.dataset.invittaFontRole) existingDate.dataset.invittaFontRole = "label";
+      if (midnightCouple && existingDate.previousElementSibling !== midnightCouple) {
+        midnightCouple.insertAdjacentElement("afterend", existingDate);
+      }
       return;
     }
 
@@ -552,15 +560,47 @@
       }
     });
 
-    var editorialHeading = document.querySelector("h2.font-display");
+    var editorialHeading = document.querySelector("#hero h2.font-display");
     if (!editorialHeading) return;
     var pieces = Array.from(editorialHeading.querySelectorAll("span"));
     if (pieces[0]) pieces[0].textContent = couple[0];
-    if (pieces[1]) pieces[1].textContent = "& " + couple[1];
+    if (pieces[1]) pieces[1].textContent = "&";
     if (pieces[2]) {
-      pieces[2].textContent = "";
-      pieces[2].style.setProperty("display", "none", "important");
+      pieces[2].textContent = couple[1];
+      pieces[2].style.removeProperty("display");
     }
+    editorialHeading.dataset.invittaMidnightCouple = "true";
+    editorialHeading.dataset.invittaCoverNameSize = "true";
+    editorialHeading.dataset.invittaFontRole = "cover-name";
+    pieces.forEach(function(piece) {
+      piece.dataset.invittaMidnightCouplePiece = "true";
+      piece.removeAttribute("data-invitta-cover-name-size");
+    });
+
+    // Keep the source's editorial hierarchy, but make each line flow in
+    // normal document order at phone widths. This is intentionally scoped to
+    // Midnight Gold so other renderers retain their native hero layouts.
+    if (!document.getElementById("invitta-midnight-couple-layout")) {
+      var style = document.createElement("style");
+      style.id = "invitta-midnight-couple-layout";
+      style.textContent = [
+        "#hero h2[data-invitta-midnight-couple]{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:clamp(.12rem,1vw,.4rem)!important;max-width:100%!important;}",
+        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]{display:block!important;margin:0!important;max-width:100%!important;overflow-wrap:anywhere!important;text-wrap:balance!important;}",
+        "@media(max-width:767px){#hero h2[data-invitta-midnight-couple]{gap:.2rem!important;line-height:1!important;}#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(1),#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(3){font-size:clamp(2.55rem,12.4vw,3.2rem)!important;line-height:.96!important;letter-spacing:-.035em!important;}#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(2){font-size:clamp(2rem,10vw,2.8rem)!important;line-height:.8!important;}}"
+      ].join("");
+      document.head.appendChild(style);
+    }
+
+    // The animated envelope is compiled with a static demo monogram (AC).
+    // Replace only its wax-seal label with initials derived from real Studio
+    // names; no demo fallback is left on a published invitation.
+    var initials = (couple[0].charAt(0) + couple[1].charAt(0)).toLocaleUpperCase("es-MX");
+    Array.from(document.querySelectorAll(".fixed span")).forEach(function(element) {
+      if (clean(element.textContent) === "AC" && element.closest(".fixed")) {
+        element.textContent = initials;
+        element.dataset.invittaDynamicText = "true";
+      }
+    });
   }
 
   function applyGoldenRomanceWeddingAdapter() {

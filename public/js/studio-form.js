@@ -364,11 +364,13 @@ function parseItineraryText(text) {
     .map(line => line.trim())
     .filter(Boolean)
     .map(line => {
-      const parts = line.split("|");
-      if (parts.length >= 2) {
+      // The slash is easier to find and enter on touch keyboards. Preserve
+      // the former pipe format so existing Studio records keep working.
+      const match = line.match(/^(\d{1,2}(?::\d{2})?(?:\s*[AaPp]\.??\s*[Mm]\.?)?)\s*(?:\||\/)\s*(.+)$/);
+      if (match) {
         return {
-          time: parts[0].trim(),
-          title: parts.slice(1).join("|").trim()
+          time: match[1].trim(),
+          title: match[2].trim()
         };
       }
       return {
@@ -397,7 +399,7 @@ function itineraryToText(value) {
     .map(item => {
       const time = item.time || "";
       const title = item.title || "";
-      return time ? `${time} | ${title}` : title;
+      return time ? `${time} / ${title}` : title;
     })
     .filter(Boolean)
     .join("\n");
