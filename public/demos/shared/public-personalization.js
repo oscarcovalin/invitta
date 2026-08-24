@@ -975,8 +975,19 @@
       var src = img.dataset.invittaOriginalSrc || img.currentSrc || img.src || "";
       if (isDemoGalleryAsset(src)) {
         // Hiding only the image leaves a framed, empty rectangle behind.
-        // Hide the standalone editorial media block with it.
-        var wrapper = img.closest(".cursor-zoom-in, .cursor-pointer, figure, .group, [class*='gallery-item']");
+        // Midnight's dress-code art has an outer responsive half-column, so
+        // hide that column rather than its inner image wrapper.
+        var wrapper = null;
+        var ancestor = img.parentElement;
+        while (ancestor && ancestor !== document.body) {
+          var classes = typeof ancestor.className === "string" ? ancestor.className : "";
+          if (/(?:^|\s)w-full(?:\s|$)/.test(classes) && /(?:^|\s)md:w-1\/2(?:\s|$)/.test(classes)) {
+            wrapper = ancestor;
+            break;
+          }
+          ancestor = ancestor.parentElement;
+        }
+        if (!wrapper) wrapper = img.closest(".cursor-zoom-in, .cursor-pointer, figure, .group, [class*='gallery-item']");
         if (wrapper && wrapper !== document.body) {
           wrapper.style.setProperty("display", "none", "important");
         } else {
