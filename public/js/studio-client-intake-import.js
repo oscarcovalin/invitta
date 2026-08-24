@@ -161,7 +161,109 @@
     });
   }
 
+  function applyValues(values) {
+    DIRECT_FIELDS.forEach(id => setValue(id, values.get(id)));
+    if (typeof window.setEventTimeSelects === "function") {
+      window.setEventTimeSelects(values.get("event_time") || "");
+    }
+    setChecked("shared_album_enabled", values.get("shared_album_enabled"));
+    if (typeof window.updateWeddingNameFields === "function") window.updateWeddingNameFields();
+    document.getElementById("title")?.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  function asMapUrl(value) {
+    const raw = asText(value);
+    if (!raw) return "";
+    return /^https?:\/\//i.test(raw)
+      ? raw
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(raw)}`;
+  }
+
+  function asLodgingMapUrl(url, address) {
+    const rawUrl = asText(url);
+    if (/^https?:\/\/(?:www\.)?(?:maps\.google|maps\.app\.goo\.gl|goo\.gl\/maps)/i.test(rawUrl)) return rawUrl;
+    return asMapUrl(address);
+  }
+
+  function defaultTitle(eventType, name) {
+    const prefix = { boda: "Boda de", xv: "XV Años de", bautizo: "Bautizo de", cumpleanos: "Cumpleaños de", otro: "Evento de" }[eventType] || "Evento de";
+    return name ? `${prefix} ${name}` : "Nueva invitación";
+  }
+
+  function applyLegacyClientData(data) {
+    if (!data || typeof data !== "object" || !data.eventType) {
+      throw new Error("Este JSON no corresponde al cuestionario de cliente de Invitta.");
+    }
+    const eventType = asText(data.eventType) || "otro";
+    const bride = asText(data.brideName);
+    const groom = asText(data.groomName);
+    const primaryName = eventType === "boda" ? [bride, groom].filter(Boolean).join(" y ") : bride;
+    const target = asText(data.countdownDate?.targetDateTime);
+    const ceremony = data.ceremonia || {};
+    const reception = data.recepcion || {};
+    const family = data.family || {};
+    const dressCode = data.dressCode || {};
+    const rsvp = data.rsvp || {};
+    const values = new Map([
+      ["title", defaultTitle(eventType, primaryName)], ["event_type", eventType],
+      ["bride_name", bride], ["groom_name", groom], ["honoree_name", bride],
+      ["event_date", target.slice(0, 10)], ["event_time", target.slice(11, 16)],
+      ["welcome_text", asText(data.quote)], ["instagram_hashtag", asText(data.hashtag)],
+      ["bride_mother_name", asText(family.brideParents?.mother)], ["bride_father_name", asText(family.brideParents?.father)],
+      ["groom_mother_name", asText(family.groomParents?.mother)], ["groom_father_name", asText(family.groomParents?.father)],
+      ["father_name", asText(family.brideParents?.father)], ["mother_name", asText(family.brideParents?.mother)],
+      ["godparents_text", asText(family.godparents)], ["ceremony_name", asText(ceremony.place || ceremony.title)],
+      ["ceremony_address", [ceremony.address1, ceremony.address2].map(asText).filter(Boolean).join(", ")],
+      ["ceremony_map_url", asMapUrl(ceremony.mapQuery)], ["reception_name", asText(reception.place || reception.title)],
+      ["reception_address", [reception.address1, reception.address2].map(asText).filter(Boolean).join(", ")],
+      ["reception_map_url", asMapUrl(reception.mapQuery)], ["dress_code", asText(dressCode.title)],
+      ["dress_code_details", [dressCode.women?.desc, dressCode.men?.desc, dressCode.women?.note].map(asText).filter(Boolean).join(" · ")],
+      ["whatsapp_number", asText(rsvp.whatsappNumber)], ["whatsapp_number_secondary", asText(rsvp.whatsappNumber2)]
+    ]);
+    applyValues(values);
+
+    const itinerary = Array.isArray(data.itinerary) ? data.itinerary : [];
+    const timeline = itinerary
+      .map(item => [asText(item?.time), asText(item?.title), asText(item?.description)])
+      .filter(parts => parts[0] || parts[1])
+      .map(([time, title, description]) => `${time}${time && title ? " / " : ""}${title}${description ? ` — ${description}` : ""}`);
+    if (timeline.length) setValue("itineraryText", timeline.join("\n"));
+
+    const hotels = Array.isArray(data.hospedaje?.opciones) ? data.hospedaje.opciones : [];
+    hotels.slice(0, 3).forEach((hotel, index) => {
+      const position = index + 1;
+      const enabled = data.incluirHospedaje && asText(hotel?.name);
+      setChecked(`lodging_${position}_enabled`, enabled ? "Sí" : "No");
+      setValue(`lodging_${position}_name`, asText(hotel?.name));
+      setValue(`lodging_${position}_phone`, asText(hotel?.phone));
+      setValue(`lodging_${position}_address`, asText(hotel?.address));
+      setValue(`lodging_${position}_map_url`, asLodgingMapUrl(hotel?.url, hotel?.address));
+    });
+
+    const registry = data.registry || {};
+    [[1, registry.registry1], [2, registry.registry2]].forEach(([position, item]) => {
+      const active = asText(item?.name) || asText(item?.url);
+      setChecked(`gift_${position}_enabled`, active ? "Sí" : "No");
+      setValue(`gift_${position}_title`, asText(item?.name));
+      setValue(`gift_${position}_url`, asText(item?.url));
+      setValue(`gift_${position}_description`, asText(registry.description));
+    });
+
+    const templateId = asText(data.visual?.template?.id);
+    const template = document.getElementById("template_id");
+    if (templateId && template?.querySelector(`option[value="${CSS.escape(templateId)}"]`)) {
+      setValue("template_id", templateId);
+    }
+  }
+
   async function importClientIntake(file) {
+    if (file.name.toLowerCase().endsWith(".json") || file.type === "application/json") {
+      let legacyData;
+      try { legacyData = JSON.parse(await file.text()); } catch (error) { throw new Error("No fue posible leer el JSON del cuestionario."); }
+      applyLegacyClientData(legacyData);
+      showMessage("Cuestionario JSON importado. Revisa la vista previa y guarda los cambios cuando estés listo.", "success");
+      return;
+    }
     if (!window.XLSX) throw new Error("No fue posible cargar el lector de archivos. Revisa tu conexión e inténtalo de nuevo.");
     const data = await file.arrayBuffer();
     const workbook = window.XLSX.read(data, { type: "array" });
@@ -173,17 +275,10 @@
       throw new Error("El formulario no contiene datos suficientes. Completa al menos el título o el nombre principal.");
     }
 
-    DIRECT_FIELDS.forEach(id => setValue(id, values.get(id)));
-    if (typeof window.setEventTimeSelects === "function") {
-      window.setEventTimeSelects(values.get("event_time") || "");
-    }
-    setChecked("shared_album_enabled", values.get("shared_album_enabled"));
+    applyValues(values);
     applyTimeline(workbook);
     applyLodging(workbook);
     applyGifts(workbook);
-
-    if (typeof window.updateWeddingNameFields === "function") window.updateWeddingNameFields();
-    document.getElementById("title")?.dispatchEvent(new Event("input", { bubbles: true }));
     showMessage("Formulario importado. Revisa la vista previa y guarda los cambios cuando estés listo.", "success");
   }
 
