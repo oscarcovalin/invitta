@@ -2,15 +2,46 @@
   "use strict";
 
   const YES_VALUES = new Set(["si", "sí", "yes", "true", "1", "activo"]);
-  const DIRECT_FIELDS = [
-    "title", "event_type", "bride_name", "groom_name", "honoree_name", "event_date", "event_time",
-    "welcome_text", "dress_code", "dress_code_details", "children_note", "children_label",
-    "bride_father_name", "bride_mother_name", "groom_father_name", "groom_mother_name",
-    "father_name", "mother_name", "honor_witness_name", "godparents_text", "ceremony_name",
-    "ceremony_address", "ceremony_map_url", "reception_name", "reception_address", "reception_map_url",
-    "whatsapp_number", "whatsapp_number_secondary", "instagram_hashtag", "thankYouTitle", "thankYouSignature",
-    "thankYouMessage", "hashtagSectionTitle", "hashtagSectionMessage", "music_title", "music_artist"
+  const CLIENT_FIELDS = [
+    ["title", "Datos principales", "Título de la invitación", "", "Ej. Nuestra boda"],
+    ["event_type", "Datos principales", "Tipo de evento", "boda", "boda, xv, bautizo, cumpleanos u otro"],
+    ["bride_name", "Datos principales", "Nombre de la novia", "", ""],
+    ["groom_name", "Datos principales", "Nombre del novio", "", ""],
+    ["honoree_name", "Datos principales", "Nombre de festejado/a (si no es boda)", "", ""],
+    ["event_date", "Datos principales", "Fecha del evento", "", "AAAA-MM-DD"],
+    ["event_time", "Datos principales", "Hora de inicio", "", "HH:MM, por ejemplo 18:30"],
+    ["welcome_text", "Mensaje", "Mensaje de bienvenida", "", ""],
+    ["dress_code", "Mensaje", "Código de vestimenta", "", ""],
+    ["dress_code_details", "Mensaje", "Indicaciones de vestimenta", "", ""],
+    ["children_note", "Mensaje", "Nota sobre niños (opcional)", "", ""],
+    ["children_label", "Mensaje", "Título para la nota de niños", "", ""],
+    ["bride_father_name", "Familia", "Padre de la novia", "", ""],
+    ["bride_mother_name", "Familia", "Madre de la novia", "", ""],
+    ["groom_father_name", "Familia", "Padre del novio", "", ""],
+    ["groom_mother_name", "Familia", "Madre del novio", "", ""],
+    ["father_name", "Familia", "Padre de festejado/a (si no es boda)", "", ""],
+    ["mother_name", "Familia", "Madre de festejado/a (si no es boda)", "", ""],
+    ["honor_witness_name", "Familia", "Testigo de honor (opcional)", "", ""],
+    ["godparents_text", "Familia", "Padrinos (una línea por participación)", "", "Padrinos de honor: Carlos y Ana"],
+    ["ceremony_name", "Ceremonia", "Lugar de ceremonia", "", ""],
+    ["ceremony_address", "Ceremonia", "Dirección de ceremonia", "", ""],
+    ["ceremony_map_url", "Ceremonia", "Enlace de mapa de ceremonia", "", "https://maps.app.goo.gl/..."],
+    ["reception_name", "Recepción", "Lugar de recepción", "", ""],
+    ["reception_address", "Recepción", "Dirección de recepción", "", ""],
+    ["reception_map_url", "Recepción", "Enlace de mapa de recepción", "", "https://maps.app.goo.gl/..."],
+    ["shared_album_enabled", "Funciones", "Activar álbum colaborativo", "No", "Sí o No"],
+    ["whatsapp_number", "Contacto", "WhatsApp de confirmaciones", "", "52 + 10 dígitos, sin espacios"],
+    ["whatsapp_number_secondary", "Contacto", "Segundo WhatsApp (opcional)", "", ""],
+    ["instagram_hashtag", "Cierre", "Hashtag de Instagram (opcional)", "", ""],
+    ["thankYouTitle", "Cierre", "Título de despedida", "", ""],
+    ["thankYouSignature", "Cierre", "Firma de despedida", "", ""],
+    ["thankYouMessage", "Cierre", "Mensaje de despedida", "", ""],
+    ["hashtagSectionTitle", "Cierre", "Título de sección hashtag", "", ""],
+    ["hashtagSectionMessage", "Cierre", "Mensaje para hashtag", "", ""],
+    ["music_title", "Música", "Nombre de canción (opcional)", "", ""],
+    ["music_artist", "Música", "Artista (opcional)", "", ""]
   ];
+  const DIRECT_FIELDS = CLIENT_FIELDS.map(([id]) => id).filter(id => id !== "shared_album_enabled");
 
   function asText(value) {
     return value == null ? "" : String(value).trim();
@@ -56,6 +87,37 @@
       if (key) values.set(key, asText(row[3]));
     });
     return values;
+  }
+
+  function addSheet(workbook, name, rows, widths) {
+    const sheet = window.XLSX.utils.aoa_to_sheet(rows);
+    sheet["!cols"] = widths.map(width => ({ wch: width }));
+    window.XLSX.utils.book_append_sheet(workbook, sheet, name);
+  }
+
+  function downloadClientIntake() {
+    if (!window.XLSX) throw new Error("No fue posible preparar el formulario. Revisa tu conexión e inténtalo de nuevo.");
+    const workbook = window.XLSX.utils.book_new();
+    addSheet(workbook, "Instrucciones", [
+      ["Formulario de datos · Invitación digital Invitta"],
+      [""],
+      ["1. En Datos, llena únicamente la columna Respuesta. No modifiques Clave."],
+      ["2. Usa AAAA-MM-DD para fecha y HH:MM para hora."],
+      ["3. Completa Itinerario, Hospedaje y Regalos sólo si aplican."],
+      ["4. Conserva el archivo en formato .xlsx y envíalo de vuelta a tu asesor."],
+      ["5. Las fotos, música y diseño se cargan por separado en Invitta Studio."]
+    ], [100]);
+    addSheet(workbook, "Datos", [["Clave", "Sección", "Campo", "Respuesta", "Ejemplo o formato"], ...CLIENT_FIELDS], [26, 18, 38, 45, 36]);
+    addSheet(workbook, "Itinerario", [["Hora", "Actividad"], ...Array.from({ length: 10 }, () => ["", ""])], [18, 54]);
+    addSheet(workbook, "Hospedaje", [["Activo (Sí/No)", "Nombre", "Teléfono", "Dirección", "Enlace de mapa"], ...Array.from({ length: 3 }, () => ["No", "", "", "", ""])], [18, 30, 20, 42, 42]);
+    addSheet(workbook, "Regalos", [["Opción", "Tipo", "Activo (Sí/No)", "Nombre / banco", "URL / CLABE", "Descripción o indicaciones"], ["1", "Mesa en línea", "No", "", "", ""], ["2", "Mesa en línea", "No", "", "", ""], ["3", "Transferencia", "No", "", "", ""]], [12, 20, 18, 30, 42, 42]);
+    const bytes = window.XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const url = URL.createObjectURL(new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Formulario-Invitta-Cliente.xlsx";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   }
 
   function applyTimeline(workbook) {
@@ -127,10 +189,19 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const button = document.getElementById("import-client-intake");
+    const downloadButton = document.getElementById("download-client-intake");
     const input = document.getElementById("client-intake-file");
     if (!button || !input) return;
 
     button.addEventListener("click", () => input.click());
+    downloadButton?.addEventListener("click", () => {
+      try {
+        downloadClientIntake();
+      } catch (error) {
+        console.error("[Invitta Intake]", error);
+        showMessage(error.message || "No se pudo crear el formulario.", "error");
+      }
+    });
     input.addEventListener("change", async () => {
       const [file] = input.files || [];
       input.value = "";
