@@ -211,7 +211,7 @@
           <td>${escapeHtml(getGuestCompanions(g))}</td>
           <td>${escapeHtml(getGuestTable(g))}</td>
           <td>${isVipEvent()
-            ? (isConfirmed(g) ? `<button class="qr-btn" type="button" data-action="view-qr" data-guest-id="${escapeHtml(g.id)}">Ver QR</button>` : '<span style="color:#A09A94;font-size:0.85rem;">No disp.</span>')
+            ? (getGuestToken(g) ? `<button class="qr-btn" type="button" data-action="view-qr" data-guest-id="${escapeHtml(g.id)}">Ver QR</button>` : '<span style="color:#A09A94;font-size:0.85rem;">No disp.</span>')
             : '<span style="color:#A09A94;font-size:0.85rem;">Solo VIP</span>'}</td>
         </tr>`;
     }).join('');
@@ -436,14 +436,22 @@
         return null;
       }
       const qrSize = Math.max(120, Math.min(220, imageEl.clientWidth || 220));
-      new window.QRCode(imageEl, {
-        text: qr.checkinUrl,
-        width: qrSize,
-        height: qrSize,
-        colorDark: '#171411',
-        colorLight: '#ffffff',
-        correctLevel: window.QRCode.CorrectLevel.H
-      });
+      try {
+        new window.QRCode(imageEl, {
+          text: qr.checkinUrl,
+          width: qrSize,
+          height: qrSize,
+          colorDark: '#171411',
+          colorLight: '#ffffff',
+          // Medium correction reliably fits the authenticated invitation URL.
+          correctLevel: window.QRCode.CorrectLevel.M
+        });
+      } catch (error) {
+        console.error('[Invitta QR] No fue posible generar el codigo QR.', error);
+        imageEl.innerHTML = '';
+        imageEl.style.display = 'none';
+        return null;
+      }
     }
 
     if (tokenId) {
