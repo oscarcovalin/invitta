@@ -10,24 +10,13 @@ interface HotelSuggestion {
   mapsUrl: string;
 }
 
-const HOTEL_SUGGESTIONS: HotelSuggestion[] = [
-  {
-    id: "hotel-1",
-    name: "Quinta Real Hotel & Gran Reserva",
-    phone: "+52 (449) 910-3000",
-    address: "Av. Aguascalientes Sur 601, Jardines de la Asunción",
-    mapsUrl: "https://maps.google.com/?q=Quinta+Real+Aguascalientes"
-  },
-  {
-    id: "hotel-2",
-    name: "Aria Boutique Hotel & Gardens",
-    phone: "+52 (449) 915-4500",
-    address: "Paseo de las Garzas 102, Campestre Norte",
-    mapsUrl: "https://maps.google.com/?q=Aria+Boutique+Hotel"
-  }
-];
+declare global { interface Window { INVITATION_DATA?: { lodgingOptions?: HotelSuggestion[] }; } }
 
 export function LodgingSuggestions() {
+  const hotels = Array.isArray(window.INVITATION_DATA?.lodgingOptions)
+    ? window.INVITATION_DATA.lodgingOptions.filter((hotel) => hotel?.name)
+    : [];
+  if (!hotels.length) return null;
   return (
     <section id="lodging" className="py-24 px-margin-mobile bg-surface-container-low/20 relative overflow-hidden border-t border-b border-outline-variant/15">
       {/* Soft elegance backgrounds */}
@@ -55,7 +44,7 @@ export function LodgingSuggestions() {
 
         {/* Hotels Grid - exactly 2 places */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {HOTEL_SUGGESTIONS.map((hotel, i) => (
+          {hotels.map((hotel, i) => (
             <motion.div
               key={hotel.id}
               initial={{ opacity: 0, y: 45, filter: "blur(6px)" }}
@@ -77,17 +66,17 @@ export function LodgingSuggestions() {
                   </div>
 
                   {/* Contact Info */}
-                  <div className="flex items-center gap-2.5 text-on-surface-variant">
+                  {hotel.phone && <div className="flex items-center gap-2.5 text-on-surface-variant">
                     <Phone className="w-4 h-4 text-sage flex-shrink-0" />
                     <a href={`tel:${hotel.phone.replace(/[^0-9+]/g, "")}`} className="hover:underline hover:text-ink font-medium">
                       {hotel.phone}
                     </a>
-                  </div>
+                  </div>}
                 </div>
               </div>
 
               {/* Action button footer */}
-              <div className="pt-8">
+              {hotel.mapsUrl && <div className="pt-8">
                 <a
                   href={hotel.mapsUrl}
                   target="_blank"
@@ -97,7 +86,7 @@ export function LodgingSuggestions() {
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>CÓMO LLEGAR (MAPS)</span>
                 </a>
-              </div>
+              </div>}
             </motion.div>
           ))}
         </div>

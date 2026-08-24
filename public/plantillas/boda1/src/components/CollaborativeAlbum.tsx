@@ -11,33 +11,8 @@ interface AlbumPhoto {
   likes: number;
 }
 
-// Beautiful initial seed photos representing a premium elegant Quinceañera celebration
-const SEED_PHOTOS: AlbumPhoto[] = [
-  {
-    id: "seed-1",
-    src: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=600",
-    guestName: "Familia Zavala",
-    message: "¡La ceremonia estuvo hermosa! Muy orgullosos de ustedes, Ana Camila y Carlos.",
-    timestamp: "12/07/2026, 17:45 P.M.",
-    likes: 8
-  },
-  {
-    id: "seed-2",
-    src: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=600",
-    guestName: "Mariana Rojas",
-    message: "¡Qué bonita boda! El primer baile de esposos me hizo llorar. ¡Felicidades! 🎉",
-    timestamp: "12/07/2026, 20:50 P.M.",
-    likes: 15
-  },
-  {
-    id: "seed-3",
-    src: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=600",
-    guestName: "Santiago & Sofía",
-    message: "Brindando por su amor eterno en este día tan especial. ¡A disfrutar la noche!",
-    timestamp: "12/07/2026, 21:15 P.M.",
-    likes: 12
-  }
-];
+type InvitationData = { invitationSlug?: string; guestToken?: string; guestName?: string; sharedAlbumEnabled?: boolean };
+declare global { interface Window { INVITATION_DATA?: InvitationData; } }
 
 export function CollaborativeAlbum() {
   const [photos, setPhotos] = useState<AlbumPhoto[]>([]);
@@ -54,34 +29,17 @@ export function CollaborativeAlbum() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load photos from localStorage and combine with seed photos
   useEffect(() => {
-    const saved = localStorage.getItem("collaborative_album_photos");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setPhotos([...parsed, ...SEED_PHOTOS]);
-      } catch (e) {
-        console.error("Error reading collaborative album photos", e);
-        setPhotos(SEED_PHOTOS);
-      }
-    } else {
-      setPhotos(SEED_PHOTOS);
-    }
-
-    const savedLikes = localStorage.getItem("collaborative_album_likes");
-    if (savedLikes) {
-      try {
-        setLikedPhotos(JSON.parse(savedLikes));
-      } catch (e) {}
-    }
+    const slug = window.INVITATION_DATA?.invitationSlug;
+    if (!slug || !window.INVITATION_DATA?.sharedAlbumEnabled) return;
+    fetch(`/api/shared-album?slug=${encodeURIComponent(slug)}`)
+      .then((response) => response.ok ? response.json() : { photos: [] })
+      .then((payload) => setPhotos((payload.photos || []).map((photo: any) => ({
+        id: photo.id, src: photo.src, guestName: photo.guestName, message: photo.message,
+        timestamp: new Date(photo.createdAt).toLocaleString("es-MX"), likes: 0
+      }))))
+      .catch(() => setPhotos([]));
   }, []);
-
-  const savePhotosToStorage = (updatedPhotos: AlbumPhoto[]) => {
-    // We only save custom uploaded photos to localStorage to avoid duplicating seed photos
-    const customPhotos = updatedPhotos.filter(p => !p.id.startsWith("seed-"));
-    localStorage.setItem("collaborative_album_photos", JSON.stringify(customPhotos));
-  };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -121,57 +79,30 @@ export function CollaborativeAlbum() {
     }
   };
 
-  const handleUploadSubmit = (e: React.FormEvent) => {
+  const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!previewUrl || !selectedFile) return;
-
+    const invitation = window.INVITATION_DATA || {};
+    if (!invitation.guestToken || !invitation.invitationSlug) {
+      alert("Abre tu enlace personalizado de invitado para compartir una foto.");
+      return;
+    }
     setUploading(true);
-    setUploadProgress(10);
-
-    // Beautiful simulated premium upload animation
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 95) {
-          clearInterval(interval);
-          return 95;
-        }
-        return prev + 15;
+    setUploadProgress(30);
+    try {
+      const response = await fetch("/api/shared-album", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: invitation.invitationSlug, guestToken: invitation.guestToken,
+          guestName: guestName.trim() || invitation.guestName || "Invitado", message: photoMessage.trim(),
+          mimeType: selectedFile.type, fileBase64: previewUrl })
       });
-    }, 150);
-
-    setTimeout(() => {
-      clearInterval(interval);
-      setUploadProgress(100);
-
-      setTimeout(() => {
-        const newPhoto: AlbumPhoto = {
-          id: "custom-" + Date.now(),
-          src: previewUrl,
-          guestName: guestName.trim() || "Invitado Especial",
-          message: photoMessage.trim() || undefined,
-          timestamp: new Date().toLocaleString("es-MX", { 
-            hour: "2-digit", 
-            minute: "2-digit",
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-          }) + " P.M.",
-          likes: 0
-        };
-
-        const updated = [newPhoto, ...photos];
-        setPhotos(updated);
-        savePhotosToStorage(updated);
-
-        // Reset state
-        setUploading(false);
-        setUploadProgress(0);
-        setSelectedFile(null);
-        setPreviewUrl(null);
-        setGuestName("");
-        setPhotoMessage("");
-      }, 400);
-    }, 1200);
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "No fue posible subir la foto.");
+      setPhotos((current) => [{ id: payload.photo.id, src: payload.photo.src, guestName: payload.photo.guestName,
+        message: payload.photo.message, timestamp: new Date(payload.photo.createdAt).toLocaleString("es-MX"), likes: 0 }, ...current]);
+      setSelectedFile(null); setPreviewUrl(null); setPhotoMessage(""); setUploadProgress(100);
+    } catch (error: any) { alert(error.message || "No fue posible subir la foto."); }
+    finally { setUploading(false); setUploadProgress(0); }
   };
 
   const handleLike = (id: string, e: React.MouseEvent) => {
@@ -188,16 +119,6 @@ export function CollaborativeAlbum() {
       return photo;
     });
     setPhotos(updated);
-    savePhotosToStorage(updated);
-  };
-
-  const handleDelete = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (confirm("¿Estás seguro de que deseas eliminar esta fotografía del álbum colaborativo?")) {
-      const updated = photos.filter(p => p.id !== id);
-      setPhotos(updated);
-      savePhotosToStorage(updated);
-    }
   };
 
   const copyLink = () => {
@@ -211,6 +132,8 @@ export function CollaborativeAlbum() {
   const triggerSelectFile = () => {
     fileInputRef.current?.click();
   };
+
+  if (!window.INVITATION_DATA?.sharedAlbumEnabled) return null;
 
   return (
     <section id="collaborative-album" className="py-24 px-margin-mobile bg-paper relative overflow-hidden">
@@ -257,70 +180,20 @@ export function CollaborativeAlbum() {
 
             <div className="space-y-6 relative z-10 text-center lg:text-left">
               <span className="text-[10px] tracking-[0.3em] uppercase text-champagne-gold font-bold block">
-                Escanea y Comparte
+                Recuerdos compartidos
               </span>
               <h3 className="font-serif text-2xl md:text-3xl text-ink font-light leading-snug">
-                Sube fotos en vivo desde tu celular
+                Comparte fotos desde tu pase
               </h3>
               <p className="text-on-surface-variant/80 text-xs leading-relaxed font-sans font-light">
-                Escanea este código QR directamente en la fiesta para acceder al álbum compartido y subir tus fotografías al instante. ¡Creemos juntos un recuerdo eterno!
+                Abre tu enlace personalizado de invitado y comparte tus fotografías. Así cada recuerdo queda asociado al evento correcto.
               </p>
             </div>
 
-            {/* QR Code Graphic Frame */}
             <div className="my-8 flex justify-center items-center relative z-10">
-              <div className="p-4 bg-white/95 rounded-sm shadow-xl border-4 border-champagne-gold/30 flex flex-col items-center gap-2 relative">
-                {/* Micro gold corner tags */}
-                <div className="absolute -top-1.5 -left-1.5 w-4 h-4 border-t-2 border-l-2 border-champagne-gold"></div>
-                <div className="absolute -top-1.5 -right-1.5 w-4 h-4 border-t-2 border-r-2 border-champagne-gold"></div>
-                <div className="absolute -bottom-1.5 -left-1.5 w-4 h-4 border-b-2 border-l-2 border-champagne-gold"></div>
-                <div className="absolute -bottom-1.5 -right-1.5 w-4 h-4 border-b-2 border-r-2 border-champagne-gold"></div>
-
-                {/* Handcrafted Golden SVG QR Code */}
-                <svg viewBox="0 0 100 100" className="w-40 h-40" fill="#1a0c17">
-                  {/* Position detection patterns (top-left, top-right, bottom-left) */}
-                  <rect x="0" y="0" width="30" height="30" fill="#1a0c17" rx="2" />
-                  <rect x="5" y="5" width="20" height="20" fill="#fff" rx="1" />
-                  <rect x="10" y="10" width="10" height="10" fill="#eac88b" rx="1" />
-
-                  <rect x="70" y="0" width="30" height="30" fill="#1a0c17" rx="2" />
-                  <rect x="75" y="5" width="20" height="20" fill="#fff" rx="1" />
-                  <rect x="80" y="10" width="10" height="10" fill="#eac88b" rx="1" />
-
-                  <rect x="0" y="70" width="30" height="30" fill="#1a0c17" rx="2" />
-                  <rect x="5" y="75" width="20" height="20" fill="#fff" rx="1" />
-                  <rect x="10" y="80" width="10" height="10" fill="#eac88b" rx="1" />
-
-                  {/* Randomized realistic QR patterns representing a custom URL */}
-                  <rect x="40" y="0" width="10" height="10" fill="#eac88b" />
-                  <rect x="50" y="10" width="10" height="10" fill="#1a0c17" />
-                  <rect x="40" y="20" width="10" height="10" fill="#1a0c17" />
-                  <rect x="55" y="20" width="10" height="10" fill="#eac88b" />
-
-                  <rect x="0" y="40" width="10" height="10" fill="#eac88b" />
-                  <rect x="10" y="50" width="10" height="10" fill="#1a0c17" />
-                  <rect x="20" y="40" width="10" height="10" fill="#eac88b" />
-
-                  <rect x="70" y="40" width="10" height="10" fill="#eac88b" />
-                  <rect x="80" y="50" width="10" height="10" fill="#1a0c17" />
-                  <rect x="90" y="40" width="10" height="10" fill="#eac88b" />
-                  
-                  <rect x="40" y="40" width="20" height="20" fill="#1a0c17" rx="1" />
-                  <rect x="45" y="45" width="10" height="10" fill="#fff" rx="0.5" />
-
-                  <rect x="40" y="70" width="10" height="10" fill="#eac88b" />
-                  <rect x="50" y="80" width="10" height="10" fill="#1a0c17" />
-                  <rect x="40" y="90" width="10" height="10" fill="#1a0c17" />
-                  <rect x="55" y="90" width="10" height="10" fill="#eac88b" />
-
-                  <rect x="80" y="80" width="15" height="15" fill="#eac88b" />
-                  <rect x="85" y="85" width="5" height="5" fill="#1a0c17" />
-                </svg>
-
-                {/* Micro emblem in the middle or bottom */}
-                <span className="text-[8px] tracking-[0.1em] font-serif uppercase text-[#9c5d72] font-bold">
-                  Ana Camila &amp; Carlos • Boda
-                </span>
+              <div className="p-8 bg-paper rounded-sm shadow-xl border border-champagne-gold/30 text-center">
+                <Camera className="w-10 h-10 text-champagne-gold mx-auto mb-3" />
+                <span className="text-[9px] tracking-[0.18em] font-serif uppercase text-sage font-bold">Tu invitación es tu acceso</span>
               </div>
             </div>
 
@@ -534,7 +407,6 @@ export function CollaborativeAlbum() {
                 className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
               >
                 {photos.map((photo) => {
-                  const isCustom = photo.id.startsWith("custom-");
                   const isLiked = !!likedPhotos[photo.id];
 
                   return (
@@ -567,16 +439,6 @@ export function CollaborativeAlbum() {
                           </span>
                         </div>
 
-                        {/* Top corner customized delete key if is custom */}
-                        {isCustom && (
-                          <button
-                            onClick={(e) => handleDelete(photo.id, e)}
-                            className="absolute top-2 right-2 bg-black/60 hover:bg-red-900/90 p-2 text-white rounded-full transition-all duration-300 z-10 cursor-pointer"
-                            title="Eliminar de mi galería local"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
                       </div>
 
                       {/* Photo details block */}
