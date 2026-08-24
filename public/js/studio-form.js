@@ -190,13 +190,25 @@ function updateWeddingNameFields() {
   const weddingParents = document.getElementById("wedding-parents-fields");
   const generalParents = document.getElementById("general-parents-fields");
 
-  if (coupleFields) coupleFields.hidden = !isWedding;
-  if (legacyField) legacyField.hidden = isWedding;
+  if (coupleFields) {
+    coupleFields.hidden = !isWedding;
+    coupleFields.style.display = isWedding ? "" : "none";
+  }
+  if (legacyField) {
+    legacyField.hidden = isWedding;
+    legacyField.style.display = isWedding ? "none" : "";
+  }
   if (bride) bride.required = isWedding;
   if (groom) groom.required = isWedding;
 
-  if (weddingParents) weddingParents.hidden = !isWedding;
-  if (generalParents) generalParents.hidden = isWedding;
+  if (weddingParents) {
+    weddingParents.hidden = !isWedding;
+    weddingParents.style.display = isWedding ? "" : "none";
+  }
+  if (generalParents) {
+    generalParents.hidden = isWedding;
+    generalParents.style.display = isWedding ? "none" : "";
+  }
 
   if (isWedding && combined) combined.value = getWeddingCoupleName();
 }
