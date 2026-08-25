@@ -8,7 +8,6 @@ import {
   Heart, 
   ExternalLink, 
   ChevronRight, 
-  Lock, 
   Music, 
   Menu, 
   X,
@@ -30,7 +29,6 @@ import MusicPlayer from './components/MusicPlayer';
 import CountdownTimer from './components/CountdownTimer';
 import RegistryModal from './components/RegistryModal';
 import RsvpForm from './components/RsvpForm';
-import AdminDashboard from './components/AdminDashboard';
 import GalleryLightbox from './components/GalleryLightbox';
 import { InvitationExtras } from '../../shared/InvitationExtras';
 
@@ -58,7 +56,6 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
   const [selectedRegistry, setSelectedRegistry] = useState<RegistryOption | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [rsvpRefreshKey, setRsvpRefreshKey] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -851,16 +848,6 @@ export default function App() {
           </button>
         </div>
 
-        {/* Administration portal trigger */}
-        <div className="pt-4 border-t border-outline-variant/10 w-full max-w-xs flex flex-col items-center gap-2">
-          <button
-            onClick={() => setIsAdminOpen(true)}
-            className="inline-flex items-center gap-2 text-[10px] font-sans tracking-[0.2em] text-secondary hover:text-sage transition-colors uppercase font-semibold"
-          >
-            <Lock size={10} /> ACCESO ORGANIZADORES
-          </button>
-        </div>
-
         {/* Copyright notice */}
         <div className="space-y-1">
           <p className="font-sans text-[9px] text-on-surface-variant/50 uppercase tracking-[0.25em] font-light">
@@ -927,13 +914,6 @@ export default function App() {
           currentIndex={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
           onSelectIndex={(idx) => setLightboxIndex(idx)}
-        />
-      )}
-
-      {/* 3. Passcode-Protected Admin RSVP Dashboard */}
-      {isAdminOpen && (
-        <AdminDashboard 
-          onClose={() => setIsAdminOpen(false)} 
         />
       )}
 

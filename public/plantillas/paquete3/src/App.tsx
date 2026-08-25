@@ -4,7 +4,6 @@ import confetti from "canvas-confetti";
 import { RSVP, GiftRegistryOption } from "./types";
 import { Countdown } from "./components/Countdown";
 import { GiftRegistryModal } from "./components/GiftRegistryModal";
-import { RsvpAdmin } from "./components/RsvpAdmin";
 import { MusicPlayer } from "./components/MusicPlayer";
 import { ParallaxImage } from "./components/ParallaxImage";
 import { FloatingParticles } from "./components/FloatingParticles";
@@ -91,7 +90,6 @@ export default function App() {
 
   // Navigation & UI States
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("invite");
   
   // Gift Registry Modal State
@@ -1700,19 +1698,6 @@ export default function App() {
         
 
 
-        {/* Locked Admin Dashboard Trigger */}
-        <div className="pt-2 flex flex-col items-center gap-3">
-          <button 
-            onClick={() => setIsAdminOpen(true)}
-            id="admin-dashboard-footer-trigger"
-            className="inline-flex items-center gap-2 text-[9px] tracking-[0.25em] text-sage hover:text-ink transition-colors uppercase font-bold"
-            title="Acceso exclusivo para organizadores del evento"
-          >
-            <span className="material-symbols-outlined text-sm font-semibold">lock_open</span>
-            Buzón de Confirmación Administrador
-          </button>
-        </div>
-
         <p className="text-[10px] text-on-surface-variant/50 uppercase tracking-[0.3em] font-light text-center">
           © 2026 INVITTA DIGITAL ATELIER. TODOS LOS DERECHOS RESERVADOS.
         </p>
@@ -1755,17 +1740,6 @@ export default function App() {
         <GiftRegistryModal 
           registry={selectedRegistry}
           onClose={() => setSelectedRegistry(null)}
-        />
-      )}
-
-      {/* Secret RSVP Admin Dashboard panel modal */}
-      {isAdminOpen && (
-        <RsvpAdmin 
-          isOpen={isAdminOpen}
-          onClose={() => setIsAdminOpen(false)}
-          rsvps={rsvps}
-          onDeleteRsvp={handleDeleteRsvp}
-          onClearAll={handleClearAllRsvps}
         />
       )}
 
