@@ -495,11 +495,15 @@
       document.head.appendChild(style);
     }
 
-    // Midnight Gold renders each member of the couple in a separate span. Its
-    // date must follow the complete couple block, not the first member.
-    var isMidnightWedding = templateId === "boda-midnight-gold-vip" && isWedding;
-    var midnightCouple = isMidnightWedding ? document.querySelector("#hero h2[data-invitta-midnight-couple]") : null;
-    var coverName = midnightCouple || Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
+    // Both premium wedding covers render each member of the couple in separate
+    // spans. Anchor editorial metadata to the complete heading so the date can
+    // never be inserted between the bride and groom.
+    var usesSplitWeddingHero = isWedding && (
+      templateId === "boda-midnight-gold-vip" ||
+      templateId === "boda-golden-romance-premium"
+    );
+    var splitWeddingCouple = usesSplitWeddingHero ? document.querySelector("#hero h2.font-display") : null;
+    var coverName = splitWeddingCouple || Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
       return element.offsetParent !== null;
     });
     if (!coverName) return;
@@ -585,7 +589,10 @@
       style.id = "invitta-midnight-couple-layout";
       style.textContent = [
         "#hero h2[data-invitta-midnight-couple]{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:clamp(.12rem,1vw,.4rem)!important;max-width:100%!important;}",
-        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]{display:block!important;margin:0!important;max-width:100%!important;overflow-wrap:anywhere!important;text-wrap:balance!important;}",
+        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]{display:block!important;max-width:100%!important;overflow-wrap:anywhere!important;text-wrap:balance!important;}",
+        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(1){margin:0!important;}",
+        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(2){margin:0 0 0 clamp(1rem,6vw,2.25rem)!important;max-width:calc(100% - clamp(1rem,6vw,2.25rem))!important;}",
+        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(3){margin:0 0 0 clamp(2.5rem,14vw,5.25rem)!important;max-width:calc(100% - clamp(2.5rem,14vw,5.25rem))!important;}",
         "@media(max-width:767px){#hero h2[data-invitta-midnight-couple]{gap:.2rem!important;line-height:1!important;}#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(1),#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(3){font-size:clamp(2.55rem,12.4vw,3.2rem)!important;line-height:.96!important;letter-spacing:-.035em!important;}#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(2){font-size:clamp(2rem,10vw,2.8rem)!important;line-height:.8!important;}}"
       ].join("");
       document.head.appendChild(style);
