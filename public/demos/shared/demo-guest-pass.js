@@ -174,10 +174,22 @@
     });
   }
 
+  function hideLegacyDemoAdmin() {
+    Array.from(document.querySelectorAll("a, button")).forEach(function (element) {
+      var label = ((element.textContent || "") + " " + (element.id || "")).replace(/\s+/g, " ").trim();
+      if (!/(?:acceso organizadores|buz[oó]n de confirmaci[oó]n administrador|admin-dashboard-footer-trigger)/i.test(label)) return;
+
+      var wrapper = element.parentElement;
+      element.remove();
+      if (wrapper && !wrapper.textContent.trim() && wrapper.children.length === 0) wrapper.remove();
+    });
+  }
+
   function render() {
     if (!document.body) return false;
 
     removeDuplicateLocationCalendarLinks();
+    hideLegacyDemoAdmin();
 
     var data = guestData();
     var anchor = findRsvpSection();

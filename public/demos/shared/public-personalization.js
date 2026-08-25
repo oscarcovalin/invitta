@@ -2180,6 +2180,59 @@
     }, "*");
   }
 
+  function rsvpAttendance(form) {
+    var selected = form.querySelector('input[type="radio"]:checked');
+    if (!selected) return null;
+
+    var context = [
+      selected.value,
+      selected.name,
+      (selected.closest("label") || {}).textContent,
+      (selected.parentElement || {}).textContent
+    ].join(" ");
+    return /no\s+(?:podr|asist|voy)|declin|cancel/i.test(context) ? false : true;
+  }
+
+  function installRsvpFormBridge() {
+    function setStatus(form, message, isError) {
+      var status = form.querySelector("[data-invitta-rsvp-status]");
+      if (!status) {
+        status = document.createElement("p");
+        status.dataset.invittaRsvpStatus = "true";
+        status.setAttribute("role", "status");
+        status.style.cssText = "margin:14px 0 0;text-align:center;font-size:.9rem;line-height:1.4;";
+        form.appendChild(status);
+      }
+      status.style.color = isError ? "#a9413c" : "inherit";
+      status.textContent = message;
+    }
+
+    document.addEventListener("submit", function (event) {
+      var form = event.target;
+      if (!form || form.tagName !== "FORM" || !data.guestToken || window.parent === window) return;
+
+      var rsvpSection = form.closest("#rsvp, [id*='rsvp' i], [id*='confirm' i], [data-section='rsvp'], [data-section='confirmation']");
+      if (!rsvpSection) return;
+
+      var attending = rsvpAttendance(form);
+      if (attending === null) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      form.dataset.invittaRsvpPending = "true";
+      setStatus(form, "Registrando tu confirmación…", false);
+      reportRsvp(attending);
+    }, true);
+
+    window.addEventListener("message", function (event) {
+      if (event.source !== window.parent || !event.data || event.data.type !== "invitta:rsvp-result") return;
+      var form = document.querySelector("form[data-invitta-rsvp-pending]");
+      if (!form) return;
+      delete form.dataset.invittaRsvpPending;
+      setStatus(form, event.data.ok ? "Tu confirmación fue registrada." : (event.data.error || "No se pudo registrar la confirmación."), !event.data.ok);
+    });
+  }
+
   function hideLegacyGuestAdmin() {
     try {
       window.localStorage.removeItem("invitta_rsvps");
@@ -2191,7 +2244,7 @@
     }
 
     document.querySelectorAll("a, button").forEach(function (element) {
-      if (/^(ADMIN|PANEL DE (CONTROL|INVITADOS)|BUZ[OÓ]N RSVP|BUZ[OÓ]N DE CONFIRMACIONES|INGRESAR AL PANEL)$/i.test((element.textContent || "").trim())) {
+      if (/^(ADMIN|PANEL DE (CONTROL|INVITADOS)|BUZ[OÓ]N RSVP|BUZ[OÓ]N DE CONFIRMACIONES|BUZ[OÓ]N DE CONFIRMACI[OÓ]N ADMINISTRADOR|ACCESO ORGANIZADORES|INGRESAR AL PANEL)$/i.test((element.textContent || "").trim())) {
         element.style.display = "none";
       }
     });
@@ -3207,6 +3260,7 @@
     applyVipAccessPass();
     applyConfirmationContacts();
     markAccessibleActions();
+    installRsvpFormBridge();
     hideLegacyGuestAdmin();
     restoreCanonicalNameCasing();
     applyPlumNoirWeddingAdapter();
