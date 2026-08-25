@@ -528,14 +528,14 @@
       existingDate.textContent = dateText;
       existingDate.dataset.invittaEditorialDate = "true";
       if (!existingDate.dataset.invittaFontRole) existingDate.dataset.invittaFontRole = "label";
-      if (midnightCouple && existingDate.previousElementSibling !== midnightCouple) {
-        midnightCouple.insertAdjacentElement("afterend", existingDate);
+      if (splitWeddingCouple && existingDate.previousElementSibling !== splitWeddingCouple) {
+        splitWeddingCouple.insertAdjacentElement("afterend", existingDate);
       }
       return;
     }
 
     // Some React templates omit a hero date entirely. Add only that missing
-    // datum directly after the real name; never duplicate an existing date.
+    // datum directly after the complete real name block; never duplicate it.
     var date = document.createElement("p");
     date.className = "invitta-editorial-cover-date";
     date.dataset.invittaEditorialDate = "true";
