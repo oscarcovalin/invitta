@@ -4,4 +4,7 @@ node_modules/
 !.env.example
 .vercel/
 
+# Supabase CLI connection metadata may contain local connection details.
+supabase/.temp/
+
 dist/
