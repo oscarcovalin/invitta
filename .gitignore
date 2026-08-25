@@ -6,5 +6,6 @@ node_modules/
 
 # Supabase CLI connection metadata may contain local connection details.
 supabase/.temp/
+supabase/.branches/
 
 dist/
