@@ -500,10 +500,14 @@
     // spans. Anchor editorial metadata to the complete heading so the date can
     // never be inserted between the bride and groom.
     var usesSplitWeddingHero = isWedding && (
+      templateId === "boda-classic-basic" ||
       templateId === "boda-midnight-gold-vip" ||
       templateId === "boda-golden-romance-premium"
     );
-    var splitWeddingCouple = usesSplitWeddingHero ? document.querySelector("#hero h2.font-display") : null;
+    var splitWeddingSelector = templateId === "boda-classic-basic"
+      ? "#hero h2.font-serif"
+      : "#hero h2.font-display";
+    var splitWeddingCouple = usesSplitWeddingHero ? document.querySelector(splitWeddingSelector) : null;
     var coverName = splitWeddingCouple || Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
       return element.offsetParent !== null;
     });
