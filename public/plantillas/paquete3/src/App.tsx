@@ -588,11 +588,11 @@ export default function App() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full md:w-5/12 flex flex-col justify-center items-start px-margin-mobile md:pl-24 z-10 space-y-8 pt-12 md:pt-0"
+            className="w-full md:w-5/12 flex flex-col justify-center items-start px-6 md:px-0 md:pl-24 z-10 space-y-8 pt-12 md:pt-0"
           >
             <span className="text-subheading-caps text-sage tracking-[0.4em] font-medium">Mis Quince Años</span>
             
-            <h2 className="font-display text-ink uppercase flex flex-col select-none">
+            <h2 className="w-full max-w-full font-display text-ink uppercase flex flex-col select-none">
               <span className="block text-5xl md:text-7xl font-light leading-none tracking-tight">Ana</span>
               <span className="block md:ml-12 italic text-sage text-6xl md:text-8xl font-normal leading-none my-1">Camila</span>
               <span className="block md:ml-24 text-5xl md:text-7xl font-light leading-none tracking-tight">Zavala</span>
