@@ -1,5 +1,3 @@
 
-[db.migrations]
-schema_paths = [
-  "schemas",
-]
+# The active database source is the timestamped baseline in migrations/.
+# legacy-migrations/ and legacy-schema-baseline/ are audit references only.
