@@ -467,6 +467,7 @@
     // in parents, RSVP or the closing never inherit the cover scale.
     Array.from(document.querySelectorAll("h1,h2,h3,span")).forEach(function(element) {
       if (element.dataset.invittaMidnightCouplePiece === "true") return;
+      if (element.tagName === "SPAN" && element.closest("[data-invitta-split-name='true']")) return;
       var visible = clean(element.textContent);
       var isExactFullName = visible.toLocaleLowerCase() === fullName.toLocaleLowerCase();
       var isHeroNamePart = nameParts.some(function(part) {
@@ -507,7 +508,12 @@
       return element.offsetParent !== null;
     });
     if (!coverName) return;
-    var hero = coverName.closest("#hero,#cover,#portada,#inv-hero,[class*='hero'],[class*='cover']") || coverName.parentElement;
+    // Prefer an explicit hero ancestor. A cover name such as `.hero__name`
+    // also matches `[class*='hero']`; treating that leaf as the container
+    // makes each observer pass append another date beside it.
+    var hero = coverName.closest("#hero,#cover,#portada,#inv-hero") ||
+      (coverName.parentElement && coverName.parentElement.closest("[class*='hero'],[class*='cover']")) ||
+      coverName.parentElement;
     if (!hero) return;
 
     var eventTitle = clean(data.eventTitle).toLocaleLowerCase();
@@ -542,6 +548,31 @@
     date.dataset.invittaFontRole = "label";
     date.textContent = dateText;
     coverName.insertAdjacentElement("afterend", date);
+  }
+
+  function applyRoseGoldXvHeroName() {
+    if (!isTemplate("xv-rose-gold-premium", "xv-premium-2")) return;
+
+    var heading = document.querySelector("#hero h2.font-display");
+    if (!heading) return;
+    var spans = Array.from(heading.children).filter(function(element) {
+      return element.tagName === "SPAN";
+    }).slice(0, 3);
+    if (spans.length < 2) return;
+
+    var parts = personNameParts(data.celebrantName);
+    var values = [parts.first, parts.middle, parts.last];
+    spans.forEach(function(span, index) {
+      var value = values[index] || "";
+      span.textContent = value;
+      span.style.setProperty("display", value ? "block" : "none", "important");
+      span.removeAttribute("data-invitta-cover-name-size");
+      span.dataset.invittaDynamicText = "true";
+    });
+
+    heading.dataset.invittaSplitName = "true";
+    heading.dataset.invittaCoverNameSize = "true";
+    heading.dataset.invittaFontRole = "cover-name";
   }
 
   function applyPlumNoirWeddingAdapter() {
@@ -3270,6 +3301,7 @@
     installRsvpFormBridge();
     hideLegacyGuestAdmin();
     restoreCanonicalNameCasing();
+    applyRoseGoldXvHeroName();
     applyPlumNoirWeddingAdapter();
     applyCoverNameSizing();
     applyEditorialCoverMeta();

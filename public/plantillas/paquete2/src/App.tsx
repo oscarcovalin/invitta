@@ -64,6 +64,22 @@ const invData = (typeof window !== "undefined" && (window as any).INVITATION_DAT
   musicTitle: ""
 };
 
+const roseGoldNameTokens = String(invData.celebrantName || "")
+  .trim()
+  .split(/\s+/)
+  .filter(Boolean);
+const roseGoldLegacyLastName = String(invData.celebrantLastName || "").trim();
+if (roseGoldLegacyLastName && roseGoldNameTokens[roseGoldNameTokens.length - 1] !== roseGoldLegacyLastName) {
+  roseGoldNameTokens.push(roseGoldLegacyLastName);
+}
+const roseGoldHeroName = {
+  first: roseGoldNameTokens[0] || "Nombre",
+  middle: roseGoldNameTokens.length > 2 ? roseGoldNameTokens[1] : "",
+  last: roseGoldNameTokens.length > 1
+    ? roseGoldNameTokens.slice(roseGoldNameTokens.length > 2 ? 2 : 1).join(" ")
+    : ""
+};
+
 const getIcon = (name: string) => {
   switch(name) {
     case "Camera": return Camera;
@@ -652,9 +668,13 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
             <span className="text-subheading-caps text-sage tracking-[0.4em] font-medium">Mis Quince Años</span>
             
             <h2 className="font-display text-ink uppercase flex flex-col select-none">
-              <span className="block text-5xl md:text-7xl font-light leading-none tracking-tight">Mary</span>
-              <span className="block md:ml-12 italic text-sage text-6xl md:text-8xl font-normal leading-none my-1">Carmen</span>
-              <span className="block md:ml-24 text-5xl md:text-7xl font-light leading-none tracking-tight">{invData.celebrantLastName}</span>
+              <span className="block text-5xl md:text-7xl font-light leading-none tracking-tight">{roseGoldHeroName.first}</span>
+              {roseGoldHeroName.middle && (
+                <span className="block md:ml-12 italic text-sage text-6xl md:text-8xl font-normal leading-none my-1">{roseGoldHeroName.middle}</span>
+              )}
+              {roseGoldHeroName.last && (
+                <span className="block md:ml-24 text-5xl md:text-7xl font-light leading-none tracking-tight">{roseGoldHeroName.last}</span>
+              )}
             </h2>
 
             <div className="mt-8 md:mt-16 border-l border-outline-variant/40 pl-6 relative before:absolute before:left-[-1px] before:top-0 before:w-px before:h-12 before:bg-sage">
