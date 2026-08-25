@@ -32,6 +32,7 @@ import RegistryModal from './components/RegistryModal';
 import RsvpForm from './components/RsvpForm';
 import AdminDashboard from './components/AdminDashboard';
 import GalleryLightbox from './components/GalleryLightbox';
+import { InvitationExtras } from '../../shared/InvitationExtras';
 
 // Framer Motion Animation Presets for Quiet Luxury Vibe
 const motionFadeUp = {
@@ -775,6 +776,8 @@ export default function App() {
           </motion.div>
         </section>
 
+        <InvitationExtras />
+
         {/* RSVP FORM SECTION */}
         <section 
           id="rsvp" 
@@ -856,9 +859,6 @@ export default function App() {
           >
             <Lock size={10} /> ACCESO ORGANIZADORES
           </button>
-          <p className="text-[8px] font-sans text-secondary-fixed-dim tracking-wider uppercase font-medium">
-            Demo pass: admin123
-          </p>
         </div>
 
         {/* Copyright notice */}
