@@ -8,6 +8,7 @@ import { RsvpAdmin } from "./components/RsvpAdmin";
 import { MusicPlayer } from "./components/MusicPlayer";
 import { ParallaxImage } from "./components/ParallaxImage";
 import { FloatingParticles } from "./components/FloatingParticles";
+import { InvitationExtras } from "../../shared/InvitationExtras";
 import { Camera, Church, GlassWater, Sparkles, Heart, Music } from "lucide-react";
 import royalHero from "./assets/royal-hero.png";
 import royalGallery01 from "./assets/royal-gallery-01.png";
@@ -1110,6 +1111,8 @@ const galleryImages = (invData.galleryUrls && invData.galleryUrls.length > 0) ? 
 
           </div>
         </section>
+
+        <InvitationExtras />
 
         {/* VISUAL ITINERARY SECTION */}
         <section id="itinerary" className="py-28 px-margin-mobile bg-[#fffcfb] relative overflow-hidden border-t border-b border-outline-variant/10">

@@ -9,8 +9,7 @@ import { MusicPlayer } from "./components/MusicPlayer";
 import { ParallaxImage } from "./components/ParallaxImage";
 import { FloatingParticles } from "./components/FloatingParticles";
 import { DigitalEnvelope } from "./components/DigitalEnvelope";
-import { CollaborativeAlbum } from "./components/CollaborativeAlbum";
-import { LodgingSuggestions } from "./components/LodgingSuggestions";
+import { InvitationExtras } from "../../shared/InvitationExtras";
 import { Camera, Church, GlassWater, Sparkles, Heart, Music, ShoppingBag, Gift, Landmark, Mail } from "lucide-react";
 import champagneHero from "./assets/champagne-hero.png";
 import champagneGallery02 from "./assets/champagne-gallery-02.png";
@@ -1063,8 +1062,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* COLLABORATIVE GUEST ALBUM WITH INTEGRATED QR CODE */}
-        <CollaborativeAlbum />
+        <InvitationExtras />
 
         {/* VISUAL ITINERARY SECTION */}
         <section id="itinerary" className="py-28 px-margin-mobile bg-[#fffcfb] relative overflow-hidden border-t border-b border-outline-variant/10">
@@ -1224,9 +1222,6 @@ export default function App() {
             </div>
           </div>
         </section>
-
-        {/* LODGING / HOTEL RECOMMENDATIONS */}
-        <LodgingSuggestions />
 
         {/* RSVP CONFIRMATION FORM */}
         <section id="rsvp" className="py-section-gap px-margin-mobile bg-paper relative">
