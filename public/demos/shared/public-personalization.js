@@ -575,6 +575,37 @@
     heading.dataset.invittaFontRole = "cover-name";
   }
 
+  function applyXvHeroSafety() {
+    var isElegance = isTemplate("xv-elegance-basic", "xv-elegance");
+    var isChampagne = isTemplate("xv-champagne-rose-vip", "xv-vip-3");
+    if (!isElegance && !isChampagne) return;
+
+    if (!document.getElementById("invitta-xv-hero-safety")) {
+      var style = document.createElement("style");
+      style.id = "invitta-xv-hero-safety";
+      style.textContent = [
+        "[data-invitta-xv-hero-quote]{width:100%!important;max-width:15rem!important;padding-right:1rem!important;box-sizing:border-box!important;white-space:normal!important;overflow-wrap:break-word!important;}",
+        "[data-invitta-xv-hero-name]{width:calc(100% - 3rem)!important;max-width:calc(100vw - 3rem)!important;margin-inline:1.5rem!important;box-sizing:border-box!important;}",
+        "[data-invitta-xv-hero-name]>span{max-width:100%!important;overflow-wrap:break-word!important;word-break:normal!important;}",
+        "@media(min-width:768px){[data-invitta-xv-hero-quote]{max-width:24rem!important;padding-right:2rem!important;}}"
+      ].join("");
+      document.head.appendChild(style);
+    }
+
+    if (isElegance) {
+      var expectedQuote = clean(data.quote);
+      var quote = Array.from(document.querySelectorAll("#hero p")).find(function(element) {
+        return expectedQuote && clean(element.textContent) === expectedQuote;
+      });
+      if (quote) quote.dataset.invittaXvHeroQuote = "true";
+    }
+
+    if (isChampagne) {
+      var heading = document.querySelector("#hero h2.font-display");
+      if (heading) heading.dataset.invittaXvHeroName = "true";
+    }
+  }
+
   function applyPlumNoirWeddingAdapter() {
     if (templateId !== "boda-midnight-gold-vip" || !isWedding) return;
     var couple = clean(data.celebrantName)
@@ -3302,6 +3333,7 @@
     hideLegacyGuestAdmin();
     restoreCanonicalNameCasing();
     applyRoseGoldXvHeroName();
+    applyXvHeroSafety();
     applyPlumNoirWeddingAdapter();
     applyCoverNameSizing();
     applyEditorialCoverMeta();

@@ -358,7 +358,7 @@ export default function App() {
               transition={{ duration: 1.2, delay: 0.4 }}
               className="mt-8 md:mt-16 border-l border-outline-variant/30 pl-6 relative before:absolute before:left-[-1px] before:top-0 before:w-px before:h-12 before:bg-sage"
             >
-              <p className="font-serif text-body-md text-on-surface-variant max-w-sm italic leading-relaxed">
+              <p className="w-full max-w-[15rem] md:max-w-sm pr-4 md:pr-8 box-border font-serif text-body-md text-on-surface-variant italic leading-relaxed">
                 {EVENT_DETAILS.quinceanera.quote}
               </p>
             </motion.div>
