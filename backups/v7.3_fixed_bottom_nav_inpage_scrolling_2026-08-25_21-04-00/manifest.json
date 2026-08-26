@@ -1,0 +1,26 @@
+{
+  "label": "v7.3_fixed_bottom_nav_inpage_scrolling",
+  "timestamp": "2026-08-26T03:04:00.344Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 121768
+    },
+    {
+      "filename": "index.html",
+      "size": 97745
+    },
+    {
+      "filename": "app.js",
+      "size": 89043
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
