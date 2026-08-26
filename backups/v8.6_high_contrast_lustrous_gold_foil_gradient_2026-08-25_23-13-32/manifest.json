@@ -1,0 +1,26 @@
+{
+  "label": "v8.6_high_contrast_lustrous_gold_foil_gradient",
+  "timestamp": "2026-08-26T05:13:32.321Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 130600
+    },
+    {
+      "filename": "index.html",
+      "size": 99536
+    },
+    {
+      "filename": "app.js",
+      "size": 89401
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
