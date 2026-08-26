@@ -1,0 +1,26 @@
+{
+  "label": "v5.6_estable",
+  "timestamp": "2026-08-26T00:20:07.684Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 104252
+    },
+    {
+      "filename": "index.html",
+      "size": 70220
+    },
+    {
+      "filename": "app.js",
+      "size": 68493
+    },
+    {
+      "filename": "style.css",
+      "size": 12175
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
