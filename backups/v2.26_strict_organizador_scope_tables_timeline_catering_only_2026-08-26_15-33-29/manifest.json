@@ -1,0 +1,26 @@
+{
+  "label": "v2.26_strict_organizador_scope_tables_timeline_catering_only",
+  "timestamp": "2026-08-26T21:33:29.153Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 199331
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 97840
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

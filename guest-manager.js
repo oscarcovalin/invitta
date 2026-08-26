@@ -760,16 +760,18 @@ class GuestManager {
       edit_invitation_design: ['admin', 'designer'],
       export_invitation_html: ['admin', 'designer'],
 
-      // Operativo Permitido para Organizador / Wedding Planner
+      // Operativo Permitido para Organizador / Wedding Planner (Solo Organización, Cronograma y Catering)
       manage_tables: ['admin', 'planner'],
       edit_guest_assignment: ['admin', 'planner'],
-      dispatch_whatsapp: ['admin', 'planner'],
-      view_guest_phones: ['admin', 'planner'],
-      view_timeline: ['admin', 'designer', 'planner', 'hostess', 'catering'],
+      view_timeline: ['admin', 'planner', 'hostess', 'catering'],
       view_catering: ['admin', 'planner', 'catering'],
-      scan_access_qr: ['admin', 'planner', 'hostess'],
-      create_emergency_pass: ['admin', 'planner', 'hostess'],
-      view_access_metrics: ['admin', 'planner', 'hostess']
+      
+      // Exclusivo Novios
+      dispatch_whatsapp: ['admin'],
+      view_guest_phones: ['admin'],
+      scan_access_qr: ['admin', 'hostess'],
+      create_emergency_pass: ['admin', 'hostess'],
+      view_access_metrics: ['admin', 'hostess']
     };
 
     const allowed = permissions[action] || [];

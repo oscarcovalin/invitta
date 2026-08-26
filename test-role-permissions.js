@@ -54,14 +54,17 @@ assert(gm.canPerformAction('view_guest_phones', 'designer') === false, 'Designer
 assert(gm.canPerformAction('reset_database', 'designer') === false, 'Designer CANNOT reset database (Protected)');
 assert(gm.canPerformAction('scan_access_qr', 'designer') === false, 'Designer CANNOT scan access QR (Protected)');
 
-// Planner (Organizador) - Operativo Limitado
+// Planner (Organizador) - Operativo Estricto (Mesas, Cronograma y Catering)
+assert(gm.canPerformAction('manage_tables', 'planner') === true, 'Planner CAN manage tables & layout (Organización)');
+assert(gm.canPerformAction('edit_guest_assignment', 'planner') === true, 'Planner CAN edit guest table assignment (Organización)');
+assert(gm.canPerformAction('view_timeline', 'planner') === true, 'Planner CAN view and follow timeline (Cronograma)');
+assert(gm.canPerformAction('view_catering', 'planner') === true, 'Planner CAN view catering tactical sheet (Catering)');
+
 assert(gm.canPerformAction('edit_invitation_design', 'planner') === false, 'Planner CANNOT edit invitation design (Protected)');
 assert(gm.canPerformAction('reset_database', 'planner') === false, 'Planner CANNOT reset database (Protected)');
-assert(gm.canPerformAction('manage_tables', 'planner') === true, 'Planner CAN manage tables & layout');
-assert(gm.canPerformAction('view_timeline', 'planner') === true, 'Planner CAN view and follow timeline');
-assert(gm.canPerformAction('view_catering', 'planner') === true, 'Planner CAN view catering sheet');
-assert(gm.canPerformAction('scan_access_qr', 'planner') === true, 'Planner CAN scan access QR');
-assert(gm.canPerformAction('create_emergency_pass', 'planner') === true, 'Planner CAN create emergency passes');
+assert(gm.canPerformAction('dispatch_whatsapp', 'planner') === false, 'Planner CANNOT dispatch bride whatsapp messages (Protected)');
+assert(gm.canPerformAction('view_guest_phones', 'planner') === false, 'Planner CANNOT view private guest phone numbers (Protected)');
+assert(gm.canPerformAction('scan_access_qr', 'planner') === false, 'Planner CANNOT scan door access QR (Delegated to Hostess)');
 
 // Hostess
 assert(gm.canPerformAction('scan_access_qr', 'hostess') === true, 'Hostess CAN scan access QR');
