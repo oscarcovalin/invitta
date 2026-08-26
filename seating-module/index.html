@@ -378,45 +378,105 @@
           </span>
           <div>
             <h3 class="font-headline-lg text-primary text-xl font-normal">Cronograma del Evento</h3>
-            <span class="font-label-caps text-on-surface-variant text-[10px]">Catalina & Julián · 20 de Marzo 2027</span>
+            <span class="font-label-caps text-on-surface-variant text-[10px]">Programa sincronizado desde la Invitación Digital (Catalina & Julián)</span>
           </div>
         </div>
         <button type="button" class="btn-close-modal text-on-surface-variant hover:text-primary text-2xl font-light">&times;</button>
       </div>
 
-      <div class="space-y-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
-        <div class="flex items-start gap-4 p-3 rounded-xl bg-surface border border-outline-variant">
-          <span class="font-mono text-xs font-bold text-primary px-2.5 py-1 rounded bg-surface-container">16:30</span>
-          <div>
-            <h4 class="text-xs font-semibold text-primary">Ceremonia Religiosa</h4>
-            <p class="text-[11px] text-on-surface-variant">Parroquia de Santa María de las Cumbres</p>
+      <div class="space-y-3 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar text-xs" id="timelineListContainer">
+        <!-- 1. 18:00 HRS · Ceremonia Religiosa -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">church</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Ceremonia Religiosa</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">18:00 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Parroquia San Rafael · Av. de las Rosas 123</p>
           </div>
         </div>
-        <div class="flex items-start gap-4 p-3 rounded-xl bg-surface border border-outline-variant">
-          <span class="font-mono text-xs font-bold text-primary px-2.5 py-1 rounded bg-surface-container">18:00</span>
-          <div>
-            <h4 class="text-xs font-semibold text-primary">Recepción & Cóctel de Bienvenida</h4>
-            <p class="text-[11px] text-on-surface-variant">Jardín Principal · Música de Cuerdas</p>
+
+        <!-- 2. 19:00 HRS · Boda Civil -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">favorite</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Boda Civil</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">19:00 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Firma de Actas & Brindis de Honor</p>
           </div>
         </div>
-        <div class="flex items-start gap-4 p-3 rounded-xl bg-surface border border-outline-variant">
-          <span class="font-mono text-xs font-bold text-primary px-2.5 py-1 rounded bg-surface-container">19:30</span>
-          <div>
-            <h4 class="text-xs font-semibold text-primary">Banquete Nupcial & Servicio de Mesas</h4>
-            <p class="text-[11px] text-on-surface-variant">Salón Las Magnolias · Protocolo Táctico de Catering</p>
+
+        <!-- 3. 20:00 HRS · Recepción -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">celebration</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Recepción</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">20:00 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Jardín Las Magnolias · Cóctel de Bienvenida</p>
           </div>
         </div>
-        <div class="flex items-start gap-4 p-3 rounded-xl bg-surface border border-outline-variant">
-          <span class="font-mono text-xs font-bold text-primary px-2.5 py-1 rounded bg-surface-container">21:00</span>
-          <div>
-            <h4 class="text-xs font-semibold text-primary">Vals de los Novios & Fiesta</h4>
-            <p class="text-[11px] text-on-surface-variant">Pista Central · Apertura de Barra Libre</p>
+
+        <!-- 4. 20:30 HRS · Cena -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">restaurant_menu</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Cena / Banquete Nupcial</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">20:30 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Salón Principal · Protocolo Táctico de Catering</p>
+          </div>
+        </div>
+
+        <!-- 5. 21:30 HRS · Todo mundo a bailar -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">nightlife</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Todo mundo a bailar</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">21:30 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Vals de los Novios, Apertura de Pista & Fiesta</p>
+          </div>
+        </div>
+
+        <!-- 6. 02:00 HRS · Fin del evento -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">directions_car</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Fin del Evento</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">02:00 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Cierre de Celebración & Agradecimientos</p>
           </div>
         </div>
       </div>
 
-      <div class="flex justify-end pt-2 border-t border-outline-variant">
-        <button type="button" class="btn-close-modal px-5 py-2 rounded-lg bg-primary text-on-primary font-label-caps text-xs tracking-wider uppercase hover:bg-charcoal transition-colors">
+      <!-- Pie del Modal con Enlace a la Invitación -->
+      <div class="flex items-center justify-between pt-3 border-t border-outline-variant">
+        <a href="../invitacion-estudio.html" target="_blank" rel="noopener noreferrer" class="text-xs text-amber-800 hover:text-amber-950 font-semibold flex items-center gap-1 transition-colors" title="Editar Itinerario en el Estudio de Invitación">
+          <span class="material-symbols-outlined text-sm text-amber-700">edit_calendar</span>
+          <span>Editar Programa en Invitación ↗</span>
+        </a>
+        <button type="button" class="btn-close-modal px-5 py-2 rounded-xl bg-primary text-white text-xs tracking-wider uppercase hover:bg-charcoal transition-colors font-medium">
           Cerrar
         </button>
       </div>
