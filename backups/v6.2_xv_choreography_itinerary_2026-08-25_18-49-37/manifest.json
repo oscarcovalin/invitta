@@ -1,0 +1,26 @@
+{
+  "label": "v6.2_xv_choreography_itinerary",
+  "timestamp": "2026-08-26T00:49:37.214Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 110005
+    },
+    {
+      "filename": "index.html",
+      "size": 75276
+    },
+    {
+      "filename": "app.js",
+      "size": 74987
+    },
+    {
+      "filename": "style.css",
+      "size": 12175
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
