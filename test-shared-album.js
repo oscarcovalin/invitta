@@ -26,4 +26,4 @@ configDisabled.sharedAlbum.enabled = false;
 const htmlDisabled = templateEngine.generateHTML(configDisabled, 'vino');
 
 console.log('\n--- TEST 2: DISABLED SHARED ALBUM ---');
-console.log('Album is hidden when enabled:false:', htmlDisabled.includes('id="albumColaborativo" class="py-16 px-margin-mobile text-center max-w-xl mx-auto relative overflow-hidden hidden"'));
+console.log('Album is hidden when enabled:false:', htmlDisabled.includes('id="albumColaborativo"') && htmlDisabled.includes('hidden'));

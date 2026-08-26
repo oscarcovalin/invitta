@@ -54,11 +54,11 @@ assert(eyebrowMatch[0].includes('font-label-caps'), 'Eyebrow uses font-label-cap
 assert(eyebrowMatch[0].includes('uppercase'), 'Eyebrow is uppercase');
 assert(eyebrowMatch[0].includes('font-medium'), 'Eyebrow uses font-medium');
 
-// 7. CUERPO / SUBCOPY (Sans 13-16px Regular sin tracking extra)
+// 7. CUERPO EDITORIAL / NARRATIVA (Serif Cormorant Garamond 17-19px Light)
 const welcomeMsgMatch = html.match(/<p[^>]*id="welcomeMessage"[^>]*>/);
 assert(welcomeMsgMatch, 'welcomeMessage exists');
-assert(welcomeMsgMatch[0].includes('font-body-lg'), 'Welcome message uses font-body-lg');
-assert(welcomeMsgMatch[0].includes('font-normal'), 'Welcome message uses font-normal');
+assert(welcomeMsgMatch[0].includes('font-display-lg'), 'Welcome message uses font-display-lg (Serif Editorial)');
+assert(welcomeMsgMatch[0].includes('font-light'), 'Welcome message uses font-light');
 
 // 8. BOTONES / CTA (Sans 11-12px Medium MAYÚSCULAS tracking +3px)
 const rsvpSubmitMatch = html.match(/<button[^>]*id="rsvpSubmit"[^>]*>/);
