@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -439,33 +439,93 @@
         <button type="button" class="btn-close-modal text-on-surface-variant hover:text-primary text-2xl font-light">&times;</button>
       </div>
 
-      <div class="space-y-4 text-xs">
-        <div>
-          <label class="font-label-caps text-on-surface-variant uppercase tracking-wider block mb-1.5">Capacidad Estándar por Mesa</label>
-          <select id="cfgDefaultCapacity" class="w-full bg-surface-container border border-outline-variant rounded-lg p-2.5 text-xs text-on-surface">
-            <option value="6">6 Asientos por mesa</option>
-            <option value="8" selected>8 Asientos por mesa (Recomendado)</option>
-            <option value="10">10 Asientos por mesa</option>
-            <option value="12">12 Asientos por mesa (Imperial)</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="font-label-caps text-on-surface-variant uppercase tracking-wider block mb-1.5">Color de Alerta de Sobrecupo</label>
-          <div class="flex items-center gap-3">
-            <input type="color" id="cfgOverColor" value="#A38047" class="w-10 h-10 rounded-lg border border-outline-variant cursor-pointer">
-            <span class="font-mono text-xs text-primary font-semibold">#A38047 (Oro Antiguo Haute-Couture)</span>
+      <div class="space-y-5 text-xs">
+        
+        <!-- 1. Métricas Globales del Evento -->
+        <div class="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-surface-container border border-outline-variant">
+          <div>
+            <span class="font-label-caps text-on-surface-variant uppercase tracking-wider text-[10px] block mb-1">Total de Invitados</span>
+            <div class="flex items-center gap-2">
+              <span id="cfgTotalGuestsBadge" class="font-headline-lg text-primary text-xl font-bold">14</span>
+              <span class="text-[10px] text-on-secondary-container font-mono">personas</span>
+            </div>
+          </div>
+          <div>
+            <span class="font-label-caps text-on-surface-variant uppercase tracking-wider text-[10px] block mb-1">Total de Mesas</span>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btnDecTables" class="w-6 h-6 rounded bg-surface border border-outline-variant hover:border-primary text-primary font-bold flex items-center justify-center">-</button>
+              <span id="cfgTotalTablesBadge" class="font-headline-lg text-primary text-xl font-bold w-6 text-center">4</span>
+              <button type="button" id="btnIncTables" class="w-6 h-6 rounded bg-surface border border-outline-variant hover:border-primary text-primary font-bold flex items-center justify-center">+</button>
+            </div>
           </div>
         </div>
 
-        <div class="pt-3 border-t border-outline-variant flex flex-col gap-2">
-          <label class="font-label-caps text-on-surface-variant uppercase tracking-wider">Herramientas de Exportación</label>
-          <div class="flex gap-2">
-            <button type="button" id="btnExportSeatingJson" class="flex-1 py-2.5 px-3 rounded-lg bg-surface-container border border-outline-variant hover:border-charcoal text-primary font-medium flex items-center justify-center gap-1.5 transition-colors">
-              <span class="material-symbols-outlined text-base">download</span> Exportar JSON
+        <!-- 2. Acomodo / Capacidad por Mesa (8, 10 y 12) -->
+        <div>
+          <label class="font-label-caps text-on-surface-variant uppercase tracking-wider block mb-2">
+            Acomodo de Invitados por Mesa
+          </label>
+          <div class="grid grid-cols-3 gap-2.5" id="capacitySelectorGroup">
+            
+            <!-- Opción 8 -->
+            <button type="button" class="btn-capacity-card active p-3 rounded-xl border border-primary bg-primary/10 text-center flex flex-col items-center gap-1 transition-all" data-capacity="8">
+              <span class="font-headline-lg text-primary text-base font-bold">8</span>
+              <span class="font-label-caps text-[9.5px] uppercase tracking-wider text-on-secondary-container">Por Mesa</span>
+              <span class="text-[9px] text-primary/75 font-mono">Redonda</span>
             </button>
-            <button type="button" id="btnResetAllTables" class="py-2.5 px-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-700 hover:bg-rose-500/20 font-medium flex items-center justify-center gap-1.5 transition-colors">
-              <span class="material-symbols-outlined text-base">restart_alt</span> Resetear Todo
+
+            <!-- Opción 10 -->
+            <button type="button" class="btn-capacity-card p-3 rounded-xl border border-outline-variant bg-surface-container text-center flex flex-col items-center gap-1 hover:border-primary transition-all" data-capacity="10">
+              <span class="font-headline-lg text-primary text-base font-bold">10</span>
+              <span class="font-label-caps text-[9.5px] uppercase tracking-wider text-on-secondary-container">Por Mesa</span>
+              <span class="text-[9px] text-on-secondary-container font-mono">Banquete</span>
+            </button>
+
+            <!-- Opción 12 -->
+            <button type="button" class="btn-capacity-card p-3 rounded-xl border border-outline-variant bg-surface-container text-center flex flex-col items-center gap-1 hover:border-primary transition-all" data-capacity="12">
+              <span class="font-headline-lg text-primary text-base font-bold">12</span>
+              <span class="font-label-caps text-[9.5px] uppercase tracking-wider text-on-secondary-container">Por Mesa</span>
+              <span class="text-[9px] text-on-secondary-container font-mono">Imperial</span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- 3. Botón de Distribución Automática Inteligente -->
+        <div class="p-3.5 rounded-xl bg-champagne-light/50 border border-primary/30 flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-primary font-semibold text-[11px] flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base">auto_awesome</span>
+              Distribución Automática Inteligente
+            </span>
+            <span class="text-[10px] font-mono text-on-secondary-container" id="autoDistSummary">Capacidad: 32 asientos</span>
+          </div>
+          <p class="text-[11px] text-on-secondary-container leading-relaxed">
+            Agrupa familias juntas en la misma mesa sin separar a niños o parientes, prioriza la Corte de Honor y VIPs en la Mesa Imperial y balancea a todos los invitados respetando el cupo de <strong id="lblSelectedCapText" class="text-primary">8 por mesa</strong>.
+          </p>
+          <button type="button" id="btnAutoDistribute" class="w-full py-2.5 px-4 rounded-lg bg-primary text-on-primary font-label-caps text-xs tracking-wider uppercase hover:bg-charcoal transition-all shadow-md flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-base">magic_button</span>
+            <span>✦ Ejecutar Distribución Automática ✦</span>
+          </button>
+        </div>
+
+        <!-- 4. Alerta de Sobrecupo & Color -->
+        <div class="flex items-center justify-between pt-1">
+          <span class="font-label-caps text-on-surface-variant uppercase tracking-wider text-[10px]">Alerta de Sobrecupo</span>
+          <div class="flex items-center gap-2">
+            <input type="color" id="cfgOverColor" value="#A38047" class="w-7 h-7 rounded border border-outline-variant cursor-pointer">
+            <span class="font-mono text-xs text-primary font-semibold">#A38047</span>
+          </div>
+        </div>
+
+        <!-- 5. Exportación y Reseteo -->
+        <div class="pt-3 border-t border-outline-variant flex flex-col gap-2">
+          <div class="flex gap-2">
+            <button type="button" id="btnExportSeatingJson" class="flex-1 py-2 px-3 rounded-lg bg-surface-container border border-outline-variant hover:border-charcoal text-primary font-medium flex items-center justify-center gap-1.5 transition-colors text-xs">
+              <span class="material-symbols-outlined text-sm">download</span> Exportar JSON
+            </button>
+            <button type="button" id="btnResetAllTables" class="py-2 px-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-700 hover:bg-rose-500/20 font-medium flex items-center justify-center gap-1.5 transition-colors text-xs">
+              <span class="material-symbols-outlined text-sm">restart_alt</span> Resetear Asignaciones
             </button>
           </div>
         </div>
@@ -505,12 +565,27 @@
     // 3. Modales (Cronograma y Configuración)
     const modalTimeline = document.getElementById('modalTimeline');
     const modalSettings = document.getElementById('modalSettings');
+    const cfgTotalGuestsBadge = document.getElementById('cfgTotalGuestsBadge');
+    const cfgTotalTablesBadge = document.getElementById('cfgTotalTablesBadge');
+    const autoDistSummary = document.getElementById('autoDistSummary');
+    const lblSelectedCapText = document.getElementById('lblSelectedCapText');
+
+    let currentSelectedCapacity = 8;
+
+    function refreshModalStats() {
+      if (cfgTotalGuestsBadge) cfgTotalGuestsBadge.textContent = planner.state.guests.length;
+      if (cfgTotalTablesBadge) cfgTotalTablesBadge.textContent = planner.state.tables.length;
+      const totalCap = planner.state.tables.length * currentSelectedCapacity;
+      if (autoDistSummary) autoDistSummary.textContent = `Capacidad: ${totalCap} asientos`;
+      if (lblSelectedCapText) lblSelectedCapText.textContent = `${currentSelectedCapacity} por mesa`;
+    }
 
     document.getElementById('btnOpenTimeline').addEventListener('click', () => {
       modalTimeline.classList.remove('hidden');
     });
 
     document.getElementById('btnOpenSettings').addEventListener('click', () => {
+      refreshModalStats();
       modalSettings.classList.remove('hidden');
     });
 
@@ -521,7 +596,43 @@
       });
     });
 
-    // 4. Exportar Plano a JSON
+    // 4. Selector de Acomodo de 8, 10 y 12 por mesa
+    document.querySelectorAll('.btn-capacity-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.btn-capacity-card').forEach(b => {
+          b.classList.remove('active', 'border-primary', 'bg-primary/10');
+          b.classList.add('border-outline-variant', 'bg-surface-container');
+        });
+        btn.classList.add('active', 'border-primary', 'bg-primary/10');
+        btn.classList.remove('border-outline-variant', 'bg-surface-container');
+
+        currentSelectedCapacity = parseInt(btn.dataset.capacity, 10) || 8;
+        refreshModalStats();
+      });
+    });
+
+    // 5. Ajustar Total de Mesas (+ / -)
+    document.getElementById('btnIncTables').addEventListener('click', () => {
+      planner.setTotalTables(planner.state.tables.length + 1, currentSelectedCapacity);
+      refreshModalStats();
+    });
+
+    document.getElementById('btnDecTables').addEventListener('click', () => {
+      if (planner.state.tables.length > 1) {
+        planner.setTotalTables(planner.state.tables.length - 1, currentSelectedCapacity);
+        refreshModalStats();
+      }
+    });
+
+    // 6. Ejecutar Distribución Automática Inteligente
+    document.getElementById('btnAutoDistribute').addEventListener('click', () => {
+      const result = planner.autoDistributeGuests({ capacity: currentSelectedCapacity });
+      refreshModalStats();
+      modalSettings.classList.add('hidden');
+      alert(`✨ ¡Distribución completada con éxito!\n\n• ${result.assignedGuests} de ${result.totalGuests} invitados asignados correctamente.\n• ${result.totalTables} mesas configuradas con cupo de ${result.capacityPerTable} comensales.\n• Bloques familiares y Corte de Honor agrupados sin separación.`);
+    });
+
+    // 7. Exportar Plano a JSON
     document.getElementById('btnExportSeatingJson').addEventListener('click', () => {
       const jsonStr = JSON.stringify(planner.state, null, 2);
       navigator.clipboard.writeText(jsonStr).then(() => {
@@ -529,11 +640,12 @@
       });
     });
 
-    // 5. Resetear todas las mesas
+    // 8. Resetear todas las mesas
     document.getElementById('btnResetAllTables').addEventListener('click', () => {
       if (confirm('¿Deseas desasignar a todos los comensales para reiniciar el plano?')) {
         planner.state.guests.forEach(g => g.tableId = null);
         planner.updateStateAndDOM();
+        refreshModalStats();
         modalSettings.classList.add('hidden');
       }
     });

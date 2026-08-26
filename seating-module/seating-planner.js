@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ============================================================================
  * SeatingPlanner — Motor Reactivo de Asignación de Mesas & Floor Plan
  * Haute-Couture Design System · Invitta Studio (Antigravity)
@@ -672,7 +672,7 @@ class SeatingPlanner {
   addTable(name = 'Mesa Adicional', type = 'circular', capacity = 8) {
     const newNumber = this.state.tables.length + 1;
     const newTable = {
-      id: 'tbl_' + Date.now(),
+      id: 'tbl_' + Date.now() + '_' + Math.random().toString(36).substring(2, 5),
       number: String(newNumber),
       name: `${name} ${newNumber}`,
       subtitle: 'Invitados',
@@ -682,6 +682,142 @@ class SeatingPlanner {
     this.state.tables.push(newTable);
     this.updateStateAndDOM();
     return newTable;
+  }
+
+  /**
+   * Ajusta la capacidad (8, 10 o 12) en todas las mesas del evento
+   */
+  setCapacityAcrossTables(capacity = 8) {
+    const validCap = [8, 10, 12].includes(Number(capacity)) ? Number(capacity) : 8;
+    this.state.tables.forEach(t => {
+      t.capacity = validCap;
+    });
+    this.updateStateAndDOM();
+    return validCap;
+  }
+
+  /**
+   * Ajusta la cantidad total de mesas en el salón
+   */
+  setTotalTables(targetCount, defaultCapacity = 8) {
+    const target = Math.max(1, Number(targetCount) || 1);
+    
+    // Si faltan mesas, crearlas
+    while (this.state.tables.length < target) {
+      const newNum = this.state.tables.length + 1;
+      this.state.tables.push({
+        id: 'tbl_' + Date.now() + '_' + Math.random().toString(36).substring(2, 5),
+        number: String(newNum),
+        name: `Mesa ${newNum}`,
+        subtitle: 'Invitados',
+        type: newNum % 3 === 0 ? 'imperial' : 'circular',
+        capacity: defaultCapacity
+      });
+    }
+
+    // Si sobran mesas, desasignar invitados y recortar
+    if (this.state.tables.length > target) {
+      const removedTables = this.state.tables.slice(target);
+      const removedIds = new Set(removedTables.map(t => t.id));
+      this.state.guests.forEach(g => {
+        if (removedIds.has(g.tableId)) {
+          g.tableId = null;
+        }
+      });
+      this.state.tables = this.state.tables.slice(0, target);
+    }
+
+    this.updateStateAndDOM();
+    return this.state.tables.length;
+  }
+
+  /**
+   * Distribución Automática Inteligente de Invitados
+   * Respeta bloques familiares, corte de honor / VIPs y capacidad por mesa (8, 10 o 12)
+   */
+  autoDistributeGuests(options = {}) {
+    const capacity = [8, 10, 12].includes(Number(options.capacity)) ? Number(options.capacity) : 8;
+    
+    // 1. Unificar capacidades si se solicitó
+    this.setCapacityAcrossTables(capacity);
+
+    // 2. Limpiar asignaciones para distribución limpia
+    this.state.guests.forEach(g => g.tableId = null);
+
+    // 3. Separar grupos
+    const courtOrVips = this.state.guests.filter(g => g.court || g.vip);
+    
+    const familiesMap = {};
+    const singles = [];
+
+    this.state.guests.forEach(g => {
+      if (g.court || g.vip) return;
+      if (g.familyKey && g.familyKey.trim()) {
+        if (!familiesMap[g.familyKey]) {
+          familiesMap[g.familyKey] = [];
+        }
+        familiesMap[g.familyKey].push(g);
+      } else {
+        singles.push(g);
+      }
+    });
+
+    const familyGroups = Object.values(familiesMap);
+
+    // 4. Asignar primero VIPs a Mesa Imperial (o Mesa 1)
+    const imperialTable = this.state.tables.find(t => t.type === 'imperial') || this.state.tables[0];
+    if (imperialTable) {
+      courtOrVips.forEach(g => {
+        const assignedInImperial = this.state.guests.filter(x => x.tableId === imperialTable.id).length;
+        if (assignedInImperial < imperialTable.capacity) {
+          g.tableId = imperialTable.id;
+        }
+      });
+    }
+
+    // 5. Asignar Bloques Familiares en mesas completas sin separarlos
+    familyGroups.forEach(group => {
+      const groupSize = group.length;
+      
+      let bestTable = this.state.tables.find(tbl => {
+        const currentCount = this.state.guests.filter(x => x.tableId === tbl.id).length;
+        return (currentCount + groupSize) <= tbl.capacity;
+      });
+
+      if (!bestTable) {
+        bestTable = this.addTable('Mesa', 'circular', capacity);
+      }
+
+      group.forEach(g => {
+        g.tableId = bestTable.id;
+      });
+    });
+
+    // 6. Asignar Invitados Individuales y Restantes
+    this.state.guests.forEach(g => {
+      if (g.tableId) return;
+
+      let bestTable = this.state.tables.find(tbl => {
+        const currentCount = this.state.guests.filter(x => x.tableId === tbl.id).length;
+        return currentCount < tbl.capacity;
+      });
+
+      if (!bestTable) {
+        bestTable = this.addTable('Mesa', 'circular', capacity);
+      }
+
+      g.tableId = bestTable.id;
+    });
+
+    this.updateStateAndDOM();
+
+    return {
+      totalGuests: this.state.guests.length,
+      assignedGuests: this.state.guests.filter(g => g.tableId).length,
+      totalTables: this.state.tables.length,
+      capacityPerTable: capacity,
+      totalCapacity: this.state.tables.reduce((acc, t) => acc + t.capacity, 0)
+    };
   }
 }
 
