@@ -1,0 +1,26 @@
+{
+  "label": "v6.0_typography_custom_scaling",
+  "timestamp": "2026-08-26T00:35:24.350Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 107994
+    },
+    {
+      "filename": "index.html",
+      "size": 74026
+    },
+    {
+      "filename": "app.js",
+      "size": 71749
+    },
+    {
+      "filename": "style.css",
+      "size": 12175
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
