@@ -1,0 +1,1589 @@
+/**
+ * Lógica principal del Dashboard Generador de Invitaciones de Lujo (XV Años & Bodas)
+ * Versión 3.2: Soporte Especializado para Bodas (Padres de la Novia y Padres del Novio)
+ */
+
+let currentConfig = JSON.parse(JSON.stringify(TemplateEngine.defaultConfig));
+let currentThemeName = "vino";
+let customTheme = JSON.parse(JSON.stringify(TemplateEngine.defaultThemes.vino));
+let debounceTimer = null;
+let currentVipUrl = "";
+
+// ==================== INICIALIZACIÓN ====================
+document.addEventListener('DOMContentLoaded', () => {
+  setupAccordion();
+  setupDeviceSwitcher();
+  setupThemePicker();
+  setupEventTypeSwitcher();
+  setupTypographyControls();
+  setupBackgroundControls();
+  setupVipPassGenerator();
+  setupStoryControls();
+  setupDressCodeControls();
+  setupInstagramControls();
+  setupDynamicLists();
+  setupFileUploads();
+  setupHeaderActions();
+  setupInputListeners();
+
+  populateForm();
+  updatePreview(true);
+});
+
+// ==================== ACCORDION ====================
+function setupAccordion() {
+  const headers = document.querySelectorAll('.accordion-header');
+  headers.forEach(header => {
+    header.addEventListener('click', () => {
+      const item = header.parentElement;
+      const isActive = item.classList.contains('active');
+      item.classList.toggle('active', !isActive);
+    });
+  });
+}
+
+// ==================== EVENT TYPE SWITCHER ====================
+function setupEventTypeSwitcher() {
+  const selectType = document.getElementById('selectEventType');
+  const groupSingle = document.getElementById('groupSingleName');
+  const groupWedding = document.getElementById('groupWeddingNames');
+  const parentsXv = document.getElementById('parentsXvFields');
+  const parentsBoda = document.getElementById('parentsBodaFields');
+  const lblGodparents = document.getElementById('lblGodparentsHeader');
+  const lblCourt = document.getElementById('lblCourtHeader');
+
+  selectType.addEventListener('change', (e) => {
+    const isWedding = e.target.value === 'boda';
+    currentConfig.eventType = e.target.value;
+
+    groupSingle.style.display = isWedding ? 'none' : 'block';
+    groupWedding.style.display = isWedding ? 'flex' : 'none';
+    parentsXv.style.display = isWedding ? 'none' : 'block';
+    parentsBoda.style.display = isWedding ? 'block' : 'none';
+
+    if (isWedding) {
+      lblGodparents.textContent = '✨ Padrinos de Velación';
+      lblCourt.textContent = 'Damas de Honor & Best Men';
+      if (!currentConfig.eyebrow || currentConfig.eyebrow === 'Mis XV años') {
+        currentConfig.eyebrow = 'Nuestra Boda';
+        document.getElementById('inputEyebrow').value = 'Nuestra Boda';
+      }
+      if (!currentConfig.blessingIntro || currentConfig.blessingIntro.includes('mis padres')) {
+        currentConfig.blessingIntro = 'Con la bendición de Dios y el amor de nuestros padres, unimos nuestras vidas';
+        document.getElementById('inputBlessing').value = currentConfig.blessingIntro;
+      }
+    } else {
+      lblGodparents.textContent = '✨ Mis Padrinos';
+      lblCourt.textContent = 'Corte de Honor / Damas & Chambelanes';
+      if (!currentConfig.eyebrow || currentConfig.eyebrow === 'Nuestra Boda') {
+        currentConfig.eyebrow = 'Mis XV años';
+        document.getElementById('inputEyebrow').value = 'Mis XV años';
+      }
+    }
+
+    schedulePreviewUpdate();
+  });
+}
+
+// ==================== DEVICE SWITCHER ====================
+function setupDeviceSwitcher() {
+  const frame = document.getElementById('deviceFrame');
+  const buttons = document.querySelectorAll('.device-btn');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const device = btn.dataset.device;
+      frame.className = `device-frame ${device}`;
+    });
+  });
+
+  document.getElementById('btnRefreshPreview').addEventListener('click', () => {
+    updatePreview(true);
+    showToast('🔄 Vista previa actualizada');
+  });
+}
+
+// ==================== THEME PICKER ====================
+function setupThemePicker() {
+  const cards = document.querySelectorAll('.theme-card');
+  const customWrapper = document.getElementById('customColorsWrapper');
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      cards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      currentThemeName = card.dataset.theme;
+
+      if (currentThemeName === 'custom') {
+        customWrapper.style.display = 'block';
+      } else {
+        customWrapper.style.display = 'none';
+      }
+      schedulePreviewUpdate();
+    });
+  });
+
+  const colorMap = {
+    colWine900: 'wine-900',
+    colWine700: 'wine-700',
+    colGold500: 'gold-500',
+    colCream: 'cream'
+  };
+
+  Object.entries(colorMap).forEach(([id, varName]) => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.addEventListener('input', (e) => {
+        customTheme[varName] = e.target.value;
+        if (currentThemeName === 'custom') {
+          schedulePreviewUpdate();
+        }
+      });
+    }
+  });
+}
+
+// ==================== VIP PASS LINK GENERATOR ====================
+function setupVipPassGenerator() {
+  const btnGen = document.getElementById('btnGenerateVipLink');
+  const inputGuest = document.getElementById('inputVipGuest');
+  const inputTickets = document.getElementById('inputVipTickets');
+  const resultBox = document.getElementById('vipGeneratedResult');
+  const inputUrl = document.getElementById('inputVipGeneratedUrl');
+  const btnCopy = document.getElementById('btnCopyVipLink');
+  const btnPrev = document.getElementById('btnPreviewVipLink');
+
+  btnGen.addEventListener('click', () => {
+    const guest = inputGuest.value.trim();
+    const tickets = parseInt(inputTickets.value, 10) || 2;
+    if (!guest) {
+      showToast('⚠️ Ingresa el nombre del invitado');
+      inputGuest.focus();
+      return;
+    }
+
+    const isWedding = currentConfig.eventType === 'boda';
+    const rawName = (isWedding && currentConfig.brideName && currentConfig.groomName)
+      ? `${currentConfig.brideName}-y-${currentConfig.groomName}`
+      : (currentConfig.name || 'Invitacion');
+    const safeName = rawName.toLowerCase().replace(/\s+/g, '-');
+    const filename = `invitacion-${safeName}.html`;
+    const params = `?invitado=${encodeURIComponent(guest)}&pases=${tickets}`;
+    currentVipUrl = filename + params;
+
+    inputUrl.value = currentVipUrl;
+    resultBox.style.display = 'block';
+    showToast('🎟️ Enlace VIP generado con éxito');
+  });
+
+  btnCopy.addEventListener('click', async () => {
+    const guest = inputGuest.value.trim();
+    const tickets = parseInt(inputTickets.value, 10) || 2;
+    const msg = `✨ *Invitación Especial para ${guest}*\n\nNos complace invitarte a celebrar con nosotros este gran día. Tienes ${tickets} pase(s) reservado(s).\n\nPuedes consultar todos los detalles, mapa y confirmar tu asistencia en el siguiente enlace:\n👉 ${inputUrl.value}`;
+    try {
+      await navigator.clipboard.writeText(msg);
+      showToast('📋 ¡Mensaje y enlace de WhatsApp copiados!');
+    } catch(err) {
+      showToast('📋 Enlace copiado');
+    }
+  });
+
+  btnPrev.addEventListener('click', () => {
+    const iframe = document.getElementById('previewFrame');
+    const decorAssets = typeof DECOR_ASSETS !== 'undefined' ? DECOR_ASSETS : {};
+    const html = TemplateEngine.generateHTML(currentConfig, currentThemeName, customTheme, decorAssets);
+    
+    const guest = inputGuest.value.trim();
+    const tickets = parseInt(inputTickets.value, 10) || 2;
+    const injectedHtml = html.replace(
+      'const urlParams = new URLSearchParams(window.location.search);',
+      `const urlParams = new URLSearchParams("?invitado=${encodeURIComponent(guest)}&pases=${tickets}");`
+    );
+    iframe.srcdoc = injectedHtml;
+    showToast(`👁️ Previsualizando pase de: ${guest}`);
+  });
+}
+
+// ==================== STORY CONTROLS ====================
+function setupStoryControls() {
+  const checkStory = document.getElementById('checkStoryEnabled');
+  const storyFields = document.getElementById('storyFields');
+  const photoInput = document.getElementById('inputStoryPhoto');
+  const photoFile = document.getElementById('fileStoryPhoto');
+
+  checkStory.addEventListener('change', (e) => {
+    if (!currentConfig.story) currentConfig.story = {};
+    currentConfig.story.enabled = e.target.checked;
+    storyFields.style.display = e.target.checked ? 'block' : 'none';
+    schedulePreviewUpdate();
+  });
+
+  photoFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (re) => {
+        photoInput.value = re.target.result;
+        if (!currentConfig.story) currentConfig.story = {};
+        currentConfig.story.photo = re.target.result;
+        schedulePreviewUpdate();
+        showToast('📸 Foto de historia cargada');
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+// ==================== DRESS CODE & COLOR PALETTE ====================
+function setupDressCodeControls() {
+  const checkColors = document.getElementById('checkDressColors');
+  const paletteFields = document.getElementById('dressPaletteFields');
+  const btnAddColor = document.getElementById('btnAddDressColor');
+
+  checkColors.addEventListener('change', (e) => {
+    if (!currentConfig.dressCode) currentConfig.dressCode = {};
+    currentConfig.dressCode.colorsEnabled = e.target.checked;
+    paletteFields.style.display = e.target.checked ? 'block' : 'none';
+    schedulePreviewUpdate();
+  });
+
+  btnAddColor.addEventListener('click', () => {
+    if (!currentConfig.dressCode) currentConfig.dressCode = {};
+    if (!currentConfig.dressCode.colorPalette) currentConfig.dressCode.colorPalette = [];
+    currentConfig.dressCode.colorPalette.push({ name: 'Nuevo Color', hex: '#c59d60' });
+    renderDressColorsInputs();
+    schedulePreviewUpdate();
+  });
+}
+
+function renderDressColorsInputs() {
+  const container = document.getElementById('dressColorsList');
+  container.innerHTML = '';
+  const colors = (currentConfig.dressCode && currentConfig.dressCode.colorPalette) || [];
+  colors.forEach((color, index) => {
+    const row = document.createElement('div');
+    row.className = 'dynamic-item';
+    row.innerHTML = `
+      <input type="color" class="color-picker" value="${color.hex || '#c59d60'}" style="width:40px; height:34px; border-radius:6px; border:none; cursor:pointer; background:none;">
+      <input type="text" class="color-name" value="${color.name || ''}" placeholder="Nombre del color" style="flex:1;">
+      <button type="button" class="btn-icon-danger" title="Eliminar color">&times;</button>
+    `;
+
+    row.querySelector('.color-picker').addEventListener('input', (e) => {
+      color.hex = e.target.value;
+      schedulePreviewUpdate();
+    });
+    row.querySelector('.color-name').addEventListener('input', (e) => {
+      color.name = e.target.value;
+      schedulePreviewUpdate();
+    });
+    row.querySelector('.btn-icon-danger').addEventListener('click', () => {
+      currentConfig.dressCode.colorPalette.splice(index, 1);
+      renderDressColorsInputs();
+      schedulePreviewUpdate();
+    });
+
+    container.appendChild(row);
+  });
+}
+
+// ==================== INSTAGRAM CONTROLS ====================
+function setupInstagramControls() {
+  const checkInstagram = document.getElementById('checkInstagramEnabled');
+  const fields = document.getElementById('instagramFields');
+
+  checkInstagram.addEventListener('change', (e) => {
+    if (!currentConfig.instagram) currentConfig.instagram = {};
+    currentConfig.instagram.enabled = e.target.checked;
+    fields.style.display = e.target.checked ? 'block' : 'none';
+    schedulePreviewUpdate();
+  });
+}
+
+// ==================== TYPOGRAPHY CONTROLS ====================
+function setupTypographyControls() {
+  const fontFields = [
+    { 
+      selectId: 'selectFontScript', 
+      customId: 'inputCustomScript', 
+      fileId: 'fileFontScript',
+      badgeId: 'badgeCustomScriptFile',
+      nameId: 'nameCustomScriptFile',
+      clearId: 'btnClearScriptFile',
+      key: 'scriptFont', 
+      customKey: 'customScript',
+      fileKey: 'customScriptFile',
+      fileNameKey: 'customScriptFileName'
+    },
+    { 
+      selectId: 'selectFontDisplay', 
+      customId: 'inputCustomDisplay', 
+      fileId: 'fileFontDisplay',
+      badgeId: 'badgeCustomDisplayFile',
+      nameId: 'nameCustomDisplayFile',
+      clearId: 'btnClearDisplayFile',
+      key: 'displayFont', 
+      customKey: 'customDisplay',
+      fileKey: 'customDisplayFile',
+      fileNameKey: 'customDisplayFileName'
+    },
+    { 
+      selectId: 'selectFontBody', 
+      customId: 'inputCustomBody', 
+      fileId: 'fileFontBody',
+      badgeId: 'badgeCustomBodyFile',
+      nameId: 'nameCustomBodyFile',
+      clearId: 'btnClearBodyFile',
+      key: 'bodyFont', 
+      customKey: 'customBody',
+      fileKey: 'customBodyFile',
+      fileNameKey: 'customBodyFileName'
+    }
+  ];
+
+  if (!currentConfig.typography) currentConfig.typography = JSON.parse(JSON.stringify(TemplateEngine.defaultConfig.typography));
+
+  fontFields.forEach(({ selectId, customId, fileId, badgeId, nameId, clearId, key, customKey, fileKey, fileNameKey }) => {
+    const selectEl = document.getElementById(selectId);
+    const customEl = document.getElementById(customId);
+    const fileEl = document.getElementById(fileId);
+    const badgeEl = document.getElementById(badgeId);
+    const nameEl = document.getElementById(nameId);
+    const clearEl = document.getElementById(clearId);
+
+    selectEl.addEventListener('change', (e) => {
+      const isCustom = e.target.value === 'custom';
+      customEl.style.display = isCustom ? 'block' : 'none';
+      if (!isCustom) {
+        currentConfig.typography[key] = e.target.value;
+        currentConfig.typography[customKey] = '';
+        customEl.value = '';
+      }
+      schedulePreviewUpdate();
+    });
+
+    customEl.addEventListener('input', (e) => {
+      currentConfig.typography[customKey] = e.target.value;
+      schedulePreviewUpdate();
+    });
+
+    // Subida manual de archivo de fuente (.ttf, .otf, .woff, .woff2)
+    if (fileEl) {
+      fileEl.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (re) => {
+            currentConfig.typography[fileKey] = re.target.result;
+            currentConfig.typography[fileNameKey] = file.name;
+            badgeEl.style.display = 'flex';
+            nameEl.textContent = file.name;
+            schedulePreviewUpdate();
+            showToast(`🔤 Fuente cargada: ${file.name}`);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    // Botón para quitar fuente manual cargada
+    if (clearEl) {
+      clearEl.addEventListener('click', () => {
+        currentConfig.typography[fileKey] = '';
+        currentConfig.typography[fileNameKey] = '';
+        badgeEl.style.display = 'none';
+        fileEl.value = '';
+        schedulePreviewUpdate();
+        showToast('🗑️ Fuente manual eliminada, usando tipografía seleccionada');
+      });
+    }
+  });
+
+  // 4. Efecto de Títulos (Metálico Foil vs Color Sólido)
+  const selectTitleEffect = document.getElementById('selectTitleEffect');
+  const wrapTitleMetallic = document.getElementById('wrapTitleMetallic');
+  const wrapTitleSolid = document.getElementById('wrapTitleSolid');
+  const selectTitleMetallicPreset = document.getElementById('selectTitleMetallicPreset');
+  const inputCustomMetallicGradient = document.getElementById('inputCustomMetallicGradient');
+  const inputTitleSolidColor = document.getElementById('inputTitleSolidColor');
+  const inputTitleSolidColorHex = document.getElementById('inputTitleSolidColorHex');
+
+  if (selectTitleEffect) {
+    selectTitleEffect.addEventListener('change', (e) => {
+      currentConfig.typography.titleEffect = e.target.value;
+      const isMetallic = e.target.value === 'metallic';
+      wrapTitleMetallic.style.display = isMetallic ? 'block' : 'none';
+      wrapTitleSolid.style.display = isMetallic ? 'none' : 'block';
+      schedulePreviewUpdate();
+    });
+  }
+
+  if (selectTitleMetallicPreset) {
+    selectTitleMetallicPreset.addEventListener('change', (e) => {
+      currentConfig.typography.titleMetallicPreset = e.target.value;
+      const isCustom = e.target.value === 'custom';
+      inputCustomMetallicGradient.style.display = isCustom ? 'block' : 'none';
+      schedulePreviewUpdate();
+    });
+  }
+
+  if (inputCustomMetallicGradient) {
+    inputCustomMetallicGradient.addEventListener('input', (e) => {
+      currentConfig.typography.titleCustomMetallic = e.target.value;
+      schedulePreviewUpdate();
+    });
+  }
+
+  if (inputTitleSolidColor) {
+    inputTitleSolidColor.addEventListener('input', (e) => {
+      currentConfig.typography.titleSolidColor = e.target.value;
+      if (inputTitleSolidColorHex) inputTitleSolidColorHex.value = e.target.value;
+      schedulePreviewUpdate();
+    });
+  }
+
+  if (inputTitleSolidColorHex) {
+    inputTitleSolidColorHex.addEventListener('input', (e) => {
+      currentConfig.typography.titleSolidColor = e.target.value;
+      if (inputTitleSolidColor) inputTitleSolidColor.value = e.target.value;
+      schedulePreviewUpdate();
+    });
+  }
+}
+
+// ==================== BACKGROUND CONTROLS ====================
+function setupBackgroundControls() {
+  if (!currentConfig.sectionBackgrounds) currentConfig.sectionBackgrounds = JSON.parse(JSON.stringify(TemplateEngine.defaultConfig.sectionBackgrounds));
+
+  const bgMap = [
+    { id: 'bgWelcome', path: 'sectionBackgrounds.welcomeBg' },
+    { id: 'bgFamily', path: 'sectionBackgrounds.familyBg' },
+    { id: 'bgStory', path: 'sectionBackgrounds.storyBg' },
+    { id: 'bgDetails', path: 'sectionBackgrounds.detailsBg' },
+    { id: 'bgDressCode', path: 'sectionBackgrounds.dressCodeBg' },
+    { id: 'bgGiftRegistry', path: 'sectionBackgrounds.giftRegistryBg' },
+    { id: 'bgInstagram', path: 'sectionBackgrounds.instagramBg' },
+    { id: 'bgRsvp', path: 'sectionBackgrounds.rsvpBg' },
+    { id: 'bgFooter', path: 'sectionBackgrounds.footerBg' }
+  ];
+
+  bgMap.forEach(({ id, path }) => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.addEventListener('input', (e) => {
+        setObjectPath(currentConfig, path, e.target.value);
+        schedulePreviewUpdate();
+      });
+    }
+  });
+}
+
+// ==================== FORM POPULATION & BINDING ====================
+function populateForm() {
+  const isWedding = currentConfig.eventType === 'boda';
+  document.getElementById('selectEventType').value = currentConfig.eventType || 'xv';
+  
+  document.getElementById('groupSingleName').style.display = isWedding ? 'none' : 'block';
+  document.getElementById('groupWeddingNames').style.display = isWedding ? 'block' : 'none';
+  document.getElementById('parentsXvFields').style.display = isWedding ? 'none' : 'block';
+  document.getElementById('parentsBodaFields').style.display = isWedding ? 'block' : 'none';
+
+  document.getElementById('inputName').value = currentConfig.name || '';
+  document.getElementById('inputBrideName').value = currentConfig.brideName || '';
+  document.getElementById('inputGroomName').value = currentConfig.groomName || '';
+
+  // Conector entre Nombres (Boda)
+  const connector = currentConfig.nameConnector || '&';
+  const selConn = document.getElementById('selectNameConnector');
+  const inCustomConn = document.getElementById('inputCustomNameConnector');
+  if (selConn) {
+    if (['&', '+', 'y'].includes(connector)) {
+      selConn.value = connector;
+      if (inCustomConn) {
+        inCustomConn.value = '';
+        inCustomConn.style.display = 'none';
+      }
+    } else {
+      selConn.value = 'custom';
+      if (inCustomConn) {
+        inCustomConn.value = connector;
+        inCustomConn.style.display = 'block';
+      }
+    }
+  }
+
+  document.getElementById('inputMonogram').value = currentConfig.monogram || '';
+  document.getElementById('inputEyebrow').value = currentConfig.eyebrow || '';
+  document.getElementById('inputWelcome').value = currentConfig.welcomeMessage || '';
+  document.getElementById('inputQuote').value = currentConfig.quote || '';
+  document.getElementById('inputFooterText').value = currentConfig.footerText || '';
+
+  // Historia
+  const story = currentConfig.story || {};
+  document.getElementById('checkStoryEnabled').checked = story.enabled !== false;
+  document.getElementById('storyFields').style.display = story.enabled !== false ? 'block' : 'none';
+  document.getElementById('inputStoryTitle').value = story.title || '';
+  document.getElementById('inputStorySubtitle').value = story.subtitle || '';
+  document.getElementById('inputStoryText').value = story.text || '';
+  document.getElementById('inputStoryPhoto').value = story.photo || '';
+
+  // Instagram
+  const ig = currentConfig.instagram || {};
+  document.getElementById('checkInstagramEnabled').checked = ig.enabled !== false;
+  document.getElementById('instagramFields').style.display = ig.enabled !== false ? 'block' : 'none';
+  document.getElementById('inputInstagramHashtag').value = ig.hashtag || '';
+  document.getElementById('inputInstagramText').value = ig.text || '';
+
+  // Dress Code
+  const dress = currentConfig.dressCode || {};
+  document.getElementById('inputDressTitle').value = dress.title || '';
+  document.getElementById('inputDressDesc').value = dress.description || '';
+  document.getElementById('checkDressColors').checked = dress.colorsEnabled !== false;
+  document.getElementById('dressPaletteFields').style.display = dress.colorsEnabled !== false ? 'block' : 'none';
+  document.getElementById('inputReservedColors').value = dress.reservedColorsNote || '';
+  renderDressColorsInputs();
+
+  // Tipografías
+  const typo = currentConfig.typography || TemplateEngine.defaultConfig.typography;
+  
+  // 1. Script Font
+  const selectScript = document.getElementById('selectFontScript');
+  const customScript = document.getElementById('inputCustomScript');
+  const badgeScript = document.getElementById('badgeCustomScriptFile');
+  const nameScript = document.getElementById('nameCustomScriptFile');
+  if (typo.customScriptFile && typo.customScriptFileName) {
+    badgeScript.style.display = 'flex';
+    nameScript.textContent = typo.customScriptFileName;
+  } else {
+    badgeScript.style.display = 'none';
+  }
+  if (typo.customScript) {
+    selectScript.value = 'custom';
+    customScript.value = typo.customScript;
+    customScript.style.display = 'block';
+  } else {
+    selectScript.value = typo.scriptFont || 'Great Vibes';
+    customScript.style.display = 'none';
+  }
+
+  // 2. Display Font
+  const selectDisplay = document.getElementById('selectFontDisplay');
+  const customDisplay = document.getElementById('inputCustomDisplay');
+  const badgeDisplay = document.getElementById('badgeCustomDisplayFile');
+  const nameDisplay = document.getElementById('nameCustomDisplayFile');
+  if (typo.customDisplayFile && typo.customDisplayFileName) {
+    badgeDisplay.style.display = 'flex';
+    nameDisplay.textContent = typo.customDisplayFileName;
+  } else {
+    badgeDisplay.style.display = 'none';
+  }
+  if (typo.customDisplay) {
+    selectDisplay.value = 'custom';
+    customDisplay.value = typo.customDisplay;
+    customDisplay.style.display = 'block';
+  } else {
+    selectDisplay.value = typo.displayFont || 'Cinzel';
+    customDisplay.style.display = 'none';
+  }
+
+  // 3. Body Font
+  const selectBody = document.getElementById('selectFontBody');
+  const customBody = document.getElementById('inputCustomBody');
+  const badgeBody = document.getElementById('badgeCustomBodyFile');
+  const nameBody = document.getElementById('nameCustomBodyFile');
+  if (typo.customBodyFile && typo.customBodyFileName) {
+    badgeBody.style.display = 'flex';
+    nameBody.textContent = typo.customBodyFileName;
+  } else {
+    badgeBody.style.display = 'none';
+  }
+  if (typo.customBody) {
+    selectBody.value = 'custom';
+    customBody.value = typo.customBody;
+    customBody.style.display = 'block';
+  } else {
+    selectBody.value = typo.bodyFont || 'Lora';
+    customBody.style.display = 'none';
+  }
+
+  // 4. Efecto de Títulos
+  const titleEffect = typo.titleEffect || 'metallic';
+  const titleMetallic = typo.titleMetallicPreset || 'gold';
+  const selectTitleEffect = document.getElementById('selectTitleEffect');
+  const wrapTitleMetallic = document.getElementById('wrapTitleMetallic');
+  const wrapTitleSolid = document.getElementById('wrapTitleSolid');
+  const selectTitleMetallicPreset = document.getElementById('selectTitleMetallicPreset');
+  const inputCustomMetallicGradient = document.getElementById('inputCustomMetallicGradient');
+  const inputTitleSolidColor = document.getElementById('inputTitleSolidColor');
+  const inputTitleSolidColorHex = document.getElementById('inputTitleSolidColorHex');
+
+  if (selectTitleEffect) selectTitleEffect.value = titleEffect;
+  if (wrapTitleMetallic) wrapTitleMetallic.style.display = titleEffect === 'metallic' ? 'block' : 'none';
+  if (wrapTitleSolid) wrapTitleSolid.style.display = titleEffect === 'solid' ? 'block' : 'none';
+
+  if (selectTitleMetallicPreset) selectTitleMetallicPreset.value = titleMetallic;
+  if (inputCustomMetallicGradient) {
+    inputCustomMetallicGradient.value = typo.titleCustomMetallic || '';
+    inputCustomMetallicGradient.style.display = titleMetallic === 'custom' ? 'block' : 'none';
+  }
+
+  if (inputTitleSolidColor) inputTitleSolidColor.value = typo.titleSolidColor || '#ffffff';
+  if (inputTitleSolidColorHex) inputTitleSolidColorHex.value = typo.titleSolidColor || '#ffffff';
+
+  // Fondos por Sección con Imágenes y Opacidad
+  const secKeys = [
+    { key: 'family', inId: 'inputBgFamilyImage', opId: 'inputBgFamilyOpacity', valId: 'valBgFamilyOpacity', defOp: 35 },
+    { key: 'details', inId: 'inputBgDetailsImage', opId: 'inputBgDetailsOpacity', valId: 'valBgDetailsOpacity', defOp: 30 },
+    { key: 'dressCode', inId: 'inputBgDressCodeImage', opId: 'inputBgDressCodeOpacity', valId: 'valBgDressCodeOpacity', defOp: 25 },
+    { key: 'gallery', inId: 'inputBgGalleryImage', opId: 'inputBgGalleryOpacity', valId: 'valBgGalleryOpacity', defOp: 25 },
+    { key: 'giftRegistry', inId: 'inputBgGiftRegistryImage', opId: 'inputBgGiftRegistryOpacity', valId: 'valBgGiftRegistryOpacity', defOp: 25 },
+    { key: 'itinerary', inId: 'inputBgItineraryImage', opId: 'inputBgItineraryOpacity', valId: 'valBgItineraryOpacity', defOp: 30 },
+    { key: 'sharedAlbum', inId: 'inputBgSharedAlbumImage', opId: 'inputBgSharedAlbumOpacity', valId: 'valBgSharedAlbumOpacity', defOp: 30 },
+    { key: 'instagram', inId: 'inputBgInstagramImage', opId: 'inputBgInstagramOpacity', valId: 'valBgInstagramOpacity', defOp: 25 },
+    { key: 'rsvp', inId: 'inputBgRsvpImage', opId: 'inputBgRsvpOpacity', valId: 'valBgRsvpOpacity', defOp: 35 }
+  ];
+
+  if (!currentConfig.sectionBackgrounds) {
+    currentConfig.sectionBackgrounds = JSON.parse(JSON.stringify(TemplateEngine.defaultConfig.sectionBackgrounds));
+  }
+
+  secKeys.forEach(({ key, inId, opId, valId, defOp }) => {
+    let item = currentConfig.sectionBackgrounds[key];
+    if (!item) {
+      item = { image: '', opacity: defOp / 100 };
+      currentConfig.sectionBackgrounds[key] = item;
+    } else if (typeof item === 'string') {
+      item = { image: item, opacity: defOp / 100 };
+      currentConfig.sectionBackgrounds[key] = item;
+    }
+    const inEl = document.getElementById(inId);
+    const opEl = document.getElementById(opId);
+    const valEl = document.getElementById(valId);
+    const opPercent = Math.round((typeof item.opacity === 'number' ? item.opacity : defOp / 100) * 100);
+    if (inEl) inEl.value = item.image || '';
+    if (opEl) opEl.value = opPercent;
+    if (valEl) valEl.textContent = opPercent + '%';
+  });
+
+  // Fecha y Contador
+  document.getElementById('inputEventDate').value = currentConfig.eventDateISO || '';
+  document.getElementById('inputTimezone').value = currentConfig.timezoneOffset || '-06:00';
+  document.getElementById('inputDateLabel').value = currentConfig.eventDateLabel || '';
+  document.getElementById('inputDateShort').value = currentConfig.eventDateShort || '';
+  document.getElementById('inputCountdownPhrase').value = currentConfig.countdownPhrase || (isWedding ? 'Para casarme con el amor de mi vida' : 'Para mi gran día');
+  document.getElementById('inputDuration').value = currentConfig.eventDurationHours || 6;
+
+  // Estilo de Cristal del Contador
+  const countStyle = currentConfig.countdownStyle || TemplateEngine.defaultConfig.countdownStyle || {};
+  const countBg = countStyle.bgColor || '#121214';
+  const countText = countStyle.textColor || '#ffffff';
+  const countOp = typeof countStyle.opacity === 'number' ? countStyle.opacity : 0.55;
+
+  const inCountBg = document.getElementById('inputCountdownBgColor');
+  const inCountBgHex = document.getElementById('inputCountdownBgColorHex');
+  const inCountText = document.getElementById('inputCountdownTextColor');
+  const inCountTextHex = document.getElementById('inputCountdownTextColorHex');
+  const inCountOp = document.getElementById('inputCountdownOpacity');
+  const valCountOp = document.getElementById('valCountdownOpacity');
+
+  if (inCountBg) inCountBg.value = countBg;
+  if (inCountBgHex) inCountBgHex.value = countBg;
+  if (inCountText) inCountText.value = countText;
+  if (inCountTextHex) inCountTextHex.value = countText;
+  if (inCountOp) inCountOp.value = Math.round(countOp * 100);
+  if (valCountOp) valCountOp.textContent = Math.round(countOp * 100) + '%';
+
+  // Familia (XV y Boda)
+  document.getElementById('inputBlessing').value = currentConfig.blessingIntro || '';
+  document.getElementById('inputMother').value = currentConfig.mother || '';
+  document.getElementById('inputFather').value = currentConfig.father || '';
+  document.getElementById('inputBrideMother').value = currentConfig.brideMother || '';
+  document.getElementById('inputBrideFather').value = currentConfig.brideFather || '';
+  document.getElementById('inputGroomMother').value = currentConfig.groomMother || '';
+  document.getElementById('inputGroomFather').value = currentConfig.groomFather || '';
+  document.getElementById('inputGodmother').value = currentConfig.godmother || '';
+  document.getElementById('inputGodfather').value = currentConfig.godfather || '';
+  renderCourtTags();
+
+  // Ubicaciones
+  document.getElementById('inputCeremonyVenue').value = currentConfig.ceremony.venue || '';
+  document.getElementById('inputCeremonyAddress').value = currentConfig.ceremony.address || '';
+  document.getElementById('inputCeremonyTime').value = currentConfig.ceremony.time || '';
+  document.getElementById('inputCeremonyMap').value = currentConfig.ceremony.mapsUrl || '';
+  document.getElementById('inputCeremonyWaze').value = currentConfig.ceremony.wazeUrl || '';
+
+  document.getElementById('inputReceptionVenue').value = currentConfig.reception.venue || '';
+  document.getElementById('inputReceptionAddress').value = currentConfig.reception.address || '';
+  document.getElementById('inputReceptionTime').value = currentConfig.reception.time || '';
+  document.getElementById('inputReceptionMap').value = currentConfig.reception.mapsUrl || '';
+  document.getElementById('inputReceptionWaze').value = currentConfig.reception.wazeUrl || '';
+
+  // Itinerario
+  renderItineraryInputs();
+
+  // Regalos
+  const giftReg = currentConfig.giftRegistry || {};
+  document.getElementById('checkGiftEnabled').checked = giftReg.enabled !== false;
+  document.getElementById('giftRegistryFields').style.display = giftReg.enabled !== false ? 'block' : 'none';
+  document.getElementById('inputGiftIntro').value = giftReg.intro || '';
+  document.getElementById('inputBankName').value = (giftReg.bank && giftReg.bank.bankName) || '';
+  document.getElementById('inputBankHolder').value = (giftReg.bank && giftReg.bank.holder) || '';
+  document.getElementById('inputBankClabe').value = (giftReg.bank && giftReg.bank.clabe) || '';
+  document.getElementById('inputEnvelopeNote').value = giftReg.envelopeNote || '';
+  renderGiftStoresInputs();
+
+  // Fotos
+  document.getElementById('inputPhotoHero').value = (currentConfig.photos && currentConfig.photos.hero) || '';
+  document.getElementById('inputPhotoDate').value = (currentConfig.photos && currentConfig.photos.saveTheDate) || '';
+  document.getElementById('inputPhotoPortrait').value = (currentConfig.photos && currentConfig.photos.portrait) || '';
+  renderGalleryPhotosInputs();
+
+  // Álbum Colaborativo
+  const sharedAlbum = currentConfig.sharedAlbum || TemplateEngine.defaultConfig.sharedAlbum || {};
+  const checkAlbum = document.getElementById('checkSharedAlbumEnabled');
+  if (checkAlbum) {
+    checkAlbum.checked = sharedAlbum.enabled !== false;
+    const albumFields = document.getElementById('sharedAlbumFields');
+    if (albumFields) albumFields.style.display = sharedAlbum.enabled !== false ? 'block' : 'none';
+    const inAlbTitle = document.getElementById('inputSharedAlbumTitle');
+    if (inAlbTitle) inAlbTitle.value = sharedAlbum.title || '';
+    const inAlbSub = document.getElementById('inputSharedAlbumSubtitle');
+    if (inAlbSub) inAlbSub.value = sharedAlbum.subtitle || '';
+    const inAlbDesc = document.getElementById('inputSharedAlbumDesc');
+    if (inAlbDesc) inAlbDesc.value = sharedAlbum.description || '';
+    const inAlbCode = document.getElementById('inputSharedAlbumCode');
+    if (inAlbCode) inAlbCode.value = sharedAlbum.accessCode || '';
+    const inAlbUrl = document.getElementById('inputSharedAlbumUrl');
+    if (inAlbUrl) inAlbUrl.value = sharedAlbum.albumUrl || '';
+  }
+
+  // Música
+  const music = currentConfig.music || TemplateEngine.defaultConfig.music || {};
+  document.getElementById('checkMusicEnabled').checked = music.enabled !== false;
+  document.getElementById('musicFields').style.display = music.enabled !== false ? 'block' : 'none';
+  document.getElementById('inputMusicUrl').value = music.url || '';
+  document.getElementById('inputMusicTitle').value = music.title || '';
+
+  // Ilustraciones Multi-Plano
+  if (!currentConfig.illustrations) {
+    currentConfig.illustrations = JSON.parse(JSON.stringify(TemplateEngine.defaultConfig.illustrations));
+  }
+  const illHero   = currentConfig.illustrations.hero   || { enabled: false, image: '', widthPct: 85, overlapPct: 50 };
+  const illFamily = currentConfig.illustrations.family || { enabled: false, image: '', widthPct: 82, overlapPct: 50 };
+
+  const chkIllH = document.getElementById('checkIllHeroEnabled');
+  const inIllHImg = document.getElementById('inputIllHeroImage');
+  const inIllHW = document.getElementById('inputIllHeroWidth');
+  const valIllHW = document.getElementById('valIllHeroWidth');
+  const inIllHO = document.getElementById('inputIllHeroOverlap');
+  const valIllHO = document.getElementById('valIllHeroOverlap');
+
+  if (chkIllH)  chkIllH.checked         = illHero.enabled !== false && !!illHero.image;
+  if (inIllHImg) inIllHImg.value         = illHero.image || '';
+  if (inIllHW)  inIllHW.value           = illHero.widthPct || 85;
+  if (valIllHW) valIllHW.textContent    = (illHero.widthPct || 85) + '%';
+  if (inIllHO)  inIllHO.value           = illHero.overlapPct || 50;
+  if (valIllHO) valIllHO.textContent    = (illHero.overlapPct || 50) + '%';
+
+  const chkIllF = document.getElementById('checkIllFamilyEnabled');
+  const inIllFImg = document.getElementById('inputIllFamilyImage');
+  const inIllFW = document.getElementById('inputIllFamilyWidth');
+  const valIllFW = document.getElementById('valIllFamilyWidth');
+  const inIllFO = document.getElementById('inputIllFamilyOverlap');
+  const valIllFO = document.getElementById('valIllFamilyOverlap');
+
+  if (chkIllF)  chkIllF.checked         = illFamily.enabled !== false && !!illFamily.image;
+  if (inIllFImg) inIllFImg.value         = illFamily.image || '';
+  if (inIllFW)  inIllFW.value           = illFamily.widthPct || 82;
+  if (valIllFW) valIllFW.textContent    = (illFamily.widthPct || 82) + '%';
+  if (inIllFO)  inIllFO.value           = illFamily.overlapPct || 50;
+  if (valIllFO) valIllFO.textContent    = (illFamily.overlapPct || 50) + '%';
+
+  // RSVP
+  document.getElementById('inputWhatsapp').value = currentConfig.whatsappNumber || '';
+  document.getElementById('inputRsvpDeadline').value = currentConfig.rsvpDeadlineLabel || '';
+}
+
+function setupInputListeners() {
+  const bindings = [
+    { id: 'selectEventType', path: 'eventType' },
+    { id: 'inputName', path: 'name' },
+    { id: 'inputBrideName', path: 'brideName' },
+    { id: 'inputGroomName', path: 'groomName' },
+    { id: 'inputMonogram', path: 'monogram' },
+    { id: 'inputEyebrow', path: 'eyebrow' },
+    { id: 'inputWelcome', path: 'welcomeMessage' },
+    { id: 'inputQuote', path: 'quote' },
+    { id: 'inputFooterText', path: 'footerText' },
+    { id: 'inputStoryTitle', path: 'story.title' },
+    { id: 'inputStorySubtitle', path: 'story.subtitle' },
+    { id: 'inputStoryText', path: 'story.text' },
+    { id: 'inputStoryPhoto', path: 'story.photo' },
+    { id: 'inputInstagramHashtag', path: 'instagram.hashtag' },
+    { id: 'inputInstagramText', path: 'instagram.text' },
+    { id: 'inputDressTitle', path: 'dressCode.title' },
+    { id: 'inputDressDesc', path: 'dressCode.description' },
+    { id: 'inputReservedColors', path: 'dressCode.reservedColorsNote' },
+    { id: 'inputEventDate', path: 'eventDateISO' },
+    { id: 'inputTimezone', path: 'timezoneOffset' },
+    { id: 'inputDateLabel', path: 'eventDateLabel' },
+    { id: 'inputDateShort', path: 'eventDateShort' },
+    { id: 'inputCountdownPhrase', path: 'countdownPhrase' },
+    { id: 'inputDuration', path: 'eventDurationHours', isNum: true },
+    { id: 'inputBlessing', path: 'blessingIntro' },
+    { id: 'inputMother', path: 'mother' },
+    { id: 'inputFather', path: 'father' },
+    { id: 'inputBrideMother', path: 'brideMother' },
+    { id: 'inputBrideFather', path: 'brideFather' },
+    { id: 'inputGroomMother', path: 'groomMother' },
+    { id: 'inputGroomFather', path: 'groomFather' },
+    { id: 'inputGodmother', path: 'godmother' },
+    { id: 'inputGodfather', path: 'godfather' },
+    { id: 'inputCeremonyVenue', path: 'ceremony.venue' },
+    { id: 'inputCeremonyAddress', path: 'ceremony.address' },
+    { id: 'inputCeremonyTime', path: 'ceremony.time' },
+    { id: 'inputCeremonyMap', path: 'ceremony.mapsUrl' },
+    { id: 'inputCeremonyWaze', path: 'ceremony.wazeUrl' },
+    { id: 'inputReceptionVenue', path: 'reception.venue' },
+    { id: 'inputReceptionAddress', path: 'reception.address' },
+    { id: 'inputReceptionTime', path: 'reception.time' },
+    { id: 'inputReceptionMap', path: 'reception.mapsUrl' },
+    { id: 'inputReceptionWaze', path: 'reception.wazeUrl' },
+    { id: 'inputGiftIntro', path: 'giftRegistry.intro' },
+    { id: 'inputBankName', path: 'giftRegistry.bank.bankName' },
+    { id: 'inputBankHolder', path: 'giftRegistry.bank.holder' },
+    { id: 'inputBankClabe', path: 'giftRegistry.bank.clabe' },
+    { id: 'inputEnvelopeNote', path: 'giftRegistry.envelopeNote' },
+    { id: 'inputPhotoHero', path: 'photos.hero' },
+    { id: 'inputPhotoDate', path: 'photos.saveTheDate' },
+    { id: 'inputPhotoPortrait', path: 'photos.portrait' },
+    { id: 'inputSharedAlbumTitle', path: 'sharedAlbum.title' },
+    { id: 'inputSharedAlbumSubtitle', path: 'sharedAlbum.subtitle' },
+    { id: 'inputSharedAlbumDesc', path: 'sharedAlbum.description' },
+    { id: 'inputSharedAlbumCode', path: 'sharedAlbum.accessCode' },
+    { id: 'inputSharedAlbumUrl', path: 'sharedAlbum.albumUrl' },
+    { id: 'inputMusicUrl', path: 'music.url' },
+    { id: 'inputMusicTitle', path: 'music.title' },
+    { id: 'inputWhatsapp', path: 'whatsappNumber' },
+    { id: 'inputRsvpDeadline', path: 'rsvpDeadlineLabel' }
+  ];
+
+  bindings.forEach(({ id, path, isNum }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', (e) => {
+      setObjectPath(currentConfig, path, isNum ? parseFloat(e.target.value) || 0 : e.target.value);
+      schedulePreviewUpdate();
+    });
+  });
+
+  const checkGift = document.getElementById('checkGiftEnabled');
+  if (checkGift) {
+    checkGift.addEventListener('change', (e) => {
+      if (!currentConfig.giftRegistry) currentConfig.giftRegistry = {};
+      currentConfig.giftRegistry.enabled = e.target.checked;
+      const f = document.getElementById('giftRegistryFields');
+      if (f) f.style.display = e.target.checked ? 'block' : 'none';
+      schedulePreviewUpdate();
+    });
+  }
+
+  const checkAlbum = document.getElementById('checkSharedAlbumEnabled');
+  if (checkAlbum) {
+    checkAlbum.addEventListener('change', (e) => {
+      if (!currentConfig.sharedAlbum) currentConfig.sharedAlbum = JSON.parse(JSON.stringify(TemplateEngine.defaultConfig.sharedAlbum));
+      currentConfig.sharedAlbum.enabled = e.target.checked;
+      const f = document.getElementById('sharedAlbumFields');
+      if (f) f.style.display = e.target.checked ? 'block' : 'none';
+      schedulePreviewUpdate();
+    });
+  }
+
+  // Event Listeners para Personalización de Cristal del Contador
+  if (!currentConfig.countdownStyle) currentConfig.countdownStyle = JSON.parse(JSON.stringify(TemplateEngine.defaultConfig.countdownStyle));
+
+  const inCountBg = document.getElementById('inputCountdownBgColor');
+  const inCountBgHex = document.getElementById('inputCountdownBgColorHex');
+  const inCountText = document.getElementById('inputCountdownTextColor');
+  const inCountTextHex = document.getElementById('inputCountdownTextColorHex');
+  const inCountOp = document.getElementById('inputCountdownOpacity');
+  const valCountOp = document.getElementById('valCountdownOpacity');
+
+  if (inCountBg) {
+    inCountBg.addEventListener('input', (e) => {
+      currentConfig.countdownStyle.bgColor = e.target.value;
+      if (inCountBgHex) inCountBgHex.value = e.target.value;
+      schedulePreviewUpdate();
+    });
+  }
+
+  if (inCountBgHex) {
+    inCountBgHex.addEventListener('input', (e) => {
+      currentConfig.countdownStyle.bgColor = e.target.value;
+      if (inCountBg) inCountBg.value = e.target.value;
+      schedulePreviewUpdate();
+    });
+  }
+
+  if (inCountText) {
+    inCountText.addEventListener('input', (e) => {
+      currentConfig.countdownStyle.textColor = e.target.value;
+      if (inCountTextHex) inCountTextHex.value = e.target.value;
+      schedulePreviewUpdate();
+    });
+  }
+
+  if (inCountTextHex) {
+    inCountTextHex.addEventListener('input', (e) => {
+      currentConfig.countdownStyle.textColor = e.target.value;
+      if (inCountText) inCountText.value = e.target.value;
+      schedulePreviewUpdate();
+    });
+  }
+
+  if (inCountOp) {
+    inCountOp.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      currentConfig.countdownStyle.opacity = val / 100;
+      if (valCountOp) valCountOp.textContent = val + '%';
+      schedulePreviewUpdate();
+    });
+  }
+
+  // Música Toggle & File Upload
+  const checkMusic = document.getElementById('checkMusicEnabled');
+  const musicFields = document.getElementById('musicFields');
+  const fileAudio = document.getElementById('fileMusicAudio');
+  const inputMusicUrl = document.getElementById('inputMusicUrl');
+
+  if (checkMusic) {
+    checkMusic.addEventListener('change', (e) => {
+      if (!currentConfig.music) currentConfig.music = JSON.parse(JSON.stringify(TemplateEngine.defaultConfig.music));
+      currentConfig.music.enabled = e.target.checked;
+      if (musicFields) musicFields.style.display = e.target.checked ? 'block' : 'none';
+      schedulePreviewUpdate();
+    });
+  }
+
+  if (fileAudio) {
+    fileAudio.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          if (!currentConfig.music) currentConfig.music = {};
+          currentConfig.music.url = re.target.result;
+          if (!currentConfig.music.title || currentConfig.music.title === 'Música') {
+            currentConfig.music.title = file.name.replace(/\.[^/.]+$/, "");
+          }
+          if (inputMusicUrl) inputMusicUrl.value = re.target.result;
+          const inTitle = document.getElementById('inputMusicTitle');
+          if (inTitle && (!inTitle.value || inTitle.value === 'Música')) inTitle.value = currentConfig.music.title;
+          schedulePreviewUpdate();
+          showToast(`🎵 Audio cargado: ${file.name}`);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Conector de Nombres de Boda (+, &, y)
+  const selConn = document.getElementById('selectNameConnector');
+  const inCustomConn = document.getElementById('inputCustomNameConnector');
+  if (selConn) {
+    selConn.addEventListener('change', (e) => {
+      if (e.target.value === 'custom') {
+        if (inCustomConn) {
+          inCustomConn.style.display = 'block';
+          inCustomConn.focus();
+        }
+      } else {
+        if (inCustomConn) inCustomConn.style.display = 'none';
+        currentConfig.nameConnector = e.target.value;
+        schedulePreviewUpdate();
+      }
+    });
+  }
+
+  if (inCustomConn) {
+    inCustomConn.addEventListener('input', (e) => {
+      currentConfig.nameConnector = e.target.value;
+      schedulePreviewUpdate();
+    });
+  }
+
+  // Listeners para Fondos por Sección (Subida de Imagen, Slider de Opacidad y Presets)
+  const secConfigs = [
+    { key: 'family', inId: 'inputBgFamilyImage', fileId: 'fileBgFamily', opId: 'inputBgFamilyOpacity', valId: 'valBgFamilyOpacity', clearId: 'btnClearBgFamily', defOp: 35 },
+    { key: 'details', inId: 'inputBgDetailsImage', fileId: 'fileBgDetails', opId: 'inputBgDetailsOpacity', valId: 'valBgDetailsOpacity', clearId: 'btnClearBgDetails', defOp: 30 },
+    { key: 'dressCode', inId: 'inputBgDressCodeImage', fileId: 'fileBgDressCode', opId: 'inputBgDressCodeOpacity', valId: 'valBgDressCodeOpacity', clearId: 'btnClearBgDressCode', defOp: 25 },
+    { key: 'gallery', inId: 'inputBgGalleryImage', fileId: 'fileBgGallery', opId: 'inputBgGalleryOpacity', valId: 'valBgGalleryOpacity', clearId: 'btnClearBgGallery', defOp: 25 },
+    { key: 'giftRegistry', inId: 'inputBgGiftRegistryImage', fileId: 'fileBgGiftRegistry', opId: 'inputBgGiftRegistryOpacity', valId: 'valBgGiftRegistryOpacity', clearId: 'btnClearBgGiftRegistry', defOp: 25 },
+    { key: 'itinerary', inId: 'inputBgItineraryImage', fileId: 'fileBgItinerary', opId: 'inputBgItineraryOpacity', valId: 'valBgItineraryOpacity', clearId: 'btnClearBgItinerary', defOp: 30 },
+    { key: 'sharedAlbum', inId: 'inputBgSharedAlbumImage', fileId: 'fileBgSharedAlbum', opId: 'inputBgSharedAlbumOpacity', valId: 'valBgSharedAlbumOpacity', clearId: 'btnClearBgSharedAlbum', defOp: 30 },
+    { key: 'instagram', inId: 'inputBgInstagramImage', fileId: 'fileBgInstagram', opId: 'inputBgInstagramOpacity', valId: 'valBgInstagramOpacity', clearId: 'btnClearBgInstagram', defOp: 25 },
+    { key: 'rsvp', inId: 'inputBgRsvpImage', fileId: 'fileBgRsvp', opId: 'inputBgRsvpOpacity', valId: 'valBgRsvpOpacity', clearId: 'btnClearBgRsvp', defOp: 35 }
+  ];
+
+  secConfigs.forEach(({ key, inId, fileId, opId, valId, clearId, defOp }) => {
+    const inEl = document.getElementById(inId);
+    const fileEl = document.getElementById(fileId);
+    const opEl = document.getElementById(opId);
+    const valEl = document.getElementById(valId);
+    const clearEl = document.getElementById(clearId);
+
+    if (inEl) {
+      inEl.addEventListener('input', (e) => {
+        if (!currentConfig.sectionBackgrounds) currentConfig.sectionBackgrounds = {};
+        if (!currentConfig.sectionBackgrounds[key]) currentConfig.sectionBackgrounds[key] = { opacity: defOp / 100 };
+        currentConfig.sectionBackgrounds[key].image = e.target.value;
+        schedulePreviewUpdate();
+      });
+    }
+
+    if (fileEl) {
+      fileEl.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (re) => {
+            if (!currentConfig.sectionBackgrounds) currentConfig.sectionBackgrounds = {};
+            if (!currentConfig.sectionBackgrounds[key]) currentConfig.sectionBackgrounds[key] = { opacity: defOp / 100 };
+            currentConfig.sectionBackgrounds[key].image = re.target.result;
+            if (inEl) inEl.value = re.target.result;
+            schedulePreviewUpdate();
+            showToast(`🖼️ Fondo cargado para la sección`);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    if (opEl) {
+      opEl.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!currentConfig.sectionBackgrounds) currentConfig.sectionBackgrounds = {};
+        if (!currentConfig.sectionBackgrounds[key]) currentConfig.sectionBackgrounds[key] = { image: '' };
+        currentConfig.sectionBackgrounds[key].opacity = val / 100;
+        if (valEl) valEl.textContent = val + '%';
+        schedulePreviewUpdate();
+      });
+    }
+
+    if (clearEl) {
+      clearEl.addEventListener('click', () => {
+        if (currentConfig.sectionBackgrounds && currentConfig.sectionBackgrounds[key]) {
+          currentConfig.sectionBackgrounds[key].image = '';
+        }
+        if (inEl) inEl.value = '';
+        if (fileEl) fileEl.value = '';
+        schedulePreviewUpdate();
+        showToast(`🧹 Fondo removido`);
+      });
+    }
+  });
+
+  // Presets de Fondos de Lujo
+  function applyGlobalBgPreset(url, opacityPercent) {
+    if (!currentConfig.sectionBackgrounds) currentConfig.sectionBackgrounds = {};
+    secConfigs.forEach(({ key, inId, opId, valId }) => {
+      currentConfig.sectionBackgrounds[key] = {
+        image: url,
+        opacity: opacityPercent / 100
+      };
+      const inEl = document.getElementById(inId);
+      const opEl = document.getElementById(opId);
+      const valEl = document.getElementById(valId);
+      if (inEl) inEl.value = url;
+      if (opEl) opEl.value = opacityPercent;
+      if (valEl) valEl.textContent = opacityPercent + '%';
+    });
+    schedulePreviewUpdate();
+  }
+
+  const btnRoses = document.getElementById('btnPresetBgRoses');
+  if (btnRoses) {
+    btnRoses.addEventListener('click', () => {
+      applyGlobalBgPreset('https://images.unsplash.com/photo-1518895949257-7621c3c786d7?q=80&w=1200&auto=format&fit=crop', 30);
+      showToast('💐 Preset Rosas Blancas aplicado');
+    });
+  }
+
+  const btnSilk = document.getElementById('btnPresetBgSilk');
+  if (btnSilk) {
+    btnSilk.addEventListener('click', () => {
+      applyGlobalBgPreset('https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=1200&auto=format&fit=crop', 25);
+      showToast('🕊️ Preset Seda Marfil aplicado');
+    });
+  }
+
+  const btnBokeh = document.getElementById('btnPresetBgBokeh');
+  if (btnBokeh) {
+    btnBokeh.addEventListener('click', () => {
+      applyGlobalBgPreset('https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1200&auto=format&fit=crop', 25);
+      showToast('✨ Preset Destellos Dorados aplicado');
+    });
+  }
+
+  const btnClearAll = document.getElementById('btnClearAllBgs');
+  if (btnClearAll) {
+    btnClearAll.addEventListener('click', () => {
+      applyGlobalBgPreset('', 30);
+      showToast('🧹 Todos los fondos han sido limpiados');
+    });
+  }
+
+  // ─── Listeners Ilustraciones Multi-Plano ────────────────────────────────
+  function setupIllustrationListeners(slot, ids) {
+    const { chkId, imgId, fileId, widthId, valWidthId, overlapId, valOverlapId, clearId } = ids;
+    const ensure = () => {
+      if (!currentConfig.illustrations) currentConfig.illustrations = {};
+      if (!currentConfig.illustrations[slot]) currentConfig.illustrations[slot] = { enabled: false, image: '', widthPct: 85, overlapPct: 50 };
+      return currentConfig.illustrations[slot];
+    };
+
+    const chkEl = document.getElementById(chkId);
+    const imgEl = document.getElementById(imgId);
+    const fileEl = document.getElementById(fileId);
+    const widthEl = document.getElementById(widthId);
+    const valWidthEl = document.getElementById(valWidthId);
+    const overlapEl = document.getElementById(overlapId);
+    const valOverlapEl = document.getElementById(valOverlapId);
+    const clearEl = document.getElementById(clearId);
+
+    if (chkEl) chkEl.addEventListener('change', (e) => { ensure().enabled = e.target.checked; schedulePreviewUpdate(); });
+    if (imgEl) imgEl.addEventListener('input', (e) => { const d = ensure(); d.image = e.target.value; d.enabled = !!e.target.value; if (chkEl) chkEl.checked = !!e.target.value; schedulePreviewUpdate(); });
+    if (fileEl) {
+      fileEl.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (re) => {
+            const d = ensure();
+            d.image = re.target.result;
+            d.enabled = true;
+            if (imgEl) imgEl.value = re.target.result;
+            if (chkEl) chkEl.checked = true;
+            schedulePreviewUpdate();
+            showToast(`🎨 Ilustración cargada para la sección`);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+    if (widthEl) {
+      widthEl.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        ensure().widthPct = val;
+        if (valWidthEl) valWidthEl.textContent = val + '%';
+        schedulePreviewUpdate();
+      });
+    }
+    if (overlapEl) {
+      overlapEl.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        ensure().overlapPct = val;
+        if (valOverlapEl) valOverlapEl.textContent = val + '%';
+        schedulePreviewUpdate();
+      });
+    }
+    if (clearEl) {
+      clearEl.addEventListener('click', () => {
+        const d = ensure();
+        d.image = '';
+        d.enabled = false;
+        if (imgEl) imgEl.value = '';
+        if (fileEl) fileEl.value = '';
+        if (chkEl) chkEl.checked = false;
+        schedulePreviewUpdate();
+        showToast('🧹 Ilustración removida');
+      });
+    }
+  }
+
+  setupIllustrationListeners('hero', {
+    chkId: 'checkIllHeroEnabled',
+    imgId: 'inputIllHeroImage',
+    fileId: 'fileIllHero',
+    widthId: 'inputIllHeroWidth',
+    valWidthId: 'valIllHeroWidth',
+    overlapId: 'inputIllHeroOverlap',
+    valOverlapId: 'valIllHeroOverlap',
+    clearId: 'btnClearIllHero'
+  });
+
+  setupIllustrationListeners('family', {
+    chkId: 'checkIllFamilyEnabled',
+    imgId: 'inputIllFamilyImage',
+    fileId: 'fileIllFamily',
+    widthId: 'inputIllFamilyWidth',
+    valWidthId: 'valIllFamilyWidth',
+    overlapId: 'inputIllFamilyOverlap',
+    valOverlapId: 'valIllFamilyOverlap',
+    clearId: 'btnClearIllFamily'
+  });
+}
+
+function setObjectPath(obj, path, value) {
+  const parts = path.split('.');
+  let curr = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (!curr[parts[i]]) curr[parts[i]] = {};
+    curr = curr[parts[i]];
+  }
+  curr[parts[parts.length - 1]] = value;
+}
+
+// ==================== DYNAMIC LISTS ====================
+function setupDynamicLists() {
+  const courtInput = document.getElementById('inputCourtMember');
+  const btnAddCourt = document.getElementById('btnAddCourtMember');
+
+  const addCourtMember = () => {
+    const val = courtInput.value.trim();
+    if (val) {
+      if (!currentConfig.court) currentConfig.court = [];
+      currentConfig.court.push(val);
+      courtInput.value = '';
+      renderCourtTags();
+      schedulePreviewUpdate();
+    }
+  };
+
+  btnAddCourt.addEventListener('click', addCourtMember);
+  courtInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addCourtMember();
+    }
+  });
+
+  // Itinerario
+  document.getElementById('btnAddItineraryStep').addEventListener('click', () => {
+    if (!currentConfig.itinerary) currentConfig.itinerary = [];
+    currentConfig.itinerary.push({ icon: 'toast', label: 'Nuevo momento', time: '8:30 p.m.' });
+    renderItineraryInputs();
+    schedulePreviewUpdate();
+  });
+
+  // Tiendas
+  document.getElementById('btnAddGiftStore').addEventListener('click', () => {
+    if (!currentConfig.giftRegistry) currentConfig.giftRegistry = {};
+    if (!currentConfig.giftRegistry.stores) currentConfig.giftRegistry.stores = [];
+    currentConfig.giftRegistry.stores.push({ name: 'Nueva Tienda', url: 'https://' });
+    renderGiftStoresInputs();
+    schedulePreviewUpdate();
+  });
+
+  // Galería
+  document.getElementById('btnAddGalleryPhoto').addEventListener('click', () => {
+    if (!currentConfig.photos) currentConfig.photos = {};
+    if (!currentConfig.photos.gallery) currentConfig.photos.gallery = [];
+    currentConfig.photos.gallery.push('');
+    renderGalleryPhotosInputs();
+    schedulePreviewUpdate();
+  });
+}
+
+function renderCourtTags() {
+  const container = document.getElementById('courtTagsContainer');
+  container.innerHTML = '';
+  (currentConfig.court || []).forEach((name, index) => {
+    const badge = document.createElement('span');
+    badge.className = 'tag-badge';
+    badge.innerHTML = `
+      ${name}
+      <span class="tag-remove" data-index="${index}" title="Eliminar">&times;</span>
+    `;
+    badge.querySelector('.tag-remove').addEventListener('click', () => {
+      currentConfig.court.splice(index, 1);
+      renderCourtTags();
+      schedulePreviewUpdate();
+    });
+    container.appendChild(badge);
+  });
+}
+
+function renderItineraryInputs() {
+  const container = document.getElementById('itineraryList');
+  container.innerHTML = '';
+  (currentConfig.itinerary || []).forEach((step, index) => {
+    const row = document.createElement('div');
+    row.className = 'dynamic-item';
+    row.innerHTML = `
+      <select class="step-icon" style="width:130px;">
+        <option value="church" ${step.icon === 'church' ? 'selected' : ''}>⛪ Ceremonia</option>
+        <option value="rings" ${step.icon === 'rings' ? 'selected' : ''}>💍 Boda Civil</option>
+        <option value="toast" ${step.icon === 'toast' ? 'selected' : ''}>🥂 Recepción</option>
+        <option value="dinner" ${step.icon === 'dinner' ? 'selected' : ''}>🍽️ Cena</option>
+        <option value="dance" ${step.icon === 'dance' ? 'selected' : ''}>👠 Baile / Vals</option>
+        <option value="car" ${step.icon === 'car' ? 'selected' : ''}>🚗 Fin de Evento</option>
+        <option value="cake" ${step.icon === 'cake' ? 'selected' : ''}>🎂 Pastel</option>
+        <option value="photo" ${step.icon === 'photo' ? 'selected' : ''}>📸 Sesión Fotos</option>
+      </select>
+      <input type="text" class="step-label" value="${step.label || ''}" placeholder="Evento" style="flex:1;">
+      <input type="text" class="step-time" value="${step.time || ''}" placeholder="Hora (ej: 18:00 hrs)" style="width:100px;">
+      <button type="button" class="btn-icon-danger" title="Eliminar evento">&times;</button>
+    `;
+
+    row.querySelector('.step-icon').addEventListener('change', (e) => {
+      step.icon = e.target.value;
+      schedulePreviewUpdate();
+    });
+    row.querySelector('.step-label').addEventListener('input', (e) => {
+      step.label = e.target.value;
+      schedulePreviewUpdate();
+    });
+    row.querySelector('.step-time').addEventListener('input', (e) => {
+      step.time = e.target.value;
+      schedulePreviewUpdate();
+    });
+    row.querySelector('.btn-icon-danger').addEventListener('click', () => {
+      currentConfig.itinerary.splice(index, 1);
+      renderItineraryInputs();
+      schedulePreviewUpdate();
+    });
+
+    container.appendChild(row);
+  });
+}
+
+function renderGiftStoresInputs() {
+  const container = document.getElementById('giftStoresList');
+  container.innerHTML = '';
+  const stores = (currentConfig.giftRegistry && currentConfig.giftRegistry.stores) || [];
+  stores.forEach((store, index) => {
+    const row = document.createElement('div');
+    row.className = 'dynamic-item';
+    row.innerHTML = `
+      <input type="text" class="store-name" value="${store.name || ''}" placeholder="Nombre tienda" style="width:130px;">
+      <input type="url" class="store-url" value="${store.url || ''}" placeholder="https://..." style="flex:1;">
+      <button type="button" class="btn-icon-danger" title="Eliminar tienda">&times;</button>
+    `;
+
+    row.querySelector('.store-name').addEventListener('input', (e) => {
+      store.name = e.target.value;
+      schedulePreviewUpdate();
+    });
+    row.querySelector('.store-url').addEventListener('input', (e) => {
+      store.url = e.target.value;
+      schedulePreviewUpdate();
+    });
+    row.querySelector('.btn-icon-danger').addEventListener('click', () => {
+      currentConfig.giftRegistry.stores.splice(index, 1);
+      renderGiftStoresInputs();
+      schedulePreviewUpdate();
+    });
+
+    container.appendChild(row);
+  });
+}
+
+function renderGalleryPhotosInputs() {
+  const container = document.getElementById('galleryPhotosList');
+  container.innerHTML = '';
+  const photos = (currentConfig.photos && currentConfig.photos.gallery) || [];
+  photos.forEach((photoUrl, index) => {
+    const row = document.createElement('div');
+    row.className = 'dynamic-item';
+    row.innerHTML = `
+      <div style="width:32px; height:32px; border-radius:4px; background-size:cover; background-position:center; background-color:var(--border-color); flex-shrink:0; ${photoUrl ? `background-image:url('${photoUrl}');` : ''}"></div>
+      <input type="text" class="photo-url" value="${photoUrl || ''}" placeholder="URL de la imagen" style="flex:1;">
+      <label class="file-btn" style="padding:6px 10px; font-size:11px;">
+        📁 <input type="file" accept="image/*" class="gallery-file-input" style="display:none;">
+      </label>
+      <button type="button" class="btn-icon-danger" title="Eliminar foto">&times;</button>
+    `;
+
+    const urlInput = row.querySelector('.photo-url');
+    const fileInput = row.querySelector('.gallery-file-input');
+
+    urlInput.addEventListener('input', (e) => {
+      currentConfig.photos.gallery[index] = e.target.value;
+      renderGalleryPhotosInputs();
+      schedulePreviewUpdate();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          currentConfig.photos.gallery[index] = re.target.result;
+          renderGalleryPhotosInputs();
+          schedulePreviewUpdate();
+          showToast('📸 Foto añadida con éxito');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    row.querySelector('.btn-icon-danger').addEventListener('click', () => {
+      currentConfig.photos.gallery.splice(index, 1);
+      renderGalleryPhotosInputs();
+      schedulePreviewUpdate();
+    });
+
+    container.appendChild(row);
+  });
+}
+
+// ==================== FILE UPLOADS ====================
+function setupFileUploads() {
+  const map = [
+    { fileId: 'filePhotoHero', inputId: 'inputPhotoHero', path: 'photos.hero' },
+    { fileId: 'filePhotoDate', inputId: 'inputPhotoDate', path: 'photos.saveTheDate' },
+    { fileId: 'filePhotoPortrait', inputId: 'inputPhotoPortrait', path: 'photos.portrait' }
+  ];
+
+  map.forEach(({ fileId, inputId, path }) => {
+    const fileEl = document.getElementById(fileId);
+    const inputEl = document.getElementById(inputId);
+    if (!fileEl) return;
+
+    fileEl.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          inputEl.value = re.target.result;
+          setObjectPath(currentConfig, path, re.target.result);
+          schedulePreviewUpdate();
+          showToast('📸 Imagen cargada');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+}
+
+// ==================== PREVIEW GENERATOR ====================
+function schedulePreviewUpdate() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    updatePreview(false);
+  }, 120);
+}
+
+function updatePreview(forced = false) {
+  const iframe = document.getElementById('previewFrame');
+  const decorAssets = typeof DECOR_ASSETS !== 'undefined' ? DECOR_ASSETS : {};
+  const html = TemplateEngine.generateHTML(currentConfig, currentThemeName, customTheme, decorAssets);
+  iframe.srcdoc = html;
+}
+
+// ==================== HEADER ACTIONS & EXPORT ====================
+function setupHeaderActions() {
+  // 1. Exportar HTML
+  document.getElementById('btnExportHtml').addEventListener('click', () => {
+    const decorAssets = typeof DECOR_ASSETS !== 'undefined' ? DECOR_ASSETS : {};
+    const html = TemplateEngine.generateHTML(currentConfig, currentThemeName, customTheme, decorAssets);
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    
+    const isWedding = currentConfig.eventType === 'boda';
+    const rawName = (isWedding && currentConfig.brideName && currentConfig.groomName)
+      ? `${currentConfig.brideName}-y-${currentConfig.groomName}`
+      : (currentConfig.name || 'Invitacion');
+    const safeName = rawName.toLowerCase().replace(/\s+/g, '-');
+    
+    a.href = url;
+    a.download = `invitacion-${safeName}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('🎉 ¡Invitación de lujo descargada con éxito!');
+  });
+
+  // 2. Guardar Proyecto JSON
+  document.getElementById('btnExportJson').addEventListener('click', () => {
+    const projectData = {
+      version: "3.2",
+      themeName: currentThemeName,
+      customTheme: customTheme,
+      config: currentConfig
+    };
+    const jsonStr = JSON.stringify(projectData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    
+    const isWedding = currentConfig.eventType === 'boda';
+    const rawName = (isWedding && currentConfig.brideName && currentConfig.groomName)
+      ? `${currentConfig.brideName}-y-${currentConfig.groomName}`
+      : (currentConfig.name || 'Proyecto');
+    const safeName = rawName.toLowerCase().replace(/\s+/g, '-');
+    
+    a.href = url;
+    a.download = `proyecto-${safeName}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('💾 Proyecto guardado como JSON');
+  });
+
+  // 3. Cargar Proyecto JSON
+  const jsonInput = document.getElementById('jsonFileInput');
+  document.getElementById('btnImportJson').addEventListener('click', () => {
+    jsonInput.click();
+  });
+
+  jsonInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (re) => {
+        try {
+          const data = JSON.parse(re.target.result);
+          if (data.config) {
+            currentConfig = data.config;
+            currentThemeName = data.themeName || "vino";
+            if (data.customTheme) customTheme = data.customTheme;
+
+            document.querySelectorAll('.theme-card').forEach(card => {
+              card.classList.toggle('selected', card.dataset.theme === currentThemeName);
+            });
+            document.getElementById('customColorsWrapper').style.display = currentThemeName === 'custom' ? 'block' : 'none';
+
+            populateForm();
+            updatePreview(true);
+            showToast('✅ Proyecto cargado exitosamente');
+          } else {
+            showToast('⚠️ Formato de archivo JSON inválido');
+          }
+        } catch (err) {
+          showToast('❌ Error al leer el archivo JSON');
+        }
+      };
+      reader.readAsText(file);
+    }
+  });
+
+  // 4. Ver en nueva pestaña
+  document.getElementById('btnOpenNewTab').addEventListener('click', () => {
+    const decorAssets = typeof DECOR_ASSETS !== 'undefined' ? DECOR_ASSETS : {};
+    const html = TemplateEngine.generateHTML(currentConfig, currentThemeName, customTheme, decorAssets);
+    const newTab = window.open();
+    if (newTab) {
+      newTab.document.open();
+      newTab.document.write(html);
+      newTab.document.close();
+    }
+  });
+}
+
+// ==================== TOAST HELPER ====================
+function showToast(message) {
+  const toast = document.getElementById('appToast');
+  const msgEl = document.getElementById('toastMessage');
+  msgEl.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2800);
+}

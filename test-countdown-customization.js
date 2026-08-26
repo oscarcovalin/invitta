@@ -10,6 +10,7 @@ console.log('Hero Date shows month name (MARZO):', htmlDefault.includes('MARZO')
 console.log('Hero Date shows day number (20):', htmlDefault.includes('id="heroDateDay"'));
 
 console.log('Contains phrase "Para casarme con el amor de mi vida":', htmlDefault.includes('Para casarme con el amor de mi vida'));
+console.log('Contains seconds element (seconds):', htmlDefault.includes('id="seconds"'));
 console.log('Contains default rgba countdown bg (0.55):', htmlDefault.includes('rgba(18, 18, 20, 0.55)'));
 
 // 2. Test Custom Countdown Style
