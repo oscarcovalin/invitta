@@ -1,0 +1,26 @@
+{
+  "label": "v6.8_clean_vendor_badge_no_star",
+  "timestamp": "2026-08-26T02:36:34.794Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 118470
+    },
+    {
+      "filename": "index.html",
+      "size": 94618
+    },
+    {
+      "filename": "app.js",
+      "size": 83586
+    },
+    {
+      "filename": "style.css",
+      "size": 12175
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
