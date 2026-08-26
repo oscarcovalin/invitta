@@ -706,42 +706,6 @@ tailwind.config = {
         </div>
       </div>
 
-      <!-- ==================== TRANSICIÓN: POLVO DE ESTRELLAS ==================== -->
-      <div id="stardustTransition" class="relative my-8 py-8 px-6 sm:px-8 rounded-2xl bg-gradient-to-b from-black/60 via-black/75 to-black/60 border border-antique-gold/50 shadow-[0_10px_35px_rgba(165,110,14,0.18)] overflow-hidden text-center gsap-fade-up ">
-        <!-- Canvas de Partículas Doradas Flotantes de Fondo -->
-        <canvas id="stardustTransitionCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
-        
-        <div class="relative z-10 flex flex-col items-center">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-antique-gold/20 border border-antique-gold/60 mb-3 backdrop-blur-md">
-            <span class="text-antique-gold text-xs animate-pulse">✦</span>
-            <span class="font-label-caps text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-antique-gold font-bold" id="stardustSubtitle">
-              Momento Mágico
-            </span>
-            <span class="text-antique-gold text-xs animate-pulse">✦</span>
-          </div>
-
-          <h3 class="font-display-lg text-[22px] sm:text-[26px] font-normal text-[#f7f6ec] tracking-wide mb-1.5" id="stardustTitle">
-            Polvo de Estrellas
-          </h3>
-
-          
-          <div class="mb-3">
-            <span class="font-mono text-[11px] font-semibold text-antique-gold bg-black/60 px-3 py-0.5 rounded-full border border-antique-gold/40 inline-block" id="stardustTime">
-              21:30 HRS · Primer Baile
-            </span>
-          </div>
-
-          <p class="font-display-lg text-[14.5px] sm:text-[16px] text-[#f7f6ec]/90 max-w-md mx-auto leading-relaxed font-light mb-6 tracking-wide" id="stardustText">
-            Al caer la noche, encenderemos juntos una constelación de luces y bengalas para iluminar nuestro primer baile.
-          </p>
-
-          <button type="button" id="btnOpenStardustLight" class="btn-luxury-primary text-[11.5px] sm:text-[12.5px] py-3 px-7 uppercase tracking-[0.25em] font-semibold inline-flex items-center gap-2.5 shadow-[0_0_25px_rgba(212,175,55,0.45)] hover:shadow-[0_0_35px_rgba(212,175,55,0.75)] transition-all transform hover:scale-105 active:scale-95 cursor-pointer">
-            <span class="text-sm animate-spin" style="animation-duration: 4s;">✨</span>
-            <span id="stardustBtnText">✨ Encender mi Luz</span>
-          </button>
-        </div>
-      </div>
-
       <!-- Recepción -->
       <div id="receptionCard" class="relative bg-white/50 backdrop-blur-xl p-8 sm:p-10 rounded-2xl shadow-[0_8px_30px_rgba(165,110,14,0.08)] border border-antique-gold/50 gsap-stagger-item ">
         <div class="absolute -top-7 left-1/2 -translate-x-1/2 w-14 h-14 bg-champagne-cream rounded-full flex items-center justify-center border border-antique-gold shadow-sm">
@@ -1313,6 +1277,44 @@ tailwind.config = {
             
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 8.2 POLVO DE ESTRELLAS (MOMENTO MÁGICO) ==================== -->
+  <section id="polvoDeEstrellas" class="py-12 px-margin-mobile text-center max-w-xl mx-auto relative overflow-hidden ">
+    <div id="stardustTransition" class="relative py-9 px-6 sm:px-10 rounded-2xl bg-gradient-to-b from-black/65 via-black/80 to-black/65 border border-antique-gold/50 shadow-[0_10px_35px_rgba(165,110,14,0.22)] overflow-hidden text-center gsap-fade-up">
+      <!-- Canvas de Partículas Doradas Flotantes de Fondo -->
+      <canvas id="stardustTransitionCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+      
+      <div class="relative z-10 flex flex-col items-center">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-antique-gold/20 border border-antique-gold/60 mb-3 backdrop-blur-md">
+          <span class="text-antique-gold text-xs animate-pulse">✦</span>
+          <span class="font-label-caps text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-antique-gold font-bold" id="stardustSubtitle">
+            Momento Mágico
+          </span>
+          <span class="text-antique-gold text-xs animate-pulse">✦</span>
+        </div>
+
+        <h3 class="font-display-lg text-[24px] sm:text-[28px] font-normal text-[#f7f6ec] tracking-wide mb-1.5" id="stardustTitle">
+          Polvo de Estrellas
+        </h3>
+
+        
+        <div class="mb-3">
+          <span class="font-mono text-[11px] font-semibold text-antique-gold bg-black/60 px-3 py-0.5 rounded-full border border-antique-gold/40 inline-block" id="stardustTime">
+            21:30 HRS · Primer Baile
+          </span>
+        </div>
+
+        <p class="font-display-lg text-[15px] sm:text-[16.5px] text-[#f7f6ec]/90 max-w-md mx-auto leading-relaxed font-light mb-6 tracking-wide" id="stardustText">
+          Al caer la noche, encenderemos juntos una constelación de luces y bengalas para iluminar nuestro primer baile.
+        </p>
+
+        <button type="button" id="btnOpenStardustLight" class="btn-luxury-primary text-[11.5px] sm:text-[12.5px] py-3 px-8 uppercase tracking-[0.25em] font-semibold inline-flex items-center gap-2.5 shadow-[0_0_25px_rgba(212,175,55,0.5)] hover:shadow-[0_0_35px_rgba(212,175,55,0.8)] transition-all transform hover:scale-105 active:scale-95 cursor-pointer">
+          <span class="text-sm animate-spin" style="animation-duration: 4s;">✨</span>
+          <span id="stardustBtnText">✨ Encender mi Luz</span>
+        </button>
       </div>
     </div>
   </section>

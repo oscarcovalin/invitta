@@ -33,15 +33,15 @@ assert(html.includes('id="stardustFullCanvas"'), 'Generated HTML includes stardu
 assert(html.includes('id="btnCloseStardust"'), 'Generated HTML includes btnCloseStardust');
 assert(html.includes('initStardust'), 'Generated HTML includes initStardust script');
 
-// 3. Check transition position (must be between ceremonyCard and receptionCard)
-const ceremonyIdx = html.indexOf('id="ceremonyCard"');
-const stardustIdx = html.indexOf('id="stardustTransition"');
-const receptionIdx = html.indexOf('id="receptionCard"');
+// 3. Check position (must be below itinerario and above albumColaborativo)
+const itineraryIdx = html.indexOf('id="itinerario"');
+const stardustIdx = html.indexOf('id="polvoDeEstrellas"');
+const albumIdx = html.indexOf('id="albumColaborativo"');
 
-assert(ceremonyIdx !== -1, 'Found ceremonyCard in HTML');
-assert(stardustIdx !== -1, 'Found stardustTransition in HTML');
-assert(receptionIdx !== -1, 'Found receptionCard in HTML');
-assert(ceremonyIdx < stardustIdx && stardustIdx < receptionIdx, 'stardustTransition is positioned between ceremonyCard and receptionCard');
+assert(itineraryIdx !== -1, 'Found itinerario in HTML');
+assert(stardustIdx !== -1, 'Found polvoDeEstrellas in HTML');
+assert(albumIdx !== -1, 'Found albumColaborativo in HTML');
+assert(itineraryIdx < stardustIdx && stardustIdx < albumIdx, 'polvoDeEstrellas is positioned below itinerario and above albumColaborativo');
 
 // 4. Check invitacion-estudio.html form controls
 const estudioHtml = fs.readFileSync(path.join(__dirname, 'invitacion-estudio.html'), 'utf-8');
