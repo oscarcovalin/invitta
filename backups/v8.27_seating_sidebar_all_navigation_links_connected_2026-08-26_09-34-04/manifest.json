@@ -1,0 +1,26 @@
+{
+  "label": "v8.27_seating_sidebar_all_navigation_links_connected",
+  "timestamp": "2026-08-26T15:34:04.596Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 156800
+    },
+    {
+      "filename": "index.html",
+      "size": 103699
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -8,7 +8,7 @@
   <!-- Google Fonts Oficiales -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script id="tailwind-config">
@@ -95,7 +95,8 @@
             "headline-lg-mobile": ["Playfair Display", "serif"],
             "body-md": ["Inter", "sans-serif"],
             "label-sm": ["Inter", "sans-serif"],
-            "headline-lg": ["Playfair Display", "serif"]
+            "headline-lg": ["Playfair Display", "serif"],
+            "mono": ["JetBrains Mono", "monospace"]
           },
           "fontSize": {
             "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400" }],
@@ -152,15 +153,23 @@
     .seat-pill {
       animation: dropInertia 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      background: rgba(20, 20, 22, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
   </style>
 </head>
 <body class="bg-background font-body-md text-on-surface antialiased flex h-screen overflow-hidden select-none">
 
   <!-- ==================== BARRA LATERAL FIJA (300px) ==================== -->
   <aside class="fixed left-0 top-0 h-full w-[300px] bg-surface-container-lowest border-r border-outline-variant z-50 flex flex-col pt-8">
-    <div class="px-7 mb-10 flex items-center gap-3.5">
-      <!-- Logotipo Oficial Invitta -->
-      <div class="w-10 h-10 rounded-xl bg-primary text-surface-container-lowest flex items-center justify-center shadow-md flex-shrink-0 border border-outline-variant/60">
+    
+    <!-- Logo Oficial Invitta Studio -->
+    <a href="../index.html" class="px-7 mb-9 flex items-center gap-3.5 group" title="Ir al Dashboard Principal">
+      <div class="w-10 h-10 rounded-xl bg-primary text-surface-container-lowest flex items-center justify-center shadow-md flex-shrink-0 border border-outline-variant/60 group-hover:scale-105 transition-transform">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2L19 9L12 16L5 9L12 2Z" stroke="#C7B299" stroke-width="1.6" stroke-linejoin="round"/>
           <path d="M12 7L16 11L12 15L8 11L12 7Z" fill="#C7B299" fill-opacity="0.3"/>
@@ -173,30 +182,54 @@
         <span class="font-headline-lg text-primary tracking-widest uppercase text-xl leading-none font-normal">Invitta</span>
         <span class="font-label-caps text-on-surface-variant tracking-[0.25em] text-[10.5px] uppercase mt-1">Studio</span>
       </div>
-    </div>
+    </a>
 
-    <nav class="flex-1 flex flex-col gap-1 px-4">
-      <a class="group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" href="#">
-        <span class="material-symbols-outlined mr-4 font-light text-[20px]">dashboard</span>
+    <!-- NAVEGACIÓN TOTALMENTE CONECTADA -->
+    <nav class="flex-1 flex flex-col gap-1.5 px-4" id="sidebarNav">
+      
+      <!-- 1. Resumen (Dashboard Central) -->
+      <a href="../index.html" class="nav-item group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" title="Dashboard Principal de Invitaciones">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px] group-hover:text-primary transition-colors">dashboard</span>
         <span class="font-label-caps uppercase tracking-widest text-xs">Resumen</span>
       </a>
-      <a class="group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" href="#">
-        <span class="material-symbols-outlined mr-4 font-light text-[20px]">group</span>
-        <span class="font-label-caps uppercase tracking-widest text-xs">Invitados</span>
+
+      <!-- 2. Invitados (Módulo RSVP & Confirmaciones) -->
+      <a href="../rsvp-module/index.html" class="nav-item group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" title="Laboratorio de Confirmación RSVP">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px] group-hover:text-primary transition-colors">group</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Invitados & RSVP</span>
       </a>
-      <a aria-current="page" class="group flex items-center px-5 py-3.5 rounded-lg transition-all duration-300 bg-surface-container-high text-primary font-medium" href="#">
+
+      <!-- 3. Mesas (PÁGINA ACTIVA) -->
+      <a aria-current="page" href="#" class="nav-item group flex items-center px-5 py-3.5 rounded-lg transition-all duration-300 bg-surface-container-high text-primary font-semibold shadow-sm" title="Organizador de Mesas y Floor Plan">
         <span class="material-symbols-outlined mr-4 font-light text-[20px]">table_restaurant</span>
-        <span class="font-label-caps uppercase tracking-widest text-xs">Mesas</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Mesas (Floor Plan)</span>
       </a>
-      <a class="group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" href="#">
-        <span class="material-symbols-outlined mr-4 font-light text-[20px]">calendar_today</span>
+
+      <!-- 4. Catering (Tabla Táctica WeasyPrint) -->
+      <a href="../catering-module/catering-tactical-sheet.html" class="nav-item group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" title="Tabla Táctica de Catering y Menús Especiales">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px] group-hover:text-primary transition-colors">restaurant_menu</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Catering Táctico</span>
+      </a>
+
+      <!-- 5. Cronograma (Modal de Itinerario) -->
+      <button type="button" id="btnOpenTimeline" class="nav-item w-full text-left group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" title="Cronograma e Itinerario del Evento">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px] group-hover:text-primary transition-colors">calendar_today</span>
         <span class="font-label-caps uppercase tracking-widest text-xs">Cronograma</span>
-      </a>
-      <a class="group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" href="#">
-        <span class="material-symbols-outlined mr-4 font-light text-[20px]">settings</span>
+      </button>
+
+      <!-- 6. Configuración (Modal de Parámetros de Mesas) -->
+      <button type="button" id="btnOpenSettings" class="nav-item w-full text-left group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" title="Ajustes de Capacidad y Exportación">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px] group-hover:text-primary transition-colors">settings</span>
         <span class="font-label-caps uppercase tracking-widest text-xs">Configuración</span>
-      </a>
+      </button>
+
     </nav>
+
+    <!-- Indicador de Enlace en Vivo en Footer de Sidebar -->
+    <div class="px-7 py-5 border-t border-outline-variant/60 flex items-center gap-2.5 text-on-surface-variant">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="font-label-sm text-[10px] tracking-wider uppercase">Todos los módulos conectados</span>
+    </div>
   </aside>
 
   <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
@@ -210,12 +243,13 @@
       </div>
       
       <div class="flex items-center gap-6">
-        <button class="text-on-surface-variant hover:text-primary transition-colors p-2" title="Notificaciones">
+        <button class="text-on-surface-variant hover:text-primary transition-colors p-2 relative" title="Notificaciones" onclick="alert('✦ No hay alertas pendientes en la recepción.')">
           <span class="material-symbols-outlined font-light text-[22px]">notifications</span>
+          <span class="w-2 h-2 rounded-full bg-amber-500 absolute top-2 right-2"></span>
         </button>
-        <div class="w-9 h-9 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center">
+        <a href="../index.html" class="w-9 h-9 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary hover:bg-surface-container transition-colors" title="Ver Perfil de Anfitrión">
           <span class="material-symbols-outlined text-primary font-light text-[18px]">person</span>
-        </div>
+        </a>
       </div>
     </header>
 
@@ -292,9 +326,7 @@
           </div>
 
           <!-- LISTA SCROLLABLE DE INVITADOS -->
-          <div class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar" id="unassignedList">
-            <!-- Inyectado dinámicamente con SeatingPlanner -->
-          </div>
+          <div class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar" id="unassignedList"></div>
 
         </div>
 
@@ -309,9 +341,7 @@
           </div>
 
           <!-- CONTENEDOR DE MESAS (Imperial & Circulares) -->
-          <div class="min-w-[700px] max-w-[850px] mx-auto relative pt-4 pb-20" id="tablesContainer">
-            <!-- Inyectado dinámicamente -->
-          </div>
+          <div class="min-w-[700px] max-w-[850px] mx-auto relative pt-4 pb-20" id="tablesContainer"></div>
 
         </div>
 
@@ -338,11 +368,122 @@
 
   </div>
 
+  <!-- ==================== MODAL: CRONOGRAMA / ITINERARIO ==================== -->
+  <div id="modalTimeline" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-6 hidden">
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl w-full max-w-lg shadow-2xl p-7 flex flex-col gap-6 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-outline-variant pb-4">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-lg bg-surface-container text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-base">calendar_today</span>
+          </span>
+          <div>
+            <h3 class="font-headline-lg text-primary text-xl font-normal">Cronograma del Evento</h3>
+            <span class="font-label-caps text-on-surface-variant text-[10px]">Catalina & Julián · 20 de Marzo 2027</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal text-on-surface-variant hover:text-primary text-2xl font-light">&times;</button>
+      </div>
+
+      <div class="space-y-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+        <div class="flex items-start gap-4 p-3 rounded-xl bg-surface border border-outline-variant">
+          <span class="font-mono text-xs font-bold text-primary px-2.5 py-1 rounded bg-surface-container">16:30</span>
+          <div>
+            <h4 class="text-xs font-semibold text-primary">Ceremonia Religiosa</h4>
+            <p class="text-[11px] text-on-surface-variant">Parroquia de Santa María de las Cumbres</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-3 rounded-xl bg-surface border border-outline-variant">
+          <span class="font-mono text-xs font-bold text-primary px-2.5 py-1 rounded bg-surface-container">18:00</span>
+          <div>
+            <h4 class="text-xs font-semibold text-primary">Recepción & Cóctel de Bienvenida</h4>
+            <p class="text-[11px] text-on-surface-variant">Jardín Principal · Música de Cuerdas</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-3 rounded-xl bg-surface border border-outline-variant">
+          <span class="font-mono text-xs font-bold text-primary px-2.5 py-1 rounded bg-surface-container">19:30</span>
+          <div>
+            <h4 class="text-xs font-semibold text-primary">Banquete Nupcial & Servicio de Mesas</h4>
+            <p class="text-[11px] text-on-surface-variant">Salón Las Magnolias · Protocolo Táctico de Catering</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-3 rounded-xl bg-surface border border-outline-variant">
+          <span class="font-mono text-xs font-bold text-primary px-2.5 py-1 rounded bg-surface-container">21:00</span>
+          <div>
+            <h4 class="text-xs font-semibold text-primary">Vals de los Novios & Fiesta</h4>
+            <p class="text-[11px] text-on-surface-variant">Pista Central · Apertura de Barra Libre</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-outline-variant">
+        <button type="button" class="btn-close-modal px-5 py-2 rounded-lg bg-primary text-on-primary font-label-caps text-xs tracking-wider uppercase hover:bg-charcoal transition-colors">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: CONFIGURACIÓN DE MESAS ==================== -->
+  <div id="modalSettings" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-6 hidden">
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl w-full max-w-lg shadow-2xl p-7 flex flex-col gap-6 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-outline-variant pb-4">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-lg bg-surface-container text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-base">settings</span>
+          </span>
+          <div>
+            <h3 class="font-headline-lg text-primary text-xl font-normal">Configuración del Salón</h3>
+            <span class="font-label-caps text-on-surface-variant text-[10px]">Ajustes de Capacidad & Exportación</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal text-on-surface-variant hover:text-primary text-2xl font-light">&times;</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="font-label-caps text-on-surface-variant uppercase tracking-wider block mb-1.5">Capacidad Estándar por Mesa</label>
+          <select id="cfgDefaultCapacity" class="w-full bg-surface-container border border-outline-variant rounded-lg p-2.5 text-xs text-on-surface">
+            <option value="6">6 Asientos por mesa</option>
+            <option value="8" selected>8 Asientos por mesa (Recomendado)</option>
+            <option value="10">10 Asientos por mesa</option>
+            <option value="12">12 Asientos por mesa (Imperial)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="font-label-caps text-on-surface-variant uppercase tracking-wider block mb-1.5">Color de Alerta de Sobrecupo</label>
+          <div class="flex items-center gap-3">
+            <input type="color" id="cfgOverColor" value="#A38047" class="w-10 h-10 rounded-lg border border-outline-variant cursor-pointer">
+            <span class="font-mono text-xs text-primary font-semibold">#A38047 (Oro Antiguo Haute-Couture)</span>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-outline-variant flex flex-col gap-2">
+          <label class="font-label-caps text-on-surface-variant uppercase tracking-wider">Herramientas de Exportación</label>
+          <div class="flex gap-2">
+            <button type="button" id="btnExportSeatingJson" class="flex-1 py-2.5 px-3 rounded-lg bg-surface-container border border-outline-variant hover:border-charcoal text-primary font-medium flex items-center justify-center gap-1.5 transition-colors">
+              <span class="material-symbols-outlined text-base">download</span> Exportar JSON
+            </button>
+            <button type="button" id="btnResetAllTables" class="py-2.5 px-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-700 hover:bg-rose-500/20 font-medium flex items-center justify-center gap-1.5 transition-colors">
+              <span class="material-symbols-outlined text-base">restart_alt</span> Resetear Todo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-outline-variant">
+        <button type="button" class="btn-close-modal px-5 py-2 rounded-lg bg-primary text-on-primary font-label-caps text-xs tracking-wider uppercase hover:bg-charcoal transition-colors">
+          Guardar & Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPT MODULAR DE SEATING PLANNER -->
   <script src="seating-planner.js"></script>
 
   <script>
-    // Inicializar instancia de SeatingPlanner conectada al nuevo diseño
+    // 1. Inicializar instancia de SeatingPlanner conectada al nuevo diseño
     const planner = new SeatingPlanner({
       unassignedListSelector: '#unassignedList',
       tablesContainerSelector: '#tablesContainer',
@@ -355,10 +496,46 @@
       searchInputSelector: '#searchGuestsInput'
     });
 
-    // Botón Nueva Mesa
+    // 2. Botón Nueva Mesa
     document.getElementById('btnAddNewTable').addEventListener('click', () => {
       const type = planner.state.tables.length % 2 === 0 ? 'circular' : 'imperial';
       planner.addTable('Mesa', type, 8);
+    });
+
+    // 3. Modales (Cronograma y Configuración)
+    const modalTimeline = document.getElementById('modalTimeline');
+    const modalSettings = document.getElementById('modalSettings');
+
+    document.getElementById('btnOpenTimeline').addEventListener('click', () => {
+      modalTimeline.classList.remove('hidden');
+    });
+
+    document.getElementById('btnOpenSettings').addEventListener('click', () => {
+      modalSettings.classList.remove('hidden');
+    });
+
+    document.querySelectorAll('.btn-close-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        modalTimeline.classList.add('hidden');
+        modalSettings.classList.add('hidden');
+      });
+    });
+
+    // 4. Exportar Plano a JSON
+    document.getElementById('btnExportSeatingJson').addEventListener('click', () => {
+      const jsonStr = JSON.stringify(planner.state, null, 2);
+      navigator.clipboard.writeText(jsonStr).then(() => {
+        alert('✅ Distribución del salón y asignación de mesas copiada al portapapeles en formato JSON.');
+      });
+    });
+
+    // 5. Resetear todas las mesas
+    document.getElementById('btnResetAllTables').addEventListener('click', () => {
+      if (confirm('¿Deseas desasignar a todos los comensales para reiniciar el plano?')) {
+        planner.state.guests.forEach(g => g.tableId = null);
+        planner.updateStateAndDOM();
+        modalSettings.classList.add('hidden');
+      }
     });
   </script>
 </body>
