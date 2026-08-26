@@ -1,0 +1,26 @@
+{
+  "label": "v6.4_multiplane_below_story_section",
+  "timestamp": "2026-08-26T01:41:43.173Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 112367
+    },
+    {
+      "filename": "index.html",
+      "size": 84599
+    },
+    {
+      "filename": "app.js",
+      "size": 81399
+    },
+    {
+      "filename": "style.css",
+      "size": 12175
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

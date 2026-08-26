@@ -9,14 +9,14 @@ console.log('parallaxBgHero wrapper present:', htmlBase.includes('id="parallaxBg
 console.log('Hero section is overflow-visible:', htmlBase.includes('overflow: visible'));
 console.log('illustrationBridgeHero present:', htmlBase.includes('id="illustrationBridgeHero"'));
 console.log('illustrationBridgeFamily present:', htmlBase.includes('id="illustrationBridgeFamily"'));
-console.log('Hero bridge is hidden by default:', htmlBase.includes('id="illustrationBridgeHero"') && htmlBase.includes('hidden'));
 console.log('GSAP parallaxBgHero animation present:', htmlBase.includes("getElementById('parallaxBgHero')"));
 console.log('GSAP illBridgeHero animation present:', htmlBase.includes("getElementById('illustrationBridgeHero')"));
 console.log('GSAP illBridgeFamily animation present:', htmlBase.includes("getElementById('illustrationBridgeFamily')"));
 console.log('Countdown has adaptive padding class (default pt-2):', htmlBase.includes('pt-2 sm:pt-4 pb-20'));
 
-// 2. Test Hero illustration active with custom precision positioning
+// 2. Test Hero illustration active with story section enabled (Debajo de Nuestra Historia)
 const configIllHero = JSON.parse(JSON.stringify(templateEngine.defaultConfig));
+configIllHero.story = { enabled: true, title: 'Nuestra Historia', subtitle: 'Un año lleno de momentos', text: 'Dicen que los mejores momentos...' };
 configIllHero.illustrations = {
   hero: { 
     enabled: true, 
@@ -34,7 +34,7 @@ configIllHero.illustrations = {
 };
 const htmlIllHero = templateEngine.generateHTML(configIllHero, 'vino');
 
-console.log('\n--- TEST 2: HERO ILLUSTRATION ACTIVE WITH PRECISION POSITIONING ---');
+console.log('\n--- TEST 2: HERO ILLUSTRATION ACTIVE (POSITIONED BELOW NUESTRA HISTORIA) ---');
 console.log('Hero bridge shows image URL:', htmlIllHero.includes('alice-illustration.png'));
 console.log('Hero bridge NOT hidden:', !htmlIllHero.includes('id="illustrationBridgeHero"\n      class="absolute z-30 pointer-events-none will-change-transform hidden"'));
 console.log('Hero bridge contains max-width 580px:', htmlIllHero.includes('max-width: 580px'));
@@ -42,6 +42,13 @@ console.log('Hero bridge contains bottom offset calc with offsetY -20px:', htmlI
 console.log('Hero bridge contains offsetX calc +10px:', htmlIllHero.includes('left: calc(50% + 10px)'));
 console.log('Countdown receives extraPadding 40px:', htmlIllHero.includes('pt-[calc(140px+40px)]'));
 console.log('GSAP receives custom parallax speed 30%:', htmlIllHero.includes('const heroParallaxSpeed = 30'));
+
+// Verify illustration is AFTER story text and BEFORE countdown
+const idxStoryText = htmlIllHero.indexOf('Dicen que los mejores momentos');
+const idxIllBridge = htmlIllHero.indexOf('id="illustrationBridgeHero"');
+const idxCountdown = htmlIllHero.indexOf('id="countdownSection"');
+console.log('Illustration is placed AFTER Story Text:', idxStoryText < idxIllBridge);
+console.log('Illustration is placed BEFORE Countdown Section:', idxIllBridge < idxCountdown);
 
 // 3. Test Family illustration active with left alignment
 const configIllFamily = JSON.parse(JSON.stringify(templateEngine.defaultConfig));
@@ -71,10 +78,9 @@ console.log('Family bottom offset for 40% overlap + 15px:', htmlIllFamily.includ
 
 // 4. Section order still intact
 const idxHero = htmlIllHero.indexOf('id="hero"');
-const idxCountdown = htmlIllHero.indexOf('id="countdownSection"');
 const idxFamily = htmlIllHero.indexOf('id="family"');
 const idxDetails = htmlIllHero.indexOf('id="details"');
 console.log('\n--- TEST 4: SECTION ORDER PRESERVED ---');
-console.log('Hero before Countdown:', idxHero < idxCountdown);
+console.log('Hero before Story/Countdown:', idxHero < idxCountdown);
 console.log('Countdown before Family:', idxCountdown < idxFamily);
 console.log('Family before Details:', idxFamily < idxDetails);
