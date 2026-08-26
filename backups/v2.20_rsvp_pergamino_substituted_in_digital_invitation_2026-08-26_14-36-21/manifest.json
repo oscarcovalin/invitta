@@ -1,0 +1,26 @@
+{
+  "label": "v2.20_rsvp_pergamino_substituted_in_digital_invitation",
+  "timestamp": "2026-08-26T20:36:21.156Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 178926
+    },
+    {
+      "filename": "index.html",
+      "size": 69736
+    },
+    {
+      "filename": "app.js",
+      "size": 97840
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

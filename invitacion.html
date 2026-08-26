@@ -290,6 +290,49 @@ tailwind.config = {
     transform: translateY(-1px);
   }
 
+  /* ==================== ESTILO PERGAMINO RSVP ==================== */
+  .pergamino-container {
+    background: #ffffff;
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 38px 28px;
+    box-shadow: 0 18px 45px rgba(22, 60, 43, 0.18), inset 0 0 35px rgba(165, 110, 14, 0.04);
+    position: relative;
+  }
+  .pergamino-ornament {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: var(--gold);
+  }
+  .ornament-line {
+    width: 45px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.65;
+  }
+  .mensaje-personalizado-pergamino {
+    background-color: rgba(165, 110, 14, 0.08);
+    border-left: 4px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 0.92rem;
+    color: var(--onyx);
+    line-height: 1.55;
+    text-align: left;
+  }
+  .pass-ticket-pergamino {
+    background: var(--champagne);
+    border: 2px dashed var(--gold);
+    border-radius: 14px;
+    padding: 22px 18px;
+    margin: 18px 0;
+    text-align: center;
+  }
+
   /* Estilo Editorial de Alta Gama para el Contador (Líneas Delicadas sin Recuadro) */
   .frosted-glass-card {
     background: transparent;
@@ -1415,83 +1458,126 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- ==================== 10. RSVP (CONFIRMACIÓN & QR PASS) ==================== -->
+  <!-- ==================== 10. RSVP PERGAMINO (CONFIRMACIÓN & PASE DE HONOR) ==================== -->
   <section id="rsvp" class="py-24 px-margin-mobile bg-emerald-dark text-center relative overflow-hidden border-t border-antique-gold/30 ">
     
-    <div class="relative z-10 max-w-md mx-auto gsap-scale-up overflow-visible">
-      <!-- RSVP como elemento gráfico tipográfico editorial de gran escala con total coherencia dorada -->
-      <p class="font-display-lg text-[52px] sm:text-[64px] md:text-[76px] font-light tracking-[0.16em] uppercase leading-none overflow-visible text-antique-gold select-none mb-2"
-        style="color: var(--color-gold, #c19a4e); text-shadow: 0 2px 14px rgba(0,0,0,0.5);">
-        RSVP
-      </p>
-      <h2 class="font-display-lg text-[26px] sm:text-[30px] md:text-[34px] mb-3 font-normal gsap-title overflow-visible text-[#f7f6ec] tracking-wide">
-        Confirma tu Asistencia
-      </h2>
-      <p id="rsvpDeadline" class="font-display-lg text-[15.5px] sm:text-[17px] text-[#f7f6ec]/85 mb-8 gsap-fade-up font-light tracking-wide">
-        Por favor, haznos saber si podrás acompañarnos antes del 20 de Febrero.
-      </p>
-
-      <form id="rsvpForm" class="flex flex-col gap-5 text-left gsap-fade-up bg-white/10 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-antique-gold/40 shadow-xl" novalidate>
+    
+    <div class="relative z-10 max-w-lg mx-auto gsap-scale-up overflow-visible">
+      
+      <!-- Contenedor Pergamino de Lujo -->
+      <div class="pergamino-container text-deep-onyx" id="pergaminoCard">
         
-        <!-- Nombre -->
-        <div class="flex flex-col gap-2">
-          <label class="font-label-caps text-[11px] text-antique-gold uppercase tracking-[0.25em] font-medium">Nombre Completo</label>
-          <input id="formGuestName" name="nombre" required class="w-full bg-white/15 border border-antique-gold/50 rounded-full px-5 py-3 font-body-lg text-[#f7f6ec] focus:outline-none focus:border-antique-gold transition-colors placeholder:text-[#f7f6ec]/40 text-sm" placeholder="Escribe tu nombre y apellidos" type="text"/>
+        <!-- Ribete / Adorno Superior -->
+        <div class="pergamino-ornament">
+          <div class="ornament-line"></div>
+          <span class="text-antique-gold text-lg">⚜️</span>
+          <div class="ornament-line"></div>
         </div>
 
-        <!-- Teléfono -->
-        <div class="flex flex-col gap-2">
-          <label class="font-label-caps text-[11px] text-antique-gold uppercase tracking-[0.25em] font-medium">Teléfono / WhatsApp</label>
-          <input name="telefono" class="w-full bg-white/15 border border-antique-gold/50 rounded-full px-5 py-3 font-body-lg text-[#f7f6ec] focus:outline-none focus:border-antique-gold transition-colors placeholder:text-[#f7f6ec]/40 text-sm" placeholder="Para enviar recordatorios" type="tel"/>
-        </div>
+        <h2 class="font-display-lg text-[25px] sm:text-[29px] font-normal text-deep-onyx mb-1 tracking-wide uppercase">
+          Confirmación de Asistencia
+        </h2>
+        <p class="font-display-lg italic text-[14.5px] sm:text-[16px] text-antique-gold mb-5 font-light" id="subEventoRsvp">
+          Catalina & Julián · 20 · Marzo · 2027
+        </p>
 
-        <!-- Asistencia -->
-        <div class="flex flex-col gap-3">
-          <label class="font-label-caps text-[11px] text-antique-gold uppercase tracking-[0.25em] font-medium">¿Asistirás?</label>
-          <div class="flex flex-col gap-2.5">
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-antique-gold/40 rounded-xl bg-[#0d130e]/40 hover:bg-[#0d130e]/60 transition-colors">
-              <input class="accent-antique-gold w-4 h-4" name="rsvp" value="si" checked type="radio"/>
-              <span class="font-body-lg text-sm text-[#f7f6ec] font-normal">Sí, con mucho gusto asistiré</span>
+        <!-- Saludo Personalizado Dinámico -->
+        <div id="contenedor-saludo-pergamino"></div>
+
+        <!-- Formulario RSVP -->
+        <form id="rsvpForm" class="flex flex-col gap-4 text-left" novalidate>
+          
+          <!-- Nombre (se oculta si viene por URL personalizada) -->
+          <div id="campoNombrePergamino" class="flex flex-col gap-1.5">
+            <label class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">
+              Nombre Completo
             </label>
-            <label class="flex items-center gap-3 cursor-pointer p-3 border border-antique-gold/40 rounded-xl bg-[#0d130e]/40 hover:bg-[#0d130e]/60 transition-colors">
-              <input class="accent-antique-gold w-4 h-4" name="rsvp" value="no" type="radio"/>
-              <span class="font-body-lg text-sm text-[#f7f6ec] font-normal">Lamentablemente no podré asistir</span>
+            <input id="formGuestName" name="nombre" required class="w-full bg-[#FAF8F5] border border-antique-gold/40 rounded-xl px-4 py-2.5 font-body-lg text-deep-onyx focus:outline-none focus:border-antique-gold focus:ring-2 focus:ring-antique-gold/20 transition-all text-sm placeholder:text-neutral-400" placeholder="Escribe tu nombre y apellidos" type="text"/>
+          </div>
+
+          <!-- Teléfono / WhatsApp -->
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">
+              Teléfono / WhatsApp
             </label>
+            <input id="formGuestPhone" name="telefono" class="w-full bg-[#FAF8F5] border border-antique-gold/40 rounded-xl px-4 py-2.5 font-body-lg text-deep-onyx focus:outline-none focus:border-antique-gold focus:ring-2 focus:ring-antique-gold/20 transition-all text-sm placeholder:text-neutral-400" placeholder="Para enviar confirmación y recordatorios" type="tel"/>
           </div>
+
+          <!-- ¿Nos acompañarás? -->
+          <div class="flex flex-col gap-2 pt-1">
+            <label class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">
+              ¿Nos acompañarás?
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <label class="flex items-center gap-2.5 cursor-pointer p-3 border border-antique-gold/40 rounded-xl bg-champagne-cream/60 hover:bg-champagne-cream transition-colors text-deep-onyx">
+                <input class="accent-antique-gold w-4 h-4" name="rsvp" value="si" checked type="radio" id="radioAsistenciaSi"/>
+                <span class="font-body-lg text-[13px] font-medium">¡Sí, ahí estaré!</span>
+              </label>
+              <label class="flex items-center gap-2.5 cursor-pointer p-3 border border-antique-gold/40 rounded-xl bg-champagne-cream/60 hover:bg-champagne-cream transition-colors text-deep-onyx">
+                <input class="accent-antique-gold w-4 h-4" name="rsvp" value="no" type="radio" id="radioAsistenciaNo"/>
+                <span class="font-body-lg text-[13px] font-medium">No podré asistir</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Selector de Pases (Stepper) -->
+          <div id="rsvpTicketsRow" class="flex items-center justify-between p-3.5 bg-champagne-cream/70 border border-antique-gold/40 rounded-xl mt-1">
+            <div>
+              <span class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] block font-semibold">Pases a Confirmar</span>
+              <span id="allowedTicketsHint" class="text-[11px] text-tertiary font-normal">Máximo 2 personas</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button type="button" class="stepper__btn w-8 h-8 rounded-full border border-antique-gold bg-antique-gold text-white flex items-center justify-center font-bold text-base hover:opacity-90 active:scale-95 transition-all" data-step="-1">-</button>
+              <span id="guestCount" class="font-display-lg text-lg text-deep-onyx font-semibold tabular-nums min-w-[20px] text-center">1</span>
+              <button type="button" class="stepper__btn w-8 h-8 rounded-full border border-antique-gold bg-antique-gold text-white flex items-center justify-center font-bold text-base hover:opacity-90 active:scale-95 transition-all" data-step="1">+</button>
+            </div>
+          </div>
+
+          <!-- Botón de Envío -->
+          <button type="submit" id="rsvpSubmit" class="btn-luxury-primary w-full py-3.5 text-[11.5px] tracking-[0.25em] uppercase font-semibold shadow-[0_4px_20px_rgba(165,110,14,0.35)] mt-2 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]">
+            Enviar Confirmación en Pergamino
+          </button>
+        </form>
+
+        <!-- Vista de Éxito / Pase Digital Pergamino -->
+        <div id="rsvpSuccess" class="hidden text-center py-3">
+          <span class="text-4xl text-antique-gold block mb-2">📜</span>
+          <h3 class="font-display-lg text-2xl font-normal text-deep-onyx uppercase tracking-wide">
+            ¡Confirmación Registrada!
+          </h3>
+          <p class="font-display-lg text-sm text-tertiary mt-1" id="rsvpSuccessMsg">
+            Tu respuesta ha sido registrada exitosamente en el sistema oficial.
+          </p>
+
+          <div class="pass-ticket-pergamino">
+            <span class="font-label-caps text-[10px] uppercase tracking-[0.25em] text-antique-gold font-bold block mb-1">
+              Pase Digital de Acceso Oficial
+            </span>
+            <h4 class="font-display-lg text-xl sm:text-2xl text-deep-onyx font-normal my-1" id="qrGuestName">
+              Invitado de Honor
+            </h4>
+            <p class="font-body-lg text-xs text-tertiary mb-3" id="qrGuestTickets">
+              Pase autorizado
+            </p>
+
+            <div id="qrContainer" class="flex justify-center my-3"></div>
+
+            <div class="inline-block px-4 py-1.5 rounded-full bg-black/5 border border-antique-gold/40 mt-1">
+              <p class="font-mono text-xs text-deep-onyx font-bold tracking-widest uppercase" id="qrFolio">
+                M03-MARTINEZ-4P
+              </p>
+            </div>
+          </div>
+
+          <p class="font-body-lg text-[11.5px] text-tertiary/90 max-w-xs mx-auto mb-4 font-normal">
+            Presenta este folio y código QR en la recepción para agilizar tu ingreso al salón.
+          </p>
+
+          <button type="button" id="btnResetRsvp" class="text-xs text-antique-gold hover:underline font-medium cursor-pointer">
+            ↺ Modificar o registrar otra respuesta
+          </button>
         </div>
 
-        <!-- Selector de Pases (Restringido por URL VIP) -->
-        <div id="rsvpTicketsRow" class="flex items-center justify-between p-3.5 bg-[#0d130e]/40 border border-antique-gold/40 rounded-xl">
-          <div>
-            <span class="font-label-caps text-[11px] text-antique-gold uppercase tracking-[0.25em] block font-medium">Pases Autorizados</span>
-            <span id="allowedTicketsHint" class="text-[11px] text-[#f7f6ec]/70 font-normal">Máximo 2 personas</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <button type="button" class="stepper__btn w-8 h-8 rounded-full border border-antique-gold bg-antique-gold/20 text-[#f7f6ec] flex items-center justify-center font-bold text-base hover:bg-antique-gold transition-colors" data-step="-1">-</button>
-            <span id="guestCount" class="font-display-lg text-lg text-[#f7f6ec] font-light tabular-nums min-w-[20px] text-center">1</span>
-            <button type="button" class="stepper__btn w-8 h-8 rounded-full border border-antique-gold bg-antique-gold/20 text-[#f7f6ec] flex items-center justify-center font-bold text-base hover:bg-antique-gold transition-colors" data-step="1">+</button>
-          </div>
-        </div>
-
-        <button type="submit" id="rsvpSubmit" class="btn-luxury-primary w-full py-3.5 text-[11px] tracking-[0.25em] uppercase font-medium shadow-[0_4px_20px_rgba(165,110,14,0.4)] mt-2">
-          Confirmar Asistencia
-        </button>
-      </form>
-
-      <!-- Pase de Acceso con Código QR -->
-      <div id="rsvpSuccess" class="hidden mt-6 bg-white text-deep-onyx p-6 sm:p-8 rounded-2xl border-2 border-dashed border-antique-gold shadow-2xl max-w-sm mx-auto text-center">
-        <span class="font-script text-3xl text-antique-gold block">Pase de Acceso</span>
-        <span class="font-display-lg text-sm tracking-widest text-deep-onyx font-normal block mt-1" id="qrEventTitle">Nuestra Boda · Catalina & Julián</span>
-        
-        <hr class="border-t border-antique-gold/30 my-4"/>
-        
-        <p class="font-body-lg text-base font-medium text-deep-onyx" id="qrGuestName"></p>
-        <p class="font-body-lg text-xs text-tertiary mt-1 font-normal" id="qrGuestTickets"></p>
-        
-        <div id="qrContainer" class="flex justify-center my-4"></div>
-        
-        <p class="font-mono text-[10px] text-tertiary tracking-widest uppercase" id="qrFolio"></p>
-        <p class="font-body-lg text-[11px] text-tertiary/80 mt-3 font-normal">Presenta este código QR en la entrada del evento para validar tu ingreso.</p>
       </div>
 
     </div>
@@ -2039,7 +2125,7 @@ if(CONFIG.eventDateISO){
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
-  // Google Calendar URL
+// Google Calendar URL
   const gStart = new Date(CONFIG.eventDateISO);
   const gEnd = new Date(gStart.getTime() + (CONFIG.eventDurationHours || 6) * 3600000);
   const pad2 = n => String(n).padStart(2,'0');
@@ -2051,7 +2137,6 @@ if(CONFIG.eventDateISO){
   if(gCalBtn){
     gCalBtn.href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${gTitle}&dates=${toGDate(gStart)}/${toGDate(gEnd)}&details=${gDet}&location=${gLoc}`;
   }
-}
 
 // 3. Apple/Outlook .ICS Calendar Download
 const btnIcs = document.getElementById('btnCalendar');
@@ -2103,7 +2188,6 @@ if(btnCopyHashtag){
   });
 }
 
-// Código Personalizado para Álbum Colaborativo (por URL o por Config)
 const urlAlbumCode = urlParams.get('codigo_album') || urlParams.get('album_code') || urlParams.get('pin') || urlParams.get('codigo');
 const albumCodeEl = document.getElementById('albumAccessCode');
 if (albumCodeEl) {
@@ -2163,147 +2247,224 @@ if (musicPlayer && audio) {
   audio.addEventListener('ended', () => updatePlayerState(false));
 }
 
-// 6. RSVP Stepper & QR Pass
-let guestCount = Math.min(1, urlTickets);
-const guestOut = document.getElementById('guestCount');
-const ticketsRow = document.getElementById('rsvpTicketsRow');
-if(guestOut) guestOut.textContent = guestCount;
+// 6. RSVP Pergamino: Detección, Stepper, Folio Logístico y QR Pass
+(function initRsvpPergamino() {
+  const saludoCont = document.getElementById('contenedor-saludo-pergamino');
+  const campoNombre = document.getElementById('campoNombrePergamino');
+  const inputNombre = document.getElementById('formGuestName');
+  const guestOut = document.getElementById('guestCount');
+  const ticketsRow = document.getElementById('rsvpTicketsRow');
+  const ticketsHint = document.getElementById('allowedTicketsHint');
+  const rsvpForm = document.getElementById('rsvpForm');
+  const rsvpSuccess = document.getElementById('rsvpSuccess');
+  const btnSubmit = document.getElementById('rsvpSubmit');
+  const btnReset = document.getElementById('btnResetRsvp');
 
-document.querySelectorAll('.stepper__btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    guestCount = Math.min(urlTickets, Math.max(1, guestCount + parseInt(btn.dataset.step, 10)));
-    if(guestOut) guestOut.textContent = guestCount;
-  });
-});
+  let guestCount = Math.min(urlTickets, Math.max(1, urlTickets));
 
-document.querySelectorAll('input[name="rsvp"]').forEach(r => {
-  r.addEventListener('change', () => {
-    if(r.value === 'no'){
-      ticketsRow.style.opacity = '0.35';
-      ticketsRow.style.pointerEvents = 'none';
-    } else {
-      ticketsRow.style.opacity = '1';
-      ticketsRow.style.pointerEvents = 'auto';
+  if (urlGuest && urlGuest.trim()) {
+    if (saludoCont) {
+      saludoCont.innerHTML = `
+        <div class="mensaje-personalizado-pergamino">
+          ¡Qué alegría tenerte aquí, <strong>${urlGuest}</strong>! Tus <strong>${urlTickets} ${urlTickets === 1 ? 'pase' : 'pases'}</strong> ya están reservados para nuestro gran día.
+        </div>
+      `;
     }
+    if (campoNombre) campoNombre.style.display = 'none';
+    if (inputNombre) inputNombre.value = urlGuest;
+    if (ticketsHint) ticketsHint.textContent = `Máximo ${urlTickets} persona${urlTickets === 1 ? '' : 's'}`;
+  } else {
+    if (saludoCont) {
+      saludoCont.innerHTML = `
+        <div class="mensaje-personalizado-pergamino">
+          Por favor ingresa tus datos para registrar tu confirmación de asistencia en el sistema oficial.
+        </div>
+      `;
+    }
+    if (campoNombre) campoNombre.style.display = 'flex';
+    if (inputNombre) inputNombre.value = '';
+    if (ticketsHint) ticketsHint.textContent = `Máximo ${urlTickets} persona${urlTickets === 1 ? '' : 's'}`;
+  }
+
+  if (guestOut) guestOut.textContent = guestCount;
+
+  // Stepper buttons
+  document.querySelectorAll('.stepper__btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      guestCount = Math.min(urlTickets, Math.max(1, guestCount + parseInt(btn.dataset.step, 10)));
+      if (guestOut) guestOut.textContent = guestCount;
+    });
   });
-});
 
-const rsvpForm = document.getElementById('rsvpForm');
-if(rsvpForm){
-  rsvpForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if(!rsvpForm.checkValidity()){ rsvpForm.reportValidity(); return; }
-    
-    const data = new FormData(rsvpForm);
-    const payload = {
-      attend: data.get('rsvp'),
-      nombre: data.get('nombre'),
-      telefono: data.get('telefono'),
-      pases: data.get('rsvp') === 'si' ? guestCount : 0
-    };
-
-    // Folio Logístico Opción B: [MESA]-[APELLIDO]-[PASES] (ej: M03-MARTINEZ-4P o MIMP-ORTIZ-2P)
-    const rawNombre = (payload.nombre || '').trim();
-    const cleanTokens = rawNombre
-      .normalize("NFD").replace(/[̀-ͯ]/g, "")
-      .replace(/[^a-zA-Z0-9s]/g, '')
-      .trim()
-      .split(/s+/)
-      .filter(w => !['FAMILIA', 'FAM', 'SR', 'SRA', 'DR', 'DRA', 'ING', 'LIC', 'DON', 'DONA', 'DE', 'DEL', 'LA', 'LAS', 'LOS', 'Y'].includes(w.toUpperCase()));
-    
-    const apellidoCode = cleanTokens.length > 0 ? cleanTokens[0].toUpperCase().substring(0, 10) : 'INVITADO';
-    
-    let mesaCode = 'MGEN';
-    const urlMesa = urlParams.get('mesa') || urlParams.get('table') || urlParams.get('m');
-    if (urlMesa) {
-      if (String(urlMesa).toLowerCase().includes('imp')) {
-        mesaCode = 'MIMP';
+  // Asistencia radio changes
+  document.querySelectorAll('input[name="rsvp"]').forEach(r => {
+    r.addEventListener('change', () => {
+      if (r.value === 'no') {
+        if (ticketsRow) ticketsRow.style.display = 'none';
+        if (btnSubmit) btnSubmit.textContent = 'Enviar Aviso (No podré asistir)';
       } else {
-        const mMatch = String(urlMesa).match(/d+/);
-        mesaCode = mMatch ? 'M' + mMatch[0].padStart(2, '0') : 'MGEN';
+        if (ticketsRow) ticketsRow.style.display = 'flex';
+        if (btnSubmit) btnSubmit.textContent = 'Enviar Confirmación en Pergamino';
       }
-    } else {
-      try {
-        if (typeof localStorage !== 'undefined') {
-          const rawDb = localStorage.getItem('invitta_2_guest_db');
-          if (rawDb) {
-            const db = JSON.parse(rawDb);
-            if (db && Array.isArray(db.guests)) {
-              const cleanN = rawNombre.toLowerCase().replace(/[^a-z0-9]/g, '');
-              const found = db.guests.find(g => {
-                const gClean = (g.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-                return cleanN.includes(gClean) || gClean.includes(cleanN);
-              });
-              if (found && found.tableId) {
-                if (found.tableId === 'tbl_imperial' || String(found.tableId).includes('imp')) {
-                  mesaCode = 'MIMP';
-                } else {
-                  const mMatch = String(found.tableId).match(/d+/);
-                  if (mMatch) mesaCode = 'M' + mMatch[0].padStart(2, '0');
+    });
+  });
+
+  // Reset button
+  if (btnReset) {
+    btnReset.addEventListener('click', () => {
+      if (rsvpSuccess) rsvpSuccess.classList.add('hidden');
+      if (rsvpForm) {
+        rsvpForm.classList.remove('hidden');
+        rsvpForm.reset();
+      }
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Enviar Confirmación en Pergamino';
+      }
+      if (urlGuest && inputNombre) inputNombre.value = urlGuest;
+      if (ticketsRow) ticketsRow.style.display = 'flex';
+      guestCount = Math.min(urlTickets, Math.max(1, urlTickets));
+      if (guestOut) guestOut.textContent = guestCount;
+    });
+  }
+
+  // Submit handler
+  if (rsvpForm) {
+    rsvpForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!rsvpForm.checkValidity()) { rsvpForm.reportValidity(); return; }
+
+      const data = new FormData(rsvpForm);
+      const isAttending = data.get('rsvp') === 'si';
+      const guestName = (data.get('nombre') || urlGuest || 'Invitado de Honor').trim();
+      const phone = (data.get('telefono') || '').trim();
+      const confirmedTickets = isAttending ? guestCount : 0;
+
+      // Generar Folio Logístico Opción B: [MESA]-[APELLIDO]-[PASES]
+      const cleanTokens = guestName
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9\s]/g, '')
+        .trim()
+        .split(/\s+/)
+        .filter(w => !['FAMILIA', 'FAM', 'SR', 'SRA', 'DR', 'DRA', 'ING', 'LIC', 'DON', 'DONA', 'DE', 'DEL', 'LA', 'LAS', 'LOS', 'Y'].includes(w.toUpperCase()));
+      
+      const isFamily = /familia|fam|flia/i.test(guestName);
+      let apellidoCode = 'INVITADO';
+      if (cleanTokens.length > 0) {
+        if (isFamily) {
+          apellidoCode = cleanTokens[0].toUpperCase().substring(0, 10);
+        } else {
+          apellidoCode = (cleanTokens.length > 1 ? cleanTokens[cleanTokens.length - 1] : cleanTokens[0]).toUpperCase().substring(0, 10);
+        }
+      }
+      
+      let mesaCode = 'MGEN';
+      const urlMesa = urlParams.get('mesa') || urlParams.get('table') || urlParams.get('m');
+      if (urlMesa) {
+        if (String(urlMesa).toLowerCase().includes('imp')) {
+          mesaCode = 'MIMP';
+        } else {
+          const mMatch = String(urlMesa).match(/\d+/);
+          mesaCode = mMatch ? 'M' + mMatch[0].padStart(2, '0') : 'MGEN';
+        }
+      } else {
+        try {
+          if (typeof localStorage !== 'undefined') {
+            const rawDb = localStorage.getItem('invitta_2_guest_db');
+            if (rawDb) {
+              const db = JSON.parse(rawDb);
+              if (db && Array.isArray(db.guests)) {
+                const cleanN = guestName.toLowerCase().replace(/[^a-z0-9]/g, '');
+                const found = db.guests.find(g => {
+                  const gClean = (g.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                  return cleanN.includes(gClean) || gClean.includes(cleanN);
+                });
+                if (found) {
+                  if (found.tableId === 'tbl_imperial' || String(found.tableId).includes('imp') || found.court || found.vip) {
+                    mesaCode = 'MIMP';
+                  } else if (found.tableId) {
+                    const mMatch = String(found.tableId).match(/\d+/);
+                    if (mMatch) mesaCode = 'M' + mMatch[0].padStart(2, '0');
+                  }
+                  found.status = isAttending ? 'CONFIRMED' : 'DECLINED';
+                  found.confirmedPasses = confirmedTickets;
+                  found.respondedAt = new Date().toISOString();
+                  localStorage.setItem('invitta_2_guest_db', JSON.stringify(db));
                 }
               }
             }
           }
-        }
-      } catch(e) {}
-    }
-
-    const folio = `${mesaCode}-${apellidoCode}-${payload.pases || 1}P`;
-    const calcDisplayName = isWedding ? (`${CONFIG.brideName || ''} & ${CONFIG.groomName || ''}`) : (CONFIG.name || 'Invitación');
-
-    if(CONFIG.whatsappNumber && CONFIG.whatsappNumber.trim()){
-      const attendLine = payload.attend === 'si' ? '✅ Sí, confirmamos nuestra asistencia' : '❌ No podremos asistir';
-      const lines = [
-        `✨ *Confirmación · ${CONFIG.eyebrow || 'Boda'} de ${calcDisplayName}*`,
-        `👤 *Titular:* ${payload.nombre}`,
-        `💌 *Estado:* ${attendLine}`
-      ];
-      if(payload.attend === 'si') {
-        lines.push(`🎟️ *Pases Confirmados:* ${payload.pases} de ${urlTickets}`);
-        lines.push(`🔖 *Folio:* ${folio}`);
+        } catch (err) {}
       }
-      const text = encodeURIComponent(lines.join('\n'));
-      const phone = CONFIG.whatsappNumber.replace(/[^\d]/g, '');
-      window.open(`https://wa.me/${phone}?text=${text}`, '_blank', 'noopener,noreferrer');
-    }
 
-    const submitBtn = document.getElementById('rsvpSubmit');
-    if(submitBtn){
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Generando Pase...';
-    }
+      const folio = `${mesaCode}-${apellidoCode}-${confirmedTickets || 1}P`;
+      const calcDisplayName = isWedding ? (`${CONFIG.brideName || ''} & ${CONFIG.groomName || ''}`) : (CONFIG.name || 'Invitación');
 
-    setTimeout(() => {
-      rsvpForm.classList.add('hidden');
-      const successBox = document.getElementById('rsvpSuccess');
-      successBox.classList.remove('hidden');
-
-      if(payload.attend === 'si'){
-        document.getElementById('qrGuestName').textContent = payload.nombre;
-        document.getElementById('qrGuestTickets').textContent = `Pase autorizado para: ${payload.pases} persona(s)`;
-        document.getElementById('qrFolio').textContent = `Folio: ${folio}`;
-
-        const qrData = JSON.stringify({
-          folio: folio,
-          evento: calcDisplayName,
-          titular: payload.nombre,
-          pases: payload.pases,
-          fecha: CONFIG.eventDateShort
-        });
-        const qrContainer = document.getElementById('qrContainer');
-        qrContainer.innerHTML = '';
-        if(typeof QRCode !== 'undefined'){
-          new QRCode(qrContainer, { text: qrData, width: 140, height: 140, colorDark: "#222222", colorLight: "#ffffff" });
+      // WhatsApp link trigger
+      if (CONFIG.whatsappNumber && CONFIG.whatsappNumber.trim()) {
+        const attendLine = isAttending ? '✅ Sí, confirmamos nuestra asistencia' : '❌ No podremos asistir';
+        const lines = [
+          `✨ *Confirmación Pergamino · ${CONFIG.eyebrow || 'Boda'} de ${calcDisplayName}*`,
+          `👤 *Titular:* ${guestName}`,
+          `💌 *Estado:* ${attendLine}`
+        ];
+        if (isAttending) {
+          lines.push(`🎟️ *Pases Confirmados:* ${confirmedTickets} de ${urlTickets}`);
+          lines.push(`🔖 *Folio Logístico:* ${folio}`);
         }
-      } else {
-        document.getElementById('qrGuestName').textContent = payload.nombre;
-        document.getElementById('qrGuestTickets').textContent = 'Lamentamos que no puedas acompañarnos. ¡Gracias por avisarnos!';
-        document.getElementById('qrContainer').innerHTML = '💌';
+        const text = encodeURIComponent(lines.join('\n'));
+        const waPhone = CONFIG.whatsappNumber.replace(/[^\d]/g, '');
+        window.open(`https://wa.me/${waPhone}?text=${text}`, '_blank', 'noopener,noreferrer');
       }
-    }, 600);
-  });
-}
+
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Generando Pase en Pergamino...';
+      }
+
+      setTimeout(() => {
+        rsvpForm.classList.add('hidden');
+        if (rsvpSuccess) {
+          rsvpSuccess.classList.remove('hidden');
+
+          const nameEl = document.getElementById('qrGuestName');
+          const ticketsEl = document.getElementById('qrGuestTickets');
+          const folioEl = document.getElementById('qrFolio');
+          const msgEl = document.getElementById('rsvpSuccessMsg');
+
+          if (nameEl) nameEl.textContent = guestName;
+          if (folioEl) folioEl.textContent = 'FOLIO: ' + folio;
+
+          if (isAttending) {
+            if (ticketsEl) ticketsEl.textContent = `Pase autorizado para: ${confirmedTickets} persona(s)`;
+            if (msgEl) msgEl.textContent = 'Tu respuesta ha sido registrada exitosamente en el sistema oficial.';
+
+            const qrData = JSON.stringify({
+              folio: folio,
+              evento: calcDisplayName,
+              titular: guestName,
+              pases: confirmedTickets,
+              fecha: CONFIG.eventDateShort
+            });
+            const qrContainer = document.getElementById('qrContainer');
+            if (qrContainer) {
+              qrContainer.innerHTML = '';
+              if (typeof QRCode !== 'undefined') {
+                new QRCode(qrContainer, { text: qrData, width: 140, height: 140, colorDark: "#222222", colorLight: "#ffffff" });
+              }
+            }
+          } else {
+            if (ticketsEl) ticketsEl.textContent = 'Lamentamos que no puedas acompañarnos.';
+            if (msgEl) msgEl.textContent = 'Hemos registrado que no podrás asistir. ¡Agradecemos mucho tu aviso!';
+            const qrContainer = document.getElementById('qrContainer');
+            if (qrContainer) qrContainer.innerHTML = '💌';
+          }
+        }
+      }, 500);
+    });
+  }
+})();
 
 // 6.5. MÓDULO POLVO DE ESTRELLAS: TRANSICIÓN Y MODO PANTALLA COMPLETA
 (function initStardust() {

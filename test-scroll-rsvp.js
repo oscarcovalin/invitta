@@ -52,5 +52,22 @@ assert(folioMartinez.endsWith('-MARTINEZ-4P'), `Generates *-MARTINEZ-4P for Fami
 const customFolio = controller.generateLogisticalFolio('Dr. Carlos Valenzuela', 2);
 assert(customFolio.includes('VALENZUELA-2P'), `Generates *-VALENZUELA-2P (got ${customFolio})`);
 
+// 6. Verification of Pergamino Replacement in Invitación Digital
+const fs = require('fs');
+const html = fs.readFileSync('./invitacion.html', 'utf-8');
+
+assert(html.includes('pergamino-container'), 'invitacion.html includes .pergamino-container luxury parchment card');
+assert(html.includes('pergamino-ornament'), 'invitacion.html includes .pergamino-ornament royal ribbon');
+assert(html.includes('id="contenedor-saludo-pergamino"'), 'invitacion.html includes #contenedor-saludo-pergamino dynamic greeting container');
+assert(html.includes('id="campoNombrePergamino"'), 'invitacion.html includes #campoNombrePergamino');
+assert(html.includes('id="radioAsistenciaSi"'), 'invitacion.html includes #radioAsistenciaSi');
+assert(html.includes('id="radioAsistenciaNo"'), 'invitacion.html includes #radioAsistenciaNo');
+assert(html.includes('id="rsvpTicketsRow"'), 'invitacion.html includes #rsvpTicketsRow pass stepper container');
+assert(html.includes('id="rsvpSubmit"'), 'invitacion.html includes #rsvpSubmit button');
+assert(html.includes('id="rsvpSuccess"'), 'invitacion.html includes #rsvpSuccess confirmation view');
+assert(html.includes('pass-ticket-pergamino'), 'invitacion.html includes .pass-ticket-pergamino digital access ticket');
+assert(html.includes('id="btnResetRsvp"'), 'invitacion.html includes #btnResetRsvp modifier button');
+assert(html.includes('initRsvpPergamino'), 'invitacion.html includes initRsvpPergamino client-side execution script');
+
 console.log(`\nResults: ${passed} passed, ${failed} failed.\n`);
 if (failed > 0) process.exit(1);

@@ -500,7 +500,15 @@
                     .trim()
                     .split(/\s+/)
                     .filter(w => !['FAMILIA', 'FAM', 'SR', 'SRA', 'DR', 'DRA', 'ING', 'LIC', 'DON', 'DONA', 'DE', 'DEL', 'LA', 'LAS', 'LOS', 'Y'].includes(w.toUpperCase()));
-                const apellidoCode = cleanTokens.length > 0 ? cleanTokens[0].toUpperCase().substring(0, 10) : 'INVITADO';
+                const isFamily = /familia|fam\b|flia\b/i.test(nombre);
+                let apellidoCode = 'INVITADO';
+                if (cleanTokens.length > 0) {
+                    if (isFamily) {
+                        apellidoCode = cleanTokens[0].toUpperCase().substring(0, 10);
+                    } else {
+                        apellidoCode = (cleanTokens.length > 1 ? cleanTokens[cleanTokens.length - 1] : cleanTokens[0]).toUpperCase().substring(0, 10);
+                    }
+                }
                 const folio = `${mesaCode}-${apellidoCode}-${pases}P`;
 
                 guardarRespuestaEnStorage(nombre, pases, asistencia);

@@ -400,8 +400,13 @@ class ScrollRsvpController {
         .split(/\s+/)
         .filter(w => !['FAMILIA', 'FAM', 'SR', 'SRA', 'DR', 'DRA', 'ING', 'LIC', 'DON', 'DONA', 'DE', 'DEL', 'LA', 'LAS', 'LOS', 'Y'].includes(w.toUpperCase()));
       
+      const isFamily = /familia|fam\b|flia\b/i.test(guestName);
       if (rawTokens.length > 0) {
-        nameCode = rawTokens[0].toUpperCase().substring(0, 10);
+        if (isFamily) {
+          nameCode = rawTokens[0].toUpperCase().substring(0, 10);
+        } else {
+          nameCode = (rawTokens.length > 1 ? rawTokens[rawTokens.length - 1] : rawTokens[0]).toUpperCase().substring(0, 10);
+        }
       }
     }
 
