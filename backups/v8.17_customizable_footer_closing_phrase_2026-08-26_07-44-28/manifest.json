@@ -1,0 +1,26 @@
+{
+  "label": "v8.17_customizable_footer_closing_phrase",
+  "timestamp": "2026-08-26T13:44:28.811Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 142932
+    },
+    {
+      "filename": "index.html",
+      "size": 99819
+    },
+    {
+      "filename": "app.js",
+      "size": 89665
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
