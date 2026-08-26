@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -270,7 +270,7 @@
             </div>
 
             <h2>Confirmación de Asistencia</h2>
-            <p class="sub-evento">Catalina & Julián · 20 de Marzo, 2027</p>
+            <p class="sub-evento" id="subEvento">Catalina & Julián · 20 de Marzo, 2027</p>
             
             <div id="contenedor-saludo"></div>
             
@@ -330,6 +330,80 @@
     </main>
 
     <script>
+        function sincronizarConfiguracionEvento() {
+            try {
+                const raw = localStorage.getItem('invitta_event_invitation_config');
+                if (raw) {
+                    const conf = JSON.parse(raw);
+                    const subEvento = document.getElementById('subEvento');
+                    if (subEvento && conf.brideName && conf.groomName) {
+                        subEvento.textContent = `${conf.brideName} & ${conf.groomName} · ${conf.eventDate || '2027'}`;
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function buscarInvitadoEnStorage(guestParam) {
+            if (!guestParam) return null;
+            const paramClean = guestParam.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            try {
+                // 1. Revisar en base de datos invitta_2_guest_db
+                const rawDb = localStorage.getItem('invitta_2_guest_db');
+                if (rawDb) {
+                    const db = JSON.parse(rawDb);
+                    if (db && Array.isArray(db.guests)) {
+                        const found = db.guests.find(g => {
+                            const idClean = g.id.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            const nameClean = g.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            return idClean.includes(paramClean) || nameClean.includes(paramClean);
+                        });
+                        if (found) return found;
+                    }
+                }
+
+                // 2. Revisar en invitta_seating_state_v2
+                const rawSeating = localStorage.getItem('invitta_seating_state_v2');
+                if (rawSeating) {
+                    const seating = JSON.parse(rawSeating);
+                    if (seating && Array.isArray(seating.guests)) {
+                        const found = seating.guests.find(g => {
+                            const idClean = g.id.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            const nameClean = g.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            return idClean.includes(paramClean) || nameClean.includes(paramClean);
+                        });
+                        if (found) return found;
+                    }
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function guardarRespuestaEnStorage(nombre, pases, asistencia) {
+            try {
+                const isConfirmed = asistencia === 'si';
+                const status = isConfirmed ? 'CONFIRMED' : 'DECLINED';
+                const nowIso = new Date().toISOString();
+
+                // Actualizar en invitta_2_guest_db
+                const rawDb = localStorage.getItem('invitta_2_guest_db');
+                if (rawDb) {
+                    const db = JSON.parse(rawDb);
+                    if (db && Array.isArray(db.guests)) {
+                        const guest = db.guests.find(g => g.name.toLowerCase().includes(nombre.toLowerCase()) || nombre.toLowerCase().includes(g.name.toLowerCase()));
+                        if (guest) {
+                            guest.status = status;
+                            guest.confirmedPasses = isConfirmed ? parseInt(pases, 10) : 0;
+                            guest.respondedAt = nowIso;
+                            localStorage.setItem('invitta_2_guest_db', JSON.stringify(db));
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Error saving RSVP response to storage', e);
+            }
+        }
+
         function cargarEstadoRsvp(guestParam, passesDefault) {
             const campoNombreContainer = document.getElementById('campo-nombre-container');
             const contenedorSaludo = document.getElementById('contenedor-saludo');
@@ -338,22 +412,24 @@
             const form = document.getElementById('rsvpForm');
             const vistaExito = document.getElementById('vistaExito');
 
+            sincronizarConfiguracionEvento();
+
             form.style.display = 'block';
             vistaExito.style.display = 'none';
 
             if (guestParam) {
-                // Simulación de datos decodificados desde la URL personalizada
-                const nombreDecodificado = guestParam.replace(/-/g, ' ').toUpperCase();
-                const pasesAsignados = passesDefault || 2;
+                const matchedGuest = buscarInvitadoEnStorage(guestParam);
+                const nombreMostrar = matchedGuest ? matchedGuest.name : guestParam.replace(/-/g, ' ').toUpperCase();
+                const pasesAsignados = matchedGuest ? (matchedGuest.passes || matchedGuest.pases || 2) : (passesDefault || 2);
                 
                 contenedorSaludo.innerHTML = `
                     <div class="mensaje-personalizado">
-                        ¡Qué alegría tenerte aquí, <strong>${nombreDecodificado}</strong>! Tus <strong>${pasesAsignados} pases</strong> ya están reservados para nuestro gran día.
+                        ¡Qué alegría tenerte aquí, <strong>${nombreMostrar}</strong>! Tus <strong>${pasesAsignados} pases</strong> ya están reservados para nuestro gran día.
                     </div>
                 `;
                 
                 // Precargamos los datos y bloqueamos la edición del nombre si viene personalizado
-                inputNombre.value = nombreDecodificado;
+                inputNombre.value = nombreMostrar;
                 inputNombre.required = false;
                 campoNombreContainer.style.display = 'none';
                 inputPases.value = pasesAsignados;
@@ -379,6 +455,8 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
+            sincronizarConfiguracionEvento();
+
             // Lógica de detección automática de URL (Parámetro ?guest=)
             const urlParams = new URLSearchParams(window.location.search);
             const guestParam = urlParams.get('guest');
@@ -405,6 +483,8 @@
                 const pases = document.getElementById('pases').value || '1';
                 const asistencia = document.getElementById('asistencia').value;
                 const folio = 'PASS-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+                guardarRespuestaEnStorage(nombre, pases, asistencia);
 
                 document.getElementById('rsvpForm').style.display = 'none';
                 document.getElementById('passNombreConfirmado').textContent = nombre;

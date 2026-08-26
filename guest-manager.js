@@ -20,6 +20,22 @@ class GuestManager {
       }
     }, options);
 
+    // Sincronizar datos con el Creador de Invitación si existen
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const rawInvite = localStorage.getItem('invitta_event_invitation_config');
+        if (rawInvite) {
+          const inviteConf = JSON.parse(rawInvite);
+          if (inviteConf.brideName && inviteConf.groomName) {
+            this.options.eventDetails.coupleName = `${inviteConf.brideName} & ${inviteConf.groomName}`;
+          }
+          if (inviteConf.eventDate) this.options.eventDetails.eventDate = inviteConf.eventDate;
+          if (inviteConf.receptionPlace) this.options.eventDetails.venue = inviteConf.receptionPlace;
+          if (inviteConf.rsvpDeadline) this.options.eventDetails.rsvpDeadline = inviteConf.rsvpDeadline;
+        }
+      } catch (e) {}
+    }
+
     this.state = this.loadState();
   }
 

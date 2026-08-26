@@ -1,0 +1,26 @@
+{
+  "label": "v2.11_invitation_creator_module_with_cross_ecosystem_sync",
+  "timestamp": "2026-08-26T19:11:26.372Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158441
+    },
+    {
+      "filename": "index.html",
+      "size": 60582
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
