@@ -1,0 +1,26 @@
+{
+  "label": "v8.30_parchment_scroll_rsvp_url_detection_personalized_passes",
+  "timestamp": "2026-08-26T16:47:44.723Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158295
+    },
+    {
+      "filename": "index.html",
+      "size": 103699
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

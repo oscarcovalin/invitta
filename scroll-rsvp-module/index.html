@@ -1,0 +1,363 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Formulario RSVP Pergamino Desplegable — Invitta Studio</title>
+
+  <!-- Tipografías de Lujo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Great+Vibes&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Iconos Material Symbols -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --color-cream: #FAF8F5;
+      --color-forest: #163C2B;
+      --color-gold: #A38047;
+      --color-gold-light: #d4af37;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: #0d0f12;
+      color: #262626;
+      min-height: 100vh;
+    }
+
+    /* ==========================================================================
+       ESTRUCTURA Y ANIMACIÓN DEL PERGAMINO REAL (UNFURLING SCROLL)
+       ========================================================================== */
+    .parchment-roller-top {
+      background: linear-gradient(180deg, #5c441b 0%, #A38047 50%, #d4af37 80%, #5c441b 100%);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+      border-radius: 9999px;
+      height: 22px;
+      position: relative;
+      z-index: 30;
+    }
+
+    .parchment-roller-bottom {
+      background: linear-gradient(180deg, #5c441b 0%, #A38047 50%, #d4af37 80%, #5c441b 100%);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+      border-radius: 9999px;
+      height: 22px;
+      position: relative;
+      z-index: 30;
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Cuerpo del Pergamino Desplegable */
+    .parchment-body {
+      background-color: #FAF8F5;
+      background-image: 
+        radial-gradient(#163C2B 0.4px, transparent 0.4px), 
+        linear-gradient(to bottom, rgba(163, 128, 71, 0.08) 0%, transparent 6%, transparent 94%, rgba(163, 128, 71, 0.12) 100%);
+      background-size: 20px 20px, 100% 100%;
+      border-left: 2px solid rgba(163, 128, 71, 0.45);
+      border-right: 2px solid rgba(163, 128, 71, 0.45);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), inset 0 0 40px rgba(163, 128, 71, 0.08);
+      max-height: 0;
+      opacity: 0;
+      transform-origin: top center;
+      transform: scaleY(0.95);
+      overflow: hidden;
+      transition: max-height 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease, transform 0.6s ease;
+    }
+
+    /* Sello de Cera Real con Monograma */
+    .wax-seal-btn {
+      background: radial-gradient(circle at 35% 35%, #d4af37 0%, #A38047 60%, #6e4f1a 100%);
+      box-shadow: 0 10px 30px rgba(163, 128, 71, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.5), 0 0 0 4px rgba(163, 128, 71, 0.25);
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+    }
+    .wax-seal-btn:hover {
+      transform: scale(1.06) rotate(3deg);
+      box-shadow: 0 15px 40px rgba(163, 128, 71, 0.7), inset 0 2px 3px rgba(255, 255, 255, 0.7), 0 0 0 6px rgba(163, 128, 71, 0.4);
+    }
+
+    /* Inputs de Lujo dentro del Pergamino */
+    .input-parchment {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(22, 60, 43, 0.25);
+      color: #163C2B;
+      transition: all 0.25s ease;
+    }
+    .input-parchment:focus {
+      outline: none;
+      border-color: #163C2B;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(22, 60, 43, 0.12);
+    }
+
+    /* Botón de Confirmación */
+    .btn-forest-gold {
+      background: linear-gradient(135deg, #163C2B 0%, #0d2419 100%);
+      color: #FAF8F5;
+      border: 1px solid #A38047;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(22, 60, 43, 0.3);
+    }
+    .btn-forest-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(22, 60, 43, 0.45);
+      background: #163C2B;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- ==================== BARRA SUPERIOR DE SIMULACIÓN DE URL ==================== -->
+  <header class="bg-neutral-900 border-b border-neutral-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4 flex-shrink-0 z-50">
+    <div class="flex items-center gap-3">
+      <span class="w-3.5 h-3.5 rounded-full bg-amber-400 animate-pulse"></span>
+      <div>
+        <h1 class="text-xs font-semibold tracking-wide text-white flex items-center gap-2">
+          <span>Formulario RSVP en Pergamino Desplegable</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">Detección ?guest=id</span>
+        </h1>
+        <p class="text-[11px] text-neutral-400">Catalina & Julián · Crema <code class="text-amber-300 font-mono">#FAF8F5</code> · Verde <code class="text-emerald-400 font-mono">#163C2B</code> · Dorado <code class="text-amber-300 font-mono">#A38047</code></p>
+      </div>
+    </div>
+
+    <!-- Simular URL en 1 Clic -->
+    <div class="flex items-center flex-wrap gap-2">
+      <span class="text-[11px] text-neutral-400 font-mono">Simular URL:</span>
+      <button type="button" class="btn-url-test px-2.5 py-1 rounded-lg text-xs font-mono bg-amber-500/15 border border-amber-400/40 text-amber-300 hover:bg-amber-500/25 transition-all" data-guest="camila_ortiz">
+        ?guest=camila_ortiz <span class="opacity-70">(Corte · 2p)</span>
+      </button>
+      <button type="button" class="btn-url-test px-2.5 py-1 rounded-lg text-xs font-mono bg-amber-500/15 border border-amber-400/40 text-amber-300 hover:bg-amber-500/25 transition-all" data-guest="familia_martinez">
+        ?guest=familia_martinez <span class="opacity-70">(Familia · 4p)</span>
+      </button>
+      <button type="button" class="btn-url-test px-2.5 py-1 rounded-lg text-xs font-mono bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-all" data-guest="dr_valenzuela">
+        ?guest=dr_valenzuela <span class="opacity-70">(2p)</span>
+      </button>
+      <button type="button" class="btn-url-test px-2.5 py-1 rounded-lg text-xs font-mono bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-all" data-guest="">
+        Sin Parámetro <span class="opacity-70">(Modo Abierto)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== LIENZO DE EXPERIENCIA (PERGAMINO REAL) ==================== -->
+  <main class="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 relative overflow-y-auto">
+    
+    <!-- CONTENEDOR DEL PERGAMINO -->
+    <div class="w-full max-w-lg relative select-none">
+      
+      <!-- 1. RODILLO SUPERIOR DORADO -->
+      <div class="parchment-roller-top flex items-center justify-between px-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-white/40 shadow-inner"></div>
+        <div class="w-16 h-1 rounded-full bg-white/30"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-white/40 shadow-inner"></div>
+      </div>
+
+      <!-- 2. SELLO DE CERA DESPLEGABLE (ESTADO INICIAL CERRADO) -->
+      <div id="waxSealWrapper" class="relative z-40 text-center py-12 transition-all duration-500">
+        
+        <div class="w-24 h-24 rounded-full wax-seal-btn mx-auto flex flex-col items-center justify-center relative shadow-2xl" id="btnWaxSeal">
+          <span class="material-symbols-outlined text-white text-2xl drop-shadow">mail</span>
+          <span class="font-['Cinzel'] text-[9px] font-bold text-white tracking-widest uppercase mt-0.5 drop-shadow">RSVP</span>
+        </div>
+
+        <p class="font-['Cinzel'] text-sm tracking-[0.25em] text-[#A38047] uppercase font-semibold mt-4">
+          ✦ Toca el Sello Real para Desplegar el Pergamino ✦
+        </p>
+        <p class="font-['Cormorant_Garamond'] text-xs text-neutral-400 italic mt-1">
+          Catalina & Julián · 20 de Marzo, 2027
+        </p>
+      </div>
+
+      <!-- 3. CUERPO DESPLEGABLE DEL PERGAMINO (CREMA #FAF8F5 & VERDE #163C2B) -->
+      <div id="parchmentBody" class="parchment-body px-7 py-10 sm:px-10 sm:py-12">
+        
+        <!-- ENCABEZADO DEL PERGAMINO -->
+        <div class="text-center mb-8">
+          <span class="font-sans text-[10.5px] uppercase tracking-[0.35em] text-[#A38047] font-semibold block mb-2">
+            Confirmación de Asistencia
+          </span>
+          <h2 class="font-['Cinzel'] text-3xl sm:text-4xl text-[#163C2B] font-light uppercase tracking-wider mb-2">
+            Catalina & Julián
+          </h2>
+          <div class="w-12 h-0.5 bg-[#A38047] mx-auto mb-3"></div>
+          <p class="font-['Cormorant_Garamond'] text-base text-[#163C2B]/85 italic leading-relaxed max-w-sm mx-auto">
+            &ldquo;Nos llena de emoción compartir el inicio de nuestra nueva vida junto a las personas más importantes de nuestro corazón.&rdquo;
+          </p>
+        </div>
+
+        <!-- CONTENIDO DEL FORMULARIO -->
+        <div id="scrollFormContent">
+          
+          <form id="scrollRsvpForm" class="flex flex-col gap-5">
+            
+            <!-- CASO A: BANNER INVITADO PRECARGADO PERSONALIZADO (?guest=id) -->
+            <div id="personalizedGuestBanner" class="hidden"></div>
+
+            <!-- CASO B: CAMPO LIBRE DE NOMBRE (Modo Abierto sin parámetro) -->
+            <div id="openNameBlock" class="flex flex-col gap-1.5">
+              <label class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-[#A38047]">person</span>
+                Nombre Completo y Apellidos
+              </label>
+              <input type="text" id="openGuestNameInput" placeholder="Escribe tu nombre para localizar tus pases"
+                class="input-parchment w-full rounded-xl px-4 py-3 text-xs font-sans">
+            </div>
+
+            <!-- Teléfono / WhatsApp -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-[#A38047]">chat</span>
+                WhatsApp / Teléfono de Contacto
+              </label>
+              <input type="tel" id="scrollGuestPhone" placeholder="+52 55 1234 5678"
+                class="input-parchment w-full rounded-xl px-4 py-3 text-xs font-sans">
+            </div>
+
+            <!-- Selector de Asistencia (Tarjetas táctiles) -->
+            <div class="flex flex-col gap-2 pt-1">
+              <label class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold">
+                ¿Nos honrarás con tu presencia?
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                
+                <div class="attendance-card active rounded-xl p-3.5 flex items-center gap-3 border border-[#A38047] bg-[#163C2B]/10 cursor-pointer transition-all" data-value="yes">
+                  <div class="w-4 h-4 rounded-full border-2 border-[#163C2B] flex items-center justify-center flex-shrink-0">
+                    <div class="radio-indicator w-2 h-2 rounded-full bg-[#163C2B]"></div>
+                  </div>
+                  <span class="text-xs font-medium text-[#163C2B] leading-tight">Sí, asistiré con honor</span>
+                </div>
+
+                <div class="attendance-card rounded-xl p-3.5 flex items-center gap-3 border border-[#A38047]/30 bg-black/5 cursor-pointer transition-all" data-value="no">
+                  <div class="w-4 h-4 rounded-full border-2 border-[#163C2B]/40 flex items-center justify-center flex-shrink-0">
+                    <div class="radio-indicator w-2 h-2 rounded-full bg-[#163C2B] hidden"></div>
+                  </div>
+                  <span class="text-xs font-medium text-[#163C2B]/75 leading-tight">No podré acompañarles</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Contador de Pases Asignados -->
+            <div id="scrollPassesBlock" class="flex items-center justify-between p-4 bg-white/70 border border-[#A38047]/35 rounded-xl">
+              <div>
+                <span class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold block">Pases a Confirmar</span>
+                <span id="maxPassesLabel" class="text-[11px] text-neutral-500 font-sans">Límite asignado: 2 persona(s)</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <button type="button" id="btnDecPasses" class="w-8 h-8 rounded-full border border-[#163C2B] bg-[#163C2B]/10 text-[#163C2B] font-bold flex items-center justify-center hover:bg-[#163C2B] hover:text-white transition-colors text-sm">-</button>
+                <span id="scrollPassesCount" class="text-lg font-['Cinzel'] text-[#163C2B] font-bold tabular-nums w-5 text-center">1</span>
+                <button type="button" id="btnIncPasses" class="w-8 h-8 rounded-full border border-[#163C2B] bg-[#163C2B]/10 text-[#163C2B] font-bold flex items-center justify-center hover:bg-[#163C2B] hover:text-white transition-colors text-sm">+</button>
+              </div>
+            </div>
+
+            <!-- Menú & Alergias -->
+            <div id="scrollDietBlock" class="flex flex-col gap-1.5">
+              <label class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-[#A38047]">restaurant</span>
+                Menú Especial o Restricción (Opcional)
+              </label>
+              <select id="scrollGuestDiet" class="input-parchment w-full rounded-xl px-4 py-2.5 text-xs font-sans">
+                <option value="none">Menú Tradicional Nupcial</option>
+                <option value="vegetarian">Menú Vegetariano</option>
+                <option value="vegan">Menú Vegano</option>
+                <option value="celiac">Menú Sin Gluten (Celíaco)</option>
+                <option value="kids">Menú Infantil</option>
+              </select>
+            </div>
+
+            <!-- Mensaje -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-[#A38047]">favorite</span>
+                Palabras de Bendición para Catalina & Julián
+              </label>
+              <textarea id="scrollGuestMessage" rows="2" placeholder="Que su unión sea eterna..."
+                class="input-parchment w-full rounded-xl px-4 py-2.5 text-xs font-sans"></textarea>
+            </div>
+
+            <!-- Botón de Confirmación Real -->
+            <button type="submit" id="btnSubmitScrollRsvp" class="btn-forest-gold w-full py-3.5 rounded-xl text-xs mt-2 flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-base">check_circle</span>
+              <span>Confirmar Asistencia en Pergamino</span>
+            </button>
+
+          </form>
+
+        </div>
+
+        <!-- 4. VISTA DE CONFIRMACIÓN ÉXITO / PASE DIGITAL VIP -->
+        <div id="scrollSuccessView" class="hidden text-center py-6">
+          <div class="w-14 h-14 bg-[#163C2B] border border-[#A38047] text-[#A38047] rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
+            <span class="material-symbols-outlined text-2xl">mark_email_read</span>
+          </div>
+
+          <span class="font-['Great_Vibes'] text-3xl text-[#A38047] block mb-1">¡Honor Aceptado!</span>
+          <h3 class="font-['Cinzel'] text-lg text-[#163C2B] font-semibold tracking-wide mb-1" id="passGuestName">Invitado de Honor</h3>
+          <p class="font-['Cormorant_Garamond'] text-sm text-[#163C2B]/85 italic mb-5" id="passSummary">Tu asistencia ha sido registrada en el libro oficial.</p>
+
+          <!-- Boleto Digital Impreso -->
+          <div class="bg-white p-5 rounded-2xl border-2 border-dashed border-[#A38047] shadow-xl max-w-xs mx-auto mb-4 text-left">
+            <div class="flex justify-between items-center border-b border-neutral-200 pb-2 mb-3">
+              <span class="text-[9px] uppercase tracking-widest font-bold text-[#A38047]">Pase de Honor</span>
+              <span class="font-mono text-[10px] font-bold text-[#163C2B]" id="passFolioCode">PASS-VIP</span>
+            </div>
+            <p class="font-['Cinzel'] text-xs font-bold text-[#163C2B] uppercase mb-1">Catalina & Julián</p>
+            <p class="text-[10px] text-neutral-500 mb-3">20 de Marzo, 2027 · Jardín Las Magnolias</p>
+            <div class="flex justify-center p-2 bg-[#FAF8F5] rounded-lg border border-neutral-200">
+              <span class="material-symbols-outlined text-4xl text-[#163C2B]">qr_code_2</span>
+            </div>
+          </div>
+
+          <button type="button" onclick="location.reload()" class="text-xs text-[#163C2B] underline hover:text-[#A38047] font-medium">
+            ↺ Probar otra confirmación
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 5. RODILLO INFERIOR DORADO -->
+      <div id="parchmentBottomRoller" class="parchment-roller-bottom flex items-center justify-between px-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-white/40 shadow-inner"></div>
+        <div class="w-16 h-1 rounded-full bg-white/30"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-white/40 shadow-inner"></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- SCRIPT MODULAR SCROLL RSVP -->
+  <script src="scroll-rsvp.js"></script>
+
+  <script>
+    // Inicializar Controlador de Pergamino
+    const scrollRsvp = new ScrollRsvpController();
+
+    // Botones de Simulación de URL en la barra superior
+    document.querySelectorAll('.btn-url-test').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const guestId = btn.dataset.guest;
+        scrollRsvp.detectGuestFromUrl(guestId);
+        scrollRsvp.unfurlParchment();
+
+        // Actualizar visual de botones
+        document.querySelectorAll('.btn-url-test').forEach(b => {
+          b.classList.remove('bg-amber-500/25', 'border-amber-400');
+        });
+        btn.classList.add('bg-amber-500/25', 'border-amber-400');
+      });
+    });
+  </script>
+</body>
+</html>
