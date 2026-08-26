@@ -1,0 +1,206 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asignación de Mesas Drag & Drop — Invitta Studio (Antigravity)</title>
+  
+  <!-- Tipografías de Lujo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Iconos Material Symbols -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'gold-primary': '#c19a4e',
+            'gold-amber': '#A38047',
+            'gold-light': '#e5cf9b',
+            'deep-onyx': '#121316',
+            'champagne': '#f7f6ec'
+          },
+          fontFamily: {
+            'display': ['Cinzel', 'serif'],
+            'body': ['Cormorant Garamond', 'serif'],
+            'sans-ui': ['Montserrat', 'sans-serif'],
+            'mono': ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #090a0d;
+      color: #e5e7eb;
+    }
+
+    /* Animaciones de Inercia y Físicas Suaves */
+    .cursor-grab {
+      cursor: grab;
+    }
+    .cursor-grab:active {
+      cursor: grabbing;
+    }
+
+    .table-dropzone {
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .table-seats-container {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Animación de entrada suave para tarjetas al soltar */
+    @keyframes dropInertia {
+      0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(6px);
+      }
+      60% {
+        transform: scale(1.02) translateY(-2px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .assigned-guest-pill {
+      animation: dropInertia 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .family-cluster-card {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .family-cluster-card:hover {
+      transform: translateY(-2px) scale(1.01);
+    }
+
+    /* Resplandor elegante de Sobrecupo (#A38047) */
+    .overcapacity-glow {
+      border-color: #A38047 !important;
+      box-shadow: 0 0 25px rgba(163, 128, 71, 0.3), inset 0 0 15px rgba(163, 128, 71, 0.08) !important;
+    }
+  </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+  <!-- ==================== HEADER DEL MÓDULO ==================== -->
+  <header class="bg-neutral-900 border-b border-neutral-800 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 flex-shrink-0 z-50">
+    <div class="flex items-center gap-3">
+      <span class="w-3.5 h-3.5 rounded-full bg-amber-400 animate-pulse"></span>
+      <div>
+        <h1 class="text-sm font-semibold tracking-wide text-white flex items-center gap-2">
+          <span>Organizador de Mesas Drag & Drop</span>
+          <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">Reactivo & Bloques Familiares</span>
+        </h1>
+        <p class="text-xs text-neutral-400">Contenedores auto-escalables con alertas sutiles de sobrecupo en color <code class="text-amber-300 font-mono">#A38047</code></p>
+      </div>
+    </div>
+
+    <!-- Botones de Acción Superior -->
+    <div class="flex items-center gap-2.5">
+      <button type="button" id="btnAddTableBtn" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 hover:bg-amber-500/30 text-xs font-medium flex items-center gap-1.5 transition-all shadow-sm">
+        <span class="material-symbols-outlined text-sm">add_circle</span>
+        <span>Añadir Mesa</span>
+      </button>
+      <button type="button" id="btnResetSeatingBtn" class="px-3.5 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium flex items-center gap-1.5 transition-all">
+        <span class="material-symbols-outlined text-sm">restart_alt</span>
+        <span>Restablecer</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== BARRA DE ESTADÍSTICAS REACTIVAS ==================== -->
+  <div class="px-6 py-3 bg-neutral-950 border-b border-neutral-800 flex-shrink-0" id="seatingStats"></div>
+
+  <!-- ==================== ÁREA DE TRABAJO (DOS COLUMNAS) ==================== -->
+  <div class="flex-1 flex overflow-hidden">
+    
+    <!-- PANEL IZQUIERDO: INVITADOS Y BLOQUES FAMILIARES SIN ASIGNAR -->
+    <aside class="w-[360px] sm:w-[400px] bg-neutral-900/90 border-r border-neutral-800 flex flex-col h-full overflow-hidden flex-shrink-0">
+      
+      <div class="p-4 border-b border-neutral-800 bg-neutral-950/40 flex items-center justify-between">
+        <div>
+          <h2 class="text-xs uppercase tracking-widest font-semibold text-amber-400 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">group_add</span>
+            Invitados & Familias
+          </h2>
+          <p class="text-[11px] text-neutral-400 mt-0.5">Arrastra bloques completos o individuales.</p>
+        </div>
+        <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-400/30 font-medium">Auto-Agrupado</span>
+      </div>
+
+      <!-- Lista Draggable de Invitados -->
+      <div class="flex-1 overflow-y-auto p-4" id="unassignedList"></div>
+
+    </aside>
+
+    <!-- PANEL DERECHO: CUADRÍCULA DE MESAS (ZONAS DE CAÍDA AUTO-ESCALABLES) -->
+    <main class="flex-1 overflow-y-auto p-6 bg-neutral-950/70 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-xs uppercase tracking-widest font-semibold text-neutral-300 flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm text-amber-400">table_restaurant</span>
+              Distribución de Salón & Mesas
+            </h2>
+            <p class="text-xs text-neutral-400">Suelta los elementos sobre cualquier mesa. Los contenedores se ajustan dinámicamente.</p>
+          </div>
+        </div>
+
+        <!-- Cuadrícula de Zonas de Caída -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5" id="tablesGrid"></div>
+      </div>
+
+      <!-- Nota de Funcionamiento Antigravity -->
+      <div class="mt-8 pt-4 border-t border-neutral-800/80 flex items-center justify-between text-[11px] text-neutral-400 select-none">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          Sin bloqueo de cupo · Alerta suave en <strong class="text-[#A38047] font-mono">#A38047</strong>
+        </span>
+        <span>Arrastra de regreso al panel izquierdo para desasignar.</span>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Script Modular -->
+  <script src="seating-planner.js"></script>
+
+  <script>
+    // Inicialización de la instancia SeatingPlanner
+    const planner = new SeatingPlanner({
+      containerSelector: '#seatingApp',
+      unassignedListSelector: '#unassignedList',
+      tablesGridSelector: '#tablesGrid',
+      statsSelector: '#seatingStats',
+      overCapacityColor: '#A38047'
+    });
+
+    // Botón Añadir Mesa
+    document.getElementById('btnAddTableBtn').addEventListener('click', () => {
+      const tableCount = planner.state.tables.length + 1;
+      planner.addTable(`Mesa ${tableCount}`, 8);
+    });
+
+    // Botón Restablecer
+    document.getElementById('btnResetSeatingBtn').addEventListener('click', () => {
+      planner.state.guests.forEach(g => g.tableId = null);
+      planner.updateStateAndDOM();
+    });
+  </script>
+</body>
+</html>
