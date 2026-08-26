@@ -1,0 +1,26 @@
+{
+  "label": "v6.6_lead_vendor_card_with_whatsapp",
+  "timestamp": "2026-08-26T02:32:17.875Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 119233
+    },
+    {
+      "filename": "index.html",
+      "size": 94612
+    },
+    {
+      "filename": "app.js",
+      "size": 83586
+    },
+    {
+      "filename": "style.css",
+      "size": 12175
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
