@@ -1,4 +1,4 @@
-﻿const templateEngine = require('./template-engine.js');
+const templateEngine = require('./template-engine.js');
 
 let passed = 0;
 let failed = 0;
@@ -34,6 +34,8 @@ console.log('\n=== RUNNING SECTION TOGGLES & ADAPTIVE SPACING TESTS ===\n');
   assert(!isSectionHidden(html, 'family'), 'Family is visible by default');
   assert(html.includes('id="details"'), 'Locations section is rendered');
   assert(!isSectionHidden(html, 'details'), 'Locations is visible by default');
+  assert(html.includes('id="hospedaje"'), 'Lodging section is rendered');
+  assert(!isSectionHidden(html, 'hospedaje'), 'Lodging is visible by default');
   assert(html.includes('id="dresscode"'), 'Dress code section is rendered');
   assert(!isSectionHidden(html, 'dresscode'), 'Dress code is visible by default');
   assert(html.includes('id="galeria"'), 'Gallery section is rendered');
@@ -72,10 +74,11 @@ console.log('\n=== RUNNING SECTION TOGGLES & ADAPTIVE SPACING TESTS ===\n');
   assert(!html.includes('pt-[calc(130px+'), 'Locations does not have family parallax bridge padding when family is hidden');
 }
 
-// Test 4: Disabling Locations, Dresscode, Gallery, GiftRegistry, Itinerary, SharedAlbum, Instagram, RSVP
+// Test 4: Disabling Locations, Lodging, Dresscode, Gallery, GiftRegistry, Itinerary, SharedAlbum, Instagram, RSVP
 {
   const config = JSON.parse(JSON.stringify(templateEngine.defaultConfig));
   config.locationsEnabled = false;
+  config.lodging = { enabled: false };
   config.dressCode = { enabled: false };
   config.photos = { galleryEnabled: false, gallery: [] };
   config.giftRegistry = { enabled: false };
@@ -88,6 +91,7 @@ console.log('\n=== RUNNING SECTION TOGGLES & ADAPTIVE SPACING TESTS ===\n');
   const html = templateEngine.generateHTML(config, 'vino');
 
   assert(isSectionHidden(html, 'details'), 'Locations is hidden when disabled');
+  assert(isSectionHidden(html, 'hospedaje'), 'Lodging is hidden when disabled');
   assert(isSectionHidden(html, 'dresscode'), 'Dresscode is hidden when disabled');
   assert(isSectionHidden(html, 'galeria'), 'Gallery is hidden when disabled');
   assert(isSectionHidden(html, 'giftregistry'), 'Gift registry is hidden when disabled');
@@ -104,6 +108,7 @@ console.log('\n=== RUNNING SECTION TOGGLES & ADAPTIVE SPACING TESTS ===\n');
   config.countdownEnabled = true;
   config.familyEnabled = true;
   config.locationsEnabled = true;
+  config.lodging = { enabled: true, hotels: [{ name: 'Hotel 1', address: 'Direccion 1', mapsUrl: 'https://maps.google.com' }] };
   config.dressCode = { enabled: true, title: 'Formal Elegante', description: 'Vestimenta de gala' };
   config.photos = { galleryEnabled: true, gallery: ['https://images.unsplash.com/photo-1.jpg'] };
   config.giftRegistry = { enabled: true, intro: 'Agradecemos tu detalle' };
@@ -117,6 +122,7 @@ console.log('\n=== RUNNING SECTION TOGGLES & ADAPTIVE SPACING TESTS ===\n');
   assert(!isSectionHidden(html, 'countdownSection'), 'Countdown is visible when re-enabled');
   assert(!isSectionHidden(html, 'family'), 'Family is visible when re-enabled');
   assert(!isSectionHidden(html, 'details'), 'Locations is visible when re-enabled');
+  assert(!isSectionHidden(html, 'hospedaje'), 'Lodging is visible when re-enabled');
   assert(!isSectionHidden(html, 'dresscode'), 'Dresscode is visible when re-enabled');
   assert(!isSectionHidden(html, 'galeria'), 'Gallery is visible when re-enabled');
   assert(!isSectionHidden(html, 'giftregistry'), 'Gift registry is visible when re-enabled');
@@ -130,3 +136,4 @@ console.log(`\nResults: ${passed} passed, ${failed} failed.\n`);
 if (failed > 0) {
   process.exit(1);
 }
+
