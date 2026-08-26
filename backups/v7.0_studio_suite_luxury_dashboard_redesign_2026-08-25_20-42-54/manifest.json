@@ -1,0 +1,26 @@
+{
+  "label": "v7.0_studio_suite_luxury_dashboard_redesign",
+  "timestamp": "2026-08-26T02:42:54.394Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 118470
+    },
+    {
+      "filename": "index.html",
+      "size": 93980
+    },
+    {
+      "filename": "app.js",
+      "size": 83199
+    },
+    {
+      "filename": "style.css",
+      "size": 17038
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
