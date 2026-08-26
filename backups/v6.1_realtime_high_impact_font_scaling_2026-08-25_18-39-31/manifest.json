@@ -1,0 +1,26 @@
+{
+  "label": "v6.1_realtime_high_impact_font_scaling",
+  "timestamp": "2026-08-26T00:39:31.643Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 108472
+    },
+    {
+      "filename": "index.html",
+      "size": 74888
+    },
+    {
+      "filename": "app.js",
+      "size": 73220
+    },
+    {
+      "filename": "style.css",
+      "size": 12175
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

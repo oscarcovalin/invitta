@@ -24,9 +24,9 @@ console.log('Contains --scale-body: 1.1:', htmlCustom.includes('--scale-body: 1.
 
 console.log('\n--- TEST 3: GUARDRAIL CLAMPING BOUNDS ---');
 const configExtreme = JSON.parse(JSON.stringify(templateEngine.defaultConfig));
-configExtreme.typography.scaleHero = 5.0; // Should be clamped to 1.4
-configExtreme.typography.scaleHeadings = 0.1; // Should be clamped to 0.7
+configExtreme.typography.scaleHero = 5.0; // Should be clamped to 2.2
+configExtreme.typography.scaleHeadings = 0.1; // Should be clamped to 0.5
 
 const htmlExtreme = templateEngine.generateHTML(configExtreme, 'vino');
-console.log('Clamps excessive scaleHero 5.0 to 1.4:', htmlExtreme.includes('--scale-hero: 1.4'));
-console.log('Clamps tiny scaleHeadings 0.1 to 0.7:', htmlExtreme.includes('--scale-headings: 0.7'));
+console.log('Clamps excessive scaleHero 5.0 to 2.2:', htmlExtreme.includes('--scale-hero: 2.2'));
+console.log('Clamps tiny scaleHeadings 0.1 to 0.5:', htmlExtreme.includes('--scale-headings: 0.5'));
