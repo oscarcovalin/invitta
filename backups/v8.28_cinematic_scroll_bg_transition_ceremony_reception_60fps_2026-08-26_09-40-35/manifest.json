@@ -1,0 +1,26 @@
+{
+  "label": "v8.28_cinematic_scroll_bg_transition_ceremony_reception_60fps",
+  "timestamp": "2026-08-26T15:40:35.524Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158295
+    },
+    {
+      "filename": "index.html",
+      "size": 103699
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
