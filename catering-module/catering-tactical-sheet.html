@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -392,10 +392,13 @@
 </head>
 <body>
 
-  <!-- BARRA DE CONTROL EN PANTALLA -->
+  <!-- BARRA DE ACCIÓN SUPERIOR (SOLO VISIBLE EN PANTALLA) -->
   <div class="screen-toolbar">
-    <div>
-      <h1>📋 Tabla Táctica de Catering (WeasyPrint / Print Ready)</h1>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="../index.html" style="color:#C7B299; text-decoration:none; font-size:11px; font-weight:600; display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:6px; background:rgba(255,255,255,0.1); transition: background 0.2s;" title="Regresar al Organizador de Mesas">
+        <span>← Volver al Organizador</span>
+      </a>
+      <h1>Documento Táctico de Cocina (Vista Imprimible WeasyPrint)</h1>
     </div>
     <button type="button" class="btn-print" onclick="window.print()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -681,9 +684,61 @@
       const tbody = document.getElementById('tacticalTableBody');
       const metricsContainer = document.getElementById('metricsSummary');
 
+      // Cargar datos en vivo si existen en localStorage
+      let dataSource = eventConfig.rsvpResponses;
+      try {
+        const raw = localStorage.getItem('invitta_seating_state_v2');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.guests) && Array.isArray(parsed.tables)) {
+            const tableMap = new Map(parsed.tables.map(t => [t.id, t]));
+            dataSource = parsed.guests.map(g => {
+              const tbl = tableMap.get(g.tableId);
+              const tagLower = (g.tag || '').toLowerCase();
+              let tipo = 'standard';
+              let label = 'Menú Estándar';
+              let isKid = false;
+
+              if (tagLower.includes('vegano') || tagLower.includes('veg')) {
+                tipo = 'vegan';
+                label = 'Menú Vegano';
+              } else if (tagLower.includes('gluten') || tagLower.includes('celiac')) {
+                tipo = 'celiac';
+                label = 'Libre de Gluten';
+              } else if (tagLower.includes('niño') || tagLower.includes('silla')) {
+                tipo = 'kids';
+                label = 'Menú Infantil / Silla';
+                isKid = true;
+              } else if (tagLower.includes('alergia') || tagLower.includes('frutos')) {
+                tipo = 'allergy_nuts';
+                label = 'Alergia / Especial';
+              } else if (g.diet && g.diet !== 'none') {
+                tipo = g.diet;
+                label = g.diet;
+              }
+
+              const tableNumRaw = tbl ? (tbl.number || tbl.name.replace(/\D/g, '') || '1') : '99';
+
+              return {
+                tableNumber: String(tableNumRaw).padStart(2, '0'),
+                tableName: tbl ? tbl.name : 'Sin Asignar',
+                nombre: g.name,
+                pases: g.pases || g.passes || 1,
+                tipoMenu: tipo,
+                menuLabel: label,
+                instruccion: g.tag ? `${g.tag}. Servir según especificación.` : 'Servicio estándar según protocolo.',
+                isKidMenu: isKid
+              };
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Usando configuración por defecto de catering', err);
+      }
+
       // 1. FILTRADO DINÁMICO ESTRICTO:
       // Se omiten los menús estándar y se conservan únicamente requerimientos especiales, alergias o infantiles
-      const tacticalRows = eventConfig.rsvpResponses.filter(r => {
+      const tacticalRows = dataSource.filter(r => {
         const isStandard = r.tipoMenu === 'standard' || r.tipoMenu === 'none' || (!r.tipoMenu && !r.isKidMenu);
         return !isStandard; // Excluye comensales sin requerimiento especial
       });

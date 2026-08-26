@@ -18,19 +18,71 @@ class SeatingPlanner {
       statsOvercapacityBadgeSelector: '#statOvercapacityBadge',
       searchInputSelector: '#searchGuestsInput',
       overCapacityColor: '#A38047',
+      storageKey: 'invitta_seating_state_v2',
       onStateChange: null
     }, options);
 
+    this.storageKey = this.options.storageKey;
     this.searchQuery = '';
 
-    // Estado centralizado en memoria con catálogo ampliado
-    this.state = {
-      guests: options.initialGuests || this.getDefaultGuests(),
-      tables: options.initialTables || this.getDefaultTables(),
-      draggedItem: null
-    };
+    // Estado reactivo centralizado con persistencia local
+    this.state = this.loadPersistedState(options.initialGuests, options.initialTables);
 
     this.init();
+  }
+
+  loadPersistedState(initialGuests, initialTables) {
+    if (initialGuests && initialTables) {
+      return { guests: initialGuests, tables: initialTables, draggedItem: null };
+    }
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const raw = localStorage.getItem(this.storageKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.guests) && Array.isArray(parsed.tables) && parsed.guests.length > 0) {
+            return {
+              guests: parsed.guests,
+              tables: parsed.tables,
+              draggedItem: null
+            };
+          }
+        }
+      } catch (err) {
+        console.warn('Could not load persisted seating state:', err);
+      }
+    }
+
+    return {
+      guests: initialGuests || this.getDefaultGuests(),
+      tables: initialTables || this.getDefaultTables(),
+      draggedItem: null
+    };
+  }
+
+  savePersistedState() {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(this.storageKey, JSON.stringify({
+          guests: this.state.guests,
+          tables: this.state.tables
+        }));
+      } catch (err) {
+        console.warn('Could not save seating state:', err);
+      }
+    }
+  }
+
+  clearPersistedState() {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.removeItem(this.storageKey);
+      } catch (err) {}
+    }
+    this.state.guests = this.getDefaultGuests();
+    this.state.tables = this.getDefaultTables();
+    this.updateStateAndDOM();
   }
 
   getDefaultGuests() {
@@ -160,6 +212,8 @@ class SeatingPlanner {
   }
 
   updateStateAndDOM() {
+    this.savePersistedState();
+
     if (typeof document !== 'undefined') {
       this.renderUnassignedList();
       this.renderTables();

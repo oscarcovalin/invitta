@@ -67,5 +67,10 @@ assert(swapSuccess === true, 'swapGuests executed successfully');
 assert(g1.tableId === prevTableG2, `${g1.name} moved to previous table of ${g2.name}`);
 assert(g2.tableId === prevTableG1, `${g2.name} moved to previous table of ${g1.name}`);
 
+// 9. Test Persistence Methods
+assert(typeof planner.savePersistedState === 'function', 'savePersistedState method available');
+assert(typeof planner.loadPersistedState === 'function', 'loadPersistedState method available');
+assert(typeof planner.clearPersistedState === 'function', 'clearPersistedState method available');
+
 console.log(`\nResults: ${passed} passed, ${failed} failed.\n`);
 if (failed > 0) process.exit(1);
