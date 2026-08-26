@@ -1,0 +1,26 @@
+{
+  "label": "v7.2_all_sections_adaptive_toggles",
+  "timestamp": "2026-08-26T02:58:29.617Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 119832
+    },
+    {
+      "filename": "index.html",
+      "size": 97745
+    },
+    {
+      "filename": "app.js",
+      "size": 89043
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
