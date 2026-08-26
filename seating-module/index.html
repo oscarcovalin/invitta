@@ -513,23 +513,23 @@
         <button type="button" class="btn-close-modal text-on-surface-variant hover:text-primary text-2xl font-light">&times;</button>
       </div>
 
-      <div class="space-y-5 text-xs">
+      <div class="space-y-4 text-xs">
         
         <!-- 1. Entrada de Invitados Contemplados & Calculadora de Mesas -->
         <div class="p-4 rounded-xl bg-surface-container border border-outline-variant space-y-3">
           <div class="flex items-center justify-between">
             <label for="inputContemplatedGuests" class="font-label-caps text-primary font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-base">groups</span>
+              <span class="material-symbols-outlined text-base text-amber-700">groups</span>
               Total de Invitados Contemplados
             </label>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary font-bold" id="badgeQuickRatio">15 Mesas requeridas</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary font-bold" id="badgeQuickRatio">12 Mesas requeridas</span>
           </div>
 
           <div class="flex items-center gap-2">
             <div class="relative flex-1">
               <input type="number" id="inputContemplatedGuests" min="1" max="1500" value="120"
                 class="w-full bg-surface border border-outline-variant rounded-xl py-2 px-3.5 text-lg font-headline-lg font-bold text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
-              <span class="absolute right-3 top-2.5 text-[11px] text-on-secondary-container font-mono">invitados</span>
+              <span class="absolute right-3 top-2.5 text-[11px] text-on-secondary-container font-mono">comensales</span>
             </div>
             
             <!-- Botones Rápidos de Escala -->
@@ -542,10 +542,41 @@
           </div>
         </div>
 
-        <!-- 2. Selector de Acomodo por Mesa (8, 10 y 12) -->
+        <!-- 2. Entrada de Invitados en Mesa Imperial (Presidencia / Novios & Corte) -->
+        <div class="p-4 rounded-xl bg-amber-50/80 border border-amber-300/70 space-y-3">
+          <div class="flex items-center justify-between">
+            <label for="inputImperialGuests" class="text-amber-950 font-bold uppercase tracking-wider text-[10.5px] flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base text-amber-700">stars</span>
+              Invitados en Mesa Imperial (Presidencia)
+            </label>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-200/80 text-amber-900 font-bold" id="badgeImperialRatio">Novios & Corte (10 pases)</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1">
+              <input type="number" id="inputImperialGuests" min="2" max="30" value="10"
+                class="w-full bg-white border border-amber-300/80 rounded-xl py-2 px-3.5 text-lg font-['Cinzel'] font-bold text-amber-950 focus:outline-none focus:border-amber-700">
+              <span class="absolute right-3 top-2.5 text-[11px] text-amber-800 font-mono">asientos</span>
+            </div>
+            
+            <!-- Botones Rápidos Mesa Imperial -->
+            <div class="flex gap-1">
+              <button type="button" class="btn-quick-imperial px-2 py-2 rounded-lg bg-white border border-amber-300/70 hover:border-amber-700 text-[10px] font-mono text-amber-900 font-bold transition-all" data-val="6">6</button>
+              <button type="button" class="btn-quick-imperial px-2 py-2 rounded-lg bg-white border border-amber-300/70 hover:border-amber-700 text-[10px] font-mono text-amber-900 font-bold transition-all" data-val="8">8</button>
+              <button type="button" class="btn-quick-imperial px-2 py-2 rounded-lg bg-white border border-amber-300/70 hover:border-amber-700 text-[10px] font-mono text-amber-900 font-bold transition-all" data-val="10">10</button>
+              <button type="button" class="btn-quick-imperial px-2 py-2 rounded-lg bg-white border border-amber-300/70 hover:border-amber-700 text-[10px] font-mono text-amber-900 font-bold transition-all" data-val="12">12</button>
+              <button type="button" class="btn-quick-imperial px-2 py-2 rounded-lg bg-white border border-amber-300/70 hover:border-amber-700 text-[10px] font-mono text-amber-900 font-bold transition-all" data-val="14">14</button>
+            </div>
+          </div>
+          <p class="text-[10px] text-amber-800/90 leading-tight">
+            Asientos reservados para los Novios y Corte. El resto (<strong id="labelRemainingGuests" class="font-bold text-amber-950">110 comensales</strong>) se distribuirá en las mesas de las alas izquierda y derecha.
+          </p>
+        </div>
+
+        <!-- 3. Selector de Acomodo por Mesa (8, 10 y 12) -->
         <div>
           <label class="font-label-caps text-on-surface-variant uppercase tracking-wider block mb-2">
-            Acomodo de Invitados por Mesa
+            Acomodo de Invitados en Mesas Circulares (Salón)
           </label>
           <div class="grid grid-cols-3 gap-2.5" id="capacitySelectorGroup">
             
@@ -553,14 +584,14 @@
             <button type="button" class="btn-capacity-card active p-3 rounded-xl border border-primary bg-primary/10 text-center flex flex-col items-center gap-1 transition-all" data-capacity="8">
               <span class="font-headline-lg text-primary text-lg font-bold">8</span>
               <span class="font-label-caps text-[9.5px] uppercase tracking-wider text-on-secondary-container font-semibold">Por Mesa</span>
-              <span class="text-[9.5px] text-primary font-mono font-bold" id="tablesNeeded8">15 mesas</span>
+              <span class="text-[9.5px] text-primary font-mono font-bold" id="tablesNeeded8">14 mesas</span>
             </button>
 
             <!-- Opción 10 -->
             <button type="button" class="btn-capacity-card p-3 rounded-xl border border-outline-variant bg-surface-container text-center flex flex-col items-center gap-1 hover:border-primary transition-all" data-capacity="10">
               <span class="font-headline-lg text-primary text-lg font-bold">10</span>
               <span class="font-label-caps text-[9.5px] uppercase tracking-wider text-on-secondary-container font-semibold">Por Mesa</span>
-              <span class="text-[9.5px] text-on-secondary-container font-mono font-bold" id="tablesNeeded10">12 mesas</span>
+              <span class="text-[9.5px] text-on-secondary-container font-mono font-bold" id="tablesNeeded10">11 mesas</span>
             </button>
 
             <!-- Opción 12 -->
@@ -573,33 +604,33 @@
           </div>
         </div>
 
-        <!-- 3. Caja Resumen de Distribución Calculada -->
-        <div class="p-3.5 rounded-xl bg-champagne-light/50 border border-primary/30 space-y-2.5">
+        <!-- 4. Caja Resumen de Distribución Calculada -->
+        <div class="p-3.5 rounded-xl bg-amber-50/60 border border-amber-400/40 space-y-2.5">
           <div class="flex items-center justify-between text-[11px]">
-            <span class="font-label-caps text-primary font-bold flex items-center gap-1.5">
+            <span class="font-label-caps text-amber-900 font-bold flex items-center gap-1.5">
               <span class="material-symbols-outlined text-base">table_restaurant</span>
               Cálculo de Distribución del Salón
             </span>
-            <span class="font-mono text-primary font-bold text-xs" id="calcSummaryBadge">15 mesas de 8 = 120 asientos</span>
+            <span class="font-mono text-amber-900 font-bold text-xs" id="calcSummaryBadge">1 Imperial (10) + 14 Circulares (8) = 122 asientos</span>
           </div>
 
           <div class="grid grid-cols-3 gap-2 text-center text-[10.5px] font-mono">
             <div class="p-2 rounded-lg bg-surface border border-outline-variant">
-              <span class="text-on-secondary-container block text-[9.5px]">Mesas Necesarias</span>
-              <span class="text-primary font-bold text-sm" id="calcRequiredTables">15</span>
+              <span class="text-on-secondary-container block text-[9.5px]">Mesas Circulares</span>
+              <span class="text-primary font-bold text-xs" id="calcRequiredTables">14 (7 Izq / 7 Der)</span>
             </div>
             <div class="p-2 rounded-lg bg-surface border border-outline-variant">
               <span class="text-on-secondary-container block text-[9.5px]">Capacidad Total</span>
-              <span class="text-primary font-bold text-sm" id="calcTotalCapacity">120</span>
+              <span class="text-primary font-bold text-sm" id="calcTotalCapacity">122</span>
             </div>
             <div class="p-2 rounded-lg bg-surface border border-outline-variant">
               <span class="text-on-secondary-container block text-[9.5px]">Asientos Libres</span>
-              <span class="text-emerald-700 font-bold text-sm" id="calcFreeSeats">0</span>
+              <span class="text-emerald-700 font-bold text-sm" id="calcFreeSeats">2</span>
             </div>
           </div>
 
-          <button type="button" id="btnAutoDistribute" class="w-full py-2.5 px-4 rounded-xl bg-primary text-on-primary font-label-caps text-xs tracking-wider uppercase hover:bg-charcoal transition-all shadow-md flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-base">magic_button</span>
+          <button type="button" id="btnAutoDistribute" class="w-full py-2.5 px-4 rounded-xl bg-primary text-on-primary font-label-caps text-xs tracking-wider uppercase hover:bg-charcoal transition-all shadow-md flex items-center justify-center gap-2 font-semibold">
+            <span class="material-symbols-outlined text-base text-amber-300">magic_button</span>
             <span>✦ Configurar Salón y Distribuir Invitados ✦</span>
           </button>
         </div>
@@ -657,11 +688,14 @@
       planner.addTable('Mesa', type, 8);
     });
 
-    // 3. Modales y Calculadora de Mesas por Invitados Contemplados
+    // 3. Modales y Calculadora de Mesas (Mesa Imperial + Circulares 8, 10, 12)
     const modalTimeline = document.getElementById('modalTimeline');
     const modalSettings = document.getElementById('modalSettings');
     const inputContemplated = document.getElementById('inputContemplatedGuests');
+    const inputImperial = document.getElementById('inputImperialGuests');
     const badgeQuickRatio = document.getElementById('badgeQuickRatio');
+    const badgeImperialRatio = document.getElementById('badgeImperialRatio');
+    const labelRemainingGuests = document.getElementById('labelRemainingGuests');
     const tablesNeeded8 = document.getElementById('tablesNeeded8');
     const tablesNeeded10 = document.getElementById('tablesNeeded10');
     const tablesNeeded12 = document.getElementById('tablesNeeded12');
@@ -673,35 +707,56 @@
     let currentSelectedCapacity = 8;
 
     function recalculateTablesPlan() {
-      const guests = Math.max(1, parseInt(inputContemplated?.value || '120', 10) || 120);
+      const totalGuests = Math.max(1, parseInt(inputContemplated?.value || '120', 10) || 120);
+      const imperialGuests = Math.max(2, parseInt(inputImperial?.value || '10', 10) || 10);
+      
+      const remainingForSalon = Math.max(0, totalGuests - imperialGuests);
+      if (labelRemainingGuests) labelRemainingGuests.textContent = `${remainingForSalon} comensales`;
+      if (badgeImperialRatio) badgeImperialRatio.textContent = `Novios & Corte (${imperialGuests} pases)`;
 
-      const n8 = Math.ceil(guests / 8);
-      const n10 = Math.ceil(guests / 10);
-      const n12 = Math.ceil(guests / 12);
+      const n8 = Math.ceil(remainingForSalon / 8) || 1;
+      const n10 = Math.ceil(remainingForSalon / 10) || 1;
+      const n12 = Math.ceil(remainingForSalon / 12) || 1;
 
-      if (tablesNeeded8) tablesNeeded8.textContent = `${n8} mesas`;
-      if (tablesNeeded10) tablesNeeded10.textContent = `${n10} mesas`;
-      if (tablesNeeded12) tablesNeeded12.textContent = `${n12} mesas`;
+      if (tablesNeeded8) tablesNeeded8.textContent = `${n8} mesas (${Math.ceil(n8/2)} Izq / ${Math.floor(n8/2)} Der)`;
+      if (tablesNeeded10) tablesNeeded10.textContent = `${n10} mesas (${Math.ceil(n10/2)} Izq / ${Math.floor(n10/2)} Der)`;
+      if (tablesNeeded12) tablesNeeded12.textContent = `${n12} mesas (${Math.ceil(n12/2)} Izq / ${Math.floor(n12/2)} Der)`;
 
-      const activeNeeded = Math.ceil(guests / currentSelectedCapacity);
-      const totalCap = activeNeeded * currentSelectedCapacity;
-      const freeSeats = totalCap - guests;
+      const activeCircularNeeded = Math.ceil(remainingForSalon / currentSelectedCapacity) || 1;
+      const totalCap = imperialGuests + (activeCircularNeeded * currentSelectedCapacity);
+      const freeSeats = totalCap - totalGuests;
 
-      if (calcRequiredTables) calcRequiredTables.textContent = activeNeeded;
+      const leftWingCount = Math.ceil(activeCircularNeeded / 2);
+      const rightWingCount = Math.floor(activeCircularNeeded / 2);
+
+      if (calcRequiredTables) calcRequiredTables.textContent = `${activeCircularNeeded} (${leftWingCount} Izq / ${rightWingCount} Der)`;
       if (calcTotalCapacity) calcTotalCapacity.textContent = totalCap;
       if (calcFreeSeats) calcFreeSeats.textContent = freeSeats;
-      if (badgeQuickRatio) badgeQuickRatio.textContent = `${activeNeeded} Mesas requeridas`;
-      if (calcSummaryBadge) calcSummaryBadge.textContent = `${activeNeeded} mesas de ${currentSelectedCapacity} = ${totalCap} asientos`;
+      if (badgeQuickRatio) badgeQuickRatio.textContent = `${activeCircularNeeded + 1} Mesas en total`;
+      if (calcSummaryBadge) calcSummaryBadge.textContent = `1 Imperial (${imperialGuests}) + ${activeCircularNeeded} Circulares (${currentSelectedCapacity}) = ${totalCap} asientos`;
     }
 
     if (inputContemplated) {
       inputContemplated.addEventListener('input', recalculateTablesPlan);
     }
 
+    if (inputImperial) {
+      inputImperial.addEventListener('input', recalculateTablesPlan);
+    }
+
     document.querySelectorAll('.btn-quick-guests').forEach(btn => {
       btn.addEventListener('click', () => {
         if (inputContemplated) {
           inputContemplated.value = btn.dataset.val;
+          recalculateTablesPlan();
+        }
+      });
+    });
+
+    document.querySelectorAll('.btn-quick-imperial').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (inputImperial) {
+          inputImperial.value = btn.dataset.val;
           recalculateTablesPlan();
         }
       });
@@ -740,15 +795,17 @@
 
     // 5. Ejecutar Distribución Automática y Ajuste del Salón
     document.getElementById('btnAutoDistribute').addEventListener('click', () => {
-      const guests = Math.max(1, parseInt(inputContemplated?.value || '120', 10) || 120);
-      const neededTables = Math.ceil(guests / currentSelectedCapacity);
+      const totalGuests = Math.max(1, parseInt(inputContemplated?.value || '120', 10) || 120);
+      const imperialGuests = Math.max(2, parseInt(inputImperial?.value || '10', 10) || 10);
 
-      // Ajustar el número exacto de mesas requeridas
-      planner.setTotalTables(neededTables, currentSelectedCapacity);
-      const result = planner.autoDistributeGuests({ capacity: currentSelectedCapacity });
+      const summary = planner.configureSalonAndDistribute({
+        totalGuests: totalGuests,
+        imperialCapacity: imperialGuests,
+        circularCapacity: currentSelectedCapacity
+      });
 
       modalSettings.classList.add('hidden');
-      alert(`✨ ¡Salón Configurado y Distribuido!\n\n• Invitados contemplados: ${guests}\n• Mesas generadas: ${neededTables} mesas (${currentSelectedCapacity} comensales/mesa)\n• Capacidad total instalada: ${neededTables * currentSelectedCapacity} asientos\n• Comensales asignados respetando bloques familiares y VIPs.`);
+      alert(`✨ ¡Salón Configurado y Distribuido!\n\n• Total de comensales: ${totalGuests}\n• Mesa Imperial (Presidencia): ${imperialGuests} asientos\n• Mesas Circulares: ${summary.circularTablesCount} mesas (${summary.leftWingCount} Ala Izquierda · ${summary.rightWingCount} Ala Derecha)\n• Capacidad total instalada: ${summary.totalCapacity} asientos (${summary.freeSeats} asientos libres).`);
     });
 
     // 7. Exportar Plano a JSON

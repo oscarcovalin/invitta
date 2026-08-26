@@ -866,14 +866,122 @@ class SeatingPlanner {
   }
 
   /**
+   * Configura el Salón con Mesa Imperial personalizada + Mesas Circulares (8, 10 o 12)
+   * y distribuye automáticamente a los invitados respetando Presidencia y Alas Izquierda / Derecha
+   */
+  configureSalonAndDistribute(options = {}) {
+    const total = Math.max(1, Number(options.totalGuests) || 120);
+    const impCap = Math.max(2, Number(options.imperialCapacity) || 10);
+    const circCap = [8, 10, 12].includes(Number(options.circularCapacity)) ? Number(options.circularCapacity) : 8;
+
+    // 1. Calcular mesas circulares requeridas para los comensales restantes
+    const remainingGuests = Math.max(0, total - impCap);
+    const neededCircular = Math.ceil(remainingGuests / circCap) || 1;
+
+    // 2. Reconstruir tablas del salón: 1 Imperial (Presidencia) + N Circulares (Alas)
+    const newTables = [
+      {
+        id: 'tbl_imperial',
+        number: 'I',
+        name: 'Mesa Imperial',
+        subtitle: 'Novios & Corte de Honor',
+        type: 'imperial',
+        capacity: impCap,
+        posX: '50%',
+        posY: '40px'
+      }
+    ];
+
+    for (let i = 1; i <= neededCircular; i++) {
+      newTables.push({
+        id: `tbl_${i}`,
+        number: String(i),
+        name: `Mesa ${i}`,
+        subtitle: 'Invitados',
+        type: 'circular',
+        capacity: circCap
+      });
+    }
+
+    this.state.tables = newTables;
+
+    // 3. Limpiar asignaciones anteriores
+    this.state.guests.forEach(g => g.tableId = null);
+
+    // 4. Asignar primero VIPs y Corte de Honor a Mesa Imperial
+    const imperialTable = this.state.tables[0];
+    const vips = this.state.guests.filter(g => g.court || g.vip);
+    const regulars = this.state.guests.filter(g => !g.court && !g.vip);
+
+    vips.forEach(g => {
+      const currentPasses = this.state.guests
+        .filter(x => x.tableId === imperialTable.id)
+        .reduce((s, x) => s + (x.pases || x.passes || 1), 0);
+      const gPasses = g.pases || g.passes || 1;
+
+      if (currentPasses + gPasses <= imperialTable.capacity) {
+        g.tableId = imperialTable.id;
+      }
+    });
+
+    // 5. Asignar resto de invitados (incluyendo VIPs que excedieron) a las mesas circulares
+    const unassigned = this.state.guests.filter(g => !g.tableId);
+    const circularTablesList = this.state.tables.slice(1);
+
+    unassigned.forEach(g => {
+      const gPasses = g.pases || g.passes || 1;
+
+      let bestTable = circularTablesList.find(tbl => {
+        const currentPasses = this.state.guests
+          .filter(x => x.tableId === tbl.id)
+          .reduce((s, x) => s + (x.pases || x.passes || 1), 0);
+        return (currentPasses + gPasses) <= tbl.capacity;
+      });
+
+      if (!bestTable && circularTablesList.length > 0) {
+        bestTable = circularTablesList.reduce((minTbl, tbl) => {
+          const occA = this.state.guests.filter(x => x.tableId === tbl.id).reduce((s, x) => s + (x.pases || x.passes || 1), 0);
+          const occMin = this.state.guests.filter(x => x.tableId === minTbl.id).reduce((s, x) => s + (x.pases || x.passes || 1), 0);
+          return occA < occMin ? tbl : minTbl;
+        }, circularTablesList[0]);
+      }
+
+      if (bestTable) {
+        g.tableId = bestTable.id;
+      }
+    });
+
+    this.updateStateAndDOM();
+
+    const totalCapacity = impCap + (neededCircular * circCap);
+    return {
+      totalGuests: total,
+      imperialCapacity: impCap,
+      circularCapacity: circCap,
+      circularTablesCount: neededCircular,
+      leftWingCount: Math.ceil(neededCircular / 2),
+      rightWingCount: Math.floor(neededCircular / 2),
+      totalCapacity: totalCapacity,
+      freeSeats: totalCapacity - total
+    };
+  }
+
+  /**
    * Distribución Automática Inteligente de Invitaciones
    * Respeta cortes de honor / VIPs y capacidad por mesa (8, 10 o 12)
    */
   autoDistributeGuests(options = {}) {
     const capacity = [8, 10, 12].includes(Number(options.capacity)) ? Number(options.capacity) : 8;
+    const imperialCap = Number(options.imperialCapacity) || 10;
     
-    // 1. Unificar capacidades
-    this.setCapacityAcrossTables(capacity);
+    // 1. Ajustar capacidades
+    this.state.tables.forEach(t => {
+      if (t.type === 'imperial') {
+        t.capacity = imperialCap;
+      } else {
+        t.capacity = capacity;
+      }
+    });
 
     // 2. Limpiar asignaciones
     this.state.guests.forEach(g => g.tableId = null);

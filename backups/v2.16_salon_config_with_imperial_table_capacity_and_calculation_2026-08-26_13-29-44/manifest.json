@@ -1,0 +1,26 @@
+{
+  "label": "v2.16_salon_config_with_imperial_table_capacity_and_calculation",
+  "timestamp": "2026-08-26T19:29:44.049Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158441
+    },
+    {
+      "filename": "index.html",
+      "size": 69736
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
