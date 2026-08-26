@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -157,10 +157,22 @@
 <body class="bg-background font-body-md text-on-surface antialiased flex h-screen overflow-hidden select-none">
 
   <!-- ==================== BARRA LATERAL FIJA (300px) ==================== -->
-  <aside class="fixed left-0 top-0 h-full w-[300px] bg-surface-container-lowest border-r border-outline-variant z-50 flex flex-col pt-10">
-    <div class="px-8 mb-12 flex flex-col gap-0.5">
-      <span class="font-headline-lg text-primary tracking-widest uppercase text-2xl font-normal">Invitta</span>
-      <span class="font-label-caps text-on-surface-variant tracking-widest text-[10px]">Studio · Atelier Digital</span>
+  <aside class="fixed left-0 top-0 h-full w-[300px] bg-surface-container-lowest border-r border-outline-variant z-50 flex flex-col pt-8">
+    <div class="px-7 mb-10 flex items-center gap-3.5">
+      <!-- Logotipo Oficial Invitta -->
+      <div class="w-10 h-10 rounded-xl bg-primary text-surface-container-lowest flex items-center justify-center shadow-md flex-shrink-0 border border-outline-variant/60">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L19 9L12 16L5 9L12 2Z" stroke="#C7B299" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M12 7L16 11L12 15L8 11L12 7Z" fill="#C7B299" fill-opacity="0.3"/>
+          <line x1="12" y1="16" x2="12" y2="22" stroke="#C7B299" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="8" y1="22" x2="16" y2="22" stroke="#C7B299" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="12" cy="11" r="1.5" fill="#C7B299"/>
+        </svg>
+      </div>
+      <div class="flex flex-col justify-center">
+        <span class="font-headline-lg text-primary tracking-widest uppercase text-xl leading-none font-normal">Invitta</span>
+        <span class="font-label-caps text-on-surface-variant tracking-[0.25em] text-[10.5px] uppercase mt-1">Studio</span>
+      </div>
     </div>
 
     <nav class="flex-1 flex flex-col gap-1 px-4">
