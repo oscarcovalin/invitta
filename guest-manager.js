@@ -708,6 +708,14 @@ class GuestManager {
     return true;
   }
 
+  generateRandomMasterPin(digits = 4) {
+    const min = Math.pow(10, digits - 1);
+    const max = Math.pow(10, digits) - 1;
+    const randomPin = Math.floor(min + Math.random() * (max - min + 1)).toString();
+    this.setMasterPin(randomPin);
+    return randomPin;
+  }
+
   verifyMasterPin(inputPin) {
     if (!inputPin) return false;
     return String(inputPin).trim() === this.getMasterPin();

@@ -25,6 +25,11 @@ assert(gm.verifyMasterPin('0000') === false, 'Rejects invalid Master PIN 0000');
 
 assert(gm.setMasterPin('4567') === true, 'Successfully updates Master PIN to 4567');
 assert(gm.verifyMasterPin('4567') === true, 'Verifies updated Master PIN 4567');
+
+const generatedPin = gm.generateRandomMasterPin();
+assert(typeof generatedPin === 'string' && generatedPin.length === 4, `Generates random 4-digit PIN (${generatedPin})`);
+assert(gm.verifyMasterPin(generatedPin) === true, 'Auto-persists and verifies generated random PIN');
+
 gm.setMasterPin('2027'); // Restore default
 
 // 2. Roles y Detección
@@ -81,6 +86,7 @@ assert(indexHtml.includes('badgeRoleAdmin'), 'index.html contains badgeRoleAdmin
 assert(indexHtml.includes('badgeRolePlanner'), 'index.html contains badgeRolePlanner');
 assert(indexHtml.includes('sidebarPrivateBrideLinks'), 'index.html contains sidebarPrivateBrideLinks');
 assert(indexHtml.includes('modalShareAccess'), 'index.html contains modalShareAccess');
+assert(indexHtml.includes('btnGenerateMasterPin'), 'index.html contains btnGenerateMasterPin button');
 assert(indexHtml.includes('btnWaDesigner'), 'index.html contains btnWaDesigner in modalShareAccess');
 assert(indexHtml.includes('modalUnlockAdmin'), 'index.html contains modalUnlockAdmin');
 assert(indexHtml.includes('applyRoleInterface'), 'index.html has applyRoleInterface function');
