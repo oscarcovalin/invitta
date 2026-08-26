@@ -1,0 +1,26 @@
+{
+  "label": "v7.1_invitta_studio_branding",
+  "timestamp": "2026-08-26T02:46:38.574Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 118480
+    },
+    {
+      "filename": "index.html",
+      "size": 94144
+    },
+    {
+      "filename": "app.js",
+      "size": 83199
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
