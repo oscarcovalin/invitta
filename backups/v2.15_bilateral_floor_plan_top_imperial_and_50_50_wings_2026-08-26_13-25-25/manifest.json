@@ -1,0 +1,26 @@
+{
+  "label": "v2.15_bilateral_floor_plan_top_imperial_and_50_50_wings",
+  "timestamp": "2026-08-26T19:25:25.070Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158441
+    },
+    {
+      "filename": "index.html",
+      "size": 65013
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

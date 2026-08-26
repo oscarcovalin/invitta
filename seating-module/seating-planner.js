@@ -132,10 +132,20 @@ class SeatingPlanner {
         id: 'tbl_3',
         number: '3',
         name: 'Mesa 3',
-        subtitle: 'Amigos & Universitarios',
-        type: 'imperial',
-        capacity: 10,
-        posX: '50%',
+        subtitle: 'Amigos Cercanos',
+        type: 'circular',
+        capacity: 8,
+        posX: '16%',
+        posY: '530px'
+      },
+      {
+        id: 'tbl_4',
+        number: '4',
+        name: 'Mesa 4',
+        subtitle: 'Compañeros & Amistades',
+        type: 'circular',
+        capacity: 8,
+        posX: '72%',
         posY: '530px'
       }
     ];
@@ -325,154 +335,51 @@ class SeatingPlanner {
   }
 
   /**
-   * Renderizado de las mesas interactivas en el Floor Plan
+   * Renderizado individual de una tarjeta de mesa (Imperial o Circular)
    */
-  renderTables() {
-    if (typeof document === 'undefined') return;
-    const container = document.querySelector(this.options.tablesContainerSelector);
-    if (!container) return;
+  renderSingleTableHTML(table) {
+    const assigned = this.state.guests.filter(g => g.tableId === table.id);
+    const totalPasses = assigned.reduce((sum, g) => sum + (g.pases || g.passes || 1), 0);
+    const isOver = totalPasses > table.capacity;
+    const overCount = totalPasses - table.capacity;
 
-    container.innerHTML = this.state.tables.map(table => {
-      const assigned = this.state.guests.filter(g => g.tableId === table.id);
-      const totalPasses = assigned.reduce((sum, g) => sum + (g.pases || g.passes || 1), 0);
-      const isOver = totalPasses > table.capacity;
-      const overCount = totalPasses - table.capacity;
+    // Expandir asientos por número de pases de cada invitación
+    const seatedSlots = [];
+    assigned.forEach(g => {
+      const passes = g.pases || g.passes || 1;
+      for (let p = 1; p <= passes; p++) {
+        seatedSlots.push({ guest: g, passNumber: p, totalPasses: passes });
+      }
+    });
 
-      // Expandir asientos por número de pases de cada invitación
-      const seatedSlots = [];
-      assigned.forEach(g => {
-        const passes = g.pases || g.passes || 1;
-        for (let p = 1; p <= passes; p++) {
-          seatedSlots.push({ guest: g, passNumber: p, totalPasses: passes });
-        }
-      });
+    // Estilo de Sobrecupo Elegante (#A38047)
+    const overBorderClass = isOver ? 'border-[#A38047] shadow-[0_0_25px_rgba(163,128,71,0.25)] ring-1 ring-[#A38047]' : 'border-outline-variant';
+    const isImperial = table.type === 'imperial';
 
-      // Estilo de Sobrecupo Elegante (#A38047)
-      const overBorderClass = isOver ? 'border-[#A38047] shadow-[0_0_25px_rgba(163,128,71,0.25)] ring-1 ring-[#A38047]' : 'border-outline-variant';
-      const isImperial = table.type === 'imperial';
+    if (isImperial) {
+      // ==================== MESA IMPERIAL (RECTANGULAR) ====================
+      const half = Math.ceil(table.capacity / 2);
+      const topAssigned = seatedSlots.slice(0, half);
+      const botAssigned = seatedSlots.slice(half);
 
-      if (isImperial) {
-        // ==================== MESA IMPERIAL (RECTANGULAR) ====================
-        const half = Math.ceil(table.capacity / 2);
-        const topAssigned = seatedSlots.slice(0, half);
-        const botAssigned = seatedSlots.slice(half);
-
-        return `
-          <div class="table-card-dropzone relative group mb-14 mx-auto max-w-[560px]"
-            data-table-id="${table.id}"
-            style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+      return `
+        <div class="table-card-dropzone relative group w-full max-w-[560px]"
+          data-table-id="${table.id}"
+          style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+          
+          <div class="w-full min-h-[135px] bg-surface-container-lowest rounded-2xl border ${overBorderClass} shadow-md flex flex-col items-center justify-center relative transition-all hover:border-charcoal p-5">
             
-            <div class="w-full min-h-[140px] bg-surface-container-lowest rounded-lg border ${overBorderClass} shadow-sm flex flex-col items-center justify-center relative transition-all hover:border-charcoal p-6">
-              
-              <!-- Asientos Superiores -->
-              <div class="absolute -top-4 w-full flex justify-around px-8">
-                ${Array.from({ length: half }).map((_, i) => {
-                  const slot = topAssigned[i];
-                  if (slot) {
-                    const g = slot.guest;
-                    const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
-                    const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
-                    const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
-                    return `
-                      <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary ring-1 ring-brushed-champagne/40' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary"
-                        draggable="true"
-                        data-drag-type="single"
-                        data-guest-id="${g.id}"
-                        data-table-id="${table.id}"
-                        title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · Arrastra a otra mesa o sobre otro invitado para intercambiar · Clic para quitar)">
-                        ${label}
-                      </div>
-                    `;
-                  }
-                  return `
-                    <div class="w-8 h-8 rounded-full bg-surface-container-low border border-dashed border-outline-variant flex items-center justify-center text-label-sm text-on-surface-variant opacity-60">
-                      +
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-
-              <!-- Asientos Inferiores -->
-              <div class="absolute -bottom-4 w-full flex justify-around px-8">
-                ${Array.from({ length: half }).map((_, i) => {
-                  const slot = botAssigned[i];
-                  if (slot) {
-                    const g = slot.guest;
-                    const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
-                    const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
-                    const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
-                    return `
-                      <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary"
-                        draggable="true"
-                        data-drag-type="single"
-                        data-guest-id="${g.id}"
-                        data-table-id="${table.id}"
-                        title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · Arrastra a otra mesa o sobre otro invitado para intercambiar · Clic para quitar)">
-                        ${label}
-                      </div>
-                    `;
-                  }
-                  return `
-                    <div class="w-8 h-8 rounded-full bg-surface-container-low border border-dashed border-outline-variant flex items-center justify-center text-label-sm text-on-surface-variant opacity-60">
-                      +
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-
-              <!-- Contenido de la Mesa -->
-              <div class="flex flex-col items-center select-none text-center">
-                <span class="font-headline-lg text-primary tracking-widest uppercase">${table.name}</span>
-                ${table.subtitle ? `<span class="font-label-caps text-on-surface-variant mt-1 tracking-widest text-[11px]">${table.subtitle}</span>` : ''}
-                
-                <div class="mt-3 flex items-center gap-4 text-label-caps text-on-surface-variant">
-                  <span class="flex items-center gap-1.5 font-mono text-xs ${isOver ? 'text-[#A38047] font-bold' : ''}">
-                    <span class="material-symbols-outlined font-light text-[16px]">group</span>
-                    ${totalPasses} / ${table.capacity} pases ${isOver ? `(+${overCount} sobrecupo)` : ''}
-                  </span>
-                  ${table.id === 'tbl_imperial' ? `
-                    <span class="flex items-center gap-1 text-brushed-champagne font-semibold">
-                      <span class="material-symbols-outlined font-light text-[15px]">star</span> VIP
-                    </span>
-                  ` : ''}
-                </div>
-              </div>
-
-              <!-- Dropzone Hover Indicator -->
-              <div class="drop-indicator absolute inset-0 flex items-center justify-center bg-surface-container-high/80 rounded-lg opacity-0 pointer-events-none transition-opacity">
-                <span class="material-symbols-outlined font-light text-[32px] text-charcoal">add</span>
-              </div>
-
-            </div>
-          </div>
-        `;
-      } else {
-        // ==================== MESA CIRCULAR ====================
-        const seatSlots = Math.max(table.capacity, seatedSlots.length);
-        const radius = 95; // Radio en px
-
-        return `
-          <div class="table-card-dropzone relative group flex justify-center mb-8"
-            data-table-id="${table.id}"
-            style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
-            
-            <div class="w-60 h-60 rounded-full bg-surface-container-lowest border ${overBorderClass} flex flex-col items-center justify-center relative transition-all hover:border-charcoal shadow-sm">
-              
-              <!-- Asientos Radiales Circulares -->
-              ${Array.from({ length: seatSlots }).map((_, i) => {
-                const angle = (i / seatSlots) * 2 * Math.PI - Math.PI / 2;
-                const x = Math.round(radius * Math.cos(angle));
-                const y = Math.round(radius * Math.sin(angle));
-                const slot = seatedSlots[i];
-
+            <!-- Asientos Superiores -->
+            <div class="absolute -top-4 w-full flex justify-around px-8">
+              ${Array.from({ length: half }).map((_, i) => {
+                const slot = topAssigned[i];
                 if (slot) {
                   const g = slot.guest;
                   const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
                   const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
                   const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
                   return `
-                    <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary ring-1 ring-brushed-champagne/40' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary absolute"
-                      style="left: calc(50% + ${x}px - 16px); top: calc(50% + ${y}px - 16px);"
+                    <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary ring-1 ring-brushed-champagne/40' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary"
                       draggable="true"
                       data-drag-type="single"
                       data-guest-id="${g.id}"
@@ -482,35 +389,215 @@ class SeatingPlanner {
                     </div>
                   `;
                 }
-
                 return `
-                  <div class="w-8 h-8 rounded-full bg-surface-container-low border border-dashed border-outline-variant flex items-center justify-center text-label-sm text-on-surface-variant opacity-60 absolute"
-                    style="left: calc(50% + ${x}px - 16px); top: calc(50% + ${y}px - 16px);">
+                  <div class="w-8 h-8 rounded-full bg-surface-container-low border border-dashed border-outline-variant flex items-center justify-center text-label-sm text-on-surface-variant opacity-60">
                     +
                   </div>
                 `;
               }).join('')}
+            </div>
 
-              <!-- Contenido Central Mesa Circular -->
-              <div class="flex flex-col items-center select-none text-center px-4">
-                <span class="font-headline-lg text-primary tracking-widest">${table.name}</span>
-                
-                <div class="mt-2 flex items-center gap-1 font-label-caps text-on-surface-variant bg-surface px-3 py-1 rounded-lg border ${isOver ? 'border-[#A38047] text-[#A38047] font-bold' : 'border-outline-variant'}">
-                  ${totalPasses} / ${table.capacity} pases ${isOver ? `(+${overCount})` : ''}
+            <!-- Asientos Inferiores -->
+            <div class="absolute -bottom-4 w-full flex justify-around px-8">
+              ${Array.from({ length: half }).map((_, i) => {
+                const slot = botAssigned[i];
+                if (slot) {
+                  const g = slot.guest;
+                  const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
+                  const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
+                  const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
+                  return `
+                    <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary"
+                      draggable="true"
+                      data-drag-type="single"
+                      data-guest-id="${g.id}"
+                      data-table-id="${table.id}"
+                      title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · Arrastra a otra mesa o sobre otro invitado para intercambiar · Clic para quitar)">
+                      ${label}
+                    </div>
+                  `;
+                }
+                return `
+                  <div class="w-8 h-8 rounded-full bg-surface-container-low border border-dashed border-outline-variant flex items-center justify-center text-label-sm text-on-surface-variant opacity-60">
+                    +
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- Contenido de la Mesa -->
+            <div class="flex flex-col items-center select-none text-center">
+              <span class="font-['Cinzel'] font-bold text-primary tracking-widest uppercase text-base">${table.name}</span>
+              ${table.subtitle ? `<span class="text-on-surface-variant mt-0.5 tracking-widest text-[10.5px] uppercase font-medium">${table.subtitle}</span>` : ''}
+              
+              <div class="mt-2.5 flex items-center gap-4 text-[11px] text-on-surface-variant">
+                <span class="flex items-center gap-1.5 font-mono ${isOver ? 'text-[#A38047] font-bold' : ''}">
+                  <span class="material-symbols-outlined font-light text-[15px]">group</span>
+                  ${totalPasses} / ${table.capacity} pases ${isOver ? `(+${overCount} sobrecupo)` : ''}
+                </span>
+                ${(table.id === 'tbl_imperial' || table.type === 'imperial') ? `
+                  <span class="flex items-center gap-1 text-amber-700 font-semibold">
+                    <span class="material-symbols-outlined font-light text-[14px]">star</span> VIP
+                  </span>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Dropzone Hover Indicator -->
+            <div class="drop-indicator absolute inset-0 flex items-center justify-center bg-surface-container-high/80 rounded-2xl opacity-0 pointer-events-none transition-opacity">
+              <span class="material-symbols-outlined font-light text-[32px] text-charcoal">add</span>
+            </div>
+
+          </div>
+        </div>
+      `;
+    } else {
+      // ==================== MESA CIRCULAR ====================
+      const seatSlots = Math.max(table.capacity, seatedSlots.length);
+      const radius = 92; // Radio en px
+
+      return `
+        <div class="table-card-dropzone relative group flex justify-center mb-6"
+          data-table-id="${table.id}"
+          style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+          
+          <div class="w-56 h-56 rounded-full bg-surface-container-lowest border ${overBorderClass} flex flex-col items-center justify-center relative transition-all hover:border-charcoal shadow-md">
+            
+            <!-- Asientos Radiales Circulares -->
+            ${Array.from({ length: seatSlots }).map((_, i) => {
+              const angle = (i / seatSlots) * 2 * Math.PI - Math.PI / 2;
+              const x = Math.round(radius * Math.cos(angle));
+              const y = Math.round(radius * Math.sin(angle));
+              const slot = seatedSlots[i];
+
+              if (slot) {
+                const g = slot.guest;
+                const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
+                const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
+                const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
+                return `
+                  <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary ring-1 ring-brushed-champagne/40' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary absolute"
+                    style="left: calc(50% + ${x}px - 16px); top: calc(50% + ${y}px - 16px);"
+                    draggable="true"
+                    data-drag-type="single"
+                    data-guest-id="${g.id}"
+                    data-table-id="${table.id}"
+                    title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · Arrastra a otra mesa o sobre otro invitado para intercambiar · Clic para quitar)">
+                    ${label}
+                  </div>
+                `;
+              }
+
+              return `
+                <div class="w-8 h-8 rounded-full bg-surface-container-low border border-dashed border-outline-variant flex items-center justify-center text-label-sm text-on-surface-variant opacity-60 absolute"
+                  style="left: calc(50% + ${x}px - 16px); top: calc(50% + ${y}px - 16px);">
+                  +
                 </div>
-              </div>
+              `;
+            }).join('')}
 
-              <!-- Dropzone Hover Indicator -->
-              <div class="drop-indicator absolute inset-0 flex items-center justify-center bg-surface-container-high/80 rounded-full opacity-0 pointer-events-none transition-opacity">
-                <span class="material-symbols-outlined font-light text-[32px] text-charcoal">add</span>
+            <!-- Contenido Central Mesa Circular -->
+            <div class="flex flex-col items-center select-none text-center px-4">
+              <span class="font-['Cinzel'] font-bold text-primary tracking-widest text-base">${table.name}</span>
+              ${table.subtitle ? `<span class="text-[10px] text-on-surface-variant tracking-wider uppercase font-medium">${table.subtitle}</span>` : ''}
+              
+              <div class="mt-2 flex items-center gap-1 text-[10.5px] font-mono text-on-surface-variant bg-surface px-2.5 py-0.5 rounded-lg border ${isOver ? 'border-[#A38047] text-[#A38047] font-bold' : 'border-outline-variant'}">
+                ${totalPasses} / ${table.capacity} pases ${isOver ? `(+${overCount})` : ''}
               </div>
+            </div>
 
+            <!-- Dropzone Hover Indicator -->
+            <div class="drop-indicator absolute inset-0 flex items-center justify-center bg-surface-container-high/80 rounded-full opacity-0 pointer-events-none transition-opacity">
+              <span class="material-symbols-outlined font-light text-[32px] text-charcoal">add</span>
+            </div>
+
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  /**
+   * Renderizado de las mesas interactivas en el Floor Plan
+   * Distribución: Mesa Imperial Superior Centrada + 50% Ala Izquierda y 50% Ala Derecha
+   */
+  renderTables() {
+    if (typeof document === 'undefined') return;
+    const container = document.querySelector(this.options.tablesContainerSelector);
+    if (!container) return;
+
+    // 1. Separar Mesa Imperial (Presidencia) y Mesas de Invitados
+    const imperialTables = this.state.tables.filter(t => t.id === 'tbl_imperial' || (t.type === 'imperial' && t.name.toLowerCase().includes('imperial')));
+    const guestTables = this.state.tables.filter(t => !imperialTables.includes(t));
+
+    // Si no hay imperial explícita pero hay alguna imperial, usar la primera como presidencia
+    if (imperialTables.length === 0 && this.state.tables.some(t => t.type === 'imperial')) {
+      const firstImp = this.state.tables.find(t => t.type === 'imperial');
+      imperialTables.push(firstImp);
+      const idx = guestTables.indexOf(firstImp);
+      if (idx !== -1) guestTables.splice(idx, 1);
+    }
+
+    // 2. Dividir las mesas de invitados en 50% Izquierda y 50% Derecha
+    const halfCount = Math.ceil(guestTables.length / 2);
+    const leftWingTables = guestTables.slice(0, halfCount);
+    const rightWingTables = guestTables.slice(halfCount);
+
+    let html = '';
+
+    // ── ZONA SUPERIOR: MESA IMPERIAL CENTRADA (PRESIDENCIA) ──
+    if (imperialTables.length > 0) {
+      html += `
+        <div class="floor-plan-presidencia w-full flex flex-col items-center mb-10">
+          <div class="text-center mb-3">
+            <span class="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-amber-900 bg-amber-50 border border-amber-300/60 px-3.5 py-1 rounded-full font-bold shadow-xs">
+              <span class="material-symbols-outlined text-[14px] text-amber-700">stars</span>
+              Presidencia · Novios & Corte de Honor
+            </span>
+          </div>
+          ${imperialTables.map(t => this.renderSingleTableHTML(t)).join('')}
+        </div>
+      `;
+    }
+
+    // ── ZONA INFERIOR: DISTRIBUCIÓN BILATERAL (ALA IZQUIERDA Y ALA DERECHA) ──
+    if (guestTables.length > 0) {
+      html += `
+        <div class="floor-plan-wings-grid grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 w-full max-w-[960px] mx-auto items-start">
+          
+          <!-- ALA IZQUIERDA (50% de las mesas) -->
+          <div class="wing-column wing-left flex flex-col items-center gap-6 p-4 rounded-2xl bg-white/50 border border-outline-variant/60 shadow-xs">
+            <div class="w-full flex items-center justify-between px-3 py-1.5 border-b border-outline-variant/60">
+              <span class="text-[10.5px] font-mono uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[15px] text-amber-700">west</span>
+                Ala Izquierda
+              </span>
+              <span class="text-[10px] font-mono text-on-surface-variant font-semibold bg-surface px-2 py-0.5 rounded border border-outline-variant">${leftWingTables.length} mesas</span>
+            </div>
+            <div class="flex flex-col items-center gap-4 w-full">
+              ${leftWingTables.map(t => this.renderSingleTableHTML(t)).join('')}
             </div>
           </div>
-        `;
-      }
-    }).join('');
 
+          <!-- ALA DERECHA (50% de las mesas) -->
+          <div class="wing-column wing-right flex flex-col items-center gap-6 p-4 rounded-2xl bg-white/50 border border-outline-variant/60 shadow-xs">
+            <div class="w-full flex items-center justify-between px-3 py-1.5 border-b border-outline-variant/60">
+              <span class="text-[10.5px] font-mono uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
+                Ala Derecha
+                <span class="material-symbols-outlined text-[15px] text-amber-700">east</span>
+              </span>
+              <span class="text-[10px] font-mono text-on-surface-variant font-semibold bg-surface px-2 py-0.5 rounded border border-outline-variant">${rightWingTables.length} mesas</span>
+            </div>
+            <div class="flex flex-col items-center gap-4 w-full">
+              ${rightWingTables.map(t => this.renderSingleTableHTML(t)).join('')}
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
     this.bindDropZoneEvents(container);
   }
 
@@ -757,7 +844,7 @@ class SeatingPlanner {
         number: String(newNum),
         name: `Mesa ${newNum}`,
         subtitle: 'Invitados',
-        type: newNum % 3 === 0 ? 'imperial' : 'circular',
+        type: 'circular',
         capacity: defaultCapacity
       });
     }
