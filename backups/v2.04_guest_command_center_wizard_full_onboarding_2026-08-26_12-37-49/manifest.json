@@ -1,0 +1,26 @@
+{
+  "label": "v2.04_guest_command_center_wizard_full_onboarding",
+  "timestamp": "2026-08-26T18:37:49.026Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158441
+    },
+    {
+      "filename": "index.html",
+      "size": 47296
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
