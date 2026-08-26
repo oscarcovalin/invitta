@@ -1,0 +1,26 @@
+{
+  "label": "v8.16_gallery_uncropped_sharp_parallax_scale",
+  "timestamp": "2026-08-26T13:38:57.929Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 142680
+    },
+    {
+      "filename": "index.html",
+      "size": 99536
+    },
+    {
+      "filename": "app.js",
+      "size": 89401
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
