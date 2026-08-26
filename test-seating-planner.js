@@ -56,5 +56,16 @@ const res12 = planner.autoDistributeGuests({ capacity: 12 });
 assert(res12.assignedPasses === res12.totalPasses, `All ${res12.totalPasses} passes assigned automatically for 12-seater`);
 assert(res12.capacityPerTable === 12, 'Distributed with 12 seats per table');
 
+// 8. Test Direct Guest Swap / Exchange
+const g1 = planner.state.guests[0];
+const g2 = planner.state.guests[1];
+const prevTableG1 = g1.tableId;
+const prevTableG2 = g2.tableId;
+
+const swapSuccess = planner.swapGuests(g1.id, g2.id);
+assert(swapSuccess === true, 'swapGuests executed successfully');
+assert(g1.tableId === prevTableG2, `${g1.name} moved to previous table of ${g2.name}`);
+assert(g2.tableId === prevTableG1, `${g2.name} moved to previous table of ${g1.name}`);
+
 console.log(`\nResults: ${passed} passed, ${failed} failed.\n`);
 if (failed > 0) process.exit(1);

@@ -140,6 +140,25 @@ class SeatingPlanner {
     this.updateStateAndDOM();
   }
 
+  /**
+   * Intercambio Directo (Swap) de Mesas entre dos Invitados/Familias
+   */
+  swapGuests(guestIdA, guestIdB) {
+    if (!guestIdA || !guestIdB || guestIdA === guestIdB) return false;
+    const guestA = this.state.guests.find(g => g.id === guestIdA);
+    const guestB = this.state.guests.find(g => g.id === guestIdB);
+    if (!guestA || !guestB) return false;
+
+    const tableA = guestA.tableId;
+    const tableB = guestB.tableId;
+
+    guestA.tableId = tableB;
+    guestB.tableId = tableA;
+
+    this.updateStateAndDOM();
+    return true;
+  }
+
   updateStateAndDOM() {
     if (typeof document !== 'undefined') {
       this.renderUnassignedList();
@@ -301,9 +320,12 @@ class SeatingPlanner {
                     const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
                     const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
                     return `
-                      <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-pointer text-[10px] font-mono font-bold shadow-sm transition-transform hover:scale-110"
-                        title="${g.name} (Pase ${slot.passNumber} de ${slot.totalPasses} · Clic para quitar)"
-                        data-guest-id="${g.id}">
+                      <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary ring-1 ring-brushed-champagne/40' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary"
+                        draggable="true"
+                        data-drag-type="single"
+                        data-guest-id="${g.id}"
+                        data-table-id="${table.id}"
+                        title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · Arrastra a otra mesa o sobre otro invitado para intercambiar · Clic para quitar)">
                         ${label}
                       </div>
                     `;
@@ -326,9 +348,12 @@ class SeatingPlanner {
                     const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
                     const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
                     return `
-                      <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-pointer text-[10px] font-mono font-bold shadow-sm transition-transform hover:scale-110"
-                        title="${g.name} (Pase ${slot.passNumber} de ${slot.totalPasses} · Clic para quitar)"
-                        data-guest-id="${g.id}">
+                      <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary"
+                        draggable="true"
+                        data-drag-type="single"
+                        data-guest-id="${g.id}"
+                        data-table-id="${table.id}"
+                        title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · Arrastra a otra mesa o sobre otro invitado para intercambiar · Clic para quitar)">
                         ${label}
                       </div>
                     `;
@@ -392,10 +417,13 @@ class SeatingPlanner {
                   const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
                   const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
                   return `
-                    <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-pointer text-[10px] font-mono font-bold shadow-sm transition-transform hover:scale-110 absolute"
+                    <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary ring-1 ring-brushed-champagne/40' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary absolute"
                       style="left: calc(50% + ${x}px - 16px); top: calc(50% + ${y}px - 16px);"
-                      title="${g.name} (Pase ${slot.passNumber} de ${slot.totalPasses} · Clic para quitar)"
-                      data-guest-id="${g.id}">
+                      draggable="true"
+                      data-drag-type="single"
+                      data-guest-id="${g.id}"
+                      data-table-id="${table.id}"
+                      title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · Arrastra a otra mesa o sobre otro invitado para intercambiar · Clic para quitar)">
                       ${label}
                     </div>
                   `;
@@ -505,6 +533,7 @@ class SeatingPlanner {
   bindDropZoneEvents(scopeElement) {
     if (typeof document === 'undefined') return;
 
+    // 1. Dropzones de Mesa (Reasignación y Mover entre mesas)
     scopeElement.querySelectorAll('.table-card-dropzone').forEach(dropzone => {
       const tableId = dropzone.dataset.tableId;
       const indicator = dropzone.querySelector('.drop-indicator');
@@ -523,27 +552,78 @@ class SeatingPlanner {
         e.preventDefault();
         if (indicator) indicator.classList.add('opacity-0');
 
+        let draggedId = null;
         try {
           const payload = JSON.parse(e.dataTransfer.getData('text/plain'));
-          if (payload.type === 'family' && Array.isArray(payload.ids)) {
-            this.assignFamilyGroupToTable(payload.ids, tableId);
-          } else if (payload.id) {
-            this.assignGuestToTable(payload.id, tableId);
-          }
+          draggedId = payload.id;
         } catch (err) {
           if (this.state.draggedItem && this.state.draggedItem.id) {
-            this.assignGuestToTable(this.state.draggedItem.id, tableId);
+            draggedId = this.state.draggedItem.id;
           }
+        }
+
+        if (draggedId) {
+          this.assignGuestToTable(draggedId, tableId);
         }
       });
     });
 
-    // Clic en asiento para desasignar
+    // 2. Drag & Drop e Intercambio Directo (Swap) en Asientos / Seat Pills
     scopeElement.querySelectorAll('.seat-pill').forEach(pill => {
+      const targetGuestId = pill.dataset.guestId;
+
+      pill.addEventListener('dragstart', (e) => {
+        e.stopPropagation();
+        this.state.draggedItem = { type: 'single', id: targetGuestId };
+        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'single', id: targetGuestId }));
+        pill.classList.add('opacity-40');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      pill.addEventListener('dragend', (e) => {
+        e.stopPropagation();
+        pill.classList.remove('opacity-40');
+        this.state.draggedItem = null;
+        document.querySelectorAll('.drop-indicator').forEach(ind => ind.classList.add('opacity-0'));
+      });
+
+      pill.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = 'move';
+        pill.classList.add('ring-4', 'ring-amber-500', 'scale-125');
+      });
+
+      pill.addEventListener('dragleave', (e) => {
+        e.stopPropagation();
+        pill.classList.remove('ring-4', 'ring-amber-500', 'scale-125');
+      });
+
+      pill.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        pill.classList.remove('ring-4', 'ring-amber-500', 'scale-125');
+
+        let draggedId = null;
+        try {
+          const payload = JSON.parse(e.dataTransfer.getData('text/plain'));
+          draggedId = payload.id;
+        } catch (err) {
+          if (this.state.draggedItem && this.state.draggedItem.id) {
+            draggedId = this.state.draggedItem.id;
+          }
+        }
+
+        if (draggedId && draggedId !== targetGuestId) {
+          // INTERCAMBIO DIRECTO (SWAP) ENTRE INVITADOS
+          this.swapGuests(draggedId, targetGuestId);
+        }
+      });
+
+      // Clic en asiento para desasignar
       pill.addEventListener('click', (e) => {
         e.stopPropagation();
-        const guestId = pill.dataset.guestId;
-        this.unassignGuest(guestId);
+        this.unassignGuest(targetGuestId);
       });
     });
   }
