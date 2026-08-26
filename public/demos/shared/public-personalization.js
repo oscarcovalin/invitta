@@ -480,6 +480,12 @@
   }
 
   function applyEditorialCoverMeta() {
+    // The general-event renderer owns its complete cover, including a
+    // structured milestone date. Rewriting that date here flattens the
+    // native weekday/month/day/time layout and, on older renderers, could
+    // insert another date on every MutationObserver pass.
+    if (isTemplate("evento-general-basic")) return;
+
     var name = clean(data.celebrantName);
     var formats = dateFormats(data.eventDate);
     if (!name || !formats) return;

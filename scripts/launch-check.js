@@ -158,6 +158,12 @@ if (!publicPersonalization.includes("typographyRoleSelectors[target]") ||
 
 const generalEventApp = read("demos/evento-general-basic/app.js");
 const generalEventStyles = read("demos/evento-general-basic/style.css");
+if (!publicPersonalization.includes('if (isTemplate("evento-general-basic")) return;')) {
+  fail("La personalización compartida vuelve a reescribir la fecha estructurada del evento general");
+}
+if (!generalEventApp.includes('displayEventTitle = "Cumpleaños"')) {
+  fail("La plantilla de 50 años no conserva el título de cumpleaños");
+}
 if (!generalEventApp.includes('classList.toggle("has-music-player"')) {
   fail("La plantilla general no identifica cuando el reproductor de música está visible");
 }

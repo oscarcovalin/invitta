@@ -365,7 +365,7 @@
   text("event-kind", milestone ? "¡Es una sorpresa!" : eventKind(data.eventType));
   var displayEventTitle = clean(data.eventTitle);
   if (selectedTemplateId() === "cumpleanos-50-sorpresa") {
-    displayEventTitle = "Aniversario";
+    displayEventTitle = "Cumpleaños";
   } else if (milestone) {
     displayEventTitle = displayEventTitle.replace(/(?:^|\s)50(?:\s|$)/, " ").trim() || "Aniversario";
   }
