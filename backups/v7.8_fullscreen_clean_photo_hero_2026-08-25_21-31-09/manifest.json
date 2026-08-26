@@ -1,0 +1,26 @@
+{
+  "label": "v7.8_fullscreen_clean_photo_hero",
+  "timestamp": "2026-08-26T03:31:09.190Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 125461
+    },
+    {
+      "filename": "index.html",
+      "size": 97153
+    },
+    {
+      "filename": "app.js",
+      "size": 88086
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
