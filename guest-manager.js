@@ -692,6 +692,124 @@ class GuestManager {
     };
   }
 
+  // ==========================================================================
+  // GESTIÓN DE ROLES Y SEGURIDAD (ADMIN VS ORGANIZADOR VS HOSTESS VS CATERING)
+  // ==========================================================================
+
+  getMasterPin() {
+    return (this.state && this.state.config && this.state.config.masterPin) || '2027';
+  }
+
+  setMasterPin(pin) {
+    if (!pin || String(pin).trim().length < 4) return false;
+    this.state.config = this.state.config || {};
+    this.state.config.masterPin = String(pin).trim();
+    this.saveState();
+    return true;
+  }
+
+  verifyMasterPin(inputPin) {
+    if (!inputPin) return false;
+    return String(inputPin).trim() === this.getMasterPin();
+  }
+
+  getCurrentRole(explicitRole = null) {
+    if (explicitRole) return explicitRole.toLowerCase();
+    
+    if (typeof window !== 'undefined' && window.location && window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      const r = params.get('role');
+      if (r) return r.toLowerCase();
+    }
+
+    if (typeof sessionStorage !== 'undefined') {
+      const stored = sessionStorage.getItem('invitta_active_role');
+      if (stored) return stored.toLowerCase();
+    }
+
+    return 'admin'; // Por defecto: Novios / Master Admin
+  }
+
+  setActiveRole(role) {
+    const validRoles = ['admin', 'planner', 'hostess', 'catering'];
+    const targetRole = validRoles.includes(role) ? role : 'admin';
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('invitta_active_role', targetRole);
+    }
+    return targetRole;
+  }
+
+  canPerformAction(action, role = null) {
+    const activeRole = role || this.getCurrentRole();
+    
+    const permissions = {
+      // Exclusivo Novios / Admin Master
+      edit_invitation_design: ['admin'],
+      reset_database: ['admin'],
+      modify_event_settings: ['admin'],
+      view_master_financials: ['admin'],
+
+      // Operativo Permitido para Organizador / Wedding Planner
+      manage_tables: ['admin', 'planner'],
+      edit_guest_assignment: ['admin', 'planner'],
+      dispatch_whatsapp: ['admin', 'planner'],
+      view_timeline: ['admin', 'planner', 'hostess', 'catering'],
+      view_catering: ['admin', 'planner', 'catering'],
+      scan_access_qr: ['admin', 'planner', 'hostess'],
+      create_emergency_pass: ['admin', 'planner', 'hostess'],
+      view_access_metrics: ['admin', 'planner', 'hostess']
+    };
+
+    const allowed = permissions[action] || [];
+    return allowed.includes(activeRole);
+  }
+
+  getDelegationLinks(customBaseUrl = null) {
+    let base = customBaseUrl || '';
+    if (!base && typeof window !== 'undefined' && window.location) {
+      const href = window.location.href.split('#')[0].split('?')[0];
+      base = href.substring(0, href.lastIndexOf('/') + 1);
+    }
+
+    return {
+      planner: {
+        role: 'planner',
+        title: 'Organizador / Wedding Planner',
+        badge: '📋 Acceso Operativo',
+        url: `${base}index.html?role=planner`,
+        description: 'Acceso táctico al plano de mesas, cronograma, semáforo de acceso y catering (sin edición de invitación ni borrado destructivo).'
+      },
+      hostess: {
+        role: 'hostess',
+        title: 'Hostess / Recepción en Puerta',
+        badge: '🚪 Acceso Puerta',
+        url: `${base}scanner-acceso.html`,
+        description: 'Escáner QR offline de pases en tiempo real, búsqueda de mesa y registro de ingresos.'
+      },
+      emergency: {
+        role: 'hostess',
+        title: 'Pase Express de Emergencia',
+        badge: '⚡ Móvil Express',
+        url: `${base}generador-emergencia.html`,
+        description: 'Emisión de invitaciones de último minuto desde el celular con auto check-in.'
+      },
+      catering: {
+        role: 'catering',
+        title: 'Catering / Banquete Táctico',
+        badge: '🍽️ Servicio & Cocina',
+        url: `${base}catering-module/catering-tactical-sheet.html`,
+        description: 'Tabla táctica con desglose de platillos, dietas especiales y alergias por mesa.'
+      },
+      invitation: {
+        role: 'guest',
+        title: 'Invitación Digital de Gala',
+        badge: '💍 Invitados',
+        url: `${base}invitacion.html`,
+        description: 'Enlace web general para que los invitados disfruten la experiencia completa.'
+      }
+    };
+  }
+
   exportDataJson() {
     return JSON.stringify(this.state, null, 2);
   }

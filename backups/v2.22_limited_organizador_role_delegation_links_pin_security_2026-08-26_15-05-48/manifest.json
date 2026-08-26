@@ -1,0 +1,26 @@
+{
+  "label": "v2.22_limited_organizador_role_delegation_links_pin_security",
+  "timestamp": "2026-08-26T21:05:48.059Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 178962
+    },
+    {
+      "filename": "index.html",
+      "size": 92830
+    },
+    {
+      "filename": "app.js",
+      "size": 97840
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
