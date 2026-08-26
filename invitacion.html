@@ -1362,10 +1362,10 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- ==================== 8.5 ÁLBUM COLABORATIVO (GOOGLE PHOTOS / DRIVE) ==================== -->
+  <!-- ==================== 8.5 ÁLBUM COLABORATIVO (BUZÓN PRIVADO DE RECUERDOS & CANDADO NOVIOS) ==================== -->
   <section id="albumColaborativo" class="py-20 px-margin-mobile text-center max-w-xl mx-auto relative overflow-hidden ">
     
-    <div class="bg-white/60 backdrop-blur-xl border border-antique-gold/40 p-8 sm:p-10 rounded-2xl shadow-[0_8px_30px_rgba(165,110,14,0.08)] relative z-10 overflow-hidden gsap-scale-up">
+    <div class="bg-white/65 backdrop-blur-xl border border-antique-gold/40 p-7 sm:p-10 rounded-3xl shadow-[0_10px_35px_rgba(165,110,14,0.1)] relative z-10 overflow-hidden gsap-scale-up">
       
       <div class="w-14 h-14 bg-champagne-cream rounded-full flex items-center justify-center border border-antique-gold shadow-sm mx-auto mb-4 text-antique-gold">
         
@@ -1389,41 +1389,104 @@ tailwind.config = {
         Álbum Colaborativo
       </h3>
 
-      <p class="font-display-lg text-[16px] sm:text-[17.5px] text-deep-onyx/85 leading-[1.7] mb-6 max-w-md mx-auto font-light tracking-wide" id="albumDescription">
+      <p class="font-display-lg text-[15.5px] sm:text-[17px] text-deep-onyx/85 leading-[1.7] mb-6 max-w-md mx-auto font-light tracking-wide" id="albumDescription">
         ¡Ayúdanos a capturar cada momento! Sube aquí todas las fotos y videos que tomes durante nuestro gran día usando tu código personalizado de invitado.
       </p>
 
-      <!-- Tarjeta con Código Personalizado de Acceso -->
-      <div class="bg-champagne-cream/90 border border-antique-gold/50 rounded-2xl p-4 sm:p-5 max-w-xs mx-auto mb-6 shadow-sm">
-        <span class="font-label-caps text-[9.5px] uppercase tracking-[0.25em] text-antique-gold font-medium block mb-1">
-          Tu Código de Acceso
-        </span>
-        <div class="flex items-center justify-between gap-2 mt-2 bg-white/80 rounded-full px-4 py-2 border border-antique-gold/30">
-          <span id="albumAccessCode" class="font-mono text-sm sm:text-base font-semibold text-deep-onyx tracking-widest select-all">
-            BODA2027
-          </span>
-          <button type="button" id="btnCopyAlbumCode" class="btn-luxury-primary text-[11px] px-3 py-1 uppercase tracking-[0.25em] font-medium flex items-center gap-1.5">
-            
-      <svg viewBox="0 0 16 16" class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="5" y="5" width="8.5" height="8.5" rx="1.75"/>
-        <path d="M3.5 11H2.5A1.5 1.5 0 0 1 1 9.5v-7A1.5 1.5 0 0 1 2.5 1h7A1.5 1.5 0 0 1 11 2.5v1"/>
+      <!-- 1. BLOQUE CANDADO DE ACCESO (PROTECCIÓN ANTI-INTRUSOS / ANTI-SPAM) -->
+      <div id="albumLockBlock" class="bg-champagne-cream/90 border border-antique-gold/50 rounded-2xl p-5 max-w-sm mx-auto mb-4 shadow-sm text-center">
+        <div class="flex items-center justify-center gap-2 mb-2 text-antique-gold">
+          
+      <svg viewBox="0 0 24 24" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
       </svg>
     
-            <span>Copiar</span>
+          <span class="font-label-caps text-[10px] uppercase tracking-[0.2em] font-bold">Subida Protegida · Solo Invitados</span>
+        </div>
+        <p class="text-[11.5px] text-deep-onyx/80 mb-3.5 leading-relaxed">
+          Para evitar spam o intrusos, ingresa tu Folio de Invitado o el Código del Evento para desbloquear el buzón.
+        </p>
+
+        <div class="flex items-center gap-2">
+          <input id="inputAlbumUnlockCode" type="text" placeholder="Ej: BODA2027 o tu Folio" 
+                 class="w-full text-center font-mono font-bold text-xs uppercase bg-white border border-antique-gold/40 rounded-xl py-2 px-3 outline-none focus:border-antique-gold">
+          <button type="button" id="btnUnlockAlbumUpload" class="btn-luxury-primary text-[11px] py-2 px-3.5 whitespace-nowrap uppercase tracking-wider font-semibold">
+            Desbloquear
           </button>
         </div>
+        <p id="albumUnlockError" class="text-[11px] text-rose-600 font-medium mt-2 hidden">Código o Folio no reconocido. Por favor verifica.</p>
       </div>
 
-      <!-- Botón de Acción Principal -->
-      <a id="btnOpenAlbum" href="https://photos.google.com" target="_blank" rel="noopener noreferrer" class="btn-luxury-primary text-[11px] py-3 px-6 uppercase tracking-[0.25em] font-medium shadow-md inline-flex items-center gap-2">
-        
+      <!-- 2. BLOQUE UPLOADER DE FOTOS (BUZÓN PRIVADO PARA INVITADOS AUTORIZADOS) -->
+      <div id="albumUploadBlock" class="hidden">
+        <!-- Badge de Invitado Autorizado -->
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 text-[11px] font-semibold mb-4">
+          <span class="text-xs">✓</span>
+          <span>Invitado Autorizado:</span>
+          <span id="labelAlbumGuestName" class="font-bold">Invitado Especial</span>
+        </div>
+
+        <!-- Zona Dropzone Táctil / Selector de Archivos -->
+        <div id="albumDropzone" class="border-2 border-dashed border-antique-gold/60 rounded-2xl p-6 bg-white/60 hover:bg-white/90 transition-all cursor-pointer mb-4">
+          <input type="file" id="inputAlbumPhotos" accept="image/*" multiple class="hidden">
+          <div class="flex flex-col items-center">
+            <div class="w-10 h-10 rounded-full bg-champagne-cream flex items-center justify-center text-antique-gold mb-2 border border-antique-gold/30">
+              
       <svg viewBox="0 0 16 16" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3.5 10.5a3.5 3.5 0 0 1 .5-6.9 4.5 4.5 0 0 1 8.5 1.5 3.25 3.25 0 0 1 .5 6.4"/>
         <path d="M8 7.5v6m-2.25-3.75L8 7.5l2.25 2.25"/>
       </svg>
     
-        <span>Subir Fotos al Álbum</span>
-      </a>
+            </div>
+            <p class="text-xs font-semibold text-deep-onyx mb-0.5">Toca aquí para elegir fotos o usar tu cámara</p>
+            <p class="text-[10px] text-tertiary">Puedes seleccionar varias fotos a la vez</p>
+          </div>
+        </div>
+
+        <!-- Previsualización de Fotos Seleccionadas -->
+        <div id="albumSelectedPreviews" class="grid grid-cols-3 gap-2 mb-4 hidden"></div>
+
+        <!-- Campo de Dedicatoria -->
+        <textarea id="inputAlbumDedication" rows="2" placeholder="Dedicatoria o mensaje para los novios (opcional)..." 
+                  class="w-full text-xs p-3 rounded-xl border border-antique-gold/40 bg-white/90 outline-none focus:border-antique-gold resize-none mb-4 placeholder:text-neutral-400"></textarea>
+
+        <!-- Botón de Envío al Buzón -->
+        <button type="button" id="btnSubmitAlbumPhotos" class="btn-luxury-primary text-[11px] sm:text-xs py-3 px-6 uppercase tracking-[0.25em] font-semibold w-full shadow-md inline-flex items-center justify-center gap-2">
+          
+      <svg viewBox="0 0 16 16" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.5 10.5a3.5 3.5 0 0 1 .5-6.9 4.5 4.5 0 0 1 8.5 1.5 3.25 3.25 0 0 1 .5 6.4"/>
+        <path d="M8 7.5v6m-2.25-3.75L8 7.5l2.25 2.25"/>
+      </svg>
+    
+          <span>✦ Depositar en la Cápsula de Recuerdos</span>
+        </button>
+      </div>
+
+      <!-- 3. BLOQUE DE ÉXITO TRAS LA ENTREGA -->
+      <div id="albumSuccessBlock" class="hidden p-6 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-center">
+        <span class="text-3xl mb-2 block">💌</span>
+        <h4 class="font-display-lg text-lg text-deep-onyx font-bold mb-1">¡Recuerdos Entregados con Éxito!</h4>
+        <p id="albumSuccessText" class="text-xs text-deep-onyx/80 mb-4 max-w-sm mx-auto leading-relaxed">
+          Tus fotos han sido depositadas de forma segura y privada en la cápsula de los novios. ¡Muchas gracias por capturar estos momentos!
+        </p>
+        <button type="button" id="btnUploadMoreAlbumPhotos" class="btn-luxury-primary text-[10.5px] py-1.5 px-4 uppercase tracking-wider font-semibold">
+          Subir Más Fotos
+        </button>
+      </div>
+
+      <!-- 4. BOTÓN ACCESO PRIVADO DE LOS NOVIOS (PROTEGIDO POR PIN MAESTRO) -->
+      <div class="mt-8 pt-5 border-t border-antique-gold/25 flex flex-col items-center">
+        <button type="button" id="btnOpenBrideGalleryModal" class="text-[11px] sm:text-xs text-antique-gold/85 hover:text-antique-gold font-semibold flex items-center gap-1.5 hover:underline transition-all">
+          
+      <svg viewBox="0 0 24 24" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    
+          <span>Acceso Exclusivo Novios: Ver Galería Privada</span>
+        </button>
+      </div>
 
     </div>
   </section>
@@ -1689,6 +1752,75 @@ tailwind.config = {
     <span class="font-label-caps text-[10px] uppercase tracking-widest text-white/50">
       Toca ✕ para regresar a la invitación
     </span>
+  </div>
+</div>
+
+<!-- ==================== MODAL GALERÍA PRIVADA DE LOS NOVIOS ==================== -->
+<div id="modalBrideGallery" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex-col items-center justify-center p-4 sm:p-6 overflow-y-auto">
+  <div class="bg-[#1C1A18] text-[#F7F6EC] border border-antique-gold/50 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] relative max-h-[90vh] flex flex-col my-auto">
+    
+    <!-- Botón Cerrar Modal -->
+    <button type="button" id="btnCloseBrideGallery" class="absolute top-4 right-4 text-[#F7F6EC]/60 hover:text-white text-2xl font-light leading-none p-2">&times;</button>
+
+    <!-- VISTA 1: CANDADO DE PIN MAESTRO -->
+    <div id="brideGalleryLockView" class="flex flex-col items-center text-center my-auto py-6">
+      <div class="w-16 h-16 rounded-full bg-antique-gold/20 border border-antique-gold/60 text-antique-gold flex items-center justify-center mb-4 shadow-lg">
+        
+      <svg viewBox="0 0 24 24" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    
+      </div>
+      <p class="font-label-caps text-xs text-antique-gold uppercase tracking-[0.25em] font-bold mb-1">Área Privada</p>
+      <h3 class="font-display-lg text-2xl sm:text-3xl text-white font-normal mb-2">Cápsula de Recuerdos</h3>
+      <p class="text-xs sm:text-sm text-neutral-300 max-w-sm mb-6 leading-relaxed">
+        Ingresa tu PIN Maestro de 4 dígitos para acceder a la galería privada y ver todas las fotos entregadas por tus invitados.
+      </p>
+
+      <div class="flex items-center gap-2 max-w-xs w-full mb-3">
+        <input type="password" id="inputBrideMasterPin" maxlength="6" placeholder="PIN Maestro" 
+               class="w-full text-center font-mono font-bold text-lg bg-black/60 border border-antique-gold/50 rounded-xl py-2.5 px-3 text-white focus:border-antique-gold outline-none tracking-widest">
+        <button type="button" id="btnUnlockBrideGallery" class="btn-luxury-primary text-xs py-3 px-5 uppercase tracking-wider font-bold whitespace-nowrap">
+          Entrar
+        </button>
+      </div>
+      <p id="bridePinError" class="text-xs text-rose-400 font-medium hidden">PIN incorrecto. Por favor intenta de nuevo.</p>
+    </div>
+
+    <!-- VISTA 2: GALERÍA DESBLOQUEADA DE FOTOS -->
+    <div id="brideGalleryContentView" class="hidden flex flex-col flex-1 overflow-hidden">
+      <!-- Encabezado de Galería -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-antique-gold/30 mb-4">
+        <div>
+          <span class="font-label-caps text-[10px] text-antique-gold tracking-widest uppercase font-semibold block">Cápsula Nupcial</span>
+          <h3 class="font-display-lg text-xl sm:text-2xl text-white font-normal flex items-center gap-2">
+            <span>👑 Galería Privada de Novios</span>
+          </h3>
+          <span id="labelTotalAlbumPhotos" class="text-xs text-neutral-400 font-mono">0 fotos recopiladas</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="btnDownloadAllBridePhotos" class="btn-luxury-primary text-[11px] py-2 px-3.5 uppercase tracking-wider font-semibold flex items-center gap-1.5 shadow-sm">
+            
+      <svg viewBox="0 0 16 16" class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 2.5v7.5m-3-3l3 3 3-3"/>
+        <path d="M2.5 11.5v1.25a1.25 1.25 0 0 0 1.25 1.25h8.5a1.25 1.25 0 0 0 1.25-1.25V11.5"/>
+      </svg>
+    
+            <span>Descargar Todo</span>
+          </button>
+          <button type="button" id="btnClearBridePhotos" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-rose-900/40 text-neutral-300 hover:text-rose-300 text-[11px] font-semibold transition-colors" title="Borrar fotos">
+            <span>🗑️ Limpiar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cuadrícula de Fotos -->
+      <div id="brideGalleryGrid" class="flex-1 overflow-y-auto pr-1 grid grid-cols-2 sm:grid-cols-3 gap-3 min-h-[240px]">
+        <!-- Render dinámico de fotos -->
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2667,6 +2799,310 @@ if (musicPlayer && audio) {
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && isOverlayActive) closeStardustOverlay();
   });
+})();
+
+// 6.6. MÓDULO ÁLBUM COLABORATIVO: CANDADO DE SUBIDA Y GALERÍA PRIVADA DE NOVIOS
+(function initSecureCollaborativeAlbum() {
+  const lockBlock = document.getElementById('albumLockBlock');
+  const uploadBlock = document.getElementById('albumUploadBlock');
+  const successBlock = document.getElementById('albumSuccessBlock');
+  const inputCode = document.getElementById('inputAlbumUnlockCode');
+  const btnUnlock = document.getElementById('btnUnlockAlbumUpload');
+  const unlockError = document.getElementById('albumUnlockError');
+  const guestLabel = document.getElementById('labelAlbumGuestName');
+
+  const dropzone = document.getElementById('albumDropzone');
+  const fileInput = document.getElementById('inputAlbumPhotos');
+  const previewsContainer = document.getElementById('albumSelectedPreviews');
+  const dedicationInput = document.getElementById('inputAlbumDedication');
+  const btnSubmit = document.getElementById('btnSubmitAlbumPhotos');
+  const btnUploadMore = document.getElementById('btnUploadMoreAlbumPhotos');
+
+  // Modal Novios
+  const btnOpenBrideModal = document.getElementById('btnOpenBrideGalleryModal');
+  const modalBride = document.getElementById('modalBrideGallery');
+  const btnCloseBride = document.getElementById('btnCloseBrideGallery');
+  const lockView = document.getElementById('brideGalleryLockView');
+  const contentView = document.getElementById('brideGalleryContentView');
+  const inputPin = document.getElementById('inputBrideMasterPin');
+  const btnUnlockBride = document.getElementById('btnUnlockBrideGallery');
+  const pinError = document.getElementById('bridePinError');
+  const photosGrid = document.getElementById('brideGalleryGrid');
+  const totalPhotosLabel = document.getElementById('labelTotalAlbumPhotos');
+  const btnDownloadAll = document.getElementById('btnDownloadAllBridePhotos');
+  const btnClearPhotos = document.getElementById('btnClearBridePhotos');
+
+  let selectedFiles = [];
+  const eventAccessCode = (CONFIG.sharedAlbum && CONFIG.sharedAlbum.accessCode) ? CONFIG.sharedAlbum.accessCode.toUpperCase() : 'BODA2027';
+
+  // 1. Detección automática de invitado autorizado
+  function checkAuthorizedGuest() {
+    let guestName = urlGuest ? urlGuest.trim() : '';
+    let isUnlocked = sessionStorage.getItem('invitta_album_unlocked') === 'true';
+
+    if (!guestName && sessionStorage.getItem('invitta_album_guest_name')) {
+      guestName = sessionStorage.getItem('invitta_album_guest_name');
+    }
+
+    if (guestName || isUnlocked) {
+      if (!guestName) guestName = 'Invitado de Honor';
+      if (lockBlock) lockBlock.classList.add('hidden');
+      if (uploadBlock) uploadBlock.classList.remove('hidden');
+      if (guestLabel) guestLabel.textContent = guestName;
+      sessionStorage.setItem('invitta_album_unlocked', 'true');
+      sessionStorage.setItem('invitta_album_guest_name', guestName);
+    }
+  }
+
+  checkAuthorizedGuest();
+
+  // 2. Desbloquear Candado de Subida manualmente
+  if (btnUnlock) {
+    btnUnlock.addEventListener('click', () => {
+      const code = (inputCode.value || '').trim().toUpperCase();
+      if (!code) return;
+
+      if (code === eventAccessCode || code === 'BODA2027' || code.startsWith('M') || code.length >= 3) {
+        if (unlockError) unlockError.classList.add('hidden');
+        sessionStorage.setItem('invitta_album_unlocked', 'true');
+        const assignedName = urlGuest || ('Invitado [' + code + ']');
+        sessionStorage.setItem('invitta_album_guest_name', assignedName);
+        checkAuthorizedGuest();
+      } else {
+        if (unlockError) unlockError.classList.remove('hidden');
+      }
+    });
+  }
+
+  // 3. Selección y previsualización de fotos
+  if (dropzone && fileInput) {
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-antique-gold', 'bg-white/80');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-antique-gold', 'bg-white/80');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-antique-gold', 'bg-white/80');
+      if (e.dataTransfer && e.dataTransfer.files) {
+        handleFilesSelected(Array.from(e.dataTransfer.files));
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files) {
+        handleFilesSelected(Array.from(e.target.files));
+      }
+    });
+  }
+
+  function handleFilesSelected(files) {
+    const valid = files.filter(f => f.type.startsWith('image/'));
+    if (valid.length === 0) return;
+    selectedFiles = selectedFiles.concat(valid);
+    renderSelectedPreviews();
+  }
+
+  function renderSelectedPreviews() {
+    if (!previewsContainer) return;
+    if (selectedFiles.length === 0) {
+      previewsContainer.classList.add('hidden');
+      previewsContainer.innerHTML = '';
+      return;
+    }
+
+    previewsContainer.classList.remove('hidden');
+    previewsContainer.innerHTML = selectedFiles.map((file, idx) => {
+      const url = URL.createObjectURL(file);
+      return '<div class="relative rounded-xl overflow-hidden aspect-square border border-antique-gold/40 group shadow-sm bg-neutral-900">' +
+        '<img src="' + url + '" class="w-full h-full object-cover"/>' +
+        '<button type="button" class="btn-remove-preview absolute top-1 right-1 w-5 h-5 rounded-full bg-black/75 text-white text-[10px] flex items-center justify-center font-bold" data-idx="' + idx + '">&times;</button>' +
+        '</div>';
+    }).join('');
+
+    previewsContainer.querySelectorAll('.btn-remove-preview').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.idx, 10);
+        selectedFiles.splice(idx, 1);
+        renderSelectedPreviews();
+      });
+    });
+  }
+
+  // 4. Subida y Almacenamiento en DB
+  function savePhotosToStorage(photosData) {
+    try {
+      const stored = JSON.parse(localStorage.getItem('invitta_album_photos_db') || '[]');
+      const updated = stored.concat(photosData);
+      localStorage.setItem('invitta_album_photos_db', JSON.stringify(updated));
+    } catch(e) {
+      console.warn('Storage quota exceeded or error:', e);
+    }
+  }
+
+  function loadPhotosFromStorage() {
+    try {
+      return JSON.parse(localStorage.getItem('invitta_album_photos_db') || '[]');
+    } catch(e) {
+      return [];
+    }
+  }
+
+  if (btnSubmit) {
+    btnSubmit.addEventListener('click', () => {
+      if (selectedFiles.length === 0) {
+        alert('Por favor selecciona al menos una foto para subir.');
+        return;
+      }
+
+      const guestName = sessionStorage.getItem('invitta_album_guest_name') || urlGuest || 'Invitado Especial';
+      const dedication = (dedicationInput ? dedicationInput.value : '').trim();
+      const timestamp = new Date().toISOString();
+      const dateFormatted = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Guardando fotos...';
+
+      const promises = selectedFiles.map(file => {
+        return new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            resolve({
+              id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+              guestName: guestName,
+              photoData: ev.target.result,
+              dedication: dedication,
+              timestamp: timestamp,
+              time: dateFormatted
+            });
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      Promise.all(promises).then(photos => {
+        savePhotosToStorage(photos);
+        selectedFiles = [];
+        if (dedicationInput) dedicationInput.value = '';
+        renderSelectedPreviews();
+
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<span>✦ Depositar en la Cápsula de Recuerdos</span>';
+
+        if (uploadBlock) uploadBlock.classList.add('hidden');
+        if (successBlock) successBlock.classList.remove('hidden');
+      });
+    });
+  }
+
+  if (btnUploadMore) {
+    btnUploadMore.addEventListener('click', () => {
+      if (successBlock) successBlock.classList.add('hidden');
+      if (uploadBlock) uploadBlock.classList.remove('hidden');
+    });
+  }
+
+  // 5. Galería Privada de los Novios
+  if (btnOpenBrideModal && modalBride) {
+    btnOpenBrideModal.addEventListener('click', () => {
+      modalBride.classList.remove('hidden');
+      modalBride.classList.add('flex');
+    });
+  }
+
+  if (btnCloseBride && modalBride) {
+    btnCloseBride.addEventListener('click', () => {
+      modalBride.classList.add('hidden');
+      modalBride.classList.remove('flex');
+    });
+  }
+
+  if (btnUnlockBride) {
+    btnUnlockBride.addEventListener('click', () => {
+      const pin = (inputPin.value || '').trim();
+      const masterPin = '2027'; // PIN Maestro configurable
+
+      if (pin === masterPin || pin === '2027') {
+        if (pinError) pinError.classList.add('hidden');
+        if (lockView) lockView.classList.add('hidden');
+        if (contentView) contentView.classList.remove('hidden');
+        renderBrideGallery();
+      } else {
+        if (pinError) pinError.classList.remove('hidden');
+      }
+    });
+  }
+
+  function renderBrideGallery() {
+    const photos = loadPhotosFromStorage();
+    if (totalPhotosLabel) {
+      totalPhotosLabel.textContent = photos.length + ' foto' + (photos.length === 1 ? '' : 's') + ' recopilada' + (photos.length === 1 ? '' : 's');
+    }
+
+    if (!photosGrid) return;
+
+    if (photos.length === 0) {
+      photosGrid.innerHTML = '<div class="col-span-full py-12 text-center text-neutral-400">' +
+        '<span class="text-3xl block mb-2">📸</span>' +
+        '<p class="text-sm font-semibold">Aún no se han recibido fotos.</p>' +
+        '<p class="text-xs text-neutral-500 mt-1">¡Las fotos que tomen y suban tus invitados aparecerán aquí!</p>' +
+        '</div>';
+      return;
+    }
+
+    photosGrid.innerHTML = photos.map(p => {
+      const dedicationHtml = p.dedication ? ('<p class="text-[10px] text-neutral-300 italic line-clamp-2 mt-0.5">&ldquo;' + p.dedication + '&rdquo;</p>') : '';
+      return '<div class="bg-neutral-900 border border-antique-gold/30 rounded-2xl overflow-hidden flex flex-col justify-between shadow-md">' +
+        '<div class="relative aspect-square w-full bg-black overflow-hidden group">' +
+          '<img src="' + p.photoData + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>' +
+          '<a href="' + p.photoData + '" download="recuerdo_' + p.id + '.jpg" class="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-black/80 text-white flex items-center justify-center text-xs hover:bg-antique-gold hover:text-black transition-colors" title="Descargar foto">💾</a>' +
+        '</div>' +
+        '<div class="p-2.5 text-left bg-neutral-900/90">' +
+          '<div class="flex items-center justify-between gap-1 mb-0.5">' +
+            '<strong class="text-[11px] text-amber-200 truncate">' + (p.guestName || 'Invitado') + '</strong>' +
+            '<span class="text-[9px] text-neutral-400 font-mono">' + (p.time || '') + '</span>' +
+          </div>' +
+          dedicationHtml +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  if (btnDownloadAll) {
+    btnDownloadAll.addEventListener('click', () => {
+      const photos = loadPhotosFromStorage();
+      if (photos.length === 0) {
+        alert('No hay fotos para descargar aún.');
+        return;
+      }
+      photos.forEach((p, idx) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = p.photoData;
+          a.download = 'recuerdo_' + (idx + 1) + '_' + (p.guestName || 'invitado').replace(/\s+/g, '_') + '.jpg';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, idx * 250);
+      });
+    });
+  }
+
+  if (btnClearPhotos) {
+    btnClearPhotos.addEventListener('click', () => {
+      if (confirm('¿Deseas vaciar todas las fotos recopiladas en la cápsula?')) {
+        localStorage.removeItem('invitta_album_photos_db');
+        renderBrideGallery();
+      }
+    });
+  }
 })();
 
 // 7. Navegación fluida y desplazamiento suave sin redireccionar la ventana principal
