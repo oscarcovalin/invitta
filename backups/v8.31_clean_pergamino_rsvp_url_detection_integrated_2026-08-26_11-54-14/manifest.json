@@ -1,0 +1,26 @@
+{
+  "label": "v8.31_clean_pergamino_rsvp_url_detection_integrated",
+  "timestamp": "2026-08-26T17:54:14.087Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158295
+    },
+    {
+      "filename": "index.html",
+      "size": 103699
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

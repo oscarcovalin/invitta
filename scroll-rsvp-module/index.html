@@ -1,363 +1,424 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Formulario RSVP Pergamino Desplegable — Invitta Studio</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP Pergamino — Invitta</title>
 
-  <!-- Tipografías de Lujo -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Great+Vibes&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  
-  <!-- Iconos Material Symbols -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tipografías de Lujo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
-  <style>
-    :root {
-      --color-cream: #FAF8F5;
-      --color-forest: #163C2B;
-      --color-gold: #A38047;
-      --color-gold-light: #d4af37;
-    }
+    <style>
+        :root {
+            --bg-color: #FAF8F5;
+            --wine-primary: #163C2B;
+            --gold-accent: #A38047;
+            --text-main: #2C2C2C;
+        }
 
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-      background: #0d0f12;
-      color: #262626;
-      min-height: 100vh;
-    }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    /* ==========================================================================
-       ESTRUCTURA Y ANIMACIÓN DEL PERGAMINO REAL (UNFURLING SCROLL)
-       ========================================================================== */
-    .parchment-roller-top {
-      background: linear-gradient(180deg, #5c441b 0%, #A38047 50%, #d4af37 80%, #5c441b 100%);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4);
-      border-radius: 9999px;
-      height: 22px;
-      position: relative;
-      z-index: 30;
-    }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
 
-    .parchment-roller-bottom {
-      background: linear-gradient(180deg, #5c441b 0%, #A38047 50%, #d4af37 80%, #5c441b 100%);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.4);
-      border-radius: 9999px;
-      height: 22px;
-      position: relative;
-      z-index: 30;
-      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+        /* Barra de Prueba Superior (Simulador de URL en Vivo) */
+        .url-simulator-bar {
+            width: 100%;
+            background: #141416;
+            color: #ffffff;
+            padding: 12px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .url-chips-wrap {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .btn-url-chip {
+            background: rgba(163, 128, 71, 0.18);
+            border: 1px solid rgba(163, 128, 71, 0.45);
+            color: #d4af37;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-url-chip:hover, .btn-url-chip.active {
+            background: rgba(163, 128, 71, 0.35);
+            border-color: #d4af37;
+            color: #ffffff;
+        }
 
-    /* Cuerpo del Pergamino Desplegable */
-    .parchment-body {
-      background-color: #FAF8F5;
-      background-image: 
-        radial-gradient(#163C2B 0.4px, transparent 0.4px), 
-        linear-gradient(to bottom, rgba(163, 128, 71, 0.08) 0%, transparent 6%, transparent 94%, rgba(163, 128, 71, 0.12) 100%);
-      background-size: 20px 20px, 100% 100%;
-      border-left: 2px solid rgba(163, 128, 71, 0.45);
-      border-right: 2px solid rgba(163, 128, 71, 0.45);
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), inset 0 0 40px rgba(163, 128, 71, 0.08);
-      max-height: 0;
-      opacity: 0;
-      transform-origin: top center;
-      transform: scaleY(0.95);
-      overflow: hidden;
-      transition: max-height 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease, transform 0.6s ease;
-    }
+        /* Contenedor Principal del Pergamino */
+        .pergamino-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            width: 100%;
+        }
 
-    /* Sello de Cera Real con Monograma */
-    .wax-seal-btn {
-      background: radial-gradient(circle at 35% 35%, #d4af37 0%, #A38047 60%, #6e4f1a 100%);
-      box-shadow: 0 10px 30px rgba(163, 128, 71, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.5), 0 0 0 4px rgba(163, 128, 71, 0.25);
-      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-      cursor: pointer;
-    }
-    .wax-seal-btn:hover {
-      transform: scale(1.06) rotate(3deg);
-      box-shadow: 0 15px 40px rgba(163, 128, 71, 0.7), inset 0 2px 3px rgba(255, 255, 255, 0.7), 0 0 0 6px rgba(163, 128, 71, 0.4);
-    }
+        .pergamino-container {
+            background: #ffffff;
+            border: 2px solid var(--gold-accent);
+            border-radius: 14px;
+            padding: 42px 36px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 15px 40px rgba(22, 60, 43, 0.12), inset 0 0 30px rgba(163, 128, 71, 0.04);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: desplegarPergamino 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+        }
 
-    /* Inputs de Lujo dentro del Pergamino */
-    .input-parchment {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(22, 60, 43, 0.25);
-      color: #163C2B;
-      transition: all 0.25s ease;
-    }
-    .input-parchment:focus {
-      outline: none;
-      border-color: #163C2B;
-      background: #FFFFFF;
-      box-shadow: 0 0 0 3px rgba(22, 60, 43, 0.12);
-    }
+        @keyframes desplegarPergamino {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-    /* Botón de Confirmación */
-    .btn-forest-gold {
-      background: linear-gradient(135deg, #163C2B 0%, #0d2419 100%);
-      color: #FAF8F5;
-      border: 1px solid #A38047;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(22, 60, 43, 0.3);
-    }
-    .btn-forest-gold:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(22, 60, 43, 0.45);
-      background: #163C2B;
-    }
-  </style>
+        /* Ribete Superior e Inferior Decorativo */
+        .pergamino-ornament {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            color: var(--gold-accent);
+        }
+        .ornament-line {
+            width: 40px;
+            height: 1px;
+            background: var(--gold-accent);
+            opacity: 0.6;
+        }
+
+        h2 {
+            font-family: 'Cinzel', Georgia, serif;
+            color: var(--wine-primary);
+            text-align: center;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 1.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .sub-evento {
+            text-align: center;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-style: italic;
+            font-size: 1.05rem;
+            color: var(--gold-accent);
+            margin-bottom: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            color: var(--wine-primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #D1C7BD;
+            border-radius: 8px;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            box-sizing: border-box;
+            transition: all 0.25s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--gold-accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(163, 128, 71, 0.15);
+        }
+
+        button.btn-submit {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--wine-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(22, 60, 43, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button.btn-submit:hover {
+            background-color: var(--gold-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(163, 128, 71, 0.35);
+        }
+
+        .mensaje-personalizado {
+            background-color: rgba(163, 128, 71, 0.09);
+            border-left: 4px solid var(--gold-accent);
+            border-radius: 0 8px 8px 0;
+            padding: 14px 16px;
+            margin-bottom: 22px;
+            font-size: 0.92rem;
+            color: var(--wine-primary);
+            line-height: 1.5;
+        }
+
+        /* Pase VIP Generado al Enviar */
+        .vip-pass-success {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+            animation: desplegarPergamino 0.6s ease forwards;
+        }
+        .pass-ticket-box {
+            background: #FAF8F5;
+            border: 2px dashed var(--gold-accent);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body>
 
-  <!-- ==================== BARRA SUPERIOR DE SIMULACIÓN DE URL ==================== -->
-  <header class="bg-neutral-900 border-b border-neutral-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4 flex-shrink-0 z-50">
-    <div class="flex items-center gap-3">
-      <span class="w-3.5 h-3.5 rounded-full bg-amber-400 animate-pulse"></span>
-      <div>
-        <h1 class="text-xs font-semibold tracking-wide text-white flex items-center gap-2">
-          <span>Formulario RSVP en Pergamino Desplegable</span>
-          <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">Detección ?guest=id</span>
-        </h1>
-        <p class="text-[11px] text-neutral-400">Catalina & Julián · Crema <code class="text-amber-300 font-mono">#FAF8F5</code> · Verde <code class="text-emerald-400 font-mono">#163C2B</code> · Dorado <code class="text-amber-300 font-mono">#A38047</code></p>
-      </div>
-    </div>
-
-    <!-- Simular URL en 1 Clic -->
-    <div class="flex items-center flex-wrap gap-2">
-      <span class="text-[11px] text-neutral-400 font-mono">Simular URL:</span>
-      <button type="button" class="btn-url-test px-2.5 py-1 rounded-lg text-xs font-mono bg-amber-500/15 border border-amber-400/40 text-amber-300 hover:bg-amber-500/25 transition-all" data-guest="camila_ortiz">
-        ?guest=camila_ortiz <span class="opacity-70">(Corte · 2p)</span>
-      </button>
-      <button type="button" class="btn-url-test px-2.5 py-1 rounded-lg text-xs font-mono bg-amber-500/15 border border-amber-400/40 text-amber-300 hover:bg-amber-500/25 transition-all" data-guest="familia_martinez">
-        ?guest=familia_martinez <span class="opacity-70">(Familia · 4p)</span>
-      </button>
-      <button type="button" class="btn-url-test px-2.5 py-1 rounded-lg text-xs font-mono bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-all" data-guest="dr_valenzuela">
-        ?guest=dr_valenzuela <span class="opacity-70">(2p)</span>
-      </button>
-      <button type="button" class="btn-url-test px-2.5 py-1 rounded-lg text-xs font-mono bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-all" data-guest="">
-        Sin Parámetro <span class="opacity-70">(Modo Abierto)</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- ==================== LIENZO DE EXPERIENCIA (PERGAMINO REAL) ==================== -->
-  <main class="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 relative overflow-y-auto">
-    
-    <!-- CONTENEDOR DEL PERGAMINO -->
-    <div class="w-full max-w-lg relative select-none">
-      
-      <!-- 1. RODILLO SUPERIOR DORADO -->
-      <div class="parchment-roller-top flex items-center justify-between px-3">
-        <div class="w-2.5 h-2.5 rounded-full bg-white/40 shadow-inner"></div>
-        <div class="w-16 h-1 rounded-full bg-white/30"></div>
-        <div class="w-2.5 h-2.5 rounded-full bg-white/40 shadow-inner"></div>
-      </div>
-
-      <!-- 2. SELLO DE CERA DESPLEGABLE (ESTADO INICIAL CERRADO) -->
-      <div id="waxSealWrapper" class="relative z-40 text-center py-12 transition-all duration-500">
-        
-        <div class="w-24 h-24 rounded-full wax-seal-btn mx-auto flex flex-col items-center justify-center relative shadow-2xl" id="btnWaxSeal">
-          <span class="material-symbols-outlined text-white text-2xl drop-shadow">mail</span>
-          <span class="font-['Cinzel'] text-[9px] font-bold text-white tracking-widest uppercase mt-0.5 drop-shadow">RSVP</span>
+    <!-- BARRA SUPERIOR DE SIMULACIÓN DE URL (Para pruebas inmediatas) -->
+    <header class="url-simulator-bar">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:#d4af37; font-weight:600;">✦ Invitta Studio:</span>
+            <span>Simulador de Enlace RSVP (?guest=id)</span>
         </div>
-
-        <p class="font-['Cinzel'] text-sm tracking-[0.25em] text-[#A38047] uppercase font-semibold mt-4">
-          ✦ Toca el Sello Real para Desplegar el Pergamino ✦
-        </p>
-        <p class="font-['Cormorant_Garamond'] text-xs text-neutral-400 italic mt-1">
-          Catalina & Julián · 20 de Marzo, 2027
-        </p>
-      </div>
-
-      <!-- 3. CUERPO DESPLEGABLE DEL PERGAMINO (CREMA #FAF8F5 & VERDE #163C2B) -->
-      <div id="parchmentBody" class="parchment-body px-7 py-10 sm:px-10 sm:py-12">
-        
-        <!-- ENCABEZADO DEL PERGAMINO -->
-        <div class="text-center mb-8">
-          <span class="font-sans text-[10.5px] uppercase tracking-[0.35em] text-[#A38047] font-semibold block mb-2">
-            Confirmación de Asistencia
-          </span>
-          <h2 class="font-['Cinzel'] text-3xl sm:text-4xl text-[#163C2B] font-light uppercase tracking-wider mb-2">
-            Catalina & Julián
-          </h2>
-          <div class="w-12 h-0.5 bg-[#A38047] mx-auto mb-3"></div>
-          <p class="font-['Cormorant_Garamond'] text-base text-[#163C2B]/85 italic leading-relaxed max-w-sm mx-auto">
-            &ldquo;Nos llena de emoción compartir el inicio de nuestra nueva vida junto a las personas más importantes de nuestro corazón.&rdquo;
-          </p>
-        </div>
-
-        <!-- CONTENIDO DEL FORMULARIO -->
-        <div id="scrollFormContent">
-          
-          <form id="scrollRsvpForm" class="flex flex-col gap-5">
-            
-            <!-- CASO A: BANNER INVITADO PRECARGADO PERSONALIZADO (?guest=id) -->
-            <div id="personalizedGuestBanner" class="hidden"></div>
-
-            <!-- CASO B: CAMPO LIBRE DE NOMBRE (Modo Abierto sin parámetro) -->
-            <div id="openNameBlock" class="flex flex-col gap-1.5">
-              <label class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm text-[#A38047]">person</span>
-                Nombre Completo y Apellidos
-              </label>
-              <input type="text" id="openGuestNameInput" placeholder="Escribe tu nombre para localizar tus pases"
-                class="input-parchment w-full rounded-xl px-4 py-3 text-xs font-sans">
-            </div>
-
-            <!-- Teléfono / WhatsApp -->
-            <div class="flex flex-col gap-1.5">
-              <label class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm text-[#A38047]">chat</span>
-                WhatsApp / Teléfono de Contacto
-              </label>
-              <input type="tel" id="scrollGuestPhone" placeholder="+52 55 1234 5678"
-                class="input-parchment w-full rounded-xl px-4 py-3 text-xs font-sans">
-            </div>
-
-            <!-- Selector de Asistencia (Tarjetas táctiles) -->
-            <div class="flex flex-col gap-2 pt-1">
-              <label class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold">
-                ¿Nos honrarás con tu presencia?
-              </label>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                
-                <div class="attendance-card active rounded-xl p-3.5 flex items-center gap-3 border border-[#A38047] bg-[#163C2B]/10 cursor-pointer transition-all" data-value="yes">
-                  <div class="w-4 h-4 rounded-full border-2 border-[#163C2B] flex items-center justify-center flex-shrink-0">
-                    <div class="radio-indicator w-2 h-2 rounded-full bg-[#163C2B]"></div>
-                  </div>
-                  <span class="text-xs font-medium text-[#163C2B] leading-tight">Sí, asistiré con honor</span>
-                </div>
-
-                <div class="attendance-card rounded-xl p-3.5 flex items-center gap-3 border border-[#A38047]/30 bg-black/5 cursor-pointer transition-all" data-value="no">
-                  <div class="w-4 h-4 rounded-full border-2 border-[#163C2B]/40 flex items-center justify-center flex-shrink-0">
-                    <div class="radio-indicator w-2 h-2 rounded-full bg-[#163C2B] hidden"></div>
-                  </div>
-                  <span class="text-xs font-medium text-[#163C2B]/75 leading-tight">No podré acompañarles</span>
-                </div>
-
-              </div>
-            </div>
-
-            <!-- Contador de Pases Asignados -->
-            <div id="scrollPassesBlock" class="flex items-center justify-between p-4 bg-white/70 border border-[#A38047]/35 rounded-xl">
-              <div>
-                <span class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold block">Pases a Confirmar</span>
-                <span id="maxPassesLabel" class="text-[11px] text-neutral-500 font-sans">Límite asignado: 2 persona(s)</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <button type="button" id="btnDecPasses" class="w-8 h-8 rounded-full border border-[#163C2B] bg-[#163C2B]/10 text-[#163C2B] font-bold flex items-center justify-center hover:bg-[#163C2B] hover:text-white transition-colors text-sm">-</button>
-                <span id="scrollPassesCount" class="text-lg font-['Cinzel'] text-[#163C2B] font-bold tabular-nums w-5 text-center">1</span>
-                <button type="button" id="btnIncPasses" class="w-8 h-8 rounded-full border border-[#163C2B] bg-[#163C2B]/10 text-[#163C2B] font-bold flex items-center justify-center hover:bg-[#163C2B] hover:text-white transition-colors text-sm">+</button>
-              </div>
-            </div>
-
-            <!-- Menú & Alergias -->
-            <div id="scrollDietBlock" class="flex flex-col gap-1.5">
-              <label class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm text-[#A38047]">restaurant</span>
-                Menú Especial o Restricción (Opcional)
-              </label>
-              <select id="scrollGuestDiet" class="input-parchment w-full rounded-xl px-4 py-2.5 text-xs font-sans">
-                <option value="none">Menú Tradicional Nupcial</option>
-                <option value="vegetarian">Menú Vegetariano</option>
-                <option value="vegan">Menú Vegano</option>
-                <option value="celiac">Menú Sin Gluten (Celíaco)</option>
-                <option value="kids">Menú Infantil</option>
-              </select>
-            </div>
-
-            <!-- Mensaje -->
-            <div class="flex flex-col gap-1.5">
-              <label class="text-[10.5px] uppercase tracking-[0.25em] text-[#163C2B] font-semibold flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm text-[#A38047]">favorite</span>
-                Palabras de Bendición para Catalina & Julián
-              </label>
-              <textarea id="scrollGuestMessage" rows="2" placeholder="Que su unión sea eterna..."
-                class="input-parchment w-full rounded-xl px-4 py-2.5 text-xs font-sans"></textarea>
-            </div>
-
-            <!-- Botón de Confirmación Real -->
-            <button type="submit" id="btnSubmitScrollRsvp" class="btn-forest-gold w-full py-3.5 rounded-xl text-xs mt-2 flex items-center justify-center gap-2">
-              <span class="material-symbols-outlined text-base">check_circle</span>
-              <span>Confirmar Asistencia en Pergamino</span>
+        <div class="url-chips-wrap">
+            <button type="button" class="btn-url-chip" data-param="camila-ortiz" data-passes="2">
+                ?guest=camila-ortiz (2 pases)
             </button>
+            <button type="button" class="btn-url-chip" data-param="familia-martinez-valdes" data-passes="4">
+                ?guest=familia-martinez-valdes (4 pases)
+            </button>
+            <button type="button" class="btn-url-chip" data-param="dr-carlos-valenzuela" data-passes="2">
+                ?guest=dr-carlos-valenzuela (2 pases)
+            </button>
+            <button type="button" class="btn-url-chip" data-param="">
+                Sin Parámetro (Modo Abierto)
+            </button>
+        </div>
+    </header>
 
-          </form>
+    <main class="pergamino-wrapper">
+        <div class="pergamino-container" id="pergaminoCard">
+            
+            <!-- Adorno Editorial -->
+            <div class="pergamino-ornament">
+                <div class="ornament-line"></div>
+                <span class="material-symbols-outlined" style="font-size: 18px;">favorite</span>
+                <div class="ornament-line"></div>
+            </div>
+
+            <h2>Confirmación de Asistencia</h2>
+            <p class="sub-evento">Catalina & Julián · 20 de Marzo, 2027</p>
+            
+            <div id="contenedor-saludo"></div>
+            
+            <form id="rsvpForm">
+                <div id="campo-nombre-container" class="form-group">
+                    <label for="nombre">
+                        <span class="material-symbols-outlined" style="font-size:16px;">person</span>
+                        Nombre Completo
+                    </label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre y apellido" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="asistencia">
+                        <span class="material-symbols-outlined" style="font-size:16px;">how_to_reg</span>
+                        ¿Nos acompañarás?
+                    </label>
+                    <select id="asistencia" name="asistencia" required>
+                        <option value="">Selecciona una opción</option>
+                        <option value="si">¡Sí, ahí estaré con gusto!</option>
+                        <option value="no">No podré asistir</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="campo-pases-container">
+                    <label for="pases">
+                        <span class="material-symbols-outlined" style="font-size:16px;">confirmation_number</span>
+                        Número de Lugares
+                    </label>
+                    <input type="number" id="pases" name="pases" min="1" value="1" required>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnEnviar">
+                    <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+                    <span>Enviar Confirmación</span>
+                </button>
+            </form>
+
+            <!-- VISTA DE ÉXITO Y PASE DIGITAL -->
+            <div class="vip-pass-success" id="vistaExito">
+                <span class="material-symbols-outlined" style="font-size: 48px; color: var(--gold-accent);">mark_email_read</span>
+                <h3 style="font-family:'Cinzel', serif; color: var(--wine-primary); margin-top: 10px; text-transform: uppercase;">¡Registro Exitoso!</h3>
+                <p style="font-size: 0.9rem; color: #555; margin-top: 5px;" id="textoResumenExito">Tu respuesta ha sido registrada en el sistema oficial.</p>
+
+                <div class="pass-ticket-box">
+                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--gold-accent); text-transform: uppercase; letter-spacing: 1px;">Pase Digital de Acceso</span>
+                    <h4 style="font-family:'Cinzel', serif; color: var(--wine-primary); margin: 6px 0;" id="passNombreConfirmado">Invitado de Honor</h4>
+                    <p style="font-size: 0.85rem; color: #666; font-family:'JetBrains Mono', monospace;" id="passFolio">FOLIO: PASS-2027</p>
+                </div>
+
+                <button type="button" onclick="reiniciarFormulario()" style="background:none; border:none; color: var(--wine-primary); text-decoration: underline; cursor: pointer; font-size: 0.85rem;">
+                    ↺ Probar otra confirmación
+                </button>
+            </div>
 
         </div>
+    </main>
 
-        <!-- 4. VISTA DE CONFIRMACIÓN ÉXITO / PASE DIGITAL VIP -->
-        <div id="scrollSuccessView" class="hidden text-center py-6">
-          <div class="w-14 h-14 bg-[#163C2B] border border-[#A38047] text-[#A38047] rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
-            <span class="material-symbols-outlined text-2xl">mark_email_read</span>
-          </div>
+    <script>
+        function cargarEstadoRsvp(guestParam, passesDefault) {
+            const campoNombreContainer = document.getElementById('campo-nombre-container');
+            const contenedorSaludo = document.getElementById('contenedor-saludo');
+            const inputNombre = document.getElementById('nombre');
+            const inputPases = document.getElementById('pases');
+            const form = document.getElementById('rsvpForm');
+            const vistaExito = document.getElementById('vistaExito');
 
-          <span class="font-['Great_Vibes'] text-3xl text-[#A38047] block mb-1">¡Honor Aceptado!</span>
-          <h3 class="font-['Cinzel'] text-lg text-[#163C2B] font-semibold tracking-wide mb-1" id="passGuestName">Invitado de Honor</h3>
-          <p class="font-['Cormorant_Garamond'] text-sm text-[#163C2B]/85 italic mb-5" id="passSummary">Tu asistencia ha sido registrada en el libro oficial.</p>
+            form.style.display = 'block';
+            vistaExito.style.display = 'none';
 
-          <!-- Boleto Digital Impreso -->
-          <div class="bg-white p-5 rounded-2xl border-2 border-dashed border-[#A38047] shadow-xl max-w-xs mx-auto mb-4 text-left">
-            <div class="flex justify-between items-center border-b border-neutral-200 pb-2 mb-3">
-              <span class="text-[9px] uppercase tracking-widest font-bold text-[#A38047]">Pase de Honor</span>
-              <span class="font-mono text-[10px] font-bold text-[#163C2B]" id="passFolioCode">PASS-VIP</span>
-            </div>
-            <p class="font-['Cinzel'] text-xs font-bold text-[#163C2B] uppercase mb-1">Catalina & Julián</p>
-            <p class="text-[10px] text-neutral-500 mb-3">20 de Marzo, 2027 · Jardín Las Magnolias</p>
-            <div class="flex justify-center p-2 bg-[#FAF8F5] rounded-lg border border-neutral-200">
-              <span class="material-symbols-outlined text-4xl text-[#163C2B]">qr_code_2</span>
-            </div>
-          </div>
+            if (guestParam) {
+                // Simulación de datos decodificados desde la URL personalizada
+                const nombreDecodificado = guestParam.replace(/-/g, ' ').toUpperCase();
+                const pasesAsignados = passesDefault || 2;
+                
+                contenedorSaludo.innerHTML = `
+                    <div class="mensaje-personalizado">
+                        ¡Qué alegría tenerte aquí, <strong>${nombreDecodificado}</strong>! Tus <strong>${pasesAsignados} pases</strong> ya están reservados para nuestro gran día.
+                    </div>
+                `;
+                
+                // Precargamos los datos y bloqueamos la edición del nombre si viene personalizado
+                inputNombre.value = nombreDecodificado;
+                inputNombre.required = false;
+                campoNombreContainer.style.display = 'none';
+                inputPases.value = pasesAsignados;
+                inputPases.max = pasesAsignados;
+            } else {
+                // Modo formulario abierto (enlace genérico)
+                contenedorSaludo.innerHTML = `
+                    <div class="mensaje-personalizado">
+                        Por favor ingresa tus datos para registrar tu solicitud de asistencia.
+                    </div>
+                `;
+                inputNombre.value = '';
+                inputNombre.required = true;
+                campoNombreContainer.style.display = 'block';
+                inputPases.value = 1;
+                inputPases.removeAttribute('max');
+            }
+        }
 
-          <button type="button" onclick="location.reload()" class="text-xs text-[#163C2B] underline hover:text-[#A38047] font-medium">
-            ↺ Probar otra confirmación
-          </button>
-        </div>
+        function reiniciarFormulario() {
+            const urlParams = new URLSearchParams(window.location.search);
+            cargarEstadoRsvp(urlParams.get('guest'), null);
+        }
 
-      </div>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Lógica de detección automática de URL (Parámetro ?guest=)
+            const urlParams = new URLSearchParams(window.location.search);
+            const guestParam = urlParams.get('guest');
+            
+            cargarEstadoRsvp(guestParam, null);
 
-      <!-- 5. RODILLO INFERIOR DORADO -->
-      <div id="parchmentBottomRoller" class="parchment-roller-bottom flex items-center justify-between px-3">
-        <div class="w-2.5 h-2.5 rounded-full bg-white/40 shadow-inner"></div>
-        <div class="w-16 h-1 rounded-full bg-white/30"></div>
-        <div class="w-2.5 h-2.5 rounded-full bg-white/40 shadow-inner"></div>
-      </div>
+            // Manejo de chips de prueba en la barra superior
+            document.querySelectorAll('.btn-url-chip').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.btn-url-chip').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
 
-    </div>
+                    const param = this.dataset.param;
+                    const passes = parseInt(this.dataset.passes || '2', 10);
+                    cargarEstadoRsvp(param, passes);
+                });
+            });
 
-  </main>
+            // Manejo del envío del formulario con feedback en pantalla
+            document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+                e.preventDefault();
 
-  <!-- SCRIPT MODULAR SCROLL RSVP -->
-  <script src="scroll-rsvp.js"></script>
+                const nombre = document.getElementById('nombre').value || 'Invitado de Honor';
+                const pases = document.getElementById('pases').value || '1';
+                const asistencia = document.getElementById('asistencia').value;
+                const folio = 'PASS-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-  <script>
-    // Inicializar Controlador de Pergamino
-    const scrollRsvp = new ScrollRsvpController();
+                document.getElementById('rsvpForm').style.display = 'none';
+                document.getElementById('passNombreConfirmado').textContent = nombre;
+                document.getElementById('passFolio').textContent = 'FOLIO: ' + folio;
+                
+                if (asistencia === 'no') {
+                    document.getElementById('textoResumenExito').textContent = 'Hemos registrado que no podrás asistir. ¡Agradecemos mucho tu aviso!';
+                } else {
+                    document.getElementById('textoResumenExito').textContent = `Asistencia confirmada para ${pases} persona(s).`;
+                }
 
-    // Botones de Simulación de URL en la barra superior
-    document.querySelectorAll('.btn-url-test').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const guestId = btn.dataset.guest;
-        scrollRsvp.detectGuestFromUrl(guestId);
-        scrollRsvp.unfurlParchment();
-
-        // Actualizar visual de botones
-        document.querySelectorAll('.btn-url-test').forEach(b => {
-          b.classList.remove('bg-amber-500/25', 'border-amber-400');
+                document.getElementById('vistaExito').style.display = 'block';
+            });
         });
-        btn.classList.add('bg-amber-500/25', 'border-amber-400');
-      });
-    });
-  </script>
+    </script>
 </body>
 </html>
