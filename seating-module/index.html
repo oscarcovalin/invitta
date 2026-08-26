@@ -1,37 +1,111 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asignación de Mesas Drag & Drop — Invitta Studio (Antigravity)</title>
-  
-  <!-- Tipografías de Lujo -->
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Organizador de Mesas — Invitta Studio</title>
+
+  <!-- Google Fonts Oficiales -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  
-  <!-- Iconos Material Symbols -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 
-  <script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
     tailwind.config = {
+      darkMode: "class",
       theme: {
         extend: {
-          colors: {
-            'gold-primary': '#c19a4e',
-            'gold-amber': '#A38047',
-            'gold-light': '#e5cf9b',
-            'deep-onyx': '#121316',
-            'champagne': '#f7f6ec'
+          "colors": {
+            "surface-container-high": "#e9e8e8",
+            "on-secondary-container": "#6e6354",
+            "soft-linen": "#F5F2ED",
+            "stone-deep": "#262626",
+            "surface": "#faf9f9",
+            "surface-variant": "#e3e2e2",
+            "outline-variant": "#c4c7c7",
+            "secondary-fixed": "#f0e0cd",
+            "on-error": "#ffffff",
+            "on-tertiary-fixed-variant": "#474743",
+            "surface-tint": "#5f5e5e",
+            "tertiary-fixed-dim": "#c9c6c2",
+            "surface-container": "#efeded",
+            "surface-container-lowest": "#ffffff",
+            "outline": "#747878",
+            "charcoal": "#3A3A3A",
+            "inverse-surface": "#2f3031",
+            "on-tertiary-fixed": "#1c1c19",
+            "primary-container": "#3a3a3a",
+            "secondary-container": "#f0e0cd",
+            "on-error-container": "#93000a",
+            "primary": "#242525",
+            "tertiary-fixed": "#e5e2dd",
+            "on-primary-fixed-variant": "#474747",
+            "surface-bright": "#faf9f9",
+            "on-primary-container": "#a5a4a3",
+            "secondary": "#685d4e",
+            "error-container": "#ffdad6",
+            "primary-fixed-dim": "#c8c6c6",
+            "on-secondary-fixed-variant": "#4f4538",
+            "tertiary-container": "#3a3a37",
+            "surface-container-low": "#f4f3f3",
+            "on-secondary-fixed": "#221a0f",
+            "on-tertiary": "#ffffff",
+            "warm-grey": "#8C8C8C",
+            "on-tertiary-container": "#a5a49f",
+            "tertiary": "#252422",
+            "on-primary": "#ffffff",
+            "surface-container-highest": "#e3e2e2",
+            "on-background": "#1b1c1c",
+            "inverse-primary": "#c8c6c6",
+            "on-secondary": "#ffffff",
+            "error": "#ba1a1a",
+            "background": "#faf9f9",
+            "primary-fixed": "#e4e2e1",
+            "secondary-fixed-dim": "#d3c4b2",
+            "on-surface-variant": "#444748",
+            "brushed-champagne": "#C7B299",
+            "on-surface": "#1b1c1c",
+            "on-primary-fixed": "#1b1c1c",
+            "inverse-on-surface": "#f2f0f0",
+            "surface-dim": "#dbdad9"
           },
-          fontFamily: {
-            'display': ['Cinzel', 'serif'],
-            'body': ['Cormorant Garamond', 'serif'],
-            'sans-ui': ['Montserrat', 'sans-serif'],
-            'mono': ['JetBrains Mono', 'monospace']
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gap-sm": "1rem",
+            "unit": "4px",
+            "gap-md": "2rem",
+            "gap-lg": "4rem",
+            "gap-xs": "0.5rem",
+            "max-width": "1440px",
+            "margin-page": "5vw",
+            "sidebar-width": "300px",
+            "section-padding": "2rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Inter", "sans-serif"],
+            "headline-xl": ["Playfair Display", "serif"],
+            "label-caps": ["Inter", "sans-serif"],
+            "display-lg": ["Playfair Display", "serif"],
+            "headline-lg-mobile": ["Playfair Display", "serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
+            "headline-lg": ["Playfair Display", "serif"]
+          },
+          "fontSize": {
+            "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-xl": ["36px", { "lineHeight": "1.2", "fontWeight": "400" }],
+            "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.15em", "fontWeight": "500" }],
+            "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "1.3", "fontWeight": "400" }],
+            "body-md": ["15px", { "lineHeight": "1.5", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "1", "fontWeight": "400" }],
+            "headline-lg": ["28px", { "lineHeight": "1.3", "fontWeight": "400" }]
           }
         }
       }
@@ -39,13 +113,29 @@
   </script>
 
   <style>
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background: #090a0d;
-      color: #e5e7eb;
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar {
+      display: block;
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #e3e2e2;
+      border-radius: 4px;
     }
 
-    /* Animaciones de Inercia y Físicas Suaves */
     .cursor-grab {
       cursor: grab;
     }
@@ -53,153 +143,210 @@
       cursor: grabbing;
     }
 
-    .table-dropzone {
-      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
-    }
-
-    .table-seats-container {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Animación de entrada suave para tarjetas al soltar */
+    /* Animación Suave de Entrada para Asientos */
     @keyframes dropInertia {
-      0% {
-        opacity: 0;
-        transform: scale(0.92) translateY(6px);
-      }
-      60% {
-        transform: scale(1.02) translateY(-2px);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
+      0% { transform: scale(0.85); opacity: 0; }
+      60% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
     }
-
-    .assigned-guest-pill {
-      animation: dropInertia 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    .family-cluster-card {
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .family-cluster-card:hover {
-      transform: translateY(-2px) scale(1.01);
-    }
-
-    /* Resplandor elegante de Sobrecupo (#A38047) */
-    .overcapacity-glow {
-      border-color: #A38047 !important;
-      box-shadow: 0 0 25px rgba(163, 128, 71, 0.3), inset 0 0 15px rgba(163, 128, 71, 0.08) !important;
+    .seat-pill {
+      animation: dropInertia 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
   </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden">
+<body class="bg-background font-body-md text-on-surface antialiased flex h-screen overflow-hidden select-none">
 
-  <!-- ==================== HEADER DEL MÓDULO ==================== -->
-  <header class="bg-neutral-900 border-b border-neutral-800 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 flex-shrink-0 z-50">
-    <div class="flex items-center gap-3">
-      <span class="w-3.5 h-3.5 rounded-full bg-amber-400 animate-pulse"></span>
-      <div>
-        <h1 class="text-sm font-semibold tracking-wide text-white flex items-center gap-2">
-          <span>Organizador de Mesas Drag & Drop</span>
-          <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">Reactivo & Bloques Familiares</span>
-        </h1>
-        <p class="text-xs text-neutral-400">Contenedores auto-escalables con alertas sutiles de sobrecupo en color <code class="text-amber-300 font-mono">#A38047</code></p>
-      </div>
+  <!-- ==================== BARRA LATERAL FIJA (300px) ==================== -->
+  <aside class="fixed left-0 top-0 h-full w-[300px] bg-surface-container-lowest border-r border-outline-variant z-50 flex flex-col pt-10">
+    <div class="px-8 mb-12 flex flex-col gap-0.5">
+      <span class="font-headline-lg text-primary tracking-widest uppercase text-2xl font-normal">Invitta</span>
+      <span class="font-label-caps text-on-surface-variant tracking-widest text-[10px]">Studio · Atelier Digital</span>
     </div>
 
-    <!-- Botones de Acción Superior -->
-    <div class="flex items-center gap-2.5">
-      <button type="button" id="btnAddTableBtn" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 hover:bg-amber-500/30 text-xs font-medium flex items-center gap-1.5 transition-all shadow-sm">
-        <span class="material-symbols-outlined text-sm">add_circle</span>
-        <span>Añadir Mesa</span>
-      </button>
-      <button type="button" id="btnResetSeatingBtn" class="px-3.5 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium flex items-center gap-1.5 transition-all">
-        <span class="material-symbols-outlined text-sm">restart_alt</span>
-        <span>Restablecer</span>
-      </button>
-    </div>
-  </header>
+    <nav class="flex-1 flex flex-col gap-1 px-4">
+      <a class="group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" href="#">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px]">dashboard</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Resumen</span>
+      </a>
+      <a class="group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" href="#">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px]">group</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Invitados</span>
+      </a>
+      <a aria-current="page" class="group flex items-center px-5 py-3.5 rounded-lg transition-all duration-300 bg-surface-container-high text-primary font-medium" href="#">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px]">table_restaurant</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Mesas</span>
+      </a>
+      <a class="group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" href="#">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px]">calendar_today</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Cronograma</span>
+      </a>
+      <a class="group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" href="#">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px]">settings</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Configuración</span>
+      </a>
+    </nav>
+  </aside>
 
-  <!-- ==================== BARRA DE ESTADÍSTICAS REACTIVAS ==================== -->
-  <div class="px-6 py-3 bg-neutral-950 border-b border-neutral-800 flex-shrink-0" id="seatingStats"></div>
-
-  <!-- ==================== ÁREA DE TRABAJO (DOS COLUMNAS) ==================== -->
-  <div class="flex-1 flex overflow-hidden">
+  <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+  <div class="pl-[300px] flex-1 flex flex-col h-full overflow-hidden">
     
-    <!-- PANEL IZQUIERDO: INVITADOS Y BLOQUES FAMILIARES SIN ASIGNAR -->
-    <aside class="w-[360px] sm:w-[400px] bg-neutral-900/90 border-r border-neutral-800 flex flex-col h-full overflow-hidden flex-shrink-0">
+    <!-- HEADER SUPERIOR -->
+    <header class="h-20 bg-surface-container-lowest/90 backdrop-blur-md z-40 px-8 flex items-center justify-between border-b border-outline-variant flex-shrink-0">
+      <div class="flex items-center bg-surface-container px-4 py-2.5 rounded-lg border border-outline-variant w-96">
+        <span class="material-symbols-outlined text-on-surface-variant font-light text-[20px] mr-3">search</span>
+        <input class="bg-transparent border-none focus:ring-0 text-sm text-on-surface placeholder-on-surface-variant w-full outline-none" placeholder="Buscar invitado o mesa..." type="text">
+      </div>
       
-      <div class="p-4 border-b border-neutral-800 bg-neutral-950/40 flex items-center justify-between">
-        <div>
-          <h2 class="text-xs uppercase tracking-widest font-semibold text-amber-400 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm">group_add</span>
-            Invitados & Familias
-          </h2>
-          <p class="text-[11px] text-neutral-400 mt-0.5">Arrastra bloques completos o individuales.</p>
+      <div class="flex items-center gap-6">
+        <button class="text-on-surface-variant hover:text-primary transition-colors p-2" title="Notificaciones">
+          <span class="material-symbols-outlined font-light text-[22px]">notifications</span>
+        </button>
+        <div class="w-9 h-9 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary font-light text-[18px]">person</span>
         </div>
-        <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-400/30 font-medium">Auto-Agrupado</span>
       </div>
+    </header>
 
-      <!-- Lista Draggable de Invitados -->
-      <div class="flex-1 overflow-y-auto p-4" id="unassignedList"></div>
-
-    </aside>
-
-    <!-- PANEL DERECHO: CUADRÍCULA DE MESAS (ZONAS DE CAÍDA AUTO-ESCALABLES) -->
-    <main class="flex-1 overflow-y-auto p-6 bg-neutral-950/70 flex flex-col justify-between">
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-xs uppercase tracking-widest font-semibold text-neutral-300 flex items-center gap-2">
-              <span class="material-symbols-outlined text-sm text-amber-400">table_restaurant</span>
-              Distribución de Salón & Mesas
-            </h2>
-            <p class="text-xs text-neutral-400">Suelta los elementos sobre cualquier mesa. Los contenedores se ajustan dinámicamente.</p>
+    <!-- ÁREA DE TRABAJO (Stats Bar + Layout de 2 Columnas) -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-background">
+      
+      <!-- STATS BAR SUPERIOR -->
+      <div class="flex flex-wrap items-center justify-between px-8 py-5 bg-surface-container-lowest border-b border-outline-variant flex-shrink-0 z-10">
+        <div class="flex gap-10">
+          
+          <!-- Asignados -->
+          <div class="flex flex-col gap-1">
+            <span class="font-label-caps text-on-surface-variant uppercase tracking-widest text-[11px]">Asignados</span>
+            <div class="flex items-baseline gap-2">
+              <span class="font-headline-xl text-primary font-normal" id="statAssignedCount">2</span>
+              <span class="font-body-md text-on-surface-variant" id="statTotalCount">/ 14</span>
+            </div>
           </div>
+          
+          <div class="w-px h-12 bg-outline-variant"></div>
+          
+          <!-- Sin Asignar -->
+          <div class="flex flex-col gap-1">
+            <span class="font-label-caps text-on-surface-variant uppercase tracking-widest text-[11px]">Sin Asignar</span>
+            <span class="font-headline-xl text-charcoal font-normal" id="statUnassignedCount">12</span>
+          </div>
+
+          <div class="w-px h-12 bg-outline-variant"></div>
+
+          <!-- Ocupación -->
+          <div class="flex flex-col gap-1">
+            <span class="font-label-caps text-on-surface-variant uppercase tracking-widest text-[11px]">Ocupación</span>
+            <div class="flex items-center gap-4 mt-1.5">
+              <div class="w-36 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                <div class="h-full bg-charcoal rounded-full transition-all duration-500" id="statProgressBar" style="width: 14%;"></div>
+              </div>
+              <span class="font-label-sm text-on-surface-variant font-mono" id="statPercent">14%</span>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Cuadrícula de Zonas de Caída -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5" id="tablesGrid"></div>
+        <!-- Alerta de Sobrecupo & Botón Nueva Mesa -->
+        <div class="flex items-center gap-4">
+          <div id="statOvercapacityBadge" class="flex items-center gap-2 px-4 py-2 bg-surface-container text-on-surface-variant border border-outline-variant rounded-lg">
+            <span class="material-symbols-outlined font-light text-[18px]">info</span>
+            <span class="font-label-caps">0 Sobrecupo</span>
+          </div>
+          
+          <button type="button" id="btnAddNewTable" class="flex items-center gap-2 px-6 py-2.5 bg-primary text-on-primary font-label-caps tracking-widest uppercase rounded-lg hover:bg-charcoal transition-colors shadow-sm text-xs">
+            <span class="material-symbols-outlined font-light text-[18px]">add</span>
+            <span>Nueva Mesa</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Nota de Funcionamiento Antigravity -->
-      <div class="mt-8 pt-4 border-t border-neutral-800/80 flex items-center justify-between text-[11px] text-neutral-400 select-none">
-        <span class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          Sin bloqueo de cupo · Alerta suave en <strong class="text-[#A38047] font-mono">#A38047</strong>
-        </span>
-        <span>Arrastra de regreso al panel izquierdo para desasignar.</span>
+      <!-- WORKSPACE AREA: 2 COLUMNAS -->
+      <div class="flex flex-1 overflow-hidden">
+        
+        <!-- SIDEBAR IZQUIERDA: PENDIENTES & FAMILIAS (w-96) -->
+        <div class="w-96 bg-surface-container-lowest border-r border-outline-variant flex flex-col h-full z-10 shrink-0">
+          
+          <div class="p-6 border-b border-outline-variant bg-surface-container-lowest">
+            <h2 class="font-headline-lg text-primary mb-4 flex items-center gap-3 text-2xl">
+              <span class="material-symbols-outlined font-light text-[24px]">group</span>
+              <span>Pendientes</span>
+            </h2>
+
+            <!-- Búsqueda reactiva -->
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-light text-[18px]">search</span>
+              <input id="searchGuestsInput" class="w-full bg-surface-container rounded-lg py-2.5 pl-11 pr-4 text-sm text-on-surface placeholder-on-surface-variant focus:outline-none border border-outline-variant focus:border-charcoal transition-all" placeholder="Buscar familia o invitado..." type="text">
+            </div>
+          </div>
+
+          <!-- LISTA SCROLLABLE DE INVITADOS -->
+          <div class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar" id="unassignedList">
+            <!-- Inyectado dinámicamente con SeatingPlanner -->
+          </div>
+
+        </div>
+
+        <!-- CANVAS: FLOOR PLAN (bg-soft-linen) -->
+        <div class="flex-1 bg-soft-linen relative overflow-auto p-10 custom-scrollbar" id="floorPlanCanvas">
+          
+          <!-- Decoración Gráfica Sutil de Fondo -->
+          <div class="absolute top-8 right-8 w-64 h-40 opacity-15 pointer-events-none rounded-lg overflow-hidden mix-blend-multiply grayscale">
+            <div class="w-full h-full border border-dashed border-charcoal/40 flex items-center justify-center text-center p-4">
+              <span class="font-label-caps text-[9px] uppercase tracking-widest text-charcoal/60">Plano Arquitectónico · Salón Las Magnolias</span>
+            </div>
+          </div>
+
+          <!-- CONTENEDOR DE MESAS (Imperial & Circulares) -->
+          <div class="min-w-[700px] max-w-[850px] mx-auto relative pt-4 pb-20" id="tablesContainer">
+            <!-- Inyectado dinámicamente -->
+          </div>
+
+        </div>
+
       </div>
+
     </main>
+
+    <!-- FOOTER FIJO -->
+    <footer class="h-14 bg-surface-container-lowest border-t border-outline-variant z-40 px-8 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-8">
+        <div class="flex items-center gap-2.5">
+          <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span class="font-label-caps text-on-surface-variant uppercase tracking-widest text-[10.5px]">Sincronización Activa</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined font-light text-[18px] text-on-surface-variant">chair</span>
+          <span class="font-label-caps text-on-surface-variant uppercase tracking-widest text-[10.5px]">Capacidad Salón: 300 Pases</span>
+        </div>
+      </div>
+      <div class="font-label-sm text-on-surface-variant opacity-60 uppercase tracking-widest text-[10px]">
+        v2.4.0-lux // invitta-engine-stable
+      </div>
+    </footer>
 
   </div>
 
-  <!-- Script Modular -->
+  <!-- SCRIPT MODULAR DE SEATING PLANNER -->
   <script src="seating-planner.js"></script>
 
   <script>
-    // Inicialización de la instancia SeatingPlanner
+    // Inicializar instancia de SeatingPlanner conectada al nuevo diseño
     const planner = new SeatingPlanner({
-      containerSelector: '#seatingApp',
       unassignedListSelector: '#unassignedList',
-      tablesGridSelector: '#tablesGrid',
-      statsSelector: '#seatingStats',
-      overCapacityColor: '#A38047'
+      tablesContainerSelector: '#tablesContainer',
+      statsAssignedCountSelector: '#statAssignedCount',
+      statsTotalCountSelector: '#statTotalCount',
+      statsUnassignedSelector: '#statUnassignedCount',
+      statsProgressBarSelector: '#statProgressBar',
+      statsPercentSelector: '#statPercent',
+      statsOvercapacityBadgeSelector: '#statOvercapacityBadge',
+      searchInputSelector: '#searchGuestsInput'
     });
 
-    // Botón Añadir Mesa
-    document.getElementById('btnAddTableBtn').addEventListener('click', () => {
-      const tableCount = planner.state.tables.length + 1;
-      planner.addTable(`Mesa ${tableCount}`, 8);
-    });
-
-    // Botón Restablecer
-    document.getElementById('btnResetSeatingBtn').addEventListener('click', () => {
-      planner.state.guests.forEach(g => g.tableId = null);
-      planner.updateStateAndDOM();
+    // Botón Nueva Mesa
+    document.getElementById('btnAddNewTable').addEventListener('click', () => {
+      const type = planner.state.tables.length % 2 === 0 ? 'circular' : 'imperial';
+      planner.addTable('Mesa', type, 8);
     });
   </script>
 </body>
