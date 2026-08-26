@@ -1,0 +1,26 @@
+{
+  "label": "v6.3_multiplane_parallax_precision_positioning",
+  "timestamp": "2026-08-26T01:32:21.155Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 111707
+    },
+    {
+      "filename": "index.html",
+      "size": 84555
+    },
+    {
+      "filename": "app.js",
+      "size": 81399
+    },
+    {
+      "filename": "style.css",
+      "size": 12175
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
