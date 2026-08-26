@@ -1,0 +1,26 @@
+{
+  "label": "v2.19_option_b_logistical_folio_implemented",
+  "timestamp": "2026-08-26T20:27:45.081Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 172829
+    },
+    {
+      "filename": "index.html",
+      "size": 69736
+    },
+    {
+      "filename": "app.js",
+      "size": 97840
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

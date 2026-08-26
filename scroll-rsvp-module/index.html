@@ -482,7 +482,26 @@
                 const nombre = document.getElementById('nombre').value || 'Invitado de Honor';
                 const pases = document.getElementById('pases').value || '1';
                 const asistencia = document.getElementById('asistencia').value;
-                const folio = 'PASS-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+                // Folio Logístico Opción B: [MESA]-[APELLIDO]-[PASES] (ej: M03-MARTINEZ-4P)
+                let mesaCode = 'MGEN';
+                const matched = buscarInvitadoEnStorage(guestParam || nombre);
+                if (matched) {
+                    if (matched.court || matched.vip || matched.tableId === 'tbl_imperial' || String(matched.tableId).includes('imp')) {
+                        mesaCode = 'MIMP';
+                    } else if (matched.tableId || matched.table) {
+                        const mMatch = String(matched.tableId || matched.table).match(/\d+/);
+                        if (mMatch) mesaCode = 'M' + mMatch[0].padStart(2, '0');
+                    }
+                }
+                const cleanTokens = nombre
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-zA-Z0-9\s]/g, '')
+                    .trim()
+                    .split(/\s+/)
+                    .filter(w => !['FAMILIA', 'FAM', 'SR', 'SRA', 'DR', 'DRA', 'ING', 'LIC', 'DON', 'DONA', 'DE', 'DEL', 'LA', 'LAS', 'LOS', 'Y'].includes(w.toUpperCase()));
+                const apellidoCode = cleanTokens.length > 0 ? cleanTokens[0].toUpperCase().substring(0, 10) : 'INVITADO';
+                const folio = `${mesaCode}-${apellidoCode}-${pases}P`;
 
                 guardarRespuestaEnStorage(nombre, pases, asistencia);
 

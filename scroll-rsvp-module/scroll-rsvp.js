@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ============================================================================
  * ScrollRsvpController — Formulario RSVP en Pergamino Desplegable & Detección URL
  * Entorno Antigravity · Invitta Studio
@@ -333,7 +333,7 @@ class ScrollRsvpController {
     const diet = document.getElementById('scrollGuestDiet')?.value || 'none';
     const message = (document.getElementById('scrollGuestMessage')?.value || '').trim();
     const confirmedPasses = this.attendance === 'yes' ? this.selectedPasses : 0;
-    const folio = 'PASS-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const folio = this.generateLogisticalFolio(guestName, confirmedPasses || this.selectedPasses);
 
     const responsePayload = {
       folio: folio,
@@ -377,6 +377,36 @@ class ScrollRsvpController {
           : `Has declinado la asistencia. Agradecemos tu aviso.`;
       }
     }
+  }
+
+  generateLogisticalFolio(guestName, passesCount = 1) {
+    let tableCode = 'MGEN';
+    if (this.currentGuest) {
+      if (this.currentGuest.isCourt || this.currentGuest.isImperial || this.currentGuest.tableId === 'tbl_imperial') {
+        tableCode = 'MIMP';
+      } else if (this.currentGuest.tableId || this.currentGuest.table) {
+        const tStr = String(this.currentGuest.tableId || this.currentGuest.table);
+        const match = tStr.match(/\d+/);
+        if (match) tableCode = 'M' + match[0].padStart(2, '0');
+      }
+    }
+
+    let nameCode = 'INVITADO';
+    if (guestName) {
+      const rawTokens = guestName
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9\s]/g, '')
+        .trim()
+        .split(/\s+/)
+        .filter(w => !['FAMILIA', 'FAM', 'SR', 'SRA', 'DR', 'DRA', 'ING', 'LIC', 'DON', 'DONA', 'DE', 'DEL', 'LA', 'LAS', 'LOS', 'Y'].includes(w.toUpperCase()));
+      
+      if (rawTokens.length > 0) {
+        nameCode = rawTokens[0].toUpperCase().substring(0, 10);
+      }
+    }
+
+    const passesCode = `${passesCount || 1}P`;
+    return `${tableCode}-${nameCode}-${passesCode}`;
   }
 }
 

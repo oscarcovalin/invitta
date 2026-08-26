@@ -1,4 +1,4 @@
-﻿const ScrollRsvpController = require('./scroll-rsvp-module/scroll-rsvp.js');
+const ScrollRsvpController = require('./scroll-rsvp-module/scroll-rsvp.js');
 
 let passed = 0;
 let failed = 0;
@@ -39,6 +39,18 @@ assert(controller.selectedPasses === 1, 'Default passes starts at 1 in open mode
 const dynamicGuest = controller.detectGuestFromUrl('Roberto Silva');
 assert(controller.mode === 'personalized', 'Personalizes when full string name is passed in URL');
 assert(controller.currentGuest.nombre === 'Roberto Silva', 'Decodes dynamic name from URL');
+
+// 5. Option B Logistical Folio Generation (Mesa + Apellido + Pases)
+controller.setPersonalizedMode(guest1); // Camila Ortiz (Court / Imperial)
+const folioCamila = controller.generateLogisticalFolio(guest1.nombre, 2);
+assert(folioCamila === 'MIMP-ORTIZ-2P', `Generates MIMP-ORTIZ-2P for Camila Ortiz (got ${folioCamila})`);
+
+controller.setPersonalizedMode(guest2); // Familia Martínez
+const folioMartinez = controller.generateLogisticalFolio(guest2.nombre, 4);
+assert(folioMartinez.endsWith('-MARTINEZ-4P'), `Generates *-MARTINEZ-4P for Familia Martínez (got ${folioMartinez})`);
+
+const customFolio = controller.generateLogisticalFolio('Dr. Carlos Valenzuela', 2);
+assert(customFolio.includes('VALENZUELA-2P'), `Generates *-VALENZUELA-2P (got ${customFolio})`);
 
 console.log(`\nResults: ${passed} passed, ${failed} failed.\n`);
 if (failed > 0) process.exit(1);
