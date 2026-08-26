@@ -1,0 +1,26 @@
+{
+  "label": "pre-restore-safety",
+  "timestamp": "2026-08-26T13:32:52.373Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 142636
+    },
+    {
+      "filename": "index.html",
+      "size": 99536
+    },
+    {
+      "filename": "app.js",
+      "size": 89401
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
