@@ -29,6 +29,7 @@ gm.setMasterPin('2027'); // Restore default
 
 // 2. Roles y Detección
 assert(gm.getCurrentRole('admin') === 'admin', 'Identifies Admin / Novios role');
+assert(gm.getCurrentRole('designer') === 'designer', 'Identifies Designer role');
 assert(gm.getCurrentRole('planner') === 'planner', 'Identifies Planner / Organizador role');
 assert(gm.getCurrentRole('hostess') === 'hostess', 'Identifies Hostess role');
 assert(gm.getCurrentRole('catering') === 'catering', 'Identifies Catering role');
@@ -39,6 +40,14 @@ assert(gm.canPerformAction('edit_invitation_design', 'admin') === true, 'Admin C
 assert(gm.canPerformAction('reset_database', 'admin') === true, 'Admin CAN reset database');
 assert(gm.canPerformAction('manage_tables', 'admin') === true, 'Admin CAN manage tables');
 assert(gm.canPerformAction('view_timeline', 'admin') === true, 'Admin CAN view timeline');
+
+// Designer (Diseñador Gráfico de Invitación) - Creativo Aislado
+assert(gm.canPerformAction('edit_invitation_design', 'designer') === true, 'Designer CAN edit invitation design');
+assert(gm.canPerformAction('export_invitation_html', 'designer') === true, 'Designer CAN export invitation HTML');
+assert(gm.canPerformAction('manage_tables', 'designer') === false, 'Designer CANNOT manage floor plan tables (Protected)');
+assert(gm.canPerformAction('view_guest_phones', 'designer') === false, 'Designer CANNOT view guest phone numbers (Protected)');
+assert(gm.canPerformAction('reset_database', 'designer') === false, 'Designer CANNOT reset database (Protected)');
+assert(gm.canPerformAction('scan_access_qr', 'designer') === false, 'Designer CANNOT scan access QR (Protected)');
 
 // Planner (Organizador) - Operativo Limitado
 assert(gm.canPerformAction('edit_invitation_design', 'planner') === false, 'Planner CANNOT edit invitation design (Protected)');
@@ -60,22 +69,30 @@ assert(gm.canPerformAction('manage_tables', 'catering') === false, 'Catering CAN
 
 // 4. Generación de Enlaces de Delegación
 const links = gm.getDelegationLinks('http://localhost:3000/');
+assert(links.designer.url.includes('role=designer'), `Designer link has ?role=designer (${links.designer.url})`);
 assert(links.planner.url.includes('role=planner'), `Planner link has ?role=planner (${links.planner.url})`);
 assert(links.hostess.url.includes('scanner-acceso.html'), `Hostess link leads to scanner-acceso.html (${links.hostess.url})`);
 assert(links.emergency.url.includes('generador-emergencia.html'), `Emergency link leads to generador-emergencia.html (${links.emergency.url})`);
 assert(links.catering.url.includes('catering-tactical-sheet.html'), `Catering link leads to tactical sheet (${links.catering.url})`);
 
-// 5. Integración en index.html y portal.html
+// 5. Integración en index.html, portal.html y invitacion-estudio.html
 const indexHtml = fs.readFileSync('./index.html', 'utf-8');
 assert(indexHtml.includes('badgeRoleAdmin'), 'index.html contains badgeRoleAdmin');
 assert(indexHtml.includes('badgeRolePlanner'), 'index.html contains badgeRolePlanner');
 assert(indexHtml.includes('sidebarPrivateBrideLinks'), 'index.html contains sidebarPrivateBrideLinks');
 assert(indexHtml.includes('modalShareAccess'), 'index.html contains modalShareAccess');
+assert(indexHtml.includes('btnWaDesigner'), 'index.html contains btnWaDesigner in modalShareAccess');
 assert(indexHtml.includes('modalUnlockAdmin'), 'index.html contains modalUnlockAdmin');
 assert(indexHtml.includes('applyRoleInterface'), 'index.html has applyRoleInterface function');
 
+const studioHtml = fs.readFileSync('./invitacion-estudio.html', 'utf-8');
+assert(studioHtml.includes('designerRoleBadge'), 'invitacion-estudio.html contains designerRoleBadge');
+assert(studioHtml.includes('adminNavigationLinks'), 'invitacion-estudio.html contains adminNavigationLinks');
+assert(studioHtml.includes('role === \'designer\''), 'invitacion-estudio.html contains designer isolation script');
+
 const portalHtml = fs.readFileSync('./portal.html', 'utf-8');
 assert(portalHtml.includes('index.html?role=planner'), 'portal.html contains direct card for Wedding Planner (?role=planner)');
+assert(portalHtml.includes('invitacion-estudio.html?role=designer'), 'portal.html contains direct card for Designer (?role=designer)');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed.\n`);
 if (failed > 0) process.exit(1);

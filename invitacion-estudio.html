@@ -30,15 +30,23 @@
     <div class="header-actions">
       <input type="file" id="jsonFileInput" accept=".json" style="display:none;">
       
-      <a href="portal.html" class="btn btn-secondary" title="Ir al Portal de Módulos">
-        <span class="material-symbols-outlined">apps</span>
-        Portal
-      </a>
+      <!-- Badge de Rol Diseñador -->
+      <div id="designerRoleBadge" style="display:none; align-items:center; gap:6px; padding:6px 12px; background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.4); border-radius:10px; font-size:11px; font-weight:700; color:#D4AF37; letter-spacing:0.05em;">
+        <span>🎨 MODO DISEÑADOR CREATIVO</span>
+      </div>
 
-      <a href="index.html" class="btn btn-secondary" style="background:#163C2B; color:#C7B299; border-color:#A38047;" title="Ir al Organizador de Mesas y Centro de Envíos">
-        <span class="material-symbols-outlined">table_restaurant</span>
-        Organizador de Mesas ➔
-      </a>
+      <!-- Enlaces Master / Salón (Ocultos en Modo Diseñador) -->
+      <div id="adminNavigationLinks" style="display:inline-flex; align-items:center; gap:8px;">
+        <a href="portal.html" class="btn btn-secondary" title="Ir al Portal de Módulos">
+          <span class="material-symbols-outlined">apps</span>
+          Portal
+        </a>
+
+        <a href="index.html" class="btn btn-secondary" style="background:#163C2B; color:#C7B299; border-color:#A38047;" title="Ir al Organizador de Mesas y Centro de Envíos">
+          <span class="material-symbols-outlined">table_restaurant</span>
+          Organizador de Mesas ➔
+        </a>
+      </div>
 
       <button type="button" class="btn btn-secondary" id="btnImportJson" title="Cargar proyecto guardado (.json)">
         <span class="material-symbols-outlined">upload_file</span>
@@ -1757,5 +1765,20 @@
   <script src="decor-assets.js"></script>
   <script src="template-engine.js"></script>
   <script src="app.js"></script>
+  <script>
+    // =========================================================================
+    // AISLAMIENTO DE ROL: DISEÑADOR CREATIVO (role=designer)
+    // =========================================================================
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const role = params.get('role');
+      if (role === 'designer') {
+        const adminLinks = document.getElementById('adminNavigationLinks');
+        const badge = document.getElementById('designerRoleBadge');
+        if (adminLinks) adminLinks.style.display = 'none';
+        if (badge) badge.style.display = 'inline-flex';
+      }
+    })();
+  </script>
 </body>
 </html>

@@ -731,7 +731,7 @@ class GuestManager {
   }
 
   setActiveRole(role) {
-    const validRoles = ['admin', 'planner', 'hostess', 'catering'];
+    const validRoles = ['admin', 'designer', 'planner', 'hostess', 'catering'];
     const targetRole = validRoles.includes(role) ? role : 'admin';
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem('invitta_active_role', targetRole);
@@ -744,16 +744,20 @@ class GuestManager {
     
     const permissions = {
       // Exclusivo Novios / Admin Master
-      edit_invitation_design: ['admin'],
       reset_database: ['admin'],
       modify_event_settings: ['admin'],
       view_master_financials: ['admin'],
+
+      // Creativo: Novios y Diseñador Gráfico de Invitaciones
+      edit_invitation_design: ['admin', 'designer'],
+      export_invitation_html: ['admin', 'designer'],
 
       // Operativo Permitido para Organizador / Wedding Planner
       manage_tables: ['admin', 'planner'],
       edit_guest_assignment: ['admin', 'planner'],
       dispatch_whatsapp: ['admin', 'planner'],
-      view_timeline: ['admin', 'planner', 'hostess', 'catering'],
+      view_guest_phones: ['admin', 'planner'],
+      view_timeline: ['admin', 'designer', 'planner', 'hostess', 'catering'],
       view_catering: ['admin', 'planner', 'catering'],
       scan_access_qr: ['admin', 'planner', 'hostess'],
       create_emergency_pass: ['admin', 'planner', 'hostess'],
@@ -772,6 +776,13 @@ class GuestManager {
     }
 
     return {
+      designer: {
+        role: 'designer',
+        title: 'Diseñador de Invitación',
+        badge: '🎨 Creativo / Diseño',
+        url: `${base}invitacion-estudio.html?role=designer`,
+        description: 'Acceso exclusivo al Estudio de Invitación para personalizar fotos, música, historia, tipografías y temas (sin acceso al plano de mesas ni teléfonos).'
+      },
       planner: {
         role: 'planner',
         title: 'Organizador / Wedding Planner',
