@@ -1,0 +1,26 @@
+{
+  "label": "v2.08_simplified_invitations_no_individual_names",
+  "timestamp": "2026-08-26T18:57:10.864Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158441
+    },
+    {
+      "filename": "index.html",
+      "size": 59900
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

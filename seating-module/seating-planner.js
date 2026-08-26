@@ -35,27 +35,12 @@ class SeatingPlanner {
 
   getDefaultGuests() {
     return [
-      // Familia Martínez (Bloque de 4)
-      { id: 'g_1', name: 'Carlos Martínez', familyKey: 'martinez', familyTitle: 'Familia Martínez', pases: 1, tableId: null, vip: false, diet: 'none', tag: '' },
-      { id: 'g_2', name: 'Elena Valdés', familyKey: 'martinez', familyTitle: 'Familia Martínez', pases: 1, tableId: null, vip: false, diet: 'vegetarian', tag: 'Veg' },
-      { id: 'g_3', name: 'Sofía M. (Niño)', familyKey: 'martinez', familyTitle: 'Familia Martínez', pases: 1, tableId: null, vip: false, diet: 'kids', tag: 'Silla' },
-      { id: 'g_4', name: 'Mateo Martínez (Niño)', familyKey: 'martinez', familyTitle: 'Familia Martínez', pases: 1, tableId: null, vip: false, diet: 'kids', tag: 'Menú Niño' },
-
-      // Hermanos López (Bloque de 2)
-      { id: 'g_5', name: 'Andrés López', familyKey: 'lopez', familyTitle: 'Hermanos López', pases: 1, tableId: null, vip: false, diet: 'none', tag: '' },
-      { id: 'g_6', name: 'Laura López', familyKey: 'lopez', familyTitle: 'Hermanos López', pases: 1, tableId: null, vip: false, diet: 'gluten_free', tag: 'Sin Gluten' },
-
-      // Familia Valenzuela (Bloque de 3)
-      { id: 'g_7', name: 'Dr. Carlos Valenzuela', familyKey: 'valenzuela', familyTitle: 'Familia Valenzuela', pases: 1, tableId: null, vip: false, diet: 'none', tag: '' },
-      { id: 'g_8', name: 'Sofía de Valenzuela', familyKey: 'valenzuela', familyTitle: 'Familia Valenzuela', pases: 1, tableId: null, vip: false, diet: 'none', tag: '' },
-      { id: 'g_9', name: 'Carlos Jr. Valenzuela', familyKey: 'valenzuela', familyTitle: 'Familia Valenzuela', pases: 1, tableId: null, vip: false, diet: 'none', tag: '' },
-
-      // VIP Singles (Padrinos & Corte de Honor)
-      { id: 'g_10', name: 'Sr. Fernando Silva', familyKey: '', familyTitle: '', pases: 1, tableId: null, vip: true, court: false, diet: 'none', tag: 'Padrino de Velación' },
-      { id: 'g_11', name: 'Camila Ortiz', familyKey: '', familyTitle: '', pases: 1, tableId: 'tbl_imperial', vip: true, court: true, diet: 'none', tag: 'Dama de Honor' },
-      { id: 'g_12', name: 'Diego Fuentes', familyKey: '', familyTitle: '', pases: 1, tableId: 'tbl_imperial', vip: true, court: true, diet: 'none', tag: 'Best Man' },
-      { id: 'g_13', name: 'Renata Vega', familyKey: '', familyTitle: '', pases: 1, tableId: null, vip: true, court: true, diet: 'celiac', tag: 'Dama de Honor' },
-      { id: 'g_14', name: 'Lucía Fernández', familyKey: '', familyTitle: '', pases: 1, tableId: null, vip: false, court: false, diet: 'vegan', tag: 'Vegana' }
+      { id: 'g_martinez', name: 'Familia Martínez Valdés', pases: 4, passes: 4, tableId: null, vip: false, court: false, phone: '+52 55 1234 5678', tag: '1 Menú Vegano, 1 Silla' },
+      { id: 'g_lopez', name: 'Hermanos López', pases: 2, passes: 2, tableId: null, vip: false, court: false, phone: '+52 55 8765 4321', tag: 'Sin Gluten' },
+      { id: 'g_valenzuela', name: 'Familia Valenzuela', pases: 3, passes: 3, tableId: null, vip: false, court: false, phone: '+52 55 9988 7766', tag: '' },
+      { id: 'g_silva', name: 'Sr. Fernando Silva & Acompañante', pases: 2, passes: 2, tableId: null, vip: true, court: false, phone: '+52 55 3344 5566', tag: 'Padrino de Velación' },
+      { id: 'g_ortiz', name: 'Camila Ortiz & Acompañante', pases: 2, passes: 2, tableId: 'tbl_imperial', vip: true, court: true, phone: '+52 55 5566 7788', tag: 'Dama de Honor' },
+      { id: 'g_fuentes', name: 'Diego Fuentes', pases: 1, passes: 1, tableId: 'tbl_imperial', vip: true, court: true, phone: '+52 55 6677 8899', tag: 'Best Man' }
     ];
   }
 
@@ -118,61 +103,18 @@ class SeatingPlanner {
       .trim();
   }
 
-  extractFamilyKey(fullName) {
-    let clean = this.normalizeText(fullName);
-    clean = clean.replace(/\b(dr|dra|ing|lic|arq|prof|profa|sr|sra|srta)\.?\s+/g, '');
-    const deMatch = clean.match(/\bde\s+(la\s+|los\s+|las\s+|del\s+)?([a-z]+)/);
-    if (deMatch && deMatch[2]) return deMatch[2];
-    const parts = clean.split(/\s+/).filter(p => !['de', 'del', 'la', 'las', 'los', 'y', 'e'].includes(p));
-    return parts.length >= 2 ? parts[parts.length - 1] : clean;
-  }
-
-  getGroupedUnassignedGuests() {
+  getUnassignedGuests() {
     let unassigned = this.state.guests.filter(g => !g.tableId);
 
-    // Filtrar por término de búsqueda si existe
     if (this.searchQuery) {
       const q = this.normalizeText(this.searchQuery);
       unassigned = unassigned.filter(g => 
         this.normalizeText(g.name).includes(q) || 
-        this.normalizeText(g.familyTitle).includes(q) ||
         this.normalizeText(g.tag).includes(q)
       );
     }
 
-    const groupsMap = new Map();
-
-    unassigned.forEach(guest => {
-      const key = guest.familyKey || this.extractFamilyKey(guest.name);
-      if (guest.familyTitle || key) {
-        if (!groupsMap.has(key)) groupsMap.set(key, []);
-        groupsMap.get(key).push(guest);
-      } else {
-        if (!groupsMap.has(guest.id)) groupsMap.set(guest.id, [guest]);
-      }
-    });
-
-    const items = [];
-    groupsMap.forEach((members, key) => {
-      if (members.length >= 2) {
-        const rawSurname = members[0].name.split(/\s+/).pop();
-        const title = members[0].familyTitle || `Familia ${rawSurname.charAt(0).toUpperCase() + rawSurname.slice(1)}`;
-        items.push({
-          type: 'family',
-          familyKey: key,
-          title: title,
-          members: members,
-          totalPases: members.reduce((acc, m) => acc + (m.pases || 1), 0)
-        });
-      } else {
-        items.push({
-          type: 'single',
-          guest: members[0]
-        });
-      }
-    });
-
-    return items;
+    return unassigned;
   }
 
   assignGuestToTable(guestId, targetTableId) {
@@ -234,131 +176,64 @@ class SeatingPlanner {
   }
 
   /**
-   * Renderizado de la lista izquierda con el diseño Haute-Couture
+   * Renderizado de la lista izquierda: SOLO NOMBRE DE INVITACIÓN & NÚMERO DE PASES
    */
   renderUnassignedList() {
     if (typeof document === 'undefined') return;
     const container = document.querySelector(this.options.unassignedListSelector);
     if (!container) return;
 
-    const groupedItems = this.getGroupedUnassignedGuests();
+    const unassigned = this.getUnassignedGuests();
 
-    if (groupedItems.length === 0) {
+    if (unassigned.length === 0) {
       container.innerHTML = `
         <div class="text-center py-16 px-4 text-on-surface-variant select-none">
           <span class="material-symbols-outlined text-4xl mb-3 text-secondary block opacity-70">task_alt</span>
           <p class="font-headline-lg-mobile text-primary text-base">Todos Asignados</p>
-          <p class="font-label-sm text-warm-grey mt-1">No hay invitados pendientes en este momento.</p>
+          <p class="font-label-sm text-warm-grey mt-1">No hay invitaciones pendientes en este momento.</p>
         </div>
       `;
       return;
     }
 
-    container.innerHTML = groupedItems.map(item => {
-      if (item.type === 'family') {
-        // BLOQUE FAMILIAR REDISEÑADO
-        const memberIdsJson = JSON.stringify(item.members.map(m => m.id)).replace(/"/g, '&quot;');
-        return `
-          <div class="border border-outline-variant rounded-lg overflow-hidden bg-surface transition-all hover:border-charcoal group mb-5 select-none"
-            draggable="true"
-            data-drag-type="family"
-            data-family-ids="${memberIdsJson}">
-            
-            <!-- Encabezado Familia Draggable -->
-            <div class="bg-surface-container px-4 py-3 flex items-center justify-between cursor-grab active:cursor-grabbing border-b border-outline-variant">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-on-surface-variant font-light text-[18px]">drag_indicator</span>
-                <span class="font-body-lg text-primary font-medium">${item.title}</span>
-              </div>
-              <span class="bg-surface-container-high text-on-surface font-label-caps px-3 py-1 rounded-lg border border-outline-variant font-semibold">
-                ${item.members.length}
-              </span>
-            </div>
+    container.innerHTML = unassigned.map(g => {
+      const passes = g.pases || g.passes || 1;
+      const isVip = g.vip || g.court;
 
-            <!-- Integrantes -->
-            <div class="p-3 space-y-2">
-              ${item.members.map(m => `
-                <div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-lowest hover:bg-surface-container transition-colors cursor-grab active:cursor-grabbing border border-outline-variant"
-                  draggable="true"
-                  data-drag-type="single"
-                  data-guest-id="${m.id}">
-                  
-                  <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-on-surface-variant font-light text-[16px]">drag_indicator</span>
-                    <span class="font-body-md text-on-surface">${m.name}</span>
-                  </div>
-                  
-                  <div class="flex items-center gap-1.5">
-                    ${m.tag ? `
-                      <span class="font-label-sm text-warm-grey uppercase tracking-widest px-2 py-0.5 rounded bg-surface-container border border-outline-variant text-[10px]" title="${m.tag}">
-                        ${m.tag}
-                      </span>
-                    ` : ''}
-                    <button type="button" class="btn-guest-card-edit p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors text-xs" title="Editar invitado" data-id="${m.id}">
-                      <span class="material-symbols-outlined text-[14px]">edit</span>
-                    </button>
-                  </div>
+      return `
+        <div class="border ${isVip ? 'border-brushed-champagne bg-amber-500/5' : 'border-outline-variant bg-surface'} rounded-xl overflow-hidden hover:border-charcoal transition-all mb-3 select-none cursor-grab active:cursor-grabbing shadow-sm group"
+          draggable="true"
+          data-drag-type="single"
+          data-guest-id="${g.id}">
+          
+          <div class="p-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-on-surface-variant font-light text-[18px]">drag_indicator</span>
+              <div class="flex flex-col gap-0.5">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-body-lg text-primary font-medium text-sm">${g.name}</span>
+                  ${isVip ? `<span class="material-symbols-outlined text-brushed-champagne text-[15px]" title="VIP / Corte">star</span>` : ''}
                 </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      } else {
-        // INVITADO INDIVIDUAL (VIP o Regular)
-        const g = item.guest;
-        const isVip = g.vip || g.court;
-        
-        if (isVip) {
-          return `
-            <div class="border border-brushed-champagne rounded-lg overflow-hidden bg-surface transition-all hover:border-charcoal group mb-4 select-none cursor-grab active:cursor-grabbing shadow-sm"
-              draggable="true"
-              data-drag-type="single"
-              data-guest-id="${g.id}">
-              
-              <div class="p-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-brushed-champagne font-light text-[18px]">drag_indicator</span>
-                  <div class="flex flex-col gap-0.5">
-                    <span class="font-body-lg text-primary font-medium">${g.name}</span>
-                    <span class="font-label-caps text-on-surface-variant text-[10px] tracking-wider">${g.tag || 'Corte de Honor'}</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button type="button" class="btn-guest-card-edit p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors text-xs" title="Editar invitado" data-id="${g.id}">
-                    <span class="material-symbols-outlined text-[15px]">edit</span>
-                  </button>
-                  <span class="material-symbols-outlined text-brushed-champagne font-light text-[20px]">star</span>
-                </div>
-              </div>
-            </div>
-          `;
-        }
-
-        return `
-          <div class="border border-outline-variant rounded-lg overflow-hidden bg-surface transition-all hover:border-charcoal group mb-3 select-none cursor-grab active:cursor-grabbing"
-            draggable="true"
-            data-drag-type="single"
-            data-guest-id="${g.id}">
-            
-            <div class="p-3.5 flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-on-surface-variant font-light text-[16px]">drag_indicator</span>
-                <span class="font-body-md text-on-surface">${g.name}</span>
-              </div>
-              <div class="flex items-center gap-2">
                 ${g.tag ? `
-                  <span class="font-label-sm text-warm-grey uppercase tracking-widest text-[10px] px-2 py-0.5 bg-surface-container rounded border border-outline-variant">
-                    ${g.tag}
-                  </span>
+                  <span class="font-label-caps text-on-surface-variant text-[10px] tracking-wider">${g.tag}</span>
                 ` : ''}
-                <button type="button" class="btn-guest-card-edit p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors text-xs" title="Editar invitado" data-id="${g.id}">
-                  <span class="material-symbols-outlined text-[14px]">edit</span>
-                </button>
               </div>
             </div>
+
+            <div class="flex items-center gap-2">
+              <!-- Insignia con el Número de Pases -->
+              <span class="px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline-variant font-mono font-bold text-xs text-primary">
+                ${passes} ${passes === 1 ? 'pase' : 'pases'}
+              </span>
+
+              <!-- Botón Editar Invitado / Familia -->
+              <button type="button" class="btn-guest-card-edit p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors" title="Editar datos" data-id="${g.id}">
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+              </button>
+            </div>
           </div>
-        `;
-      }
+        </div>
+      `;
     }).join('');
 
     container.querySelectorAll('.btn-guest-card-edit').forEach(btn => {
@@ -386,9 +261,18 @@ class SeatingPlanner {
 
     container.innerHTML = this.state.tables.map(table => {
       const assigned = this.state.guests.filter(g => g.tableId === table.id);
-      const count = assigned.length;
-      const isOver = count > table.capacity;
-      const overCount = count - table.capacity;
+      const totalPasses = assigned.reduce((sum, g) => sum + (g.pases || g.passes || 1), 0);
+      const isOver = totalPasses > table.capacity;
+      const overCount = totalPasses - table.capacity;
+
+      // Expandir asientos por número de pases de cada invitación
+      const seatedSlots = [];
+      assigned.forEach(g => {
+        const passes = g.pases || g.passes || 1;
+        for (let p = 1; p <= passes; p++) {
+          seatedSlots.push({ guest: g, passNumber: p, totalPasses: passes });
+        }
+      });
 
       // Estilo de Sobrecupo Elegante (#A38047)
       const overBorderClass = isOver ? 'border-[#A38047] shadow-[0_0_25px_rgba(163,128,71,0.25)] ring-1 ring-[#A38047]' : 'border-outline-variant';
@@ -397,8 +281,8 @@ class SeatingPlanner {
       if (isImperial) {
         // ==================== MESA IMPERIAL (RECTANGULAR) ====================
         const half = Math.ceil(table.capacity / 2);
-        const topAssigned = assigned.slice(0, half);
-        const botAssigned = assigned.slice(half);
+        const topAssigned = seatedSlots.slice(0, half);
+        const botAssigned = seatedSlots.slice(half);
 
         return `
           <div class="table-card-dropzone relative group mb-14 mx-auto max-w-[560px]"
@@ -410,14 +294,17 @@ class SeatingPlanner {
               <!-- Asientos Superiores -->
               <div class="absolute -top-4 w-full flex justify-around px-8">
                 ${Array.from({ length: half }).map((_, i) => {
-                  const guest = topAssigned[i];
-                  if (guest) {
-                    const initials = guest.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                  const slot = topAssigned[i];
+                  if (slot) {
+                    const g = slot.guest;
+                    const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
+                    const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
+                    const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
                     return `
-                      <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${guest.vip || guest.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-pointer text-label-sm font-semibold shadow-sm transition-transform hover:scale-110"
-                        title="${guest.name} (Clic para quitar)"
-                        data-guest-id="${guest.id}">
-                        ${initials}
+                      <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-pointer text-[10px] font-mono font-bold shadow-sm transition-transform hover:scale-110"
+                        title="${g.name} (Pase ${slot.passNumber} de ${slot.totalPasses} · Clic para quitar)"
+                        data-guest-id="${g.id}">
+                        ${label}
                       </div>
                     `;
                   }
@@ -432,14 +319,17 @@ class SeatingPlanner {
               <!-- Asientos Inferiores -->
               <div class="absolute -bottom-4 w-full flex justify-around px-8">
                 ${Array.from({ length: half }).map((_, i) => {
-                  const guest = botAssigned[i];
-                  if (guest) {
-                    const initials = guest.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                  const slot = botAssigned[i];
+                  if (slot) {
+                    const g = slot.guest;
+                    const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
+                    const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
+                    const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
                     return `
-                      <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${guest.vip || guest.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-pointer text-label-sm font-semibold shadow-sm transition-transform hover:scale-110"
-                        title="${guest.name} (Clic para quitar)"
-                        data-guest-id="${guest.id}">
-                        ${initials}
+                      <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-pointer text-[10px] font-mono font-bold shadow-sm transition-transform hover:scale-110"
+                        title="${g.name} (Pase ${slot.passNumber} de ${slot.totalPasses} · Clic para quitar)"
+                        data-guest-id="${g.id}">
+                        ${label}
                       </div>
                     `;
                   }
@@ -459,7 +349,7 @@ class SeatingPlanner {
                 <div class="mt-3 flex items-center gap-4 text-label-caps text-on-surface-variant">
                   <span class="flex items-center gap-1.5 font-mono text-xs ${isOver ? 'text-[#A38047] font-bold' : ''}">
                     <span class="material-symbols-outlined font-light text-[16px]">group</span>
-                    ${count} / ${table.capacity} ${isOver ? `(+${overCount} sobrecupo)` : ''}
+                    ${totalPasses} / ${table.capacity} pases ${isOver ? `(+${overCount} sobrecupo)` : ''}
                   </span>
                   ${table.id === 'tbl_imperial' ? `
                     <span class="flex items-center gap-1 text-brushed-champagne font-semibold">
@@ -479,7 +369,7 @@ class SeatingPlanner {
         `;
       } else {
         // ==================== MESA CIRCULAR ====================
-        const seatSlots = Math.max(table.capacity, count);
+        const seatSlots = Math.max(table.capacity, seatedSlots.length);
         const radius = 95; // Radio en px
 
         return `
@@ -494,16 +384,19 @@ class SeatingPlanner {
                 const angle = (i / seatSlots) * 2 * Math.PI - Math.PI / 2;
                 const x = Math.round(radius * Math.cos(angle));
                 const y = Math.round(radius * Math.sin(angle));
-                const guest = assigned[i];
+                const slot = seatedSlots[i];
 
-                if (guest) {
-                  const initials = guest.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                if (slot) {
+                  const g = slot.guest;
+                  const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
+                  const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
+                  const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
                   return `
-                    <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${guest.vip || guest.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-pointer text-label-sm font-semibold shadow-sm transition-transform hover:scale-110 absolute"
+                    <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-pointer text-[10px] font-mono font-bold shadow-sm transition-transform hover:scale-110 absolute"
                       style="left: calc(50% + ${x}px - 16px); top: calc(50% + ${y}px - 16px);"
-                      title="${guest.name} (Clic para quitar)"
-                      data-guest-id="${guest.id}">
-                      ${initials}
+                      title="${g.name} (Pase ${slot.passNumber} de ${slot.totalPasses} · Clic para quitar)"
+                      data-guest-id="${g.id}">
+                      ${label}
                     </div>
                   `;
                 }
@@ -521,7 +414,7 @@ class SeatingPlanner {
                 <span class="font-headline-lg text-primary tracking-widest">${table.name}</span>
                 
                 <div class="mt-2 flex items-center gap-1 font-label-caps text-on-surface-variant bg-surface px-3 py-1 rounded-lg border ${isOver ? 'border-[#A38047] text-[#A38047] font-bold' : 'border-outline-variant'}">
-                  ${count} / ${table.capacity} ${isOver ? `(+${overCount})` : ''}
+                  ${totalPasses} / ${table.capacity} pases ${isOver ? `(+${overCount})` : ''}
                 </div>
               </div>
 
@@ -540,30 +433,30 @@ class SeatingPlanner {
   }
 
   /**
-   * Renderizado de la barra de estadísticas superior
+   * Renderizado de la barra de estadísticas superior (por número total de pases)
    */
   renderStats() {
     if (typeof document === 'undefined') return;
 
-    const totalGuests = this.state.guests.length;
-    const assignedCount = this.state.guests.filter(g => g.tableId).length;
-    const unassignedCount = totalGuests - assignedCount;
-    const percent = totalGuests > 0 ? Math.round((assignedCount / totalGuests) * 100) : 0;
+    const totalPasses = this.state.guests.reduce((s, g) => s + (g.pases || g.passes || 1), 0);
+    const assignedPasses = this.state.guests.filter(g => g.tableId).reduce((s, g) => s + (g.pases || g.passes || 1), 0);
+    const unassignedPasses = totalPasses - assignedPasses;
+    const percent = totalPasses > 0 ? Math.round((assignedPasses / totalPasses) * 100) : 0;
 
     const overCapacityTables = this.state.tables.filter(table => {
-      const seats = this.state.guests.filter(g => g.tableId === table.id).length;
-      return seats > table.capacity;
+      const passes = this.state.guests.filter(g => g.tableId === table.id).reduce((s, g) => s + (g.pases || g.passes || 1), 0);
+      return passes > table.capacity;
     }).length;
 
     // Actualizar contadores DOM
     const elAssigned = document.querySelector(this.options.statsAssignedCountSelector);
-    if (elAssigned) elAssigned.textContent = assignedCount;
+    if (elAssigned) elAssigned.textContent = assignedPasses;
 
     const elTotal = document.querySelector(this.options.statsTotalCountSelector);
-    if (elTotal) elTotal.textContent = `/ ${totalGuests}`;
+    if (elTotal) elTotal.textContent = `/ ${totalPasses} pases`;
 
     const elUnassigned = document.querySelector(this.options.statsUnassignedSelector);
-    if (elUnassigned) elUnassigned.textContent = unassignedCount;
+    if (elUnassigned) elUnassigned.textContent = unassignedPasses;
 
     const elProgressBar = document.querySelector(this.options.statsProgressBarSelector);
     if (elProgressBar) elProgressBar.style.width = `${percent}%`;
@@ -593,16 +486,9 @@ class SeatingPlanner {
     if (typeof document === 'undefined') return;
     scopeElement.querySelectorAll('[draggable="true"]').forEach(el => {
       el.addEventListener('dragstart', (e) => {
-        const type = el.dataset.dragType;
-        if (type === 'family') {
-          const ids = JSON.parse(el.dataset.familyIds || '[]');
-          this.state.draggedItem = { type: 'family', ids: ids };
-          e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'family', ids: ids }));
-        } else {
-          const guestId = el.dataset.guestId;
-          this.state.draggedItem = { type: 'single', id: guestId };
-          e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'single', id: guestId }));
-        }
+        const guestId = el.dataset.guestId;
+        this.state.draggedItem = { type: 'single', id: guestId };
+        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'single', id: guestId }));
 
         el.classList.add('opacity-40');
         e.dataTransfer.effectAllowed = 'move';
@@ -639,18 +525,14 @@ class SeatingPlanner {
 
         try {
           const payload = JSON.parse(e.dataTransfer.getData('text/plain'));
-          if (payload.type === 'family') {
+          if (payload.type === 'family' && Array.isArray(payload.ids)) {
             this.assignFamilyGroupToTable(payload.ids, tableId);
-          } else if (payload.type === 'single') {
+          } else if (payload.id) {
             this.assignGuestToTable(payload.id, tableId);
           }
         } catch (err) {
-          if (this.state.draggedItem) {
-            if (this.state.draggedItem.type === 'family') {
-              this.assignFamilyGroupToTable(this.state.draggedItem.ids, tableId);
-            } else {
-              this.assignGuestToTable(this.state.draggedItem.id, tableId);
-            }
+          if (this.state.draggedItem && this.state.draggedItem.id) {
+            this.assignGuestToTable(this.state.draggedItem.id, tableId);
           }
         }
       });
@@ -687,16 +569,20 @@ class SeatingPlanner {
       
       try {
         const payload = JSON.parse(e.dataTransfer.getData('text/plain'));
-        if (payload.type === 'single') {
-          this.unassignGuest(payload.id);
-        } else if (payload.type === 'family') {
+        if (payload.type === 'family' && Array.isArray(payload.ids)) {
           payload.ids.forEach(id => this.unassignGuest(id));
+        } else if (payload.id) {
+          this.unassignGuest(payload.id);
         }
-      } catch (err) {}
+      } catch (err) {
+        if (this.state.draggedItem && this.state.draggedItem.id) {
+          this.unassignGuest(this.state.draggedItem.id);
+        }
+      }
     });
   }
 
-  addTable(name = 'Mesa Adicional', type = 'circular', capacity = 8) {
+  addTable(name = 'Mesa', type = 'circular', capacity = 8) {
     const newNumber = this.state.tables.length + 1;
     const newTable = {
       id: 'tbl_' + Date.now() + '_' + Math.random().toString(36).substring(2, 5),
@@ -759,74 +645,48 @@ class SeatingPlanner {
   }
 
   /**
-   * Distribución Automática Inteligente de Invitados
-   * Respeta bloques familiares, corte de honor / VIPs y capacidad por mesa (8, 10 o 12)
+   * Distribución Automática Inteligente de Invitaciones
+   * Respeta cortes de honor / VIPs y capacidad por mesa (8, 10 o 12)
    */
   autoDistributeGuests(options = {}) {
     const capacity = [8, 10, 12].includes(Number(options.capacity)) ? Number(options.capacity) : 8;
     
-    // 1. Unificar capacidades si se solicitó
+    // 1. Unificar capacidades
     this.setCapacityAcrossTables(capacity);
 
-    // 2. Limpiar asignaciones para distribución limpia
+    // 2. Limpiar asignaciones
     this.state.guests.forEach(g => g.tableId = null);
 
-    // 3. Separar grupos
-    const courtOrVips = this.state.guests.filter(g => g.court || g.vip);
-    
-    const familiesMap = {};
-    const singles = [];
+    // 3. Separar VIPs y Regulares
+    const vips = this.state.guests.filter(g => g.court || g.vip);
+    const regulars = this.state.guests.filter(g => !g.court && !g.vip);
 
-    this.state.guests.forEach(g => {
-      if (g.court || g.vip) return;
-      if (g.familyKey && g.familyKey.trim()) {
-        if (!familiesMap[g.familyKey]) {
-          familiesMap[g.familyKey] = [];
-        }
-        familiesMap[g.familyKey].push(g);
-      } else {
-        singles.push(g);
-      }
-    });
-
-    const familyGroups = Object.values(familiesMap);
-
-    // 4. Asignar primero VIPs a Mesa Imperial (o Mesa 1)
+    // 4. Asignar primero VIPs a Mesa Imperial
     const imperialTable = this.state.tables.find(t => t.type === 'imperial') || this.state.tables[0];
     if (imperialTable) {
-      courtOrVips.forEach(g => {
-        const assignedInImperial = this.state.guests.filter(x => x.tableId === imperialTable.id).length;
-        if (assignedInImperial < imperialTable.capacity) {
+      vips.forEach(g => {
+        const currentPasses = this.state.guests
+          .filter(x => x.tableId === imperialTable.id)
+          .reduce((s, x) => s + (x.pases || x.passes || 1), 0);
+        const gPasses = g.pases || g.passes || 1;
+
+        if (currentPasses + gPasses <= imperialTable.capacity) {
           g.tableId = imperialTable.id;
         }
       });
     }
 
-    // 5. Asignar Bloques Familiares en mesas completas sin separarlos
-    familyGroups.forEach(group => {
-      const groupSize = group.length;
-      
-      let bestTable = this.state.tables.find(tbl => {
-        const currentCount = this.state.guests.filter(x => x.tableId === tbl.id).length;
-        return (currentCount + groupSize) <= tbl.capacity;
-      });
+    // 5. Asignar Resto de Invitaciones por Bloques de Pases sin Separar
+    const unassignedRemaining = this.state.guests.filter(g => !g.tableId);
 
-      if (!bestTable) {
-        bestTable = this.addTable('Mesa', 'circular', capacity);
-      }
-
-      group.forEach(g => {
-        g.tableId = bestTable.id;
-      });
-    });
-
-    // 6. Asignar Invitados Individuales y Restantes
-    this.state.guests.forEach(g => {
-      if (g.tableId) return;
+    unassignedRemaining.forEach(g => {
+      const gPasses = g.pases || g.passes || 1;
 
       let bestTable = this.state.tables.find(tbl => {
-        const currentCount = this.state.guests.filter(x => x.tableId === tbl.id).length;
-        return currentCount < tbl.capacity;
+        const currentPasses = this.state.guests
+          .filter(x => x.tableId === tbl.id)
+          .reduce((s, x) => s + (x.pases || x.passes || 1), 0);
+        return (currentPasses + gPasses) <= tbl.capacity;
       });
 
       if (!bestTable) {
@@ -838,9 +698,13 @@ class SeatingPlanner {
 
     this.updateStateAndDOM();
 
+    const totalPasses = this.state.guests.reduce((s, g) => s + (g.pases || g.passes || 1), 0);
+    const assignedPasses = this.state.guests.filter(g => g.tableId).reduce((s, g) => s + (g.pases || g.passes || 1), 0);
+
     return {
       totalGuests: this.state.guests.length,
-      assignedGuests: this.state.guests.filter(g => g.tableId).length,
+      totalPasses: totalPasses,
+      assignedPasses: assignedPasses,
       totalTables: this.state.tables.length,
       capacityPerTable: capacity,
       totalCapacity: this.state.tables.reduce((acc, t) => acc + t.capacity, 0)
