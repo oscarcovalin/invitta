@@ -381,8 +381,9 @@ class GuestManager {
   // ==========================================
   getPersonalizedUrl(guest) {
     const base = this.options.eventDetails.baseUrl.replace(/\/+$/, '');
-    const cleanId = encodeURIComponent(guest.id.replace(/^g_/, ''));
-    return `${base}/scroll-rsvp-module/index.html?guest=${cleanId}`;
+    const cleanGuest = encodeURIComponent(guest.name || guest.contactName || guest.id.replace(/^g_/, ''));
+    const passes = guest.passes || 2;
+    return `${base}/invitacion.html?guest=${cleanGuest}&passes=${passes}`;
   }
 
   getWhatsAppLink(guest) {

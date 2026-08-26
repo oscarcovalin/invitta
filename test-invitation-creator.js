@@ -34,10 +34,13 @@ assert(portalHtml.includes('Estudio de Invitación Digital'), 'portal.html conta
 const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 assert(indexHtml.includes('invitacion-estudio.html'), 'index.html sidebar links to invitacion-estudio.html');
 
-// 4. Check scroll-rsvp-module/index.html reads invitta_event_invitation_config
-const scrollHtml = fs.readFileSync(path.join(__dirname, 'scroll-rsvp-module/index.html'), 'utf8');
-assert(scrollHtml.includes('invitta_event_invitation_config'), 'scroll-rsvp-module reads saved invitation config');
-assert(scrollHtml.includes('guardarRespuestaEnStorage'), 'scroll-rsvp-module saves RSVP responses back to storage');
+// 4. Check invitacion.html (Real Live Digital Webpage) exists
+const liveHtml = fs.readFileSync(path.join(__dirname, 'invitacion.html'), 'utf8');
+assert(liveHtml.includes('Catalina & Julián') || liveHtml.includes('Nuestra Boda'), 'invitacion.html contains full wedding invitation content');
+assert(liveHtml.includes('id="vipBanner"'), 'invitacion.html includes VIP banner personalization');
+assert(liveHtml.includes('id="itinerario"'), 'invitacion.html includes full itinerary program');
+assert(indexHtml.includes('href="invitacion.html"'), 'index.html links to invitacion.html for Ver Invitación Real');
+assert(portalHtml.includes('href="invitacion.html"'), 'portal.html links to invitacion.html for Invitación Real');
 
 // 5. Test GuestManager with custom invitation config
 const manager = new GuestManager();
@@ -45,6 +48,7 @@ assert(typeof manager.getWhatsAppLink === 'function', 'GuestManager generates Wh
 const guest = manager.state.guests[0];
 const waLink = manager.getWhatsAppLink(guest);
 assert((waLink.includes('wa.me') || waLink.includes('whatsapp.com')) && waLink.includes('text='), 'WhatsApp link generated with invitation data');
+assert(waLink.includes('invitacion.html'), 'WhatsApp link points to invitacion.html');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed.\n`);
 if (failed > 0) process.exit(1);

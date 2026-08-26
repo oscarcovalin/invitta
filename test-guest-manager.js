@@ -1,4 +1,4 @@
-﻿const GuestManager = require('./guest-manager.js');
+const GuestManager = require('./guest-manager.js');
 
 let passed = 0;
 let failed = 0;
@@ -56,7 +56,7 @@ const martinez = gm.state.guests.find(g => g.familyKey === 'martinez');
 assert(!!martinez, 'Found Familia Martínez');
 
 const personalizedUrl = gm.getPersonalizedUrl(martinez);
-assert(personalizedUrl.includes('guest=martinez') || personalizedUrl.includes('guest='), `Personalized URL generated: ${personalizedUrl}`);
+assert(personalizedUrl.includes('invitacion.html') && personalizedUrl.includes('guest='), `Personalized URL generated: ${personalizedUrl}`);
 
 const waLink = gm.getWhatsAppLink(martinez);
 assert(waLink.includes('wa.me/525512345678') && waLink.includes('text='), 'WhatsApp link correctly formatted with phone and encoded invite message');

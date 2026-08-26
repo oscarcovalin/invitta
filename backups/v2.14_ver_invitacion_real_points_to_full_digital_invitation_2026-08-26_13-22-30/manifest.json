@@ -1,0 +1,26 @@
+{
+  "label": "v2.14_ver_invitacion_real_points_to_full_digital_invitation",
+  "timestamp": "2026-08-26T19:22:30.054Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158441
+    },
+    {
+      "filename": "index.html",
+      "size": 65016
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
