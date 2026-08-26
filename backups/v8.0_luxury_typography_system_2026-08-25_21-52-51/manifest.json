@@ -1,0 +1,26 @@
+{
+  "label": "v8.0_luxury_typography_system",
+  "timestamp": "2026-08-26T03:52:51.189Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 127107
+    },
+    {
+      "filename": "index.html",
+      "size": 96728
+    },
+    {
+      "filename": "app.js",
+      "size": 88095
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
