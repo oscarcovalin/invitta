@@ -1,0 +1,26 @@
+{
+  "label": "v8.12_rsvp_large_editorial_heading_with_foil",
+  "timestamp": "2026-08-26T05:27:45.922Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 132651
+    },
+    {
+      "filename": "index.html",
+      "size": 99536
+    },
+    {
+      "filename": "app.js",
+      "size": 89401
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
