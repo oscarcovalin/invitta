@@ -1,0 +1,26 @@
+{
+  "label": "v8.1_discrete_vendor_cta_button",
+  "timestamp": "2026-08-26T03:56:54.688Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 127164
+    },
+    {
+      "filename": "index.html",
+      "size": 96728
+    },
+    {
+      "filename": "app.js",
+      "size": 88095
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
