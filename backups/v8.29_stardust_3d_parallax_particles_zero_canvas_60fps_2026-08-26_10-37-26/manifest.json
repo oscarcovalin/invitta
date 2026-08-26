@@ -1,0 +1,26 @@
+{
+  "label": "v8.29_stardust_3d_parallax_particles_zero_canvas_60fps",
+  "timestamp": "2026-08-26T16:37:26.063Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158295
+    },
+    {
+      "filename": "index.html",
+      "size": 103699
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
