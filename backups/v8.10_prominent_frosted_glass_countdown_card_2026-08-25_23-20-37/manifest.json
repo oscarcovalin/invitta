@@ -1,0 +1,26 @@
+{
+  "label": "v8.10_prominent_frosted_glass_countdown_card",
+  "timestamp": "2026-08-26T05:20:37.155Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 132690
+    },
+    {
+      "filename": "index.html",
+      "size": 99536
+    },
+    {
+      "filename": "app.js",
+      "size": 89401
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
