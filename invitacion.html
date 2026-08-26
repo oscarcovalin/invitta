@@ -23,15 +23,15 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        "champagne-cream": "#f7f6ec",
-        "antique-gold": "#A56E0E",
-        "soft-gold": "#dccf96",
-        "deep-onyx": "#0d130e",
-        "emerald-dark": "#0b2118",
-        "emerald-deep": "#0d130e",
+        "champagne-cream": "#FAF8F5",
+        "antique-gold": "#A38047",
+        "soft-gold": "#D4B67D",
+        "deep-onyx": "#1E1E1E",
+        "emerald-dark": "#163C2B",
+        "emerald-deep": "#1E1E1E",
         "tertiary": "#5c5c5c",
-        "surface": "#f7f6ec",
-        "surface-container": "#f1f6ed",
+        "surface": "#FAF8F5",
+        "surface-container": "#F5F2EB",
         "error": "#ba1a1a"
       },
       fontFamily: {
@@ -62,12 +62,12 @@ tailwind.config = {
   
 
   :root {
-    --champagne: #f7f6ec;
-    --gold: #A56E0E;
-    --gold-light: #dccf96;
-    --onyx: #0d130e;
-    --emerald: #0b2118;
-    --emerald-dark: #0d130e;
+    --champagne: #FAF8F5;
+    --gold: #A38047;
+    --gold-light: #D4B67D;
+    --onyx: #1E1E1E;
+    --emerald: #163C2B;
+    --emerald-dark: #1E1E1E;
     --font-names: 'Cormorant Garamond', serif;
     --font-script: 'Parisienne', cursive;
     --font-display: 'Cormorant Garamond', serif;
@@ -703,6 +703,42 @@ tailwind.config = {
     
             <span>Waze</span>
           </a>
+        </div>
+      </div>
+
+      <!-- ==================== TRANSICIÓN: POLVO DE ESTRELLAS ==================== -->
+      <div id="stardustTransition" class="relative my-8 py-8 px-6 sm:px-8 rounded-2xl bg-gradient-to-b from-black/60 via-black/75 to-black/60 border border-antique-gold/50 shadow-[0_10px_35px_rgba(165,110,14,0.18)] overflow-hidden text-center gsap-fade-up ">
+        <!-- Canvas de Partículas Doradas Flotantes de Fondo -->
+        <canvas id="stardustTransitionCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+        
+        <div class="relative z-10 flex flex-col items-center">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-antique-gold/20 border border-antique-gold/60 mb-3 backdrop-blur-md">
+            <span class="text-antique-gold text-xs animate-pulse">✦</span>
+            <span class="font-label-caps text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-antique-gold font-bold" id="stardustSubtitle">
+              Momento Mágico
+            </span>
+            <span class="text-antique-gold text-xs animate-pulse">✦</span>
+          </div>
+
+          <h3 class="font-display-lg text-[22px] sm:text-[26px] font-normal text-[#f7f6ec] tracking-wide mb-1.5" id="stardustTitle">
+            Polvo de Estrellas
+          </h3>
+
+          
+          <div class="mb-3">
+            <span class="font-mono text-[11px] font-semibold text-antique-gold bg-black/60 px-3 py-0.5 rounded-full border border-antique-gold/40 inline-block" id="stardustTime">
+              21:30 HRS · Primer Baile
+            </span>
+          </div>
+
+          <p class="font-display-lg text-[14.5px] sm:text-[16px] text-[#f7f6ec]/90 max-w-md mx-auto leading-relaxed font-light mb-6 tracking-wide" id="stardustText">
+            Al caer la noche, encenderemos juntos una constelación de luces y bengalas para iluminar nuestro primer baile.
+          </p>
+
+          <button type="button" id="btnOpenStardustLight" class="btn-luxury-primary text-[11.5px] sm:text-[12.5px] py-3 px-7 uppercase tracking-[0.25em] font-semibold inline-flex items-center gap-2.5 shadow-[0_0_25px_rgba(212,175,55,0.45)] hover:shadow-[0_0_35px_rgba(212,175,55,0.75)] transition-all transform hover:scale-105 active:scale-95 cursor-pointer">
+            <span class="text-sm animate-spin" style="animation-duration: 4s;">✨</span>
+            <span id="stardustBtnText">✨ Encender mi Luz</span>
+          </button>
         </div>
       </div>
 
@@ -1525,6 +1561,49 @@ tailwind.config = {
   </div>
 </div>
 
+<!-- ==================== OVERLAY MODO POLVO DE ESTRELLAS A PANTALLA COMPLETA ==================== -->
+<div id="stardustFullScreenOverlay" class="fixed inset-0 z-[9999] bg-[#07090e] hidden flex-col items-center justify-between p-6 select-none overflow-hidden touch-none transition-opacity duration-500">
+  <!-- Canvas Dinámico de Destellos Mágicos -->
+  <canvas id="stardustFullCanvas" class="absolute inset-0 w-full h-full pointer-events-auto"></canvas>
+
+  <!-- Resplandor Dorado Central Intenso (Efecto Lámpara / Bengala) -->
+  <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,_rgba(255,223,128,0.45)_0%,_rgba(212,175,55,0.2)_45%,_transparent_75%)] animate-pulse"></div>
+
+  <!-- Cabecera Superior -->
+  <div class="relative z-10 w-full flex items-center justify-between pt-2">
+    <span class="font-label-caps text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-antique-gold font-bold flex items-center gap-2">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+      <span>Polvo de Estrellas Activo</span>
+    </span>
+    <button type="button" id="btnCloseStardust" class="w-11 h-11 rounded-full bg-white/10 hover:bg-white/25 border border-white/30 text-white flex items-center justify-center text-2xl transition-all cursor-pointer">
+      ✕
+    </button>
+  </div>
+
+  <!-- Centro Iluminado (Ilumina el rostro / pista de baile con el celular) -->
+  <div class="relative z-10 flex flex-col items-center text-center px-4 my-auto pointer-events-none">
+    <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-amber-300/30 border border-amber-300/60 flex items-center justify-center shadow-[0_0_70px_rgba(255,215,0,0.85)] mb-6 animate-bounce">
+      <span class="text-4xl sm:text-5xl">✨</span>
+    </div>
+    <h2 class="font-display-lg text-3xl sm:text-4xl md:text-5xl text-amber-100 font-normal tracking-wide drop-shadow-[0_2px_20px_rgba(255,215,0,0.9)] mb-2">
+      ¡Ilumina a los Novios!
+    </h2>
+    <p class="font-display-lg text-xl sm:text-2xl text-amber-200/90 italic font-light max-w-xs drop-shadow-md">
+      Catalina & Julián
+    </p>
+    <p class="font-label-caps text-[10.5px] uppercase tracking-[0.2em] text-amber-300/80 mt-5 font-semibold">
+      ✨ Mueve o toca la pantalla para soltar chispas ✨
+    </p>
+  </div>
+
+  <!-- Pie Inferior -->
+  <div class="relative z-10 pb-4 text-center">
+    <span class="font-label-caps text-[10px] uppercase tracking-widest text-white/50">
+      Toca ✕ para regresar a la invitación
+    </span>
+  </div>
+</div>
+
 </main>
 
 <!-- ==================== BARRA DE NAVEGACIÓN INFERIOR MÓVIL ==================== -->
@@ -1740,6 +1819,14 @@ const CONFIG = {
     "time": "6:30 PM",
     "mapsUrl": "https://maps.google.com/?q=Jardín+Las+Magnolias",
     "wazeUrl": "https://waze.com/ul?q=Jardín+Las+Magnolias"
+  },
+  "stardust": {
+    "enabled": true,
+    "title": "Polvo de Estrellas",
+    "subtitle": "Momento Mágico",
+    "text": "Al caer la noche, encenderemos juntos una constelación de luces y bengalas para iluminar nuestro primer baile.",
+    "buttonText": "✨ Encender mi Luz",
+    "time": "21:30 HRS"
   },
   "lodging": {
     "enabled": true,
@@ -2169,6 +2256,208 @@ if(rsvpForm){
     }, 600);
   });
 }
+
+// 6.5. MÓDULO POLVO DE ESTRELLAS: TRANSICIÓN Y MODO PANTALLA COMPLETA
+(function initStardust() {
+  // A. Canvas sutil de partículas doradas en la tarjeta de transición
+  const transCanvas = document.getElementById('stardustTransitionCanvas');
+  if (transCanvas) {
+    const ctx = transCanvas.getContext('2d');
+    let width = transCanvas.width = transCanvas.offsetWidth || 350;
+    let height = transCanvas.height = transCanvas.offsetHeight || 220;
+
+    window.addEventListener('resize', () => {
+      if (transCanvas.offsetWidth && transCanvas.offsetHeight) {
+        width = transCanvas.width = transCanvas.offsetWidth;
+        height = transCanvas.height = transCanvas.offsetHeight;
+      }
+    });
+
+    const particles = Array.from({ length: 28 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: Math.random() * 2.2 + 0.6,
+      speedX: (Math.random() - 0.5) * 0.4,
+      speedY: -Math.random() * 0.5 - 0.2,
+      opacity: Math.random() * 0.8 + 0.2,
+      pulseSpeed: Math.random() * 0.03 + 0.01,
+      angle: Math.random() * Math.PI * 2
+    }));
+
+    function renderTransition() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.angle += p.pulseSpeed;
+        const currentOp = p.opacity * (0.6 + 0.4 * Math.sin(p.angle));
+
+        if (p.y < 0) p.y = height;
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(234, 180, 121, ${currentOp})`;
+        ctx.shadowBlur = p.size * 3;
+        ctx.shadowColor = '#D4AF37';
+        ctx.fill();
+      });
+      requestAnimationFrame(renderTransition);
+    }
+    renderTransition();
+  }
+
+  // B. Modo Pantalla Completa "Encender mi Luz" (Linterna Mágica de Celular)
+  const btnOpen = document.getElementById('btnOpenStardustLight');
+  const btnClose = document.getElementById('btnCloseStardust');
+  const overlay = document.getElementById('stardustFullScreenOverlay');
+  const fullCanvas = document.getElementById('stardustFullCanvas');
+
+  let fullAnimationId = null;
+  let fullParticles = [];
+  let isOverlayActive = false;
+
+  function initFullScreenCanvas() {
+    if (!fullCanvas) return;
+    const ctx = fullCanvas.getContext('2d');
+    let width = fullCanvas.width = window.innerWidth;
+    let height = fullCanvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = fullCanvas.width = window.innerWidth;
+      height = fullCanvas.height = window.innerHeight;
+    });
+
+    function spawnBurst(originX, originY, count = 12) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3 + 1;
+        fullParticles.push({
+          x: originX,
+          y: originY,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: Math.random() * 3.5 + 1,
+          color: Math.random() > 0.4 ? '#FFE082' : '#FFF9C4',
+          alpha: 1,
+          decay: Math.random() * 0.015 + 0.008,
+          sparks: Math.random() > 0.7
+        });
+      }
+    }
+
+    // Inicializar partículas flotantes base
+    fullParticles = Array.from({ length: 65 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.8,
+      vy: -Math.random() * 1.2 - 0.3,
+      size: Math.random() * 3.2 + 0.8,
+      color: Math.random() > 0.3 ? '#FFD54F' : '#FFF8E1',
+      alpha: Math.random() * 0.9 + 0.1,
+      decay: 0,
+      sparks: Math.random() > 0.5
+    }));
+
+    function loop() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Partículas continuas
+      for (let i = fullParticles.length - 1; i >= 0; i--) {
+        const p = fullParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.decay > 0) {
+          p.alpha -= p.decay;
+          if (p.alpha <= 0) {
+            fullParticles.splice(i, 1);
+            continue;
+          }
+        } else {
+          if (p.y < 0) p.y = height;
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.shadowBlur = p.size * 4;
+        ctx.shadowColor = '#FFD700';
+        ctx.fill();
+
+        // Destellos en forma de cruz brillante en algunas partículas
+        if (p.sparks && p.size > 2) {
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(p.x - p.size * 2, p.y);
+          ctx.lineTo(p.x + p.size * 2, p.y);
+          ctx.moveTo(p.x, p.y - p.size * 2);
+          ctx.lineTo(p.x, p.y + p.size * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // Auto-generación suave en el centro
+      if (Math.random() < 0.25) {
+        spawnBurst(width / 2 + (Math.random() - 0.5) * 120, height / 2 + (Math.random() - 0.5) * 120, 3);
+      }
+
+      if (isOverlayActive) {
+        fullAnimationId = requestAnimationFrame(loop);
+      }
+    }
+
+    fullCanvas.addEventListener('pointerdown', (e) => {
+      const rect = fullCanvas.getBoundingClientRect();
+      spawnBurst(e.clientX - rect.left, e.clientY - rect.top, 25);
+    });
+
+    fullCanvas.addEventListener('pointermove', (e) => {
+      if (Math.random() < 0.4) {
+        const rect = fullCanvas.getBoundingClientRect();
+        spawnBurst(e.clientX - rect.left, e.clientY - rect.top, 4);
+      }
+    });
+
+    loop();
+  }
+
+  function openStardustOverlay() {
+    if (!overlay) return;
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+    isOverlayActive = true;
+    initFullScreenCanvas();
+    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  }
+
+  function closeStardustOverlay() {
+    if (!overlay) return;
+    overlay.classList.add('hidden');
+    overlay.classList.remove('flex');
+    isOverlayActive = false;
+    if (fullAnimationId) cancelAnimationFrame(fullAnimationId);
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  if (btnOpen) btnOpen.addEventListener('click', openStardustOverlay);
+  if (btnClose) btnClose.addEventListener('click', closeStardustOverlay);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOverlayActive) closeStardustOverlay();
+  });
+})();
 
 // 7. Navegación fluida y desplazamiento suave sin redireccionar la ventana principal
 function scrollToSection(targetId) {
