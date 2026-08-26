@@ -1,0 +1,26 @@
+{
+  "label": "v7.6_moved_story_accordion_below_hero",
+  "timestamp": "2026-08-26T03:25:28.288Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 120908
+    },
+    {
+      "filename": "index.html",
+      "size": 97153
+    },
+    {
+      "filename": "app.js",
+      "size": 88086
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
