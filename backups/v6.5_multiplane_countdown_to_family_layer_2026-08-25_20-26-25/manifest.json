@@ -1,0 +1,26 @@
+{
+  "label": "v6.5_multiplane_countdown_to_family_layer",
+  "timestamp": "2026-08-26T02:26:25.543Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 114551
+    },
+    {
+      "filename": "index.html",
+      "size": 91493
+    },
+    {
+      "filename": "app.js",
+      "size": 81533
+    },
+    {
+      "filename": "style.css",
+      "size": 12175
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

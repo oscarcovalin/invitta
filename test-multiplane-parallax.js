@@ -4,13 +4,15 @@ const templateEngine = require('./template-engine.js');
 const configBase = JSON.parse(JSON.stringify(templateEngine.defaultConfig));
 const htmlBase = templateEngine.generateHTML(configBase, 'vino');
 
-console.log('--- TEST 1: BASE HTML — GSAP PARALLAX INFRASTRUCTURE ---');
+console.log('--- TEST 1: BASE HTML — 3-LAYER MULTI-PLANE INFRASTRUCTURE ---');
 console.log('parallaxBgHero wrapper present:', htmlBase.includes('id="parallaxBgHero"'));
 console.log('Hero section is overflow-visible:', htmlBase.includes('overflow: visible'));
 console.log('illustrationBridgeHero present:', htmlBase.includes('id="illustrationBridgeHero"'));
+console.log('illustrationBridgeCountdown present:', htmlBase.includes('id="illustrationBridgeCountdown"'));
 console.log('illustrationBridgeFamily present:', htmlBase.includes('id="illustrationBridgeFamily"'));
 console.log('GSAP parallaxBgHero animation present:', htmlBase.includes("getElementById('parallaxBgHero')"));
 console.log('GSAP illBridgeHero animation present:', htmlBase.includes("getElementById('illustrationBridgeHero')"));
+console.log('GSAP illBridgeCountdown animation present:', htmlBase.includes("getElementById('illustrationBridgeCountdown')"));
 console.log('GSAP illBridgeFamily animation present:', htmlBase.includes("getElementById('illustrationBridgeFamily')"));
 console.log('Countdown has adaptive padding class (default pt-2):', htmlBase.includes('pt-2 sm:pt-4 pb-20'));
 
@@ -30,6 +32,7 @@ configIllHero.illustrations = {
     parallaxSpeed: 30,
     extraPadding: 40
   },
+  countdown: { enabled: false, image: '' },
   family: { enabled: false, image: '' }
 };
 const htmlIllHero = templateEngine.generateHTML(configIllHero, 'vino');
@@ -50,37 +53,63 @@ const idxCountdown = htmlIllHero.indexOf('id="countdownSection"');
 console.log('Illustration is placed AFTER Story Text:', idxStoryText < idxIllBridge);
 console.log('Illustration is placed BEFORE Countdown Section:', idxIllBridge < idxCountdown);
 
-// 3. Test Family illustration active with left alignment
-const configIllFamily = JSON.parse(JSON.stringify(templateEngine.defaultConfig));
-configIllFamily.illustrations = {
+// 3. Test Countdown-to-Family illustration active (NUEVA CAPA MULTIPLANO)
+const configIllCountdown = JSON.parse(JSON.stringify(templateEngine.defaultConfig));
+configIllCountdown.illustrations = {
   hero: { enabled: false, image: '' },
-  family: { 
-    enabled: true, 
-    image: 'https://example.com/cards-illustration.png', 
-    widthPct: 75, 
-    maxWidth: 620,
-    offsetY: 15,
-    offsetX: -5,
-    overlapPct: 40,
-    alignX: 'left',
-    parallaxSpeed: 20,
-    extraPadding: 20
-  }
+  countdown: {
+    enabled: true,
+    image: 'https://example.com/floral-transition.png',
+    widthPct: 80,
+    maxWidth: 540,
+    offsetY: 10,
+    offsetX: 0,
+    overlapPct: 60,
+    alignX: 'center',
+    parallaxSpeed: 35,
+    extraPadding: 25
+  },
+  family: { enabled: false, image: '' }
 };
-const htmlIllFamily = templateEngine.generateHTML(configIllFamily, 'vino');
+const htmlIllCountdown = templateEngine.generateHTML(configIllCountdown, 'vino');
 
-console.log('\n--- TEST 3: FAMILY ILLUSTRATION ACTIVE WITH LEFT ALIGNMENT ---');
-console.log('Family bridge shows image URL:', htmlIllFamily.includes('cards-illustration.png'));
-console.log('Details section gets extra top padding + 20px:', htmlIllFamily.includes('pt-[calc(130px+20px)]'));
-console.log('Family width is 75% and max-width 620px:', htmlIllFamily.includes('width: 75%; max-width: 620px'));
-console.log('Family left alignment applied:', htmlIllFamily.includes('left: calc(3% + -5px)'));
-console.log('Family bottom offset for 40% overlap + 15px:', htmlIllFamily.includes('bottom: calc(-20% + 15px)'));
+console.log('\n--- TEST 3: COUNTDOWN-TO-FAMILY MULTIPLANE LAYER ---');
+console.log('Countdown bridge shows image URL:', htmlIllCountdown.includes('floral-transition.png'));
+console.log('Countdown bridge NOT hidden:', !htmlIllCountdown.includes('id="illustrationBridgeCountdown"\n      class="absolute z-30 pointer-events-none will-change-transform hidden"'));
+console.log('Family section receives extra top padding +25px:', htmlIllCountdown.includes('pt-[calc(130px+25px)]'));
+console.log('Countdown bridge bottom offset for 60% overlap +10px:', htmlIllCountdown.includes('bottom: calc(-30% + 10px)'));
+console.log('GSAP receives custom parallax speed 35%:', htmlIllCountdown.includes('const cdParallaxSpeed = 35'));
 
-// 4. Section order still intact
-const idxHero = htmlIllHero.indexOf('id="hero"');
-const idxFamily = htmlIllHero.indexOf('id="family"');
-const idxDetails = htmlIllHero.indexOf('id="details"');
-console.log('\n--- TEST 4: SECTION ORDER PRESERVED ---');
-console.log('Hero before Story/Countdown:', idxHero < idxCountdown);
-console.log('Countdown before Family:', idxCountdown < idxFamily);
-console.log('Family before Details:', idxFamily < idxDetails);
+const idxBtnCalendar = htmlIllCountdown.indexOf('id="btnCalendar"');
+const idxIllCountdown = htmlIllCountdown.indexOf('id="illustrationBridgeCountdown"');
+const idxFamily = htmlIllCountdown.indexOf('id="family"');
+console.log('Countdown bridge placed AFTER Calendar buttons:', idxBtnCalendar < idxIllCountdown);
+console.log('Countdown bridge placed BEFORE Family section:', idxIllCountdown < idxFamily);
+
+// 4. Test All 3 Multi-Plane Layers Active Concurrently
+const configAll3 = JSON.parse(JSON.stringify(templateEngine.defaultConfig));
+configAll3.story = { enabled: true, title: 'Nuestra Historia', text: 'Historia...' };
+configAll3.illustrations = {
+  hero: { enabled: true, image: 'https://example.com/ill1.png', widthPct: 85, maxWidth: 560, offsetY: 0, offsetX: 0, overlapPct: 50, alignX: 'center', parallaxSpeed: 25, extraPadding: 0 },
+  countdown: { enabled: true, image: 'https://example.com/ill2.png', widthPct: 80, maxWidth: 540, offsetY: 0, offsetX: 0, overlapPct: 50, alignX: 'center', parallaxSpeed: 25, extraPadding: 0 },
+  family: { enabled: true, image: 'https://example.com/ill3.png', widthPct: 82, maxWidth: 560, offsetY: 0, offsetX: 0, overlapPct: 50, alignX: 'center', parallaxSpeed: 25, extraPadding: 0 }
+};
+const htmlAll3 = templateEngine.generateHTML(configAll3, 'vino');
+
+console.log('\n--- TEST 4: ALL 3 MULTI-PLANE LAYERS ACTIVE ---');
+console.log('All 3 images present in HTML:', htmlAll3.includes('ill1.png') && htmlAll3.includes('ill2.png') && htmlAll3.includes('ill3.png'));
+console.log('Countdown gets top padding:', htmlAll3.includes('pt-[calc(140px+0px)]'));
+console.log('Family gets top padding:', htmlAll3.includes('pt-[calc(130px+0px)]'));
+console.log('Details gets top padding:', htmlAll3.includes('pt-[calc(130px+0px)]'));
+
+// 5. Section Order Preserved
+const idxH = htmlAll3.indexOf('id="hero"');
+const idxS = htmlAll3.indexOf('id="storySection"');
+const idxC = htmlAll3.indexOf('id="countdownSection"');
+const idxF = htmlAll3.indexOf('id="family"');
+const idxD = htmlAll3.indexOf('id="details"');
+console.log('\n--- TEST 5: SECTION ORDER PRESERVED ---');
+console.log('Hero < Story:', idxH < idxS);
+console.log('Story < Countdown:', idxS < idxC);
+console.log('Countdown < Family:', idxC < idxF);
+console.log('Family < Details:', idxF < idxD);
