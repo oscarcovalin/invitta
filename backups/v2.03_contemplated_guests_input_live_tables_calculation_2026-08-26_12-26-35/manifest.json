@@ -1,0 +1,26 @@
+{
+  "label": "v2.03_contemplated_guests_input_live_tables_calculation",
+  "timestamp": "2026-08-26T18:26:35.404Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158441
+    },
+    {
+      "filename": "index.html",
+      "size": 103699
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
