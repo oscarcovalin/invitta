@@ -1,0 +1,26 @@
+{
+  "label": "v8.22_modular_rsvp_manager_court_prioritization",
+  "timestamp": "2026-08-26T14:48:39.230Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 156800
+    },
+    {
+      "filename": "index.html",
+      "size": 103699
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
