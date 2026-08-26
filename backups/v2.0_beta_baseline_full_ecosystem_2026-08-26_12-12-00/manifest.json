@@ -1,0 +1,26 @@
+{
+  "label": "v2.0_beta_baseline_full_ecosystem",
+  "timestamp": "2026-08-26T18:12:00.369Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158295
+    },
+    {
+      "filename": "index.html",
+      "size": 103699
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
