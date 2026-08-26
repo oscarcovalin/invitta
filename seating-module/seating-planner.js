@@ -288,11 +288,16 @@ class SeatingPlanner {
                     <span class="font-body-md text-on-surface">${m.name}</span>
                   </div>
                   
-                  ${m.tag ? `
-                    <span class="font-label-sm text-warm-grey uppercase tracking-widest px-2 py-0.5 rounded bg-surface-container border border-outline-variant text-[10px]" title="${m.tag}">
-                      ${m.tag}
-                    </span>
-                  ` : ''}
+                  <div class="flex items-center gap-1.5">
+                    ${m.tag ? `
+                      <span class="font-label-sm text-warm-grey uppercase tracking-widest px-2 py-0.5 rounded bg-surface-container border border-outline-variant text-[10px]" title="${m.tag}">
+                        ${m.tag}
+                      </span>
+                    ` : ''}
+                    <button type="button" class="btn-guest-card-edit p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors text-xs" title="Editar invitado" data-id="${m.id}">
+                      <span class="material-symbols-outlined text-[14px]">edit</span>
+                    </button>
+                  </div>
                 </div>
               `).join('')}
             </div>
@@ -318,7 +323,12 @@ class SeatingPlanner {
                     <span class="font-label-caps text-on-surface-variant text-[10px] tracking-wider">${g.tag || 'Corte de Honor'}</span>
                   </div>
                 </div>
-                <span class="material-symbols-outlined text-brushed-champagne font-light text-[20px]">star</span>
+                <div class="flex items-center gap-2">
+                  <button type="button" class="btn-guest-card-edit p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors text-xs" title="Editar invitado" data-id="${g.id}">
+                    <span class="material-symbols-outlined text-[15px]">edit</span>
+                  </button>
+                  <span class="material-symbols-outlined text-brushed-champagne font-light text-[20px]">star</span>
+                </div>
               </div>
             </div>
           `;
@@ -335,16 +345,33 @@ class SeatingPlanner {
                 <span class="material-symbols-outlined text-on-surface-variant font-light text-[16px]">drag_indicator</span>
                 <span class="font-body-md text-on-surface">${g.name}</span>
               </div>
-              ${g.tag ? `
-                <span class="font-label-sm text-warm-grey uppercase tracking-widest text-[10px] px-2 py-0.5 bg-surface-container rounded border border-outline-variant">
-                  ${g.tag}
-                </span>
-              ` : ''}
+              <div class="flex items-center gap-2">
+                ${g.tag ? `
+                  <span class="font-label-sm text-warm-grey uppercase tracking-widest text-[10px] px-2 py-0.5 bg-surface-container rounded border border-outline-variant">
+                    ${g.tag}
+                  </span>
+                ` : ''}
+                <button type="button" class="btn-guest-card-edit p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors text-xs" title="Editar invitado" data-id="${g.id}">
+                  <span class="material-symbols-outlined text-[14px]">edit</span>
+                </button>
+              </div>
             </div>
           </div>
         `;
       }
     }).join('');
+
+    container.querySelectorAll('.btn-guest-card-edit').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        if (typeof window.openModalGuestEdit === 'function') {
+          window.openModalGuestEdit(id);
+        } else {
+          window.dispatchEvent(new CustomEvent('guest:edit', { detail: { guestId: id } }));
+        }
+      });
+    });
 
     this.bindDragStartEvents(container);
   }
