@@ -383,7 +383,19 @@ class GuestManager {
     const base = this.options.eventDetails.baseUrl.replace(/\/+$/, '');
     const cleanGuest = encodeURIComponent(guest.name || guest.contactName || guest.id.replace(/^g_/, ''));
     const passes = guest.passes || 2;
-    return `${base}/invitacion.html?guest=${cleanGuest}&passes=${passes}`;
+    let url = `${base}/invitacion.html?guest=${cleanGuest}&passes=${passes}`;
+    if (guest.phone) {
+      url += `&phone=${encodeURIComponent(guest.phone)}`;
+    }
+    if (guest.tableId) {
+      if (guest.tableId === 'tbl_imperial' || String(guest.tableId).includes('imp') || guest.court || guest.vip) {
+        url += `&mesa=imperial`;
+      } else {
+        const match = String(guest.tableId).match(/\d+/);
+        if (match) url += `&mesa=${match[0]}`;
+      }
+    }
+    return url;
   }
 
   getWhatsAppLink(guest) {
@@ -500,6 +512,183 @@ class GuestManager {
       declinedPasses: declinedPasses,
       pendingCount: pendingCount,
       confirmedPercent: totalPasses > 0 ? ((confirmedPasses / totalPasses) * 100).toFixed(1) : 0
+    };
+  }
+
+  generateFolio(guest, passesCount) {
+    if (!guest) return 'MGEN-INVITADO-1P';
+    let mesaCode = 'MGEN';
+    if (guest.isCourt || guest.isImperial || guest.court || guest.vip || guest.tableId === 'tbl_imperial' || String(guest.tableId).includes('imp')) {
+      mesaCode = 'MIMP';
+    } else if (guest.tableId || guest.table) {
+      const match = String(guest.tableId || guest.table).match(/\d+/);
+      if (match) mesaCode = 'M' + match[0].padStart(2, '0');
+    }
+
+    const gName = guest.name || guest.contactName || 'Invitado';
+    const cleanTokens = gName
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .trim()
+      .split(/\s+/)
+      .filter(w => !['FAMILIA', 'FAM', 'SR', 'SRA', 'DR', 'DRA', 'ING', 'LIC', 'DON', 'DONA', 'DE', 'DEL', 'LA', 'LAS', 'LOS', 'Y'].includes(w.toUpperCase()));
+    
+    const isFamily = /familia|fam\b|flia\b/i.test(gName);
+    let apellidoCode = 'INVITADO';
+    if (cleanTokens.length > 0) {
+      if (isFamily) {
+        apellidoCode = cleanTokens[0].toUpperCase().substring(0, 10);
+      } else {
+        apellidoCode = (cleanTokens.length > 1 ? cleanTokens[cleanTokens.length - 1] : cleanTokens[0]).toUpperCase().substring(0, 10);
+      }
+    }
+    const passes = passesCount !== undefined ? passesCount : (guest.passes || 1);
+    return `${mesaCode}-${apellidoCode}-${passes}P`;
+  }
+
+  checkInGuest(queryOrFolio, admittedPasses) {
+    if (!queryOrFolio) return { success: false, error: 'Query o Folio requerido' };
+    const q = String(queryOrFolio).trim().toLowerCase();
+    
+    // Find by ID, exact Folio match, or name matching
+    let guest = this.state.guests.find(g => {
+      if (g.id && g.id.toLowerCase() === q) return true;
+      const f = this.generateFolio(g).toLowerCase();
+      if (f === q || f.replace(/-/g, '') === q.replace(/-/g, '')) return true;
+      return false;
+    });
+
+    if (!guest) {
+      // Fuzzy search by name or contact name
+      const cleanQ = q.replace(/[^a-z0-9]/g, '');
+      guest = this.state.guests.find(g => {
+        const n = (g.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const c = (g.contactName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        return (n && (n.includes(cleanQ) || cleanQ.includes(n))) || (c && (c.includes(cleanQ) || cleanQ.includes(c)));
+      });
+    }
+
+    if (!guest) {
+      return { success: false, error: 'Invitado no encontrado con el folio o nombre proporcionado' };
+    }
+
+    const totalAllowed = guest.passes || 1;
+    const finalAdmitted = admittedPasses !== undefined ? Math.min(totalAllowed, Math.max(1, parseInt(admittedPasses, 10))) : (guest.confirmedPasses || totalAllowed);
+
+    guest.status = 'CHECKED_IN';
+    guest.admittedPasses = finalAdmitted;
+    guest.checkedInAt = new Date().toISOString();
+    
+    const folio = this.generateFolio(guest, finalAdmitted);
+    guest.folio = folio;
+
+    this.state.checkinLogs = this.state.checkinLogs || [];
+    this.state.checkinLogs.unshift({
+      timestamp: guest.checkedInAt,
+      guestId: guest.id,
+      guestName: guest.name,
+      folio: folio,
+      tableId: guest.tableId,
+      admittedPasses: finalAdmitted,
+      totalPasses: totalAllowed,
+      isEmergency: !!guest.isEmergency
+    });
+
+    this.saveState();
+    return {
+      success: true,
+      guest: guest,
+      folio: folio,
+      admittedPasses: finalAdmitted,
+      totalPasses: totalAllowed
+    };
+  }
+
+  createEmergencyGuest({ name, phone = '', passes = 2, tableId = 'tbl_1', autoCheckIn = true, notes = '' }) {
+    if (!name || !name.trim()) return { success: false, error: 'El nombre es obligatorio' };
+    
+    const count = parseInt(passes, 10) || 2;
+    const id = `g_emerg_${Date.now()}`;
+    
+    const newGuest = {
+      id: id,
+      name: name.trim(),
+      contactName: name.trim(),
+      familyKey: 'emergencia',
+      passes: count,
+      confirmedPasses: count,
+      admittedPasses: autoCheckIn ? count : 0,
+      phone: phone.trim(),
+      email: '',
+      role: 'emergency',
+      roleLabel: 'Pase de Emergencia',
+      vip: true,
+      court: false,
+      isEmergency: true,
+      tableId: tableId,
+      status: autoCheckIn ? 'CHECKED_IN' : 'EMERGENCY',
+      diet: 'none',
+      notes: notes || 'Generado express desde el celular',
+      sentAt: new Date().toISOString(),
+      respondedAt: new Date().toISOString(),
+      checkedInAt: autoCheckIn ? new Date().toISOString() : null
+    };
+
+    const folio = this.generateFolio(newGuest, count);
+    newGuest.folio = folio;
+
+    this.state.guests.push(newGuest);
+
+    if (autoCheckIn) {
+      this.state.checkinLogs = this.state.checkinLogs || [];
+      this.state.checkinLogs.unshift({
+        timestamp: newGuest.checkedInAt,
+        guestId: newGuest.id,
+        guestName: newGuest.name,
+        folio: folio,
+        tableId: newGuest.tableId,
+        admittedPasses: count,
+        totalPasses: count,
+        isEmergency: true
+      });
+    }
+
+    this.saveState();
+    return {
+      success: true,
+      guest: newGuest,
+      folio: folio
+    };
+  }
+
+  getAccessMetrics() {
+    const totalGuests = this.state.guests.length;
+    const totalPasses = this.state.guests.reduce((sum, g) => sum + (g.passes || 1), 0);
+
+    // 🟢 Verde: Ingresados al Salón
+    const inSalonGuests = this.state.guests.filter(g => g.status === 'CHECKED_IN');
+    const inSalonPasses = inSalonGuests.reduce((sum, g) => sum + (g.admittedPasses || g.confirmedPasses || g.passes || 1), 0);
+
+    // 🟡 Amarillo: Confirmados pero en camino
+    const inTransitGuests = this.state.guests.filter(g => g.status === 'CONFIRMED');
+    const inTransitPasses = inTransitGuests.reduce((sum, g) => sum + (g.confirmedPasses || g.passes || 1), 0);
+
+    // 🔴 Rojo: Pendientes / Declinados
+    const pendingGuests = this.state.guests.filter(g => g.status === 'SENT' || g.status === 'DRAFT' || g.status === 'DECLINED' || !g.status);
+    const pendingPasses = pendingGuests.reduce((sum, g) => sum + (g.passes || 1), 0);
+
+    // 🔵 Azul: Emergencias / VIP Express
+    const emergencyGuests = this.state.guests.filter(g => g.isEmergency || g.status === 'EMERGENCY');
+    const emergencyPasses = emergencyGuests.reduce((sum, g) => sum + (g.passes || 1), 0);
+
+    return {
+      totalGuests,
+      totalPasses,
+      inSalon: { count: inSalonGuests.length, passes: inSalonPasses },
+      inTransit: { count: inTransitGuests.length, passes: inTransitPasses },
+      pending: { count: pendingGuests.length, passes: pendingPasses },
+      emergency: { count: emergencyGuests.length, passes: emergencyPasses },
+      occupancyRate: totalPasses > 0 ? ((inSalonPasses / totalPasses) * 100).toFixed(1) : '0.0'
     };
   }
 

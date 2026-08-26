@@ -2442,10 +2442,11 @@ if (musicPlayer && audio) {
 
             const qrData = JSON.stringify({
               folio: folio,
-              evento: calcDisplayName,
               titular: guestName,
               pases: confirmedTickets,
-              fecha: CONFIG.eventDateShort
+              mesa: mesaCode,
+              evento: calcDisplayName,
+              fecha: CONFIG.eventDateShort || ''
             });
             const qrContainer = document.getElementById('qrContainer');
             if (qrContainer) {

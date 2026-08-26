@@ -1,0 +1,26 @@
+{
+  "label": "v2.21_offline_access_control_qr_scanner_emergency_generator",
+  "timestamp": "2026-08-26T20:55:15.493Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 178962
+    },
+    {
+      "filename": "index.html",
+      "size": 73226
+    },
+    {
+      "filename": "app.js",
+      "size": 97840
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

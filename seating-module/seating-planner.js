@@ -250,6 +250,49 @@ class SeatingPlanner {
     });
   }
 
+  getGuestStatusClasses(g) {
+    if (!g) return { pill: 'border-charcoal text-on-surface bg-surface', badge: 'bg-neutral-100 text-neutral-700 border border-neutral-300', label: 'Sin Estado' };
+    if (g.isEmergency || g.status === 'EMERGENCY') {
+      return {
+        pill: 'border-blue-500 bg-blue-50 text-blue-900 ring-2 ring-blue-500/50 shadow-xs font-bold',
+        badge: 'bg-blue-500/15 text-blue-800 border border-blue-400/40 font-bold',
+        dot: 'bg-blue-500',
+        label: '🔵 Emergencia'
+      };
+    }
+    if (g.status === 'CHECKED_IN') {
+      return {
+        pill: 'border-emerald-600 bg-emerald-50 text-emerald-950 ring-2 ring-emerald-500/50 shadow-xs font-bold',
+        badge: 'bg-emerald-500/15 text-emerald-900 border border-emerald-500/40 font-bold',
+        dot: 'bg-emerald-500',
+        label: '🟢 Ingresó'
+      };
+    }
+    if (g.status === 'CONFIRMED') {
+      return {
+        pill: 'border-amber-500 bg-amber-50 text-amber-950 ring-2 ring-amber-500/50 shadow-xs font-bold',
+        badge: 'bg-amber-500/15 text-amber-900 border border-amber-400/40 font-bold',
+        dot: 'bg-amber-400',
+        label: '🟡 Confirmado'
+      };
+    }
+    if (g.status === 'DECLINED') {
+      return {
+        pill: 'border-neutral-300 bg-neutral-100 text-neutral-500 opacity-60',
+        badge: 'bg-neutral-200 text-neutral-600 border border-neutral-300',
+        dot: 'bg-neutral-400',
+        label: '✕ Declinó'
+      };
+    }
+    // Default PENDING / SENT / DRAFT
+    return {
+      pill: 'border-rose-300 bg-rose-50/70 text-rose-950 ring-1 ring-rose-300/60 font-medium',
+      badge: 'bg-rose-500/10 text-rose-800 border border-rose-400/30 font-medium',
+      dot: 'bg-rose-400',
+      label: '🔴 Pendiente'
+    };
+  }
+
   render() {
     if (typeof document === 'undefined') return;
     this.renderUnassignedList();
@@ -282,6 +325,7 @@ class SeatingPlanner {
     container.innerHTML = unassigned.map(g => {
       const passes = g.pases || g.passes || 1;
       const isVip = g.vip || g.court;
+      const st = this.getGuestStatusClasses(g);
 
       return `
         <div class="border ${isVip ? 'border-brushed-champagne bg-amber-500/5' : 'border-outline-variant bg-surface'} rounded-xl overflow-hidden hover:border-charcoal transition-all mb-3 select-none cursor-grab active:cursor-grabbing shadow-sm group"
@@ -297,9 +341,10 @@ class SeatingPlanner {
                   <span class="font-body-lg text-primary font-medium text-sm">${g.name}</span>
                   ${isVip ? `<span class="material-symbols-outlined text-brushed-champagne text-[15px]" title="VIP / Corte">star</span>` : ''}
                 </div>
-                ${g.tag ? `
-                  <span class="font-label-caps text-on-surface-variant text-[10px] tracking-wider">${g.tag}</span>
-                ` : ''}
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-[10px] px-2 py-0.5 rounded-full ${st.badge} font-mono tracking-wide">${st.label}</span>
+                  ${g.tag ? `<span class="font-label-caps text-on-surface-variant text-[10px] tracking-wider">${g.tag}</span>` : ''}
+                </div>
               </div>
             </div>
 
@@ -375,16 +420,17 @@ class SeatingPlanner {
                 const slot = topAssigned[i];
                 if (slot) {
                   const g = slot.guest;
+                  const st = this.getGuestStatusClasses(g);
                   const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
                   const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
                   const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
                   return `
-                    <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary ring-1 ring-brushed-champagne/40' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary"
+                    <div class="seat-pill w-8 h-8 rounded-full ${st.pill} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary"
                       draggable="true"
                       data-drag-type="single"
                       data-guest-id="${g.id}"
                       data-table-id="${table.id}"
-                      title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · Arrastra a otra mesa o sobre otro invitado para intercambiar · Clic para quitar)">
+                      title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · ${st.label})">
                       ${label}
                     </div>
                   `;
@@ -403,16 +449,17 @@ class SeatingPlanner {
                 const slot = botAssigned[i];
                 if (slot) {
                   const g = slot.guest;
+                  const st = this.getGuestStatusClasses(g);
                   const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
                   const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
                   const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
                   return `
-                    <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary"
+                    <div class="seat-pill w-8 h-8 rounded-full ${st.pill} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary"
                       draggable="true"
                       data-drag-type="single"
                       data-guest-id="${g.id}"
                       data-table-id="${table.id}"
-                      title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · Arrastra a otra mesa o sobre otro invitado para intercambiar · Clic para quitar)">
+                      title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · ${st.label})">
                       ${label}
                     </div>
                   `;
@@ -472,17 +519,18 @@ class SeatingPlanner {
 
               if (slot) {
                 const g = slot.guest;
+                const st = this.getGuestStatusClasses(g);
                 const rawName = g.name.replace(/^(Familia|Hermanos|Sr\.|Sra\.|Dr\.|Dra\.)\s+/i, '');
                 const initials = rawName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'IN';
                 const label = slot.totalPasses > 1 ? `${initials}${slot.passNumber}` : initials;
                 return `
-                  <div class="seat-pill w-8 h-8 rounded-full bg-surface border ${g.vip || g.court ? 'border-brushed-champagne text-primary ring-1 ring-brushed-champagne/40' : 'border-charcoal text-on-surface'} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary absolute"
+                  <div class="seat-pill w-8 h-8 rounded-full ${st.pill} flex items-center justify-center cursor-grab active:cursor-grabbing text-[10px] font-mono font-bold shadow-sm transition-all hover:scale-125 select-none hover:ring-2 hover:ring-primary absolute"
                     style="left: calc(50% + ${x}px - 16px); top: calc(50% + ${y}px - 16px);"
                     draggable="true"
                     data-drag-type="single"
                     data-guest-id="${g.id}"
                     data-table-id="${table.id}"
-                    title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · Arrastra a otra mesa o sobre otro invitado para intercambiar · Clic para quitar)">
+                    title="${g.name} (${slot.totalPasses} ${slot.totalPasses === 1 ? 'pase' : 'pases'} · ${st.label})">
                     ${label}
                   </div>
                 `;
