@@ -1,0 +1,26 @@
+{
+  "label": "v8.3_dedicated_names_font_separation",
+  "timestamp": "2026-08-26T04:11:52.795Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 130217
+    },
+    {
+      "filename": "index.html",
+      "size": 99536
+    },
+    {
+      "filename": "app.js",
+      "size": 89401
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
