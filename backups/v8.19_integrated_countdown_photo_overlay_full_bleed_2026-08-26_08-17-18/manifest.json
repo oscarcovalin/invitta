@@ -1,0 +1,26 @@
+{
+  "label": "v8.19_integrated_countdown_photo_overlay_full_bleed",
+  "timestamp": "2026-08-26T14:17:18.719Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 150920
+    },
+    {
+      "filename": "index.html",
+      "size": 101498
+    },
+    {
+      "filename": "app.js",
+      "size": 91498
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
