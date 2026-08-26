@@ -1,0 +1,26 @@
+{
+  "label": "v6.7_discrete_vendor_badge_in_footer",
+  "timestamp": "2026-08-26T02:34:32.108Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 118482
+    },
+    {
+      "filename": "index.html",
+      "size": 94612
+    },
+    {
+      "filename": "app.js",
+      "size": 83586
+    },
+    {
+      "filename": "style.css",
+      "size": 12175
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
