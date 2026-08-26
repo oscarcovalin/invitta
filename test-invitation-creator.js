@@ -17,24 +17,22 @@ function assert(condition, message) {
 
 console.log("\n🧪 Testing Invitation Creator Module & Cross-Ecosystem Integration...");
 
-// 1. Check crear-invitacion.html exists
-const creatorHtml = fs.readFileSync(path.join(__dirname, 'crear-invitacion.html'), 'utf8');
-assert(creatorHtml.includes('Creador de Invitación Digital'), 'crear-invitacion.html contains main title');
-assert(creatorHtml.includes('inputBrideName') && creatorHtml.includes('inputGroomName'), 'Contains bride and groom input fields');
-assert(creatorHtml.includes('inputMonogram') && creatorHtml.includes('inputEventDate'), 'Contains monogram and event date fields');
-assert(creatorHtml.includes('inputCeremonyPlace') && creatorHtml.includes('inputReceptionPlace'), 'Contains venue input fields');
-assert(creatorHtml.includes('inputDressCode') && creatorHtml.includes('inputRsvpDeadline'), 'Contains dress code and deadline fields');
-assert(creatorHtml.includes('previewScrollCard') && creatorHtml.includes('previewCoupleNames'), 'Contains real-time live preview container');
-assert(creatorHtml.includes('invitta_event_invitation_config'), 'Saves to invitta_event_invitation_config in localStorage');
+// 1. Check invitacion-estudio.html (Original Studio Invitation Generator) exists
+const studioHtml = fs.readFileSync(path.join(__dirname, 'invitacion-estudio.html'), 'utf8');
+assert(studioHtml.includes('Invitta Studio'), 'invitacion-estudio.html contains main title');
+assert(studioHtml.includes('template-engine.js') && studioHtml.includes('app.js'), 'Connects to template-engine.js and app.js');
+assert(studioHtml.includes('selectEventType'), 'Contains event type switcher');
+assert(studioHtml.includes('groupWeddingNames'), 'Contains dual names for wedding');
+assert(studioHtml.includes('btnExportHtml'), 'Contains export HTML button');
 
-// 2. Check portal.html contains link to crear-invitacion.html
+// 2. Check portal.html contains link to invitacion-estudio.html
 const portalHtml = fs.readFileSync(path.join(__dirname, 'portal.html'), 'utf8');
-assert(portalHtml.includes('crear-invitacion.html'), 'portal.html links to crear-invitacion.html');
-assert(portalHtml.includes('Creador de Invitación Digital'), 'portal.html contains Creador de Invitación card');
+assert(portalHtml.includes('invitacion-estudio.html'), 'portal.html links to invitacion-estudio.html');
+assert(portalHtml.includes('Estudio de Invitación Digital'), 'portal.html contains original studio card');
 
-// 3. Check index.html contains link to crear-invitacion.html
+// 3. Check index.html contains link to invitacion-estudio.html
 const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-assert(indexHtml.includes('crear-invitacion.html'), 'index.html sidebar links to crear-invitacion.html');
+assert(indexHtml.includes('invitacion-estudio.html'), 'index.html sidebar links to invitacion-estudio.html');
 
 // 4. Check scroll-rsvp-module/index.html reads invitta_event_invitation_config
 const scrollHtml = fs.readFileSync(path.join(__dirname, 'scroll-rsvp-module/index.html'), 'utf8');

@@ -1,0 +1,26 @@
+{
+  "label": "v2.12_original_invitation_studio_restored_and_connected",
+  "timestamp": "2026-08-26T19:15:05.604Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 158441
+    },
+    {
+      "filename": "index.html",
+      "size": 60601
+    },
+    {
+      "filename": "app.js",
+      "size": 96370
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
