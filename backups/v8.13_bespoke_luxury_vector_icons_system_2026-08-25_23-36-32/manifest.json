@@ -1,0 +1,26 @@
+{
+  "label": "v8.13_bespoke_luxury_vector_icons_system",
+  "timestamp": "2026-08-26T05:36:32.067Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 140947
+    },
+    {
+      "filename": "index.html",
+      "size": 99536
+    },
+    {
+      "filename": "app.js",
+      "size": 89401
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
