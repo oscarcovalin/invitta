@@ -1,0 +1,26 @@
+{
+  "label": "v2.38_rsvp_title_selector_and_simulator_removed",
+  "timestamp": "2026-08-27T01:59:30.360Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 203640
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 96854
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

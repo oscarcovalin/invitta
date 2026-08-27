@@ -77,11 +77,11 @@ assert(html.includes('id="btnDownloadPassImage"'), 'invitacion.html includes #bt
 assert(html.includes('id="btnResetRsvp"'), 'invitacion.html includes #btnResetRsvp modifier button');
 assert(html.includes('initRsvpPergamino'), 'invitacion.html includes initRsvpPergamino client-side execution script');
 
-// 7. Verification of VIP Preview Simulator in invitacion-estudio.html
+// 7. Verification of RSVP Controls in invitacion-estudio.html
 const studioHtml = fs.readFileSync('./invitacion-estudio.html', 'utf-8');
-assert(studioHtml.includes('btn-simulate-vip'), 'invitacion-estudio.html contains btn-simulate-vip buttons');
-assert(studioHtml.includes('Simulador de Vista Previa VIP'), 'invitacion-estudio.html contains VIP Preview Simulator');
-assert(!studioHtml.includes('id="btnGenerateVipLink"'), 'invitacion-estudio.html removed redundant manual link generator');
+assert(studioHtml.includes('id="selectRsvpTitle"'), 'invitacion-estudio.html contains selectRsvpTitle dropdown');
+assert(!studioHtml.includes('btn-simulate-vip'), 'invitacion-estudio.html removed redundant VIP simulator');
+assert(!studioHtml.includes('Simulador de Vista Previa VIP'), 'invitacion-estudio.html removed simulator container');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed.\n`);
 if (failed > 0) process.exit(1);

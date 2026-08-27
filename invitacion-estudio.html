@@ -1070,48 +1070,32 @@
           </div>
         </div>
 
-        <!-- 10. PASES VIP & CONFIRMACIÓN RSVP -->
+        <!-- 10. PASES & CONFIRMACIÓN RSVP -->
         <div class="accordion-item">
           <button type="button" class="accordion-header">
             <span class="accordion-title">
-              <span class="accordion-icon"><span class="material-symbols-outlined">qr_code_2</span></span>
-              Pases VIP & Confirmación RSVP
+              <span class="accordion-icon"><span class="material-symbols-outlined">how_to_reg</span></span>
+              Pases & Confirmación (RSVP)
             </span>
             <span class="accordion-arrow">▼</span>
           </button>
           <div class="accordion-content">
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
               <input type="checkbox" id="checkRsvpEnabled" checked style="width:16px; height:16px;">
-              <label for="checkRsvpEnabled" style="margin:0; text-transform:none; cursor:pointer; font-weight:600;">Mostrar sección de Confirmación RSVP y Pases</label>
+              <label for="checkRsvpEnabled" style="margin:0; text-transform:none; cursor:pointer; font-weight:600;">Mostrar sección de Confirmación de Asistencia</label>
             </div>
 
             <div id="rsvpFields">
-              <!-- SIMULADOR DE VISTA PREVIA VIP EN TIEMPO REAL -->
-              <div class="decor-box" style="background:var(--primary-light); border:1px solid var(--primary); border-radius:10px; padding:12px;">
-                <label style="color:var(--primary); font-weight:700; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
-                  <span class="material-symbols-outlined" style="font-size:16px;">visibility</span>
-                  Simulador de Vista Previa VIP
-                </label>
-                <span class="hint" style="margin-bottom:8px; display:block;">
-                  Prueba en tiempo real cómo ve la invitación un comensal personalizado vs un invitado general:
-                </span>
-                
-                <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-                  <button type="button" class="btn btn-secondary btn-simulate-vip active" data-guest="" data-passes="" data-mesa="" style="font-size:11.5px; justify-content:flex-start; text-align:left; padding:6px 10px;">
-                    <span style="margin-right:4px;">🌐</span> <strong>Vista General</strong> (Sin personalizar)
-                  </button>
-                  <button type="button" class="btn btn-secondary btn-simulate-vip" data-guest="Familia Martínez Valdés" data-passes="4" data-mesa="3" style="font-size:11.5px; justify-content:flex-start; text-align:left; padding:6px 10px;">
-                    <span style="margin-right:4px;">👑</span> <strong>Familia Martínez</strong> · 4 Pases · Mesa 3
-                  </button>
-                  <button type="button" class="btn btn-secondary btn-simulate-vip" data-guest="Dr. Alejandro Gómez" data-passes="1" data-mesa="1" style="font-size:11.5px; justify-content:flex-start; text-align:left; padding:6px 10px;">
-                    <span style="margin-right:4px;">👤</span> <strong>Dr. Alejandro Gómez</strong> · 1 Pase · Mesa 1
-                  </button>
-                </div>
+              <div class="form-group">
+                <label for="selectRsvpTitle">Texto del Encabezado</label>
+                <select id="selectRsvpTitle">
+                  <option value="Confirmación de Asistencia" selected>Confirmación de Asistencia</option>
+                  <option value="RSVP">RSVP</option>
+                  <option value="custom">Personalizado...</option>
+                </select>
+                <input type="text" id="inputCustomRsvpTitle" placeholder="Escribe el título..." style="margin-top:6px; display:none;">
               </div>
 
-              <hr style="border:none; border-top:1px solid var(--border-subtle); margin:12px 0;">
-
-              <label style="color:var(--primary); margin-bottom:6px;">WhatsApp & Confirmación</label>
               <div class="form-group">
                 <label for="inputWhatsapp">WhatsApp del Anfitrión (con lada)</label>
                 <input type="tel" id="inputWhatsapp" placeholder="5215512345678">
