@@ -1,0 +1,26 @@
+{
+  "label": "v2.30_sealed_1click_vip_pass_and_security_filter",
+  "timestamp": "2026-08-27T01:12:00.257Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 207717
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 96769
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

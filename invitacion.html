@@ -2425,6 +2425,7 @@ if (musicPlayer && audio) {
 
   let guestCount = Math.max(1, urlTickets || 2);
   const urlMesaParam = urlParams.get('mesa') || urlParams.get('table') || urlParams.get('m') || '';
+  const isVipGuest = !!(urlGuest && urlGuest.trim());
 
   // Render Pill Chips for Pass Selection
   const renderPillChips = (maxPasses) => {
@@ -2447,7 +2448,7 @@ if (musicPlayer && audio) {
     }
   };
 
-  if (urlGuest && urlGuest.trim()) {
+  if (isVipGuest) {
     let mesaLabelTxt = '';
     if (urlMesaParam) {
       mesaLabelTxt = urlMesaParam.toLowerCase().includes('imp') ? ' en la <strong class="text-primary font-bold">Mesa Imperial</strong>' : (' en la <strong class="text-primary font-bold">Mesa ' + urlMesaParam.replace(/\D/g, '') + '</strong>');
@@ -2457,7 +2458,7 @@ if (musicPlayer && audio) {
       saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino shadow-sm border border-antique-gold/40 rounded-2xl bg-amber-500/10 p-4 mb-2 text-left">' +
         '<div class="flex items-center gap-2 mb-1 text-antique-gold font-bold">' +
           '<span class="text-xl">⚜️</span>' +
-          '<strong class="font-display-lg text-xs uppercase tracking-wider text-deep-onyx">Pase de Honor Personalizado</strong>' +
+          '<strong class="font-display-lg text-xs uppercase tracking-wider text-deep-onyx">Pase de Honor Pre-Asignado</strong>' +
         '</div>' +
         '<p class="text-sm text-deep-onyx leading-relaxed">' +
           '¡Qué alegría tenerles aquí, <strong class="text-primary font-bold text-base">' + urlGuest + '</strong>!<br>' +
@@ -2470,15 +2471,16 @@ if (musicPlayer && audio) {
     if (document.getElementById('campoTelefonoPergamino')) document.getElementById('campoTelefonoPergamino').style.display = 'none';
     if (inputNombre) inputNombre.value = urlGuest;
     if (ticketsHint) ticketsHint.textContent = urlTickets + ' Pase' + (urlTickets === 1 ? '' : 's');
+    if (btnSubmit) btnSubmit.innerHTML = '<span>✨ Confirmar Asistencia y Obtener Pase QR</span>';
   } else {
     if (saludoCont) {
       saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino shadow-sm border border-antique-gold/30 rounded-2xl bg-champagne-cream/50 p-3.5 mb-2 text-left">' +
         '<div class="flex items-center gap-1.5 mb-0.5 text-antique-gold font-bold">' +
           '<span class="text-base">⚜️</span>' +
-          '<strong class="font-display-lg text-[11px] uppercase tracking-wider text-deep-onyx">Registro de Asistencia</strong>' +
+          '<strong class="font-display-lg text-[11px] uppercase tracking-wider text-deep-onyx">Solicitud de Registro</strong>' +
         '</div>' +
         '<p class="text-xs text-deep-onyx/85 leading-relaxed">' +
-          'Por favor ingresa tus datos para confirmar tus pases y generar tu boleto de acceso.' +
+          'Para proteger el acomodo del salón, ingresa tus datos. Los novios te asignarán tu mesa oficial y recibirás tu pase QR definitivo.' +
         '</p>' +
       '</div>';
     }
@@ -2486,6 +2488,7 @@ if (musicPlayer && audio) {
     if (document.getElementById('campoTelefonoPergamino')) document.getElementById('campoTelefonoPergamino').style.display = 'flex';
     if (inputNombre) inputNombre.value = '';
     if (ticketsHint) ticketsHint.textContent = urlTickets + ' Pase' + (urlTickets === 1 ? '' : 's');
+    if (btnSubmit) btnSubmit.innerHTML = '<span>📲 Enviar Solicitud a los Novios</span>';
   }
 
   // Render pills
@@ -2499,7 +2502,7 @@ if (musicPlayer && audio) {
       labelAsistenciaNo.className = 'flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border border-neutral-300 rounded-2xl bg-white/50 hover:bg-neutral-100 transition-all text-center opacity-60';
       if (ticketsRow) ticketsRow.style.display = 'flex';
       if (dietaryBlock) dietaryBlock.style.display = 'flex';
-      if (btnSubmit) btnSubmit.innerHTML = '<span>📲 Confirmar Asistencia por WhatsApp</span>';
+      if (btnSubmit) btnSubmit.innerHTML = isVipGuest ? '<span>✨ Confirmar Asistencia y Obtener Pase QR</span>' : '<span>📲 Enviar Solicitud a los Novios</span>';
     };
 
     labelAsistenciaNo.onclick = () => {
@@ -2522,7 +2525,7 @@ if (musicPlayer && audio) {
       }
       if (btnSubmit) {
         btnSubmit.disabled = false;
-        btnSubmit.innerHTML = '<span>📲 Confirmar Asistencia por WhatsApp</span>';
+        btnSubmit.innerHTML = isVipGuest ? '<span>✨ Confirmar Asistencia y Obtener Pase QR</span>' : '<span>📲 Enviar Solicitud a los Novios</span>';
       }
       if (urlGuest && inputNombre) inputNombre.value = urlGuest;
       if (ticketsRow) ticketsRow.style.display = 'flex';
@@ -2543,12 +2546,7 @@ if (musicPlayer && audio) {
       const guestName = (data.get('nombre') || urlGuest || 'Invitado de Honor').trim();
       const phone = (data.get('telefono') || '').trim();
       const confirmedTickets = isAttending ? guestCount : 0;
-
-      // Preferencias dietarias
-      const selectedDiets = Array.from(rsvpForm.querySelectorAll('input[name="diet"]:checked')).map(cb => cb.value);
       const allergies = (data.get('alergias') || '').trim();
-      let dietaryNotes = selectedDiets.join(', ');
-      if (allergies) dietaryNotes += (dietaryNotes ? ' | ' : '') + 'Alergias: ' + allergies;
 
       // Generar Folio Logístico Opción B: [MESA]-[APELLIDO]-[PASES]
       const cleanTokens = guestName
@@ -2606,7 +2604,7 @@ if (musicPlayer && audio) {
                   found.status = isAttending ? 'CONFIRMED' : 'DECLINED';
                   found.confirmedPasses = confirmedTickets;
                   found.respondedAt = new Date().toISOString();
-                  if (dietaryNotes) found.dietary = dietaryNotes;
+                  if (allergies) found.dietary = allergies;
                   localStorage.setItem('invitta_2_guest_db', JSON.stringify(db));
                 }
               }
@@ -2629,9 +2627,13 @@ if (musicPlayer && audio) {
           ];
           if (isAttending) {
             lines.push('🎟️ *Pases Confirmados:* ' + confirmedTickets + ' de ' + urlTickets);
-            lines.push('🪑 *Mesa Asignada:* ' + tableDisplay);
-            lines.push('🔖 *Folio Logístico:* ' + folio);
-            if (dietaryNotes) lines.push('🍽️ *Preferencias Dietarias:* ' + dietaryNotes);
+            if (isVipGuest) {
+              lines.push('🪑 *Mesa Asignada:* ' + tableDisplay);
+              lines.push('🔖 *Folio de Acceso:* ' + folio);
+            } else {
+              lines.push('⏳ *Mesa:* Pendiente de asignación por los Novios');
+            }
+            if (allergies) lines.push('🍽️ *Nota / Dieta:* ' + allergies);
           }
           const text = encodeURIComponent(lines.join('\n'));
           const waPhone = CONFIG.whatsappNumber.replace(/[^\d]/g, '');
@@ -2649,12 +2651,12 @@ if (musicPlayer && audio) {
         };
       }
 
-      // Auto-trigger WhatsApp on confirm if configured
+      // Auto-trigger WhatsApp on confirm
       triggerWhatsApp();
 
       if (btnSubmit) {
         btnSubmit.disabled = true;
-        btnSubmit.textContent = 'Generando Pase en Pergamino...';
+        btnSubmit.textContent = 'Procesando...';
       }
 
       setTimeout(() => {
@@ -2674,32 +2676,41 @@ if (musicPlayer && audio) {
           if (folioEl) folioEl.textContent = 'FOLIO: ' + folio;
 
           if (isAttending) {
-            if (ticketsEl) ticketsEl.textContent = 'Pase autorizado para: ' + confirmedTickets + ' persona' + (confirmedTickets === 1 ? '' : 's');
-            if (msgEl) msgEl.textContent = 'Tu respuesta ha sido registrada exitosamente en el sistema oficial.';
-            if (labelTableEl) labelTableEl.textContent = tableDisplay.toUpperCase();
-            if (badgeTableEl) badgeTableEl.classList.remove('hidden');
+            if (isVipGuest) {
+              if (ticketsEl) ticketsEl.textContent = 'Pase autorizado para: ' + confirmedTickets + ' persona' + (confirmedTickets === 1 ? '' : 's');
+              if (msgEl) msgEl.textContent = '¡Pase Digital Sellado! Presenta este código QR en la entrada del salón.';
+              if (labelTableEl) labelTableEl.textContent = tableDisplay.toUpperCase();
+              if (badgeTableEl) badgeTableEl.classList.remove('hidden');
 
-            if (dietaryNotes && dietarySumEl) {
-              dietarySumEl.textContent = '🍽️ Menú: ' + dietaryNotes;
-              dietarySumEl.classList.remove('hidden');
-            } else if (dietarySumEl) {
-              dietarySumEl.classList.add('hidden');
-            }
-
-            const qrData = JSON.stringify({
-              folio: folio,
-              titular: guestName,
-              pases: confirmedTickets,
-              mesa: mesaCode,
-              evento: calcDisplayName,
-              fecha: CONFIG.eventDateShort || ''
-            });
-            const qrContainer = document.getElementById('qrContainer');
-            if (qrContainer) {
-              qrContainer.innerHTML = '';
-              if (typeof QRCode !== 'undefined') {
-                new QRCode(qrContainer, { text: qrData, width: 140, height: 140, colorDark: "#222222", colorLight: "#ffffff" });
+              if (allergies && dietarySumEl) {
+                dietarySumEl.textContent = '🍽️ Nota: ' + allergies;
+                dietarySumEl.classList.remove('hidden');
+              } else if (dietarySumEl) {
+                dietarySumEl.classList.add('hidden');
               }
+
+              const qrData = JSON.stringify({
+                folio: folio,
+                titular: guestName,
+                pases: confirmedTickets,
+                mesa: mesaCode,
+                evento: calcDisplayName,
+                fecha: CONFIG.eventDateShort || ''
+              });
+              const qrContainer = document.getElementById('qrContainer');
+              if (qrContainer) {
+                qrContainer.innerHTML = '';
+                if (typeof QRCode !== 'undefined') {
+                  new QRCode(qrContainer, { text: qrData, width: 140, height: 140, colorDark: "#222222", colorLight: "#ffffff" });
+                }
+              }
+            } else {
+              // Invitado en Lista de Espera / Sin Mesa Asignada aún
+              if (ticketsEl) ticketsEl.textContent = 'Solicitud por ' + confirmedTickets + ' pase' + (confirmedTickets === 1 ? '' : 's');
+              if (msgEl) msgEl.textContent = 'Tu solicitud ha sido enviada a los Novios. Te notificarán tu mesa y te enviarán tu Pase QR definitivo.';
+              if (badgeTableEl) badgeTableEl.classList.add('hidden');
+              const qrContainer = document.getElementById('qrContainer');
+              if (qrContainer) qrContainer.innerHTML = '<div class="p-3 bg-amber-500/10 border border-antique-gold/30 rounded-2xl my-2"><span class="text-3xl block mb-1">⏳</span><span class="text-xs font-bold text-deep-onyx">Mesa en proceso de asignación</span></div>';
             }
           } else {
             if (ticketsEl) ticketsEl.textContent = 'Lamentamos que no puedas acompañarnos.';
