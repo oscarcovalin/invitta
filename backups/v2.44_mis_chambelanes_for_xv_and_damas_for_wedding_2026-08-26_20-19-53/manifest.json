@@ -1,0 +1,26 @@
+{
+  "label": "v2.44_mis_chambelanes_for_xv_and_damas_for_wedding",
+  "timestamp": "2026-08-27T02:19:53.880Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 210549
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 99587
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
