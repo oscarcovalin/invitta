@@ -68,7 +68,7 @@
   function buildGuestRsvpUrl(guestId) {
     const token = state.guestLinks.get(guestId);
     if (!token) return null;
-    const url = new URL('scroll-rsvp-module/index.html', window.location.href);
+    const url = new URL(config.rsvpPublicBaseUrl || 'scroll-rsvp-module/index.html', window.location.href);
     url.search = '';
     url.searchParams.set('token', token);
     return url.toString();
