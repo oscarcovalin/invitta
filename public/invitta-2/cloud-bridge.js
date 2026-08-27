@@ -10,6 +10,8 @@
     projectId: null,
     designId: null,
     version: null,
+    identity: null,
+    projectStatus: null,
     loadingProject: false
   };
 
@@ -56,6 +58,118 @@
     return `${data.eventType === 'xv' ? 'XV Años' : 'Evento'} ${data.name || 'Sin nombre'}`;
   }
 
+  function normalizedEventType(value) {
+    const allowed = ['boda', 'xv', 'bautizo', 'cumpleanos', 'corporativo', 'otro'];
+    return allowed.includes(value) ? value : 'otro';
+  }
+
+  function projectIdentity(configValue) {
+    const data = configValue || {};
+    const eventType = normalizedEventType(data.eventType);
+    const normalize = value => String(value || '').trim().toLocaleLowerCase('es-MX');
+    if (eventType === 'boda') {
+      return ['boda', normalize(data.brideName), normalize(data.groomName)].join('|');
+    }
+    return [eventType, normalize(data.name)].join('|');
+  }
+
+  function extensionForMime(mimeType) {
+    const known = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+      'image/svg+xml': 'svg',
+      'audio/mpeg': 'mp3',
+      'audio/mp4': 'm4a',
+      'audio/ogg': 'ogg',
+      'audio/wav': 'wav',
+      'video/mp4': 'mp4',
+      'video/webm': 'webm'
+    };
+    return known[mimeType] || 'bin';
+  }
+
+  async function sha256Hex(blob) {
+    const digest = await window.crypto.subtle.digest('SHA-256', await blob.arrayBuffer());
+    return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+  }
+
+  function blobToDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error || new Error('No se pudo leer el recurso'));
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function mapConfigValues(value, transformString) {
+    if (typeof value === 'string') return transformString(value);
+    if (Array.isArray(value)) {
+      return Promise.all(value.map(item => mapConfigValues(item, transformString)));
+    }
+    if (value && typeof value === 'object') {
+      const entries = await Promise.all(Object.entries(value).map(async ([key, item]) => [
+        key,
+        await mapConfigValues(item, transformString)
+      ]));
+      return Object.fromEntries(entries);
+    }
+    return value;
+  }
+
+  async function prepareConfigForCloud(projectId, configValue) {
+    const bucket = config.assetBucket;
+    if (!bucket) return { config: clone(configValue), uploadedPaths: [] };
+    const uploadedPaths = [];
+    const cache = new Map();
+
+    try {
+      const cloudConfig = await mapConfigValues(configValue, async value => {
+        if (!/^data:(image|audio|video)\/[a-z0-9.+-]+;base64,/i.test(value)) return value;
+        if (cache.has(value)) return cache.get(value);
+
+        const blob = await fetch(value).then(response => response.blob());
+        const hash = await sha256Hex(blob);
+        const path = `${projectId}/assets/${hash}.${extensionForMime(blob.type)}`;
+        const reference = `storage://${bucket}/${path}`;
+        const { error } = await state.client.storage.from(bucket).upload(path, blob, {
+          contentType: blob.type || 'application/octet-stream',
+          upsert: true
+        });
+        if (error) throw error;
+        uploadedPaths.push(path);
+        cache.set(value, reference);
+        return reference;
+      });
+      return { config: cloudConfig, uploadedPaths };
+    } catch (error) {
+      if (uploadedPaths.length) {
+        await state.client.storage.from(bucket).remove(uploadedPaths);
+      }
+      throw error;
+    }
+  }
+
+  async function hydrateConfigFromCloud(configValue) {
+    const bucket = config.assetBucket;
+    if (!bucket) return clone(configValue);
+    const prefix = `storage://${bucket}/`;
+    const cache = new Map();
+
+    return mapConfigValues(configValue, async value => {
+      if (!value.startsWith(prefix)) return value;
+      if (cache.has(value)) return cache.get(value);
+      const path = value.slice(prefix.length);
+      const { data, error } = await state.client.storage.from(bucket).download(path);
+      if (error) throw error;
+      const dataUrl = await blobToDataUrl(data);
+      cache.set(value, dataUrl);
+      return dataUrl;
+    });
+  }
+
   function ensureModal() {
     let modal = document.getElementById('invittaCloudModal');
     if (modal) return modal;
@@ -74,6 +188,11 @@
       .invitta-cloud-actions button{border:1px solid #c9b991;border-radius:10px;padding:10px 14px;background:#fff;font:700 12px 'Plus Jakarta Sans',sans-serif;cursor:pointer}
       .invitta-cloud-actions button.primary{background:#202024;color:#fff;border-color:#202024}
       .invitta-cloud-message{min-height:18px;margin-top:10px!important;color:#8a641e!important}
+      .invitta-cloud-projects{display:grid;gap:8px;margin:16px 0;max-height:220px;overflow:auto}
+      .invitta-cloud-project{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:11px 12px;border:1px solid #e4ded2;border-radius:10px;background:#faf9f6;text-align:left;cursor:pointer}
+      .invitta-cloud-project strong{display:block;font-size:12px;color:#202024}
+      .invitta-cloud-project small{display:block;margin-top:3px;color:#777;font-size:10px}
+      .invitta-cloud-project[disabled]{cursor:default;opacity:.62}
     `;
     document.head.appendChild(style);
 
@@ -100,6 +219,7 @@
         </form>
         <div id="invittaCloudAccount" hidden>
           <p id="invittaCloudAccountText"></p>
+          <div class="invitta-cloud-projects" id="invittaCloudProjects" aria-live="polite"></div>
           <div class="invitta-cloud-actions">
             <button type="button" id="invittaCloudSignOut">Cerrar sesión</button>
             <button type="button" class="primary" data-cloud-close>Continuar diseñando</button>
@@ -132,6 +252,49 @@
         ? `Conectado como ${email}. Los guardados se enviarán a invitta-2-dev.`
         : 'Sesión segura activa en invitta-2-dev.';
     }
+    if (state.session) loadProjectList();
+  }
+
+  async function loadProjectList() {
+    const container = ensureModal().querySelector('#invittaCloudProjects');
+    if (!container || !state.session) return;
+    container.textContent = 'Cargando tus proyectos…';
+
+    const { data, error } = await state.client
+      .from('invitation_projects')
+      .select('id,name,event_type,status,updated_at')
+      .order('updated_at', { ascending: false });
+
+    container.replaceChildren();
+    if (error) {
+      container.textContent = `No se pudieron cargar los proyectos: ${error.message}`;
+      return;
+    }
+    if (!data || !data.length) {
+      container.textContent = 'Todavía no hay proyectos guardados en la nube.';
+      return;
+    }
+
+    data.forEach(project => {
+      const button = document.createElement('button');
+      const label = document.createElement('span');
+      const name = document.createElement('strong');
+      const detail = document.createElement('small');
+      const current = project.id === state.projectId;
+      button.type = 'button';
+      button.className = 'invitta-cloud-project';
+      button.disabled = current;
+      name.textContent = project.name;
+      detail.textContent = `${project.event_type.toUpperCase()} · ${project.status === 'archived' ? 'Archivado' : current ? 'Abierto' : 'Disponible'}`;
+      label.append(name, detail);
+      button.append(label);
+      button.addEventListener('click', async () => {
+        setProjectUrl(project.id);
+        closeModal();
+        await loadProject(project.id);
+      });
+      container.append(button);
+    });
   }
 
   function openModal() {
@@ -177,6 +340,8 @@
     state.projectId = null;
     state.designId = null;
     state.version = null;
+    state.identity = null;
+    state.projectStatus = null;
     setCloudStatus('Solo local', '#b7791f', 'Haz clic para conectar Invitta Cloud');
     refreshModal();
   }
@@ -204,9 +369,13 @@
       state.projectId = project.id;
       state.designId = design.id;
       state.version = Number(design.version);
+      state.projectStatus = project.status;
+      setCloudStatus('Cargando recursos…', '#b7791f', 'Recuperando recursos privados del proyecto');
+      const hydratedConfig = await hydrateConfigFromCloud(design.config);
+      state.identity = projectIdentity(hydratedConfig);
       studio().applyProject({
         projectId: project.id,
-        config: design.config,
+        config: hydratedConfig,
         themeName: design.theme_name,
         customTheme: design.custom_theme
       });
@@ -232,23 +401,32 @@
 
   async function createCloudProject(projectData) {
     const userId = state.session.user.id;
+    let prepared = null;
     const { data: project, error: projectError } = await state.client
       .from('invitation_projects')
       .insert({
         owner_id: userId,
         name: projectName(projectData),
-        event_type: projectData.config.eventType || 'otro',
+        event_type: normalizedEventType(projectData.config.eventType),
         status: 'draft'
       })
       .select('id,name')
       .single();
     if (projectError) throw projectError;
 
+    try {
+      setCloudStatus('Guardando recursos…', '#b7791f', 'Protegiendo archivos en Storage privado');
+      prepared = await prepareConfigForCloud(project.id, projectData.config);
+    } catch (error) {
+      await state.client.from('invitation_projects').delete().eq('id', project.id);
+      throw error;
+    }
+
     const { data: design, error: designError } = await state.client
       .from('invitation_designs')
       .insert({
         project_id: project.id,
-        config: clone(projectData.config),
+        config: prepared.config,
         theme_name: projectData.themeName || 'vino',
         custom_theme: clone(projectData.customTheme || {}),
         created_by: userId,
@@ -257,6 +435,9 @@
       .select('id,version')
       .single();
     if (designError) {
+      if (prepared.uploadedPaths.length) {
+        await state.client.storage.from(config.assetBucket).remove(prepared.uploadedPaths);
+      }
       await state.client.from('invitation_projects').delete().eq('id', project.id);
       throw designError;
     }
@@ -264,6 +445,8 @@
     state.projectId = project.id;
     state.designId = design.id;
     state.version = Number(design.version);
+    state.identity = projectIdentity(projectData.config);
+    state.projectStatus = 'draft';
     setProjectUrl(project.id);
   }
 
@@ -281,12 +464,42 @@
 
     try {
       if (!state.projectId || !state.designId) {
+        const createConfirmed = window.confirm(
+          `Crear un proyecto nuevo en Invitta Cloud: “${projectName(projectData)}”?`
+        );
+        if (!createConfirmed) {
+          setCloudStatus('Nube lista', '#1d8a55', 'Creación cancelada; no se guardaron cambios');
+          notify('Creación de proyecto cancelada');
+          return true;
+        }
+        await createCloudProject(projectData);
+      } else if (state.projectStatus === 'archived') {
+        const copyConfirmed = window.confirm(
+          'Este proyecto está archivado. ¿Deseas guardar el diseño actual como un proyecto nuevo?'
+        );
+        if (!copyConfirmed) {
+          setCloudStatus(`Nube v${state.version}`, '#1d8a55', 'Proyecto archivado; guardado cancelado');
+          notify('El proyecto archivado no fue modificado');
+          return true;
+        }
+        await createCloudProject(projectData);
+      } else if (state.identity !== projectIdentity(projectData.config)) {
+        const identityConfirmed = window.confirm(
+          'Cambiaste el tipo de evento o sus protagonistas. ¿Guardar como un proyecto nuevo?'
+        );
+        if (!identityConfirmed) {
+          setCloudStatus(`Nube v${state.version}`, '#1d8a55', 'Cambio de identidad cancelado');
+          notify('El proyecto original no fue modificado');
+          return true;
+        }
         await createCloudProject(projectData);
       } else {
+        setCloudStatus('Guardando recursos…', '#b7791f', 'Protegiendo archivos en Storage privado');
+        const prepared = await prepareConfigForCloud(state.projectId, projectData.config);
         const { data, error } = await state.client.rpc('save_invitation_design', {
           p_design_id: state.designId,
           p_expected_version: state.version,
-          p_config: clone(projectData.config),
+          p_config: prepared.config,
           p_theme_name: projectData.themeName || 'vino',
           p_custom_theme: clone(projectData.customTheme || {})
         });
