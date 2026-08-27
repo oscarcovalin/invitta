@@ -67,7 +67,7 @@ assert(html.includes('id="dieta"'), 'invitacion.html includes #dieta select drop
 assert(html.includes('Menú Infantil'), 'invitacion.html includes Menú Infantil option');
 assert(html.includes('Alergias'), 'invitacion.html includes Alergias option');
 assert(html.includes('Vegano'), 'invitacion.html includes Vegano option');
-assert(html.includes('id="alergias"'), 'invitacion.html includes #alergias text input');
+assert(!html.includes('id="alergias"'), 'invitacion.html removed redundant #alergias text input');
 assert(html.includes('id="rsvpSubmit"'), 'invitacion.html includes #rsvpSubmit button');
 assert(html.includes('id="rsvpSuccess"'), 'invitacion.html includes #rsvpSuccess confirmation view');
 assert(html.includes('pass-ticket-pergamino'), 'invitacion.html includes .pass-ticket-pergamino digital access ticket');

@@ -1641,7 +1641,6 @@ tailwind.config = {
               <option value="Alergias">Alergias</option>
               <option value="Vegano">Vegano</option>
             </select>
-            <input type="text" id="alergias" name="alergias" placeholder="Especifica alergias o mensaje adicional (opcional)..." style="margin-top: 8px;">
           </div>
 
           <button type="submit" id="rsvpSubmit" class="btn-rsvp-submit-clean">Enviar Confirmación</button>
@@ -2443,7 +2442,7 @@ if (musicPlayer && audio) {
   const inputNombre = document.getElementById('nombre');
   const inputAsistencia = document.getElementById('asistencia');
   const inputPases = document.getElementById('pases');
-  const inputAlergias = document.getElementById('alergias');
+  const inputDieta = document.getElementById('dieta');
   const rsvpForm = document.getElementById('rsvpForm');
   const rsvpSuccess = document.getElementById('rsvpSuccess');
   const btnSubmit = document.getElementById('rsvpSubmit');
@@ -2491,8 +2490,6 @@ if (musicPlayer && audio) {
     if (inputPases) inputPases.value = 1;
   }
 
-  const inputDieta = document.getElementById('dieta');
-
   // Toggle pases input depending on asistencia
   if (inputAsistencia) {
     inputAsistencia.addEventListener('change', () => {
@@ -2518,7 +2515,6 @@ if (musicPlayer && audio) {
         btnSubmit.textContent = 'Enviar Confirmación';
       }
       if (inputDieta) inputDieta.value = '';
-      if (inputAlergias) inputAlergias.value = '';
       if (guestParam && inputNombre) {
         inputNombre.value = guestParam.replace(/-/g, ' ').replace(/_/g, ' ').trim();
         if (inputPases) inputPases.value = ticketsParam;
@@ -2535,13 +2531,7 @@ if (musicPlayer && audio) {
       const isAttending = inputAsistencia ? inputAsistencia.value === 'si' : true;
       const guestName = (inputNombre ? inputNombre.value : (guestParam || 'Invitado de Honor')).trim();
       const confirmedTickets = isAttending ? (parseInt(inputPases.value, 10) || 1) : 0;
-      
-      const selectedDiet = inputDieta ? inputDieta.value : '';
-      const extraNotes = inputAlergias ? inputAlergias.value.trim() : '';
-      let allergies = selectedDiet;
-      if (extraNotes) {
-        allergies += (allergies ? ' | ' : '') + extraNotes;
-      }
+      const allergies = inputDieta ? inputDieta.value.trim() : '';
 
       // Generar Folio Logístico: [MESA]-[APELLIDO]-[PASES]
       const cleanTokens = guestName
