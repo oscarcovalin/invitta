@@ -330,6 +330,12 @@
     </main>
 
     <script>
+        const rsvpUrlParams = new URLSearchParams(window.location.search);
+        const rsvpCloudProjectId = rsvpUrlParams.get('cloudProject');
+        const rsvpStorageSuffix = rsvpCloudProjectId ? `_cloud_${rsvpCloudProjectId}` : '';
+        const rsvpGuestStorageKey = `invitta_2_guest_db${rsvpStorageSuffix}`;
+        const rsvpSeatingStorageKey = `invitta_seating_state_v2${rsvpStorageSuffix}`;
+
         function sincronizarConfiguracionEvento() {
             try {
                 const raw = localStorage.getItem('invitta_event_invitation_config');
@@ -349,7 +355,7 @@
 
             try {
                 // 1. Revisar en base de datos invitta_2_guest_db
-                const rawDb = localStorage.getItem('invitta_2_guest_db');
+                const rawDb = localStorage.getItem(rsvpGuestStorageKey);
                 if (rawDb) {
                     const db = JSON.parse(rawDb);
                     if (db && Array.isArray(db.guests)) {
@@ -363,7 +369,7 @@
                 }
 
                 // 2. Revisar en invitta_seating_state_v2
-                const rawSeating = localStorage.getItem('invitta_seating_state_v2');
+                const rawSeating = localStorage.getItem(rsvpSeatingStorageKey);
                 if (rawSeating) {
                     const seating = JSON.parse(rawSeating);
                     if (seating && Array.isArray(seating.guests)) {
@@ -379,24 +385,40 @@
             return null;
         }
 
-        function guardarRespuestaEnStorage(nombre, pases, asistencia) {
+        function guardarRespuestaEnStorage(nombre, pases, asistencia, guestParam) {
             try {
                 const isConfirmed = asistencia === 'si';
                 const status = isConfirmed ? 'CONFIRMED' : 'DECLINED';
                 const nowIso = new Date().toISOString();
+                const guestParamClean = (guestParam || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                const updateGuest = (guest) => {
+                    const idClean = (guest.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                    const nameClean = (guest.name || '').toLowerCase();
+                    const requestedName = nombre.toLowerCase();
+                    const matches = guestParamClean
+                        ? idClean === guestParamClean
+                        : nameClean.includes(requestedName) || requestedName.includes(nameClean);
+                    if (!matches) return false;
+                    guest.status = status;
+                    guest.confirmedPasses = isConfirmed ? parseInt(pases, 10) : 0;
+                    guest.respondedAt = nowIso;
+                    return true;
+                };
 
-                // Actualizar en invitta_2_guest_db
-                const rawDb = localStorage.getItem('invitta_2_guest_db');
+                // Actualizar directorio y plano aislados por proyecto.
+                const rawDb = localStorage.getItem(rsvpGuestStorageKey);
                 if (rawDb) {
                     const db = JSON.parse(rawDb);
                     if (db && Array.isArray(db.guests)) {
-                        const guest = db.guests.find(g => g.name.toLowerCase().includes(nombre.toLowerCase()) || nombre.toLowerCase().includes(g.name.toLowerCase()));
-                        if (guest) {
-                            guest.status = status;
-                            guest.confirmedPasses = isConfirmed ? parseInt(pases, 10) : 0;
-                            guest.respondedAt = nowIso;
-                            localStorage.setItem('invitta_2_guest_db', JSON.stringify(db));
-                        }
+                        if (db.guests.some(updateGuest)) localStorage.setItem(rsvpGuestStorageKey, JSON.stringify(db));
+                    }
+                }
+
+                const rawSeating = localStorage.getItem(rsvpSeatingStorageKey);
+                if (rawSeating) {
+                    const seating = JSON.parse(rawSeating);
+                    if (seating && Array.isArray(seating.guests)) {
+                        if (seating.guests.some(updateGuest)) localStorage.setItem(rsvpSeatingStorageKey, JSON.stringify(seating));
                     }
                 }
             } catch (e) {
@@ -450,18 +472,17 @@
         }
 
         function reiniciarFormulario() {
-            const urlParams = new URLSearchParams(window.location.search);
-            cargarEstadoRsvp(urlParams.get('guest'), null);
+            cargarEstadoRsvp(rsvpUrlParams.get('guest'), parseInt(rsvpUrlParams.get('passes') || '0', 10) || null);
         }
 
         document.addEventListener("DOMContentLoaded", function() {
             sincronizarConfiguracionEvento();
 
             // Lógica de detección automática de URL (Parámetro ?guest=)
-            const urlParams = new URLSearchParams(window.location.search);
-            const guestParam = urlParams.get('guest');
+            const guestParam = rsvpUrlParams.get('guest');
+            const passesParam = parseInt(rsvpUrlParams.get('passes') || '0', 10) || null;
             
-            cargarEstadoRsvp(guestParam, null);
+            cargarEstadoRsvp(guestParam, passesParam);
 
             // Manejo de chips de prueba en la barra superior
             document.querySelectorAll('.btn-url-chip').forEach(btn => {
@@ -511,7 +532,7 @@
                 }
                 const folio = `${mesaCode}-${apellidoCode}-${pases}P`;
 
-                guardarRespuestaEnStorage(nombre, pases, asistencia);
+                guardarRespuestaEnStorage(nombre, pases, asistencia, guestParam);
 
                 document.getElementById('rsvpForm').style.display = 'none';
                 document.getElementById('passNombreConfirmado').textContent = nombre;

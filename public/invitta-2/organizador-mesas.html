@@ -1038,6 +1038,8 @@
     // 1. Inicializar SeatingPlanner y GuestManager
     const operationsCloudProjectId = new URLSearchParams(window.location.search).get('cloudProject');
     const operationsStorageSuffix = operationsCloudProjectId ? `_cloud_${operationsCloudProjectId}` : '';
+    const operationsGuestStorageKey = `invitta_2_guest_db${operationsStorageSuffix}`;
+    const operationsSeatingStorageKey = `invitta_seating_state_v2${operationsStorageSuffix}`;
     const planner = new SeatingPlanner({
       unassignedListSelector: '#unassignedList',
       tablesContainerSelector: '#tablesContainer',
@@ -1078,11 +1080,12 @@
 
     // Sincronización reactiva entre pestañas (Escáner de Puerta, Generador de Emergencia y Salón)
     window.addEventListener('storage', (e) => {
-      if (e.key === 'invitta_2_guest_db' || e.key === 'invitta_2_seating_state') {
+      if (e.key === operationsGuestStorageKey || e.key === operationsSeatingStorageKey) {
         planner.state = planner.loadPersistedState();
         gm.state = gm.loadState();
         planner.render();
         updateFooterStats();
+        window.dispatchEvent(new CustomEvent('guests:updated', { detail: { state: gm.state } }));
       }
     });
 
@@ -1397,12 +1400,15 @@
       document.getElementById('modalKpiPending').textContent = `${pendingPasses} pases`;
 
       const list = document.getElementById('modalDispatchList');
-      const baseUrl = window.location.href.split('index.html')[0].replace(/\/+$/, '');
 
       list.innerHTML = guests.map(g => {
         const passes = g.pases || g.passes || 1;
-        const cleanId = g.id.replace(/^g_/, '');
-        const inviteUrl = `${baseUrl}/scroll-rsvp-module/index.html?guest=${cleanId}`;
+        const inviteUrlObject = new URL('scroll-rsvp-module/index.html', window.location.href);
+        inviteUrlObject.search = '';
+        inviteUrlObject.searchParams.set('guest', g.id);
+        inviteUrlObject.searchParams.set('passes', String(passes));
+        if (operationsCloudProjectId) inviteUrlObject.searchParams.set('cloudProject', operationsCloudProjectId);
+        const inviteUrl = inviteUrlObject.toString();
         
         const message = `✨ *Invitación Especial de Boda — Catalina & Julián* ✨\n\n` +
           `Estimad@ *${g.name}*:\n` +
@@ -1433,11 +1439,19 @@
             </div>
 
             <div class="flex items-center gap-1.5">
-              <a href="${waUrl}" target="_blank" onclick="g.status='SENT'; renderModalDispatch();"
-                class="px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[11px] font-semibold flex items-center gap-1 hover:bg-emerald-700 transition-colors shadow-sm">
-                <span class="material-symbols-outlined text-sm">chat</span>
-                <span>WhatsApp</span>
-              </a>
+              ${g.phone ? `
+                <a href="${waUrl}" target="_blank" rel="noopener noreferrer"
+                  class="px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[11px] font-semibold flex items-center gap-1 hover:bg-emerald-700 transition-colors shadow-sm">
+                  <span class="material-symbols-outlined text-sm">chat</span>
+                  <span>WhatsApp</span>
+                </a>
+              ` : `
+                <span title="Agrega un teléfono para habilitar WhatsApp"
+                  class="px-2.5 py-1.5 rounded-lg bg-neutral-100 text-neutral-400 text-[11px] font-semibold flex items-center gap-1 cursor-not-allowed">
+                  <span class="material-symbols-outlined text-sm">chat</span>
+                  <span>Sin teléfono</span>
+                </span>
+              `}
 
               <button type="button" class="btn-copy-rsvp-link px-2 py-1.5 rounded-lg bg-surface-container border border-outline-variant hover:border-primary text-primary text-[11px] flex items-center gap-1 transition-colors" data-url="${inviteUrl}">
                 <span class="material-symbols-outlined text-sm">link</span>
