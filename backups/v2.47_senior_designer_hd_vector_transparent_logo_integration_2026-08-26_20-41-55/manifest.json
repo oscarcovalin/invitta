@@ -1,0 +1,26 @@
+{
+  "label": "v2.47_senior_designer_hd_vector_transparent_logo_integration",
+  "timestamp": "2026-08-27T02:41:55.592Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 216582
+    },
+    {
+      "filename": "index.html",
+      "size": 96192
+    },
+    {
+      "filename": "app.js",
+      "size": 102566
+    },
+    {
+      "filename": "style.css",
+      "size": 17423
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
