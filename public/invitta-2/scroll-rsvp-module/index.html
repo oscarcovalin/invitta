@@ -238,7 +238,7 @@
 <body>
 
     <!-- BARRA SUPERIOR DE SIMULACIÓN DE URL (Para pruebas inmediatas) -->
-    <header class="url-simulator-bar">
+    <header class="url-simulator-bar" id="urlSimulatorBar">
         <div style="display:flex; align-items:center; gap:8px;">
             <span style="color:#d4af37; font-weight:600;">✦ Invitta Studio:</span>
             <span>Simulador de Enlace RSVP (?guest=id)</span>
@@ -309,32 +309,94 @@
                 </button>
             </form>
 
-            <!-- VISTA DE ÉXITO Y PASE DIGITAL -->
+            <!-- VISTA DE ÉXITO Y COMPROBANTE RSVP -->
             <div class="vip-pass-success" id="vistaExito">
                 <span class="material-symbols-outlined" style="font-size: 48px; color: var(--gold-accent);">mark_email_read</span>
                 <h3 style="font-family:'Cinzel', serif; color: var(--wine-primary); margin-top: 10px; text-transform: uppercase;">¡Registro Exitoso!</h3>
                 <p style="font-size: 0.9rem; color: #555; margin-top: 5px;" id="textoResumenExito">Tu respuesta ha sido registrada en el sistema oficial.</p>
 
                 <div class="pass-ticket-box">
-                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--gold-accent); text-transform: uppercase; letter-spacing: 1px;">Pase Digital de Acceso</span>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--gold-accent); text-transform: uppercase; letter-spacing: 1px;">Comprobante de Confirmación</span>
                     <h4 style="font-family:'Cinzel', serif; color: var(--wine-primary); margin: 6px 0;" id="passNombreConfirmado">Invitado de Honor</h4>
                     <p style="font-size: 0.85rem; color: #666; font-family:'JetBrains Mono', monospace;" id="passFolio">FOLIO: PASS-2027</p>
                 </div>
 
                 <button type="button" onclick="reiniciarFormulario()" style="background:none; border:none; color: var(--wine-primary); text-decoration: underline; cursor: pointer; font-size: 0.85rem;">
-                    ↺ Probar otra confirmación
+                    ↺ Revisar mi confirmación
                 </button>
             </div>
 
         </div>
     </main>
 
+    <script src="../cloud-config.js"></script>
     <script>
         const rsvpUrlParams = new URLSearchParams(window.location.search);
+        const rsvpPublicToken = rsvpUrlParams.get('token');
         const rsvpCloudProjectId = rsvpUrlParams.get('cloudProject');
         const rsvpStorageSuffix = rsvpCloudProjectId ? `_cloud_${rsvpCloudProjectId}` : '';
         const rsvpGuestStorageKey = `invitta_2_guest_db${rsvpStorageSuffix}`;
         const rsvpSeatingStorageKey = `invitta_seating_state_v2${rsvpStorageSuffix}`;
+        let rsvpCloudGuest = null;
+
+        function escapeRsvpHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            })[character]);
+        }
+
+        function guestRsvpEndpoint() {
+            const config = window.INVITTA2_CLOUD_CONFIG;
+            return config && config.url ? `${config.url}/functions/v1/guest-rsvp` : '';
+        }
+
+        async function cargarRsvpPublico(token) {
+            const endpoint = guestRsvpEndpoint();
+            if (!endpoint) throw new Error('El servicio RSVP no está configurado.');
+            const response = await fetch(`${endpoint}?token=${encodeURIComponent(token)}`, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' },
+                cache: 'no-store'
+            });
+            if (!response.ok) throw new Error('Este enlace no es válido o ya expiró.');
+            const data = await response.json();
+            rsvpCloudGuest = data.guest;
+
+            const subEvento = document.getElementById('subEvento');
+            if (subEvento && data.project && data.project.name) subEvento.textContent = data.project.name;
+            cargarEstadoRsvp(data.guest.id, data.guest.passes);
+
+            const inputNombre = document.getElementById('nombre');
+            const inputPases = document.getElementById('pases');
+            const campoNombreContainer = document.getElementById('campo-nombre-container');
+            const contenedorSaludo = document.getElementById('contenedor-saludo');
+            inputNombre.value = data.guest.name;
+            inputPases.value = data.guest.passes;
+            inputPases.max = data.guest.passes;
+            campoNombreContainer.style.display = 'none';
+            contenedorSaludo.innerHTML = `
+                <div class="mensaje-personalizado">
+                    ¡Qué alegría tenerte aquí, <strong>${escapeRsvpHtml(data.guest.name)}</strong>! ${data.guest.passes === 1 ? 'Tu' : 'Tus'} <strong>${data.guest.passes} ${data.guest.passes === 1 ? 'pase' : 'pases'}</strong> ya ${data.guest.passes === 1 ? 'está reservado' : 'están reservados'} para nuestro gran día.
+                </div>
+            `;
+        }
+
+        async function guardarRsvpPublico(token, pases, asistencia) {
+            const endpoint = guestRsvpEndpoint();
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    token,
+                    attending: asistencia === 'si',
+                    confirmedPasses: asistencia === 'si' ? parseInt(pases, 10) : 0
+                })
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.error || 'No fue posible guardar la confirmación.');
+            rsvpCloudGuest = data.guest;
+            return data;
+        }
 
         function sincronizarConfiguracionEvento() {
             try {
@@ -446,7 +508,7 @@
                 
                 contenedorSaludo.innerHTML = `
                     <div class="mensaje-personalizado">
-                        ¡Qué alegría tenerte aquí, <strong>${nombreMostrar}</strong>! Tus <strong>${pasesAsignados} pases</strong> ya están reservados para nuestro gran día.
+                        ¡Qué alegría tenerte aquí, <strong>${escapeRsvpHtml(nombreMostrar)}</strong>! Tus <strong>${pasesAsignados} pases</strong> ya están reservados para nuestro gran día.
                     </div>
                 `;
                 
@@ -471,18 +533,33 @@
             }
         }
 
-        function reiniciarFormulario() {
+        async function reiniciarFormulario() {
+            if (rsvpPublicToken) {
+                await cargarRsvpPublico(rsvpPublicToken);
+                return;
+            }
             cargarEstadoRsvp(rsvpUrlParams.get('guest'), parseInt(rsvpUrlParams.get('passes') || '0', 10) || null);
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", async function() {
+            if (rsvpPublicToken) document.getElementById('urlSimulatorBar')?.remove();
             sincronizarConfiguracionEvento();
 
             // Lógica de detección automática de URL (Parámetro ?guest=)
             const guestParam = rsvpUrlParams.get('guest');
             const passesParam = parseInt(rsvpUrlParams.get('passes') || '0', 10) || null;
             
-            cargarEstadoRsvp(guestParam, passesParam);
+            if (rsvpPublicToken) {
+                try {
+                    await cargarRsvpPublico(rsvpPublicToken);
+                } catch (error) {
+                    document.getElementById('rsvpForm').style.display = 'none';
+                    document.getElementById('contenedor-saludo').innerHTML = `<div class="mensaje-personalizado">${escapeRsvpHtml(error.message)}</div>`;
+                    return;
+                }
+            } else {
+                cargarEstadoRsvp(guestParam, passesParam);
+            }
 
             // Manejo de chips de prueba en la barra superior
             document.querySelectorAll('.btn-url-chip').forEach(btn => {
@@ -497,16 +574,16 @@
             });
 
             // Manejo del envío del formulario con feedback en pantalla
-            document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+            document.getElementById('rsvpForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
 
-                const nombre = document.getElementById('nombre').value || 'Invitado de Honor';
+                const nombre = (rsvpCloudGuest && rsvpCloudGuest.name) || document.getElementById('nombre').value || 'Invitado de Honor';
                 const pases = document.getElementById('pases').value || '1';
                 const asistencia = document.getElementById('asistencia').value;
 
                 // Folio Logístico Opción B: [MESA]-[APELLIDO]-[PASES] (ej: M03-MARTINEZ-4P)
                 let mesaCode = 'MGEN';
-                const matched = buscarInvitadoEnStorage(guestParam || nombre);
+                const matched = rsvpCloudGuest || buscarInvitadoEnStorage(guestParam || nombre);
                 if (matched) {
                     if (matched.court || matched.vip || matched.tableId === 'tbl_imperial' || String(matched.tableId).includes('imp')) {
                         mesaCode = 'MIMP';
@@ -532,7 +609,19 @@
                 }
                 const folio = `${mesaCode}-${apellidoCode}-${pases}P`;
 
-                guardarRespuestaEnStorage(nombre, pases, asistencia, guestParam);
+                if (rsvpPublicToken) {
+                    const submitButton = document.querySelector('#rsvpForm button[type="submit"]');
+                    if (submitButton) submitButton.disabled = true;
+                    try {
+                        await guardarRsvpPublico(rsvpPublicToken, pases, asistencia);
+                    } catch (error) {
+                        if (submitButton) submitButton.disabled = false;
+                        alert(error.message);
+                        return;
+                    }
+                } else {
+                    guardarRespuestaEnStorage(nombre, pases, asistencia, guestParam);
+                }
 
                 document.getElementById('rsvpForm').style.display = 'none';
                 document.getElementById('passNombreConfirmado').textContent = nombre;

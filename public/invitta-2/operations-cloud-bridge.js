@@ -26,8 +26,74 @@
     saving: false,
     saveTimer: null,
     active: false,
-    dirty: false
+    dirty: false,
+    guestLinks: new Map(),
+    realtimeChannel: null
   };
+
+  async function ensureGuestLinks() {
+    if (!state.project || state.project.status === 'archived') return new Map();
+
+    const guestIds = (planner.state.guests || []).map(guest => guest.id).filter(Boolean);
+    if (guestIds.length === 0) return new Map();
+
+    const { data: existing, error: existingError } = await state.client
+      .from('invitation_guest_links')
+      .select('guest_id,token')
+      .eq('project_id', projectId)
+      .in('guest_id', guestIds);
+    if (existingError) throw existingError;
+
+    const existingIds = new Set((existing || []).map(link => link.guest_id));
+    const missing = guestIds
+      .filter(guestId => !existingIds.has(guestId))
+      .map(guestId => ({ project_id: projectId, guest_id: guestId }));
+
+    if (missing.length > 0) {
+      const { error: insertError } = await state.client.from('invitation_guest_links').insert(missing);
+      if (insertError && insertError.code !== '23505') throw insertError;
+    }
+
+    const { data: links, error: linksError } = await state.client
+      .from('invitation_guest_links')
+      .select('guest_id,token')
+      .eq('project_id', projectId)
+      .in('guest_id', guestIds);
+    if (linksError) throw linksError;
+
+    state.guestLinks = new Map((links || []).map(link => [link.guest_id, link.token]));
+    return new Map(state.guestLinks);
+  }
+
+  function buildGuestRsvpUrl(guestId) {
+    const token = state.guestLinks.get(guestId);
+    if (!token) return null;
+    const url = new URL('scroll-rsvp-module/index.html', window.location.href);
+    url.search = '';
+    url.searchParams.set('token', token);
+    return url.toString();
+  }
+
+  function subscribeToOperations() {
+    if (state.realtimeChannel || !state.client || !state.project) return;
+    state.realtimeChannel = state.client
+      .channel(`invitation-operations-${projectId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'invitation_operations',
+        filter: `project_id=eq.${projectId}`
+      }, payload => {
+        const remoteVersion = Number(payload.new && payload.new.version) || 0;
+        if (!state.saving && !state.dirty && remoteVersion > state.version) initialize();
+      })
+      .subscribe();
+  }
+
+  window.InvittaOperationsCloud = Object.freeze({
+    ensureGuestLinks,
+    buildGuestRsvpUrl
+  });
 
   function cloneSeatingState() {
     return {
@@ -137,6 +203,7 @@
 
       if (record) {
         applyRemoteState(record);
+        subscribeToOperations();
         const readOnly = project.status === 'archived';
         setStatus(
           `${project.name} · Mesas nube v${state.version}${readOnly ? ' · Solo lectura' : ''}`,
