@@ -60,14 +60,26 @@ assert(html.includes('pergamino-container'), 'invitacion.html includes .pergamin
 assert(html.includes('pergamino-ornament'), 'invitacion.html includes .pergamino-ornament royal ribbon');
 assert(html.includes('id="contenedor-saludo-pergamino"'), 'invitacion.html includes #contenedor-saludo-pergamino dynamic greeting container');
 assert(html.includes('id="campoNombrePergamino"'), 'invitacion.html includes #campoNombrePergamino');
+assert(html.includes('id="campoTelefonoPergamino"'), 'invitacion.html includes #campoTelefonoPergamino');
 assert(html.includes('id="radioAsistenciaSi"'), 'invitacion.html includes #radioAsistenciaSi');
 assert(html.includes('id="radioAsistenciaNo"'), 'invitacion.html includes #radioAsistenciaNo');
 assert(html.includes('id="rsvpTicketsRow"'), 'invitacion.html includes #rsvpTicketsRow pass stepper container');
+assert(html.includes('id="rsvpDietaryBlock"'), 'invitacion.html includes #rsvpDietaryBlock for catering preferences');
+assert(html.includes('id="formGuestAllergies"'), 'invitacion.html includes #formGuestAllergies for kitchen restrictions');
 assert(html.includes('id="rsvpSubmit"'), 'invitacion.html includes #rsvpSubmit button');
 assert(html.includes('id="rsvpSuccess"'), 'invitacion.html includes #rsvpSuccess confirmation view');
 assert(html.includes('pass-ticket-pergamino'), 'invitacion.html includes .pass-ticket-pergamino digital access ticket');
+assert(html.includes('id="badgePassTable"'), 'invitacion.html includes #badgePassTable badge');
+assert(html.includes('id="btnSharePassWhatsapp"'), 'invitacion.html includes #btnSharePassWhatsapp action');
+assert(html.includes('id="btnDownloadPassImage"'), 'invitacion.html includes #btnDownloadPassImage action');
 assert(html.includes('id="btnResetRsvp"'), 'invitacion.html includes #btnResetRsvp modifier button');
 assert(html.includes('initRsvpPergamino'), 'invitacion.html includes initRsvpPergamino client-side execution script');
+
+// 7. Verification of VIP Preview Simulator in invitacion-estudio.html
+const studioHtml = fs.readFileSync('./invitacion-estudio.html', 'utf-8');
+assert(studioHtml.includes('btn-simulate-vip'), 'invitacion-estudio.html contains btn-simulate-vip buttons');
+assert(studioHtml.includes('Simulador de Vista Previa VIP'), 'invitacion-estudio.html contains VIP Preview Simulator');
+assert(!studioHtml.includes('id="btnGenerateVipLink"'), 'invitacion-estudio.html removed redundant manual link generator');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed.\n`);
 if (failed > 0) process.exit(1);

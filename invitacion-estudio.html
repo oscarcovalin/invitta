@@ -1086,38 +1086,26 @@
             </div>
 
             <div id="rsvpFields">
-              <div class="decor-box">
-                <label style="color:var(--primary); font-weight:700;">Generar Enlace por Invitado (Con QR y Pases)</label>
-                <span class="hint">Crea enlaces personalizados para cada familia o persona. Al abrirlo, verán su nombre en la portada y su número de pases asignados.</span>
+              <!-- SIMULADOR DE VISTA PREVIA VIP EN TIEMPO REAL -->
+              <div class="decor-box" style="background:var(--primary-light); border:1px solid var(--primary); border-radius:10px; padding:12px;">
+                <label style="color:var(--primary); font-weight:700; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                  <span class="material-symbols-outlined" style="font-size:16px;">visibility</span>
+                  Simulador de Vista Previa VIP
+                </label>
+                <span class="hint" style="margin-bottom:8px; display:block;">
+                  Prueba en tiempo real cómo ve la invitación un comensal personalizado vs un invitado general:
+                </span>
                 
-                <div class="form-group" style="margin-top:10px;">
-                  <label for="inputVipGuest">Nombre de la Familia o Invitado</label>
-                  <input type="text" id="inputVipGuest" placeholder="Ej: Familia Martínez López">
-                </div>
-
-                <div class="form-row" style="margin-top:8px;">
-                  <div class="form-group">
-                    <label for="inputVipTickets">Pases Asignados</label>
-                    <input type="number" id="inputVipTickets" min="1" max="10" value="2">
-                  </div>
-                  <div class="form-group" style="display:flex; align-items:flex-end;">
-                    <button type="button" class="btn btn-primary" id="btnGenerateVipLink" style="width:100%; height:36px; justify-content:center;">
-                      <span class="material-symbols-outlined">link</span> Generar Enlace
-                    </button>
-                  </div>
-                </div>
-
-                <div id="vipGeneratedResult" style="display:none; margin-top:12px; padding:12px; background:var(--bg-app); border:1px solid var(--border-medium); border-radius:8px;">
-                  <label style="font-size:11px;">Enlace Personalizado Listo:</label>
-                  <input type="text" id="inputVipGeneratedUrl" readonly style="font-size:12px; margin:4px 0 8px;">
-                  <div style="display:flex; gap:8px;">
-                    <button type="button" class="btn btn-secondary" id="btnCopyVipLink" style="flex:1; font-size:11.5px; justify-content:center;">
-                      <span class="material-symbols-outlined">content_copy</span> Copiar Enlace
-                    </button>
-                    <button type="button" class="btn btn-secondary" id="btnPreviewVipLink" style="flex:1; font-size:11.5px; justify-content:center;">
-                      <span class="material-symbols-outlined">visibility</span> Previsualizar
-                    </button>
-                  </div>
+                <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                  <button type="button" class="btn btn-secondary btn-simulate-vip active" data-guest="" data-passes="" data-mesa="" style="font-size:11.5px; justify-content:flex-start; text-align:left; padding:6px 10px;">
+                    <span style="margin-right:4px;">🌐</span> <strong>Vista General</strong> (Sin personalizar)
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-simulate-vip" data-guest="Familia Martínez Valdés" data-passes="4" data-mesa="3" style="font-size:11.5px; justify-content:flex-start; text-align:left; padding:6px 10px;">
+                    <span style="margin-right:4px;">👑</span> <strong>Familia Martínez</strong> · 4 Pases · Mesa 3
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-simulate-vip" data-guest="Dr. Alejandro Gómez" data-passes="1" data-mesa="1" style="font-size:11.5px; justify-content:flex-start; text-align:left; padding:6px 10px;">
+                    <span style="margin-right:4px;">👤</span> <strong>Dr. Alejandro Gómez</strong> · 1 Pase · Mesa 1
+                  </button>
                 </div>
               </div>
 
