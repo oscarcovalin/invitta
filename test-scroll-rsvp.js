@@ -63,10 +63,11 @@ assert(html.includes('id="campo-nombre-container"'), 'invitacion.html includes #
 assert(html.includes('id="nombre"'), 'invitacion.html includes #nombre');
 assert(html.includes('id="asistencia"'), 'invitacion.html includes #asistencia');
 assert(html.includes('id="pases"'), 'invitacion.html includes #pases');
-assert(html.includes('id="alergias"'), 'invitacion.html includes #alergias');
-assert(html.includes('id="labelDietVegano"'), 'invitacion.html includes #labelDietVegano option');
-assert(html.includes('id="labelDietInfantil"'), 'invitacion.html includes #labelDietInfantil option');
-assert(html.includes('id="labelDietAlergias"'), 'invitacion.html includes #labelDietAlergias option');
+assert(html.includes('id="dieta"'), 'invitacion.html includes #dieta select dropdown');
+assert(html.includes('Menú Infantil'), 'invitacion.html includes Menú Infantil option');
+assert(html.includes('Alergias'), 'invitacion.html includes Alergias option');
+assert(html.includes('Vegano'), 'invitacion.html includes Vegano option');
+assert(html.includes('id="alergias"'), 'invitacion.html includes #alergias text input');
 assert(html.includes('id="rsvpSubmit"'), 'invitacion.html includes #rsvpSubmit button');
 assert(html.includes('id="rsvpSuccess"'), 'invitacion.html includes #rsvpSuccess confirmation view');
 assert(html.includes('pass-ticket-pergamino'), 'invitacion.html includes .pass-ticket-pergamino digital access ticket');

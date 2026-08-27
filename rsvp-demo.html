@@ -135,6 +135,17 @@
                 <input type="number" id="pases" name="pases" min="1" value="1" required>
             </div>
 
+            <div class="form-group" id="campo-dieta-container">
+                <label for="dieta">Dieta Especial / Menú</label>
+                <select id="dieta" name="dieta">
+                    <option value="">Selecciona una opción (Opcional)</option>
+                    <option value="Menú Infantil">Menú Infantil</option>
+                    <option value="Alergias">Alergias</option>
+                    <option value="Vegano">Vegano</option>
+                </select>
+                <input type="text" id="alergias" name="alergias" placeholder="Especifica alergias o mensaje adicional (opcional)..." style="margin-top: 8px;">
+            </div>
+
             <button type="submit">Enviar Confirmación</button>
         </form>
     </div>

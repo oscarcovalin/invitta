@@ -1,0 +1,26 @@
+{
+  "label": "v2.33_clean_dropdown_dieta_select_without_icons",
+  "timestamp": "2026-08-27T01:40:54.293Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 201712
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 96769
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
