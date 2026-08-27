@@ -1,0 +1,26 @@
+{
+  "label": "v2.28_luxury_vip_rsvp_refined_padding_and_greeting",
+  "timestamp": "2026-08-27T00:43:58.590Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 207226
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 96769
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

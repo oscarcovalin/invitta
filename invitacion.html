@@ -1522,7 +1522,7 @@ tailwind.config = {
   </section>
 
   <!-- ==================== 10. RSVP PERGAMINO (CONFIRMACIÓN & PASE DE HONOR) ==================== -->
-  <section id="rsvp" class="py-24 px-margin-mobile bg-emerald-dark text-center relative overflow-hidden border-t border-antique-gold/30 ">
+  <section id="rsvp" class="pt-20 pb-36 px-margin-mobile bg-emerald-dark text-center relative overflow-hidden border-t border-antique-gold/30 ">
     
     
     <div class="relative z-10 max-w-lg mx-auto gsap-scale-up overflow-visible">
@@ -1584,8 +1584,8 @@ tailwind.config = {
           </div>
 
           <!-- Selector de Pases (Stepper) -->
-          <div id="rsvpTicketsRow" class="flex items-center justify-between p-3.5 bg-champagne-cream/70 border border-antique-gold/40 rounded-xl mt-1">
-            <div>
+          <div id="rsvpTicketsRow" class="flex flex-col sm:flex-row items-center justify-between p-3.5 bg-champagne-cream/70 border border-antique-gold/40 rounded-xl mt-1 gap-2">
+            <div class="text-center sm:text-left">
               <span class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] block font-semibold">Pases a Confirmar</span>
               <span id="allowedTicketsHint" class="text-[11px] text-tertiary font-normal">Máximo 2 personas</span>
             </div>
@@ -1599,10 +1599,10 @@ tailwind.config = {
           <!-- Preferencias Dietarias y Alergias (Conexión Catering) -->
           <div id="rsvpDietaryBlock" class="flex flex-col gap-2 pt-2 border-t border-antique-gold/25 mt-1">
             <div class="flex items-center justify-between">
-              <label class="font-label-caps text-[10.5px] text-deep-onyx uppercase tracking-[0.2em] font-semibold flex items-center gap-1">
-                <span>🍽️</span> Preferencias Dietarias (Opcional)
+              <label class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] font-semibold flex items-center gap-1">
+                <span>🍽️</span> Preferencias Dietarias
               </label>
-              <span class="text-[10px] text-antique-gold/90 font-medium">Para banquetes</span>
+              <span class="text-[10px] text-antique-gold/90 font-medium">(Opcional)</span>
             </div>
             <div class="grid grid-cols-2 gap-2 text-xs">
               <label class="flex items-center gap-2 p-2 border border-antique-gold/30 rounded-lg bg-champagne-cream/40 cursor-pointer">
@@ -1622,12 +1622,12 @@ tailwind.config = {
                 <span class="text-[11px] text-deep-onyx font-medium">Sin Lácteos</span>
               </label>
             </div>
-            <input type="text" name="alergias" id="formGuestAllergies" placeholder="Alergias o restricciones médicas (ej: nueces, mariscos...)" 
+            <input type="text" name="alergias" id="formGuestAllergies" placeholder="Alergias o notas para cocina (ej: nueces, mariscos...)" 
                    class="w-full bg-[#FAF8F5] border border-antique-gold/40 rounded-xl px-3.5 py-2 text-xs text-deep-onyx focus:outline-none focus:border-antique-gold placeholder:text-neutral-400">
           </div>
 
           <!-- Botón de Envío -->
-          <button type="submit" id="rsvpSubmit" class="btn-luxury-primary w-full py-3.5 text-[11.5px] tracking-[0.25em] uppercase font-semibold shadow-[0_4px_20px_rgba(165,110,14,0.35)] mt-2 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]">
+          <button type="submit" id="rsvpSubmit" class="btn-luxury-primary w-full py-3.5 text-[11.5px] tracking-[0.25em] uppercase font-semibold shadow-[0_4px_20px_rgba(165,110,14,0.35)] mt-2 mb-4 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]">
             Enviar Confirmación en Pergamino
           </button>
         </form>
@@ -2452,25 +2452,36 @@ if (musicPlayer && audio) {
   if (urlGuest && urlGuest.trim()) {
     let mesaLabelTxt = '';
     if (urlMesaParam) {
-      mesaLabelTxt = urlMesaParam.toLowerCase().includes('imp') ? ' en la <strong>Mesa Imperial</strong>' : (' en la <strong>Mesa ' + urlMesaParam.replace(/\D/g, '') + '</strong>');
+      mesaLabelTxt = urlMesaParam.toLowerCase().includes('imp') ? ' en la <strong class="text-primary font-bold">Mesa Imperial</strong>' : (' en la <strong class="text-primary font-bold">Mesa ' + urlMesaParam.replace(/\D/g, '') + '</strong>');
     }
 
     if (saludoCont) {
-      saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino">' +
-        '<span class="text-base block mb-0.5">⚜️</span>' +
-        '¡Qué alegría tenerles aquí, <strong class="text-deep-onyx">' + urlGuest + '</strong>!<br>' +
-        'Tienen <strong class="text-deep-onyx">' + urlTickets + (urlTickets === 1 ? ' pase reservado' : ' pases reservados') + '</strong>' +
-        mesaLabelTxt + ' para celebrar nuestro gran día.' +
-        '</div>';
+      saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino shadow-sm border border-antique-gold/40 rounded-2xl bg-amber-500/10 p-4 mb-4 text-left">' +
+        '<div class="flex items-center gap-2 mb-1.5 text-antique-gold font-bold">' +
+          '<span class="text-xl">⚜️</span>' +
+          '<strong class="font-display-lg text-xs uppercase tracking-wider text-deep-onyx">Pase de Honor Personalizado</strong>' +
+        '</div>' +
+        '<p class="text-sm text-deep-onyx leading-relaxed">' +
+          '¡Qué alegría tenerles aquí, <strong class="text-primary font-bold text-base">' + urlGuest + '</strong>!<br>' +
+          'Tienen <strong class="text-primary font-bold">' + urlTickets + (urlTickets === 1 ? ' pase reservado' : ' pases reservados') + '</strong>' +
+          mesaLabelTxt + ' para celebrar con nosotros.' +
+        '</p>' +
+      '</div>';
     }
     if (campoNombre) campoNombre.style.display = 'none';
     if (inputNombre) inputNombre.value = urlGuest;
     if (ticketsHint) ticketsHint.textContent = 'Máximo ' + urlTickets + ' persona' + (urlTickets === 1 ? '' : 's');
   } else {
     if (saludoCont) {
-      saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino">' +
-        'Por favor ingresa tus datos para registrar tu confirmación de asistencia en el sistema oficial.' +
-        '</div>';
+      saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino shadow-sm border border-antique-gold/30 rounded-2xl bg-champagne-cream/50 p-3.5 mb-3 text-left">' +
+        '<div class="flex items-center gap-1.5 mb-1 text-antique-gold font-bold">' +
+          '<span class="text-base">⚜️</span>' +
+          '<strong class="font-display-lg text-[11px] uppercase tracking-wider text-deep-onyx">Registro de Asistencia</strong>' +
+        '</div>' +
+        '<p class="text-xs text-deep-onyx/85 leading-relaxed">' +
+          'Ingresa tu nombre para generar tu pase digital de acceso y asignar tu mesa oficial.' +
+        '</p>' +
+      '</div>';
     }
     if (campoNombre) campoNombre.style.display = 'flex';
     if (inputNombre) inputNombre.value = '';
