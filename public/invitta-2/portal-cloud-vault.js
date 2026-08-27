@@ -46,7 +46,14 @@
     state.message = 'Consultando nube…';
 
     try {
-      state.client = state.client || window.supabase.createClient(config.url, config.publishableKey);
+      state.client = state.client || window.supabase.createClient(config.url, config.publishableKey, {
+        auth: {
+          storageKey: config.authStorageKey || 'invitta-2-dev-auth',
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: false
+        }
+      });
       const { data: sessionData, error: sessionError } = await state.client.auth.getSession();
       if (sessionError) throw sessionError;
 

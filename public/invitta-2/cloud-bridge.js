@@ -554,7 +554,7 @@
 
     state.client = sdk.createClient(config.url, config.publishableKey, {
       auth: {
-        storageKey: 'invitta-2-dev-auth',
+        storageKey: config.authStorageKey || 'invitta-2-dev-auth',
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true

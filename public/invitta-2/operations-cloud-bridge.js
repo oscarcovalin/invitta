@@ -12,7 +12,14 @@
   if (!config || !window.supabase || typeof planner === 'undefined' || typeof gm === 'undefined') return;
 
   const state = {
-    client: window.supabase.createClient(config.url, config.publishableKey),
+    client: window.supabase.createClient(config.url, config.publishableKey, {
+      auth: {
+        storageKey: config.authStorageKey || 'invitta-2-dev-auth',
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false
+      }
+    }),
     project: null,
     version: 0,
     applying: false,
