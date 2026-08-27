@@ -618,10 +618,12 @@
               <!-- Menú de Acciones Secundarias -->
               <div class="flex items-center justify-between pt-1 text-[11px] text-neutral-400">
                 ${isCloud ? `
+                <a href="organizador-mesas.html?cloudProject=${projectParam}" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1">
+                  <span class="material-symbols-outlined text-xs">table_restaurant</span> Mesas
+                </a>
                 <span class="inline-flex items-center gap-1 text-emerald-300/80">
                   <span class="material-symbols-outlined text-xs">history</span> Historial v${Number(p.version) || 1}
                 </span>
-                <span class="text-neutral-500">Gestionado en Studio</span>
                 ` : `
                 <a href="organizador-mesas.html?project=${projectParam}" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1">
                   <span class="material-symbols-outlined text-xs">table_restaurant</span> Mesas

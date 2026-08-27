@@ -370,6 +370,7 @@
       state.designId = design.id;
       state.version = Number(design.version);
       state.projectStatus = project.status;
+      updateOperationalLinks(project.id);
       setCloudStatus('Cargando recursos…', '#b7791f', 'Recuperando recursos privados del proyecto');
       const hydratedConfig = await hydrateConfigFromCloud(design.config);
       state.identity = projectIdentity(hydratedConfig);
@@ -397,6 +398,16 @@
     url.searchParams.delete('id');
     url.searchParams.set('cloudProject', projectId);
     window.history.replaceState({}, '', url);
+    updateOperationalLinks(projectId);
+  }
+
+  function updateOperationalLinks(projectId) {
+    if (!UUID_PATTERN.test(projectId || '')) return;
+    document.querySelectorAll('a[href^="organizador-mesas.html"]').forEach(link => {
+      const target = new URL(link.getAttribute('href'), window.location.href);
+      target.searchParams.set('cloudProject', projectId);
+      link.setAttribute('href', `${target.pathname.split('/').pop()}${target.search}${target.hash}`);
+    });
   }
 
   async function createCloudProject(projectData) {

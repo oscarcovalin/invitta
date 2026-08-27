@@ -1031,9 +1031,13 @@
   <!-- SCRIPTS DE MOTOR: SEATING PLANNER & GUEST MANAGER -->
   <script src="seating-module/seating-planner.js"></script>
   <script src="guest-manager.js"></script>
+  <script src="vendor/supabase-2.112.3.js"></script>
+  <script src="cloud-config.js"></script>
 
   <script>
     // 1. Inicializar SeatingPlanner y GuestManager
+    const operationsCloudProjectId = new URLSearchParams(window.location.search).get('cloudProject');
+    const operationsStorageSuffix = operationsCloudProjectId ? `_cloud_${operationsCloudProjectId}` : '';
     const planner = new SeatingPlanner({
       unassignedListSelector: '#unassignedList',
       tablesContainerSelector: '#tablesContainer',
@@ -1043,10 +1047,13 @@
       statsProgressBarSelector: '#statProgressBar',
       statsPercentSelector: '#statPercent',
       statsOvercapacityBadgeSelector: '#statOvercapacityBadge',
-      searchInputSelector: '#searchGuestsInput'
+      searchInputSelector: '#searchGuestsInput',
+      storageKey: `invitta_seating_state_v2${operationsStorageSuffix}`
     });
 
-    const gm = new GuestManager();
+    const gm = new GuestManager({
+      storageKey: `invitta_2_guest_db${operationsStorageSuffix}`
+    });
 
     // Sincronizar footer y métricas de semáforo de acceso en tiempo real
     function updateAccessTrafficLightStats() {
@@ -1632,5 +1639,6 @@
       btn.addEventListener('click', () => modalShareAccess.classList.add('hidden'));
     });
   </script>
+  <script src="operations-cloud-bridge.js"></script>
 </body>
 </html>

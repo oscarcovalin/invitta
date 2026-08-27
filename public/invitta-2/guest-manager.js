@@ -58,6 +58,12 @@ class GuestManager {
         localStorage.setItem(this.storageKey, JSON.stringify(this.state));
       } catch (e) {}
     }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('guests:updated', {
+        detail: { state: this.state }
+      }));
+    }
   }
 
   getInitialState() {
