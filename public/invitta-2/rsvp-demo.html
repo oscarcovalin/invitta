@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP - Invitta Demo</title>
+    <style>
+        :root {
+            --bg-color: #FAF8F5;
+            --wine-primary: #163C2B;
+            --gold-accent: #A38047;
+            --text-main: #2C2C2C;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+
+        .pergamino-container {
+            background: #ffffff;
+            border: 2px solid var(--gold-accent);
+            border-radius: 12px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(22, 60, 43, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: desplegarPergamino 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes desplegarPergamino {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        h2 {
+            color: var(--text-main);
+            text-align: center;
+            margin-top: 4px;
+            margin-bottom: 20px;
+            font-weight: 400;
+            font-size: clamp(32px, 6.5vw, 52px);
+            font-family: 'Cormorant Garamond', serif;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            line-height: 1.15;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--gold-accent);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1px solid rgba(163, 128, 71, 0.35);
+            border-radius: 10px;
+            background-color: var(--bg-color);
+            font-size: 0.95rem;
+            color: var(--text-main);
+            box-sizing: border-box;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-weight: 400;
+            letter-spacing: 0.015em;
+            transition: all 0.25s ease;
+        }
+
+        select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23A38047'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-position: right 14px center;
+            background-repeat: no-repeat;
+            background-size: 16px 16px;
+            padding-right: 42px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        select option {
+            background-color: #ffffff;
+            color: var(--text-main);
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 0.95rem;
+            padding: 10px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--gold-accent);
+            box-shadow: 0 0 0 3px rgba(163, 128, 71, 0.18);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--gold-accent);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            letter-spacing: 0.22em;
+            font-weight: 600;
+            font-family: 'Cormorant Garamond', serif;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 18px rgba(163, 128, 71, 0.28);
+            margin-top: 12px;
+        }
+
+        button:hover {
+            background-color: var(--wine-primary);
+            transform: translateY(-2px);
+        }
+
+        .mensaje-personalizado {
+            background-color: rgba(163, 128, 71, 0.1);
+            border-left: 4px solid var(--gold-accent);
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: var(--wine-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="pergamino-container">
+        <h2>Confirmación de Asistencia</h2>
+        <div id="contenedor-saludo"></div>
+        
+        <form id="rsvpForm">
+            <div id="campo-nombre-container" class="form-group">
+                <label for="nombre">Nombre Completo</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre y apellido" required>
+            </div>
+
+            <div id="campo-email-container" class="form-group">
+                <label for="email">Correo Electrónico (Opcional)</label>
+                <input type="email" id="email" name="email" placeholder="ejemplo@correo.com">
+            </div>
+
+            <div class="form-group">
+                <label for="asistencia">¿Nos acompañarás?</label>
+                <select id="asistencia" name="asistencia" required>
+                    <option value="">Selecciona una opción</option>
+                    <option value="si">¡Sí, ahí estaré!</option>
+                    <option value="no">No podré asistir</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="pases">Número de Lugares</label>
+                <select id="pases" name="pases" required>
+                    <option value="1" selected>1 Lugar</option>
+                    <option value="2">2 Lugares</option>
+                    <option value="3">3 Lugares</option>
+                    <option value="4">4 Lugares</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="campo-dieta-container">
+                <label for="dieta">Dieta Especial / Menú</label>
+                <select id="dieta" name="dieta">
+                    <option value="">Selecciona una opción (Opcional)</option>
+                    <option value="Menú Infantil">Menú Infantil</option>
+                    <option value="Alergias">Alergias</option>
+                    <option value="Vegano">Vegano</option>
+                </select>
+            </div>
+
+            <button type="submit">Enviar Confirmación</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Lógica de detección automática de URL (Parámetro ?guest=)
+            const urlParams = new URLSearchParams(window.location.search);
+            const guestParam = urlParams.get('guest') || urlParams.get('invitado');
+            const ticketsParam = parseInt(urlParams.get('passes') || urlParams.get('pases') || '2', 10);
+            
+            const campoNombreContainer = document.getElementById('campo-nombre-container');
+            const contenedorSaludo = document.getElementById('contenedor-saludo');
+            const inputNombre = document.getElementById('nombre');
+            const inputPases = document.getElementById('pases');
+
+            if (guestParam) {
+                // Simulación de datos decodificados desde la URL personalizada
+                const nombreDecodificado = guestParam.replace(/-/g, ' ').replace(/_/g, ' ').toUpperCase();
+                
+                contenedorSaludo.innerHTML = `
+                    <div class="mensaje-personalizado">
+                        ¡Qué alegría tenerte aquí, <strong>${nombreDecodificado}</strong>! Tus pases ya están reservados.
+                    </div>
+                `;
+                
+                // Precargamos los datos y bloqueamos la edición del nombre si viene personalizado
+                inputNombre.value = nombreDecodificado;
+                campoNombreContainer.style.display = 'none';
+                if (inputPases) {
+                    inputPases.innerHTML = '';
+                    for (let i = 1; i <= ticketsParam; i++) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.textContent = i === 1 ? '1 Lugar' : `${i} Lugares`;
+                        if (i === ticketsParam) opt.selected = true;
+                        inputPases.appendChild(opt);
+                    }
+                }
+            } else {
+                // Modo formulario abierto (enlace genérico)
+                contenedorSaludo.innerHTML = `
+                    <div class="mensaje-personalizado">
+                        Por favor ingresa tus datos para registrar tu solicitud de asistencia.
+                    </div>
+                `;
+            }
+
+            // Manejo del envío del formulario
+            document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert("¡Gracias! Tu respuesta ha sido registrada correctamente.");
+            });
+        });
+    </script>
+</body>
+</html>

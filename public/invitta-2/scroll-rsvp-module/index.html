@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP Pergamino — Invitta</title>
+
+    <!-- Tipografías de Lujo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <style>
+        :root {
+            --bg-color: #FAF8F5;
+            --wine-primary: #163C2B;
+            --gold-accent: #A38047;
+            --text-main: #2C2C2C;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* Barra de Prueba Superior (Simulador de URL en Vivo) */
+        .url-simulator-bar {
+            width: 100%;
+            background: #141416;
+            color: #ffffff;
+            padding: 12px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .url-chips-wrap {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .btn-url-chip {
+            background: rgba(163, 128, 71, 0.18);
+            border: 1px solid rgba(163, 128, 71, 0.45);
+            color: #d4af37;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-url-chip:hover, .btn-url-chip.active {
+            background: rgba(163, 128, 71, 0.35);
+            border-color: #d4af37;
+            color: #ffffff;
+        }
+
+        /* Contenedor Principal del Pergamino */
+        .pergamino-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .pergamino-container {
+            background: #ffffff;
+            border: 2px solid var(--gold-accent);
+            border-radius: 14px;
+            padding: 42px 36px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 15px 40px rgba(22, 60, 43, 0.12), inset 0 0 30px rgba(163, 128, 71, 0.04);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: desplegarPergamino 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+        }
+
+        @keyframes desplegarPergamino {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Ribete Superior e Inferior Decorativo */
+        .pergamino-ornament {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            color: var(--gold-accent);
+        }
+        .ornament-line {
+            width: 40px;
+            height: 1px;
+            background: var(--gold-accent);
+            opacity: 0.6;
+        }
+
+        h2 {
+            font-family: 'Cinzel', Georgia, serif;
+            color: var(--wine-primary);
+            text-align: center;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 1.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .sub-evento {
+            text-align: center;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-style: italic;
+            font-size: 1.05rem;
+            color: var(--gold-accent);
+            margin-bottom: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            color: var(--wine-primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #D1C7BD;
+            border-radius: 8px;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            box-sizing: border-box;
+            transition: all 0.25s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--gold-accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(163, 128, 71, 0.15);
+        }
+
+        button.btn-submit {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--wine-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(22, 60, 43, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button.btn-submit:hover {
+            background-color: var(--gold-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(163, 128, 71, 0.35);
+        }
+
+        .mensaje-personalizado {
+            background-color: rgba(163, 128, 71, 0.09);
+            border-left: 4px solid var(--gold-accent);
+            border-radius: 0 8px 8px 0;
+            padding: 14px 16px;
+            margin-bottom: 22px;
+            font-size: 0.92rem;
+            color: var(--wine-primary);
+            line-height: 1.5;
+        }
+
+        /* Pase VIP Generado al Enviar */
+        .vip-pass-success {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+            animation: desplegarPergamino 0.6s ease forwards;
+        }
+        .pass-ticket-box {
+            background: #FAF8F5;
+            border: 2px dashed var(--gold-accent);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BARRA SUPERIOR DE SIMULACIÓN DE URL (Para pruebas inmediatas) -->
+    <header class="url-simulator-bar">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:#d4af37; font-weight:600;">✦ Invitta Studio:</span>
+            <span>Simulador de Enlace RSVP (?guest=id)</span>
+        </div>
+        <div class="url-chips-wrap">
+            <button type="button" class="btn-url-chip" data-param="camila-ortiz" data-passes="2">
+                ?guest=camila-ortiz (2 pases)
+            </button>
+            <button type="button" class="btn-url-chip" data-param="familia-martinez-valdes" data-passes="4">
+                ?guest=familia-martinez-valdes (4 pases)
+            </button>
+            <button type="button" class="btn-url-chip" data-param="dr-carlos-valenzuela" data-passes="2">
+                ?guest=dr-carlos-valenzuela (2 pases)
+            </button>
+            <button type="button" class="btn-url-chip" data-param="">
+                Sin Parámetro (Modo Abierto)
+            </button>
+        </div>
+    </header>
+
+    <main class="pergamino-wrapper">
+        <div class="pergamino-container" id="pergaminoCard">
+            
+            <!-- Adorno Editorial -->
+            <div class="pergamino-ornament">
+                <div class="ornament-line"></div>
+                <span class="material-symbols-outlined" style="font-size: 18px;">favorite</span>
+                <div class="ornament-line"></div>
+            </div>
+
+            <h2>Confirmación de Asistencia</h2>
+            <p class="sub-evento" id="subEvento">Catalina & Julián · 20 de Marzo, 2027</p>
+            
+            <div id="contenedor-saludo"></div>
+            
+            <form id="rsvpForm">
+                <div id="campo-nombre-container" class="form-group">
+                    <label for="nombre">
+                        <span class="material-symbols-outlined" style="font-size:16px;">person</span>
+                        Nombre Completo
+                    </label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre y apellido" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="asistencia">
+                        <span class="material-symbols-outlined" style="font-size:16px;">how_to_reg</span>
+                        ¿Nos acompañarás?
+                    </label>
+                    <select id="asistencia" name="asistencia" required>
+                        <option value="">Selecciona una opción</option>
+                        <option value="si">¡Sí, ahí estaré con gusto!</option>
+                        <option value="no">No podré asistir</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="campo-pases-container">
+                    <label for="pases">
+                        <span class="material-symbols-outlined" style="font-size:16px;">confirmation_number</span>
+                        Número de Lugares
+                    </label>
+                    <input type="number" id="pases" name="pases" min="1" value="1" required>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnEnviar">
+                    <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+                    <span>Enviar Confirmación</span>
+                </button>
+            </form>
+
+            <!-- VISTA DE ÉXITO Y PASE DIGITAL -->
+            <div class="vip-pass-success" id="vistaExito">
+                <span class="material-symbols-outlined" style="font-size: 48px; color: var(--gold-accent);">mark_email_read</span>
+                <h3 style="font-family:'Cinzel', serif; color: var(--wine-primary); margin-top: 10px; text-transform: uppercase;">¡Registro Exitoso!</h3>
+                <p style="font-size: 0.9rem; color: #555; margin-top: 5px;" id="textoResumenExito">Tu respuesta ha sido registrada en el sistema oficial.</p>
+
+                <div class="pass-ticket-box">
+                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--gold-accent); text-transform: uppercase; letter-spacing: 1px;">Pase Digital de Acceso</span>
+                    <h4 style="font-family:'Cinzel', serif; color: var(--wine-primary); margin: 6px 0;" id="passNombreConfirmado">Invitado de Honor</h4>
+                    <p style="font-size: 0.85rem; color: #666; font-family:'JetBrains Mono', monospace;" id="passFolio">FOLIO: PASS-2027</p>
+                </div>
+
+                <button type="button" onclick="reiniciarFormulario()" style="background:none; border:none; color: var(--wine-primary); text-decoration: underline; cursor: pointer; font-size: 0.85rem;">
+                    ↺ Probar otra confirmación
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function sincronizarConfiguracionEvento() {
+            try {
+                const raw = localStorage.getItem('invitta_event_invitation_config');
+                if (raw) {
+                    const conf = JSON.parse(raw);
+                    const subEvento = document.getElementById('subEvento');
+                    if (subEvento && conf.brideName && conf.groomName) {
+                        subEvento.textContent = `${conf.brideName} & ${conf.groomName} · ${conf.eventDate || '2027'}`;
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function buscarInvitadoEnStorage(guestParam) {
+            if (!guestParam) return null;
+            const paramClean = guestParam.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            try {
+                // 1. Revisar en base de datos invitta_2_guest_db
+                const rawDb = localStorage.getItem('invitta_2_guest_db');
+                if (rawDb) {
+                    const db = JSON.parse(rawDb);
+                    if (db && Array.isArray(db.guests)) {
+                        const found = db.guests.find(g => {
+                            const idClean = g.id.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            const nameClean = g.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            return idClean.includes(paramClean) || nameClean.includes(paramClean);
+                        });
+                        if (found) return found;
+                    }
+                }
+
+                // 2. Revisar en invitta_seating_state_v2
+                const rawSeating = localStorage.getItem('invitta_seating_state_v2');
+                if (rawSeating) {
+                    const seating = JSON.parse(rawSeating);
+                    if (seating && Array.isArray(seating.guests)) {
+                        const found = seating.guests.find(g => {
+                            const idClean = g.id.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            const nameClean = g.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            return idClean.includes(paramClean) || nameClean.includes(paramClean);
+                        });
+                        if (found) return found;
+                    }
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function guardarRespuestaEnStorage(nombre, pases, asistencia) {
+            try {
+                const isConfirmed = asistencia === 'si';
+                const status = isConfirmed ? 'CONFIRMED' : 'DECLINED';
+                const nowIso = new Date().toISOString();
+
+                // Actualizar en invitta_2_guest_db
+                const rawDb = localStorage.getItem('invitta_2_guest_db');
+                if (rawDb) {
+                    const db = JSON.parse(rawDb);
+                    if (db && Array.isArray(db.guests)) {
+                        const guest = db.guests.find(g => g.name.toLowerCase().includes(nombre.toLowerCase()) || nombre.toLowerCase().includes(g.name.toLowerCase()));
+                        if (guest) {
+                            guest.status = status;
+                            guest.confirmedPasses = isConfirmed ? parseInt(pases, 10) : 0;
+                            guest.respondedAt = nowIso;
+                            localStorage.setItem('invitta_2_guest_db', JSON.stringify(db));
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Error saving RSVP response to storage', e);
+            }
+        }
+
+        function cargarEstadoRsvp(guestParam, passesDefault) {
+            const campoNombreContainer = document.getElementById('campo-nombre-container');
+            const contenedorSaludo = document.getElementById('contenedor-saludo');
+            const inputNombre = document.getElementById('nombre');
+            const inputPases = document.getElementById('pases');
+            const form = document.getElementById('rsvpForm');
+            const vistaExito = document.getElementById('vistaExito');
+
+            sincronizarConfiguracionEvento();
+
+            form.style.display = 'block';
+            vistaExito.style.display = 'none';
+
+            if (guestParam) {
+                const matchedGuest = buscarInvitadoEnStorage(guestParam);
+                const nombreMostrar = matchedGuest ? matchedGuest.name : guestParam.replace(/-/g, ' ').toUpperCase();
+                const pasesAsignados = matchedGuest ? (matchedGuest.passes || matchedGuest.pases || 2) : (passesDefault || 2);
+                
+                contenedorSaludo.innerHTML = `
+                    <div class="mensaje-personalizado">
+                        ¡Qué alegría tenerte aquí, <strong>${nombreMostrar}</strong>! Tus <strong>${pasesAsignados} pases</strong> ya están reservados para nuestro gran día.
+                    </div>
+                `;
+                
+                // Precargamos los datos y bloqueamos la edición del nombre si viene personalizado
+                inputNombre.value = nombreMostrar;
+                inputNombre.required = false;
+                campoNombreContainer.style.display = 'none';
+                inputPases.value = pasesAsignados;
+                inputPases.max = pasesAsignados;
+            } else {
+                // Modo formulario abierto (enlace genérico)
+                contenedorSaludo.innerHTML = `
+                    <div class="mensaje-personalizado">
+                        Por favor ingresa tus datos para registrar tu solicitud de asistencia.
+                    </div>
+                `;
+                inputNombre.value = '';
+                inputNombre.required = true;
+                campoNombreContainer.style.display = 'block';
+                inputPases.value = 1;
+                inputPases.removeAttribute('max');
+            }
+        }
+
+        function reiniciarFormulario() {
+            const urlParams = new URLSearchParams(window.location.search);
+            cargarEstadoRsvp(urlParams.get('guest'), null);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            sincronizarConfiguracionEvento();
+
+            // Lógica de detección automática de URL (Parámetro ?guest=)
+            const urlParams = new URLSearchParams(window.location.search);
+            const guestParam = urlParams.get('guest');
+            
+            cargarEstadoRsvp(guestParam, null);
+
+            // Manejo de chips de prueba en la barra superior
+            document.querySelectorAll('.btn-url-chip').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.btn-url-chip').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const param = this.dataset.param;
+                    const passes = parseInt(this.dataset.passes || '2', 10);
+                    cargarEstadoRsvp(param, passes);
+                });
+            });
+
+            // Manejo del envío del formulario con feedback en pantalla
+            document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const nombre = document.getElementById('nombre').value || 'Invitado de Honor';
+                const pases = document.getElementById('pases').value || '1';
+                const asistencia = document.getElementById('asistencia').value;
+
+                // Folio Logístico Opción B: [MESA]-[APELLIDO]-[PASES] (ej: M03-MARTINEZ-4P)
+                let mesaCode = 'MGEN';
+                const matched = buscarInvitadoEnStorage(guestParam || nombre);
+                if (matched) {
+                    if (matched.court || matched.vip || matched.tableId === 'tbl_imperial' || String(matched.tableId).includes('imp')) {
+                        mesaCode = 'MIMP';
+                    } else if (matched.tableId || matched.table) {
+                        const mMatch = String(matched.tableId || matched.table).match(/\d+/);
+                        if (mMatch) mesaCode = 'M' + mMatch[0].padStart(2, '0');
+                    }
+                }
+                const cleanTokens = nombre
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-zA-Z0-9\s]/g, '')
+                    .trim()
+                    .split(/\s+/)
+                    .filter(w => !['FAMILIA', 'FAM', 'SR', 'SRA', 'DR', 'DRA', 'ING', 'LIC', 'DON', 'DONA', 'DE', 'DEL', 'LA', 'LAS', 'LOS', 'Y'].includes(w.toUpperCase()));
+                const isFamily = /familia|fam\b|flia\b/i.test(nombre);
+                let apellidoCode = 'INVITADO';
+                if (cleanTokens.length > 0) {
+                    if (isFamily) {
+                        apellidoCode = cleanTokens[0].toUpperCase().substring(0, 10);
+                    } else {
+                        apellidoCode = (cleanTokens.length > 1 ? cleanTokens[cleanTokens.length - 1] : cleanTokens[0]).toUpperCase().substring(0, 10);
+                    }
+                }
+                const folio = `${mesaCode}-${apellidoCode}-${pases}P`;
+
+                guardarRespuestaEnStorage(nombre, pases, asistencia);
+
+                document.getElementById('rsvpForm').style.display = 'none';
+                document.getElementById('passNombreConfirmado').textContent = nombre;
+                document.getElementById('passFolio').textContent = 'FOLIO: ' + folio;
+                
+                if (asistencia === 'no') {
+                    document.getElementById('textoResumenExito').textContent = 'Hemos registrado que no podrás asistir. ¡Agradecemos mucho tu aviso!';
+                } else {
+                    document.getElementById('textoResumenExito').textContent = `Asistencia confirmada para ${pases} persona(s).`;
+                }
+
+                document.getElementById('vistaExito').style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
