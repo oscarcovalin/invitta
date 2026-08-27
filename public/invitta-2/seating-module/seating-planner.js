@@ -1055,11 +1055,12 @@ class SeatingPlanner {
 
     // 5. Asignar Resto de Invitaciones por Bloques de Pases sin Separar
     const unassignedRemaining = this.state.guests.filter(g => !g.tableId);
+    const regularTables = this.state.tables.filter(t => !imperialTable || t.id !== imperialTable.id);
 
     unassignedRemaining.forEach(g => {
       const gPasses = g.pases || g.passes || 1;
 
-      let bestTable = this.state.tables.find(tbl => {
+      let bestTable = regularTables.find(tbl => {
         const currentPasses = this.state.guests
           .filter(x => x.tableId === tbl.id)
           .reduce((s, x) => s + (x.pases || x.passes || 1), 0);
@@ -1068,6 +1069,7 @@ class SeatingPlanner {
 
       if (!bestTable) {
         bestTable = this.addTable('Mesa', 'circular', capacity);
+        regularTables.push(bestTable);
       }
 
       g.tableId = bestTable.id;
