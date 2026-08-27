@@ -293,13 +293,13 @@ tailwind.config = {
   /* ==================== ESTILO PERGAMINO RSVP (COHERENCIA TOTAL) ==================== */
   .pergamino-container {
     background: #ffffff;
-    border: 1px solid rgba(163, 128, 71, 0.4);
-    border-radius: 18px;
-    padding: 38px 26px;
+    border: 1px solid rgba(163, 128, 71, 0.45);
+    border-radius: 20px;
+    padding: 42px 28px;
     width: 92%;
     max-width: 480px;
     margin: 0 auto;
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
     transform: translateY(20px);
     opacity: 0;
     animation: desplegarPergamino 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -318,24 +318,36 @@ tailwind.config = {
     justify-content: center;
     align-items: center;
     gap: 12px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     color: var(--gold);
   }
   .ornament-line {
-    width: 45px;
+    width: 50px;
     height: 1px;
     background: var(--gold);
     opacity: 0.65;
   }
 
+  #tituloRsvpPergamino {
+    font-family: var(--font-names, var(--font-display, 'Cormorant Garamond', serif)) !important;
+    font-size: clamp(32px, 6.5vw, 54px) !important;
+    letter-spacing: 0.22em !important;
+    font-weight: 400 !important;
+    text-transform: uppercase !important;
+    color: var(--onyx) !important;
+    margin-top: 2px !important;
+    margin-bottom: 4px !important;
+    line-height: 1.15 !important;
+  }
+
   .form-group-clean {
-    margin-bottom: 18px;
+    margin-bottom: 20px;
     text-align: left;
   }
 
   .form-group-clean label {
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 7px;
     color: var(--gold);
     font-family: var(--font-display, var(--font-names, 'Cormorant Garamond', serif));
     font-size: 0.78rem;
@@ -346,54 +358,76 @@ tailwind.config = {
 
   .form-group-clean input, .form-group-clean select {
     width: 100%;
-    padding: 12px 14px;
+    padding: 13px 16px;
     border: 1px solid rgba(163, 128, 71, 0.35);
-    border-radius: 8px;
+    border-radius: 10px;
     background-color: var(--bg-primary, #FAF8F5);
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     color: var(--onyx, #2C2C2C);
     box-sizing: border-box;
     font-family: var(--font-body, 'Montserrat', sans-serif);
-    font-weight: 300;
-    transition: all 0.2s ease;
+    font-weight: 400;
+    letter-spacing: 0.015em;
+    transition: all 0.25s ease;
+  }
+
+  .form-group-clean select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23A38047'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-position: right 14px center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    padding-right: 42px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  .form-group-clean select option {
+    background-color: #ffffff;
+    color: var(--onyx, #2C2C2C);
+    font-family: var(--font-body, 'Montserrat', sans-serif);
+    font-size: 0.95rem;
+    padding: 10px;
   }
 
   .form-group-clean input::placeholder {
-    color: #9C958E;
+    color: #A39B92;
     font-family: var(--font-body, 'Montserrat', sans-serif);
     font-weight: 300;
+    letter-spacing: normal;
   }
 
   .form-group-clean input:focus, .form-group-clean select:focus {
     outline: none;
     border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(163, 128, 71, 0.15);
+    box-shadow: 0 0 0 3px rgba(163, 128, 71, 0.18);
     background-color: #ffffff;
   }
 
   .btn-rsvp-submit-clean {
     width: 100%;
-    padding: 15px;
+    padding: 16px;
     background: var(--gold, #A38047);
     color: #ffffff;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-family: var(--font-display, var(--font-names, 'Cormorant Garamond', serif));
-    font-size: 0.92rem;
-    letter-spacing: 0.2em;
+    font-size: 0.95rem;
+    letter-spacing: 0.22em;
     font-weight: 600;
     text-transform: uppercase;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 4px 14px rgba(163, 128, 71, 0.25);
-    margin-top: 10px;
+    box-shadow: 0 6px 18px rgba(163, 128, 71, 0.28);
+    margin-top: 12px;
   }
 
   .btn-rsvp-submit-clean:hover {
     background-color: var(--primary, #163C2B);
     color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
   }
 
   .btn-rsvp-submit-clean:active {
@@ -414,12 +448,16 @@ tailwind.config = {
   }
 
   .pass-ticket-pergamino {
-    background: var(--champagne);
-    border: 2px dashed var(--gold);
-    border-radius: 12px;
-    padding: 20px 16px;
-    margin: 16px 0;
+    background: rgba(163, 128, 71, 0.07);
+    border: 1.5px dashed var(--gold);
+    border-radius: 14px;
+    padding: 24px 18px;
+    margin: 18px 0;
     text-align: center;
+  }
+  .pass-ticket-pergamino h4 {
+    font-family: var(--font-names, 'Cormorant Garamond', serif);
+    letter-spacing: 0.05em;
   }
 
   /* Estilo Editorial de Alta Gama para el Contador (Líneas Delicadas sin Recuadro) */

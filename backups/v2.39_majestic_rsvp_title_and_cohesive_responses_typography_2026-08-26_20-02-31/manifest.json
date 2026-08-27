@@ -1,0 +1,26 @@
+{
+  "label": "v2.39_majestic_rsvp_title_and_cohesive_responses_typography",
+  "timestamp": "2026-08-27T02:02:31.179Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 205006
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 96854
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}
