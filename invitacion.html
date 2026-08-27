@@ -1634,8 +1634,25 @@ tailwind.config = {
           </div>
 
           <div class="form-group-clean" id="campo-dietas-container">
-            <label for="alergias">Mensaje o Dieta Especial (Opcional)</label>
-            <input type="text" id="alergias" name="alergias" placeholder="Ej: Vegetariano, felicitaciones...">
+            <label style="margin-bottom: 6px; display:block;">Dieta Especial / Menú (Opcional)</label>
+            <div class="grid grid-cols-3 gap-2 mb-2">
+              <label class="diet-option-btn flex flex-col items-center justify-center gap-1 p-2.5 rounded-lg border border-antique-gold/40 bg-antique-gold/5 cursor-pointer text-center select-none transition-all hover:bg-antique-gold/15" id="labelDietVegano">
+                <input type="checkbox" name="dietaOption" value="Vegano" class="hidden diet-checkbox" id="checkDietVegano">
+                <span class="text-base">🥦</span>
+                <span class="text-[11px] font-medium text-deep-onyx">Vegano</span>
+              </label>
+              <label class="diet-option-btn flex flex-col items-center justify-center gap-1 p-2.5 rounded-lg border border-antique-gold/40 bg-antique-gold/5 cursor-pointer text-center select-none transition-all hover:bg-antique-gold/15" id="labelDietInfantil">
+                <input type="checkbox" name="dietaOption" value="Menú Infantil" class="hidden diet-checkbox" id="checkDietInfantil">
+                <span class="text-base">👶</span>
+                <span class="text-[11px] font-medium text-deep-onyx">Infantil</span>
+              </label>
+              <label class="diet-option-btn flex flex-col items-center justify-center gap-1 p-2.5 rounded-lg border border-antique-gold/40 bg-antique-gold/5 cursor-pointer text-center select-none transition-all hover:bg-antique-gold/15" id="labelDietAlergias">
+                <input type="checkbox" name="dietaOption" value="Alergias" class="hidden diet-checkbox" id="checkDietAlergias">
+                <span class="text-base">⚠️</span>
+                <span class="text-[11px] font-medium text-deep-onyx">Alergias</span>
+              </label>
+            </div>
+            <input type="text" id="alergias" name="alergias" placeholder="Especifica alergias o mensaje adicional (opcional)..." class="text-xs">
           </div>
 
           <button type="submit" id="rsvpSubmit" class="btn-rsvp-submit-clean">Enviar Confirmación</button>
@@ -2451,15 +2468,21 @@ if (musicPlayer && audio) {
 
   if (guestParam && guestParam.trim()) {
     const nombreDecodificado = guestParam.replace(/-/g, ' ').replace(/_/g, ' ').trim();
-    let mesaLabelTxt = '';
+    let mesaLabelTxt = 'Mesa Reservada';
     if (urlMesaParam) {
-      mesaLabelTxt = urlMesaParam.toLowerCase().includes('imp') ? ' (Mesa Imperial)' : (' (Mesa ' + urlMesaParam.replace(/\D/g, '') + ')');
+      mesaLabelTxt = urlMesaParam.toLowerCase().includes('imp') ? 'Mesa Imperial' : ('Mesa ' + urlMesaParam.replace(/\D/g, ''));
     }
 
     if (contenedorSaludo) {
-      contenedorSaludo.innerHTML = '<div class="mensaje-personalizado">' +
-        '¡Qué alegría tenerte aquí, <strong class="text-deep-onyx">' + nombreDecodificado + '</strong>! Tus <strong>' + ticketsParam + (ticketsParam === 1 ? ' pase' : ' pases') + '</strong> ya están reservados' + mesaLabelTxt + '.' +
-        '</div>';
+      contenedorSaludo.innerHTML = '<div class="mensaje-personalizado shadow-sm border border-antique-gold/40 rounded-2xl bg-amber-500/10 p-3.5 mb-3 text-left">' +
+        '<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-antique-gold/20 border border-antique-gold/50 text-deep-onyx font-bold text-xs mb-2 font-mono">' +
+          '<span>🪑</span> <span>' + mesaLabelTxt.toUpperCase() + ' · ' + ticketsParam + (ticketsParam === 1 ? ' PASE ASIGNADO' : ' PASES ASIGNADOS') + '</span>' +
+        '</div>' +
+        '<h3 class="font-display-lg text-lg text-deep-onyx font-bold mb-0.5">' + nombreDecodificado + '</h3>' +
+        '<p class="text-xs text-deep-onyx/80 leading-relaxed">' +
+          'Tus lugares ya están reservados para celebrar con nosotros.' +
+        '</p>' +
+      '</div>';
     }
 
     if (inputNombre) inputNombre.value = nombreDecodificado;
@@ -2478,6 +2501,31 @@ if (musicPlayer && audio) {
     if (inputNombre) inputNombre.value = '';
     if (inputPases) inputPases.value = 1;
   }
+
+  // Interactive Diet Toggle Buttons (Vegano, Infantil, Alergias)
+  const dietButtons = [
+    { labelId: 'labelDietVegano', checkId: 'checkDietVegano' },
+    { labelId: 'labelDietInfantil', checkId: 'checkDietInfantil' },
+    { labelId: 'labelDietAlergias', checkId: 'checkDietAlergias' }
+  ];
+
+  dietButtons.forEach(({ labelId, checkId }) => {
+    const labelEl = document.getElementById(labelId);
+    const checkEl = document.getElementById(checkId);
+    if (labelEl && checkEl) {
+      labelEl.addEventListener('click', () => {
+        setTimeout(() => {
+          if (checkEl.checked) {
+            labelEl.classList.add('border-2', 'border-antique-gold', 'bg-antique-gold/25', 'font-bold', 'scale-105', 'shadow-sm');
+            labelEl.classList.remove('bg-antique-gold/5');
+          } else {
+            labelEl.classList.remove('border-2', 'border-antique-gold', 'bg-antique-gold/25', 'font-bold', 'scale-105', 'shadow-sm');
+            labelEl.classList.add('bg-antique-gold/5');
+          }
+        }, 10);
+      });
+    }
+  });
 
   // Toggle pases input depending on asistencia
   if (inputAsistencia) {
@@ -2503,6 +2551,15 @@ if (musicPlayer && audio) {
         btnSubmit.disabled = false;
         btnSubmit.textContent = 'Enviar Confirmación';
       }
+      dietButtons.forEach(({ labelId, checkId }) => {
+        const labelEl = document.getElementById(labelId);
+        const checkEl = document.getElementById(checkId);
+        if (checkEl) checkEl.checked = false;
+        if (labelEl) {
+          labelEl.classList.remove('border-2', 'border-antique-gold', 'bg-antique-gold/25', 'font-bold', 'scale-105', 'shadow-sm');
+          labelEl.classList.add('bg-antique-gold/5');
+        }
+      });
       if (guestParam && inputNombre) {
         inputNombre.value = guestParam.replace(/-/g, ' ').replace(/_/g, ' ').trim();
         if (inputPases) inputPases.value = ticketsParam;
@@ -2519,7 +2576,13 @@ if (musicPlayer && audio) {
       const isAttending = inputAsistencia ? inputAsistencia.value === 'si' : true;
       const guestName = (inputNombre ? inputNombre.value : (guestParam || 'Invitado de Honor')).trim();
       const confirmedTickets = isAttending ? (parseInt(inputPases.value, 10) || 1) : 0;
-      const allergies = inputAlergias ? inputAlergias.value.trim() : '';
+      
+      const selectedDiets = Array.from(document.querySelectorAll('.diet-checkbox:checked')).map(c => c.value);
+      const extraNotes = inputAlergias ? inputAlergias.value.trim() : '';
+      let allergies = selectedDiets.join(', ');
+      if (extraNotes) {
+        allergies += (allergies ? ' | ' : '') + extraNotes;
+      }
 
       // Generar Folio Logístico: [MESA]-[APELLIDO]-[PASES]
       const cleanTokens = guestName
