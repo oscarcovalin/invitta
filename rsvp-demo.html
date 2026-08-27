@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP - Invitta Demo</title>
+    <style>
+        :root {
+            --bg-color: #FAF8F5;
+            --wine-primary: #163C2B;
+            --gold-accent: #A38047;
+            --text-main: #2C2C2C;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+
+        .pergamino-container {
+            background: #ffffff;
+            border: 2px solid var(--gold-accent);
+            border-radius: 12px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(22, 60, 43, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: desplegarPergamino 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes desplegarPergamino {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        h2 {
+            color: var(--wine-primary);
+            text-align: center;
+            margin-bottom: 24px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--wine-primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #D1C7BD;
+            border-radius: 6px;
+            background-color: var(--bg-color);
+            font-size: 1rem;
+            color: var(--text-main);
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--gold-accent);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--wine-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: var(--gold-accent);
+        }
+
+        .mensaje-personalizado {
+            background-color: rgba(163, 128, 71, 0.1);
+            border-left: 4px solid var(--gold-accent);
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: var(--wine-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="pergamino-container">
+        <h2>Confirmación de Asistencia</h2>
+        <div id="contenedor-saludo"></div>
+        
+        <form id="rsvpForm">
+            <div id="campo-nombre-container" class="form-group">
+                <label for="nombre">Nombre Completo</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre y apellido" required>
+            </div>
+
+            <div class="form-group">
+                <label for="asistencia">¿Nos acompañarás?</label>
+                <select id="asistencia" name="asistencia" required>
+                    <option value="">Selecciona una opción</option>
+                    <option value="si">¡Sí, ahí estaré!</option>
+                    <option value="no">No podré asistir</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="pases">Número de Lugares</label>
+                <input type="number" id="pases" name="pases" min="1" value="1" required>
+            </div>
+
+            <button type="submit">Enviar Confirmación</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Lógica de detección automática de URL (Parámetro ?guest=)
+            const urlParams = new URLSearchParams(window.location.search);
+            const guestParam = urlParams.get('guest') || urlParams.get('invitado');
+            
+            const campoNombreContainer = document.getElementById('campo-nombre-container');
+            const contenedorSaludo = document.getElementById('contenedor-saludo');
+            const inputNombre = document.getElementById('nombre');
+            const inputPases = document.getElementById('pases');
+
+            if (guestParam) {
+                // Simulación de datos decodificados desde la URL personalizada
+                const nombreDecodificado = guestParam.replace(/-/g, ' ').replace(/_/g, ' ').toUpperCase();
+                
+                contenedorSaludo.innerHTML = `
+                    <div class="mensaje-personalizado">
+                        ¡Qué alegría tenerte aquí, <strong>${nombreDecodificado}</strong>! Tus pases ya están reservados.
+                    </div>
+                `;
+                
+                // Precargamos los datos y bloqueamos la edición del nombre si viene personalizado
+                inputNombre.value = nombreDecodificado;
+                campoNombreContainer.style.display = 'none';
+                inputPases.value = parseInt(urlParams.get('passes') || urlParams.get('pases') || '2', 10);
+            } else {
+                // Modo formulario abierto (enlace genérico)
+                contenedorSaludo.innerHTML = `
+                    <div class="mensaje-personalizado">
+                        Por favor ingresa tus datos para registrar tu solicitud de asistencia.
+                    </div>
+                `;
+            }
+
+            // Manejo del envío del formulario
+            document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert("¡Gracias! Tu respuesta ha sido registrada correctamente.");
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "label": "v2.31_clean_pergamino_user_design_integrated",
+  "timestamp": "2026-08-27T01:18:31.782Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 200527
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 96769
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

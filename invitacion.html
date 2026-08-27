@@ -290,15 +290,29 @@ tailwind.config = {
     transform: translateY(-1px);
   }
 
-  /* ==================== ESTILO PERGAMINO RSVP ==================== */
+  /* ==================== ESTILO PERGAMINO RSVP (USUARIO) ==================== */
   .pergamino-container {
     background: #ffffff;
     border: 2px solid var(--gold);
-    border-radius: 20px;
-    padding: 38px 28px;
-    box-shadow: 0 18px 45px rgba(22, 60, 43, 0.18), inset 0 0 35px rgba(165, 110, 14, 0.04);
+    border-radius: 12px;
+    padding: 36px 28px;
+    width: 92%;
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(22, 60, 43, 0.12);
+    transform: translateY(20px);
+    opacity: 0;
+    animation: desplegarPergamino 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     position: relative;
   }
+
+  @keyframes desplegarPergamino {
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
   .pergamino-ornament {
     display: flex;
     justify-content: center;
@@ -313,23 +327,76 @@ tailwind.config = {
     background: var(--gold);
     opacity: 0.65;
   }
-  .mensaje-personalizado-pergamino {
-    background-color: rgba(165, 110, 14, 0.08);
-    border-left: 4px solid var(--gold);
-    border-radius: 0 10px 10px 0;
-    padding: 14px 16px;
-    margin-bottom: 20px;
-    font-size: 0.92rem;
-    color: var(--onyx);
-    line-height: 1.55;
+
+  .form-group-clean {
+    margin-bottom: 18px;
     text-align: left;
   }
+
+  .form-group-clean label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--onyx);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .form-group-clean input, .form-group-clean select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #D1C7BD;
+    border-radius: 6px;
+    background-color: #FAF8F5;
+    font-size: 0.95rem;
+    color: #2C2C2C;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+  }
+
+  .form-group-clean input:focus, .form-group-clean select:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  .btn-rsvp-submit-clean {
+    width: 100%;
+    padding: 14px;
+    background-color: #163C2B;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 10px;
+  }
+
+  .btn-rsvp-submit-clean:hover {
+    background-color: var(--gold);
+  }
+
+  .mensaje-personalizado-pergamino, .mensaje-personalizado {
+    background-color: rgba(163, 128, 71, 0.1);
+    border-left: 4px solid var(--gold);
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    font-size: 0.92rem;
+    color: #163C2B;
+    border-radius: 0 8px 8px 0;
+    text-align: left;
+    line-height: 1.5;
+  }
+
   .pass-ticket-pergamino {
     background: var(--champagne);
     border: 2px dashed var(--gold);
-    border-radius: 14px;
-    padding: 22px 18px;
-    margin: 18px 0;
+    border-radius: 12px;
+    padding: 20px 16px;
+    margin: 16px 0;
     text-align: center;
   }
 
@@ -1521,13 +1588,13 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- ==================== 10. RSVP PERGAMINO (CONFIRMACIÓN ULTRA-SIMPLE) ==================== -->
+  <!-- ==================== 10. RSVP PERGAMINO (CONFIRMACIÓN LIMPIA Y DIRECTA) ==================== -->
   <section id="rsvp" class="pt-16 pb-36 px-margin-mobile bg-emerald-dark text-center relative overflow-hidden border-t border-antique-gold/30 ">
     
     
     <div class="relative z-10 max-w-md mx-auto gsap-scale-up overflow-visible">
       
-      <!-- Tarjeta Pergamino Minimalista y Elegante -->
+      <!-- Contenedor Pergamino Exacto del Usuario -->
       <div class="pergamino-container text-deep-onyx" id="pergaminoCard">
         
         <div class="pergamino-ornament">
@@ -1543,77 +1610,42 @@ tailwind.config = {
           Catalina & Julián · 20 · Marzo · 2027
         </p>
 
-        <!-- Saludo Personalizado VIP / Tarjeta de Honor -->
-        <div id="contenedor-saludo-pergamino" class="mb-4"></div>
+        <!-- Saludo Personalizado Dinámico -->
+        <div id="contenedor-saludo"></div>
 
-        <!-- Formulario RSVP Ultra-Simple -->
-        <form id="rsvpForm" class="flex flex-col gap-4 text-left" novalidate>
-          
-          <!-- Nombre (solo si no viene por URL) -->
-          <div id="campoNombrePergamino" class="flex flex-col gap-1">
-            <label class="font-label-caps text-[10.5px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">
-              Tu Nombre y Apellidos
-            </label>
-            <input id="formGuestName" name="nombre" required class="w-full bg-[#FAF8F5] border border-antique-gold/40 rounded-xl px-4 py-2.5 font-body-lg text-deep-onyx focus:outline-none focus:border-antique-gold text-sm placeholder:text-neutral-400" placeholder="Escribe tu nombre..." type="text"/>
+        <!-- Formulario RSVP Limpio -->
+        <form id="rsvpForm" novalidate>
+          <div id="campo-nombre-container" class="form-group-clean">
+            <label for="nombre">Nombre Completo</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre y apellido" required>
           </div>
 
-          <div id="campoTelefonoPergamino" class="flex flex-col gap-1">
-            <label class="font-label-caps text-[10.5px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">
-              Teléfono / WhatsApp
-            </label>
-            <input id="formGuestPhone" name="telefono" class="w-full bg-[#FAF8F5] border border-antique-gold/40 rounded-xl px-4 py-2.5 font-body-lg text-deep-onyx focus:outline-none focus:border-antique-gold text-sm placeholder:text-neutral-400" placeholder="Número de celular" type="tel"/>
+          <div class="form-group-clean">
+            <label for="asistencia">¿Nos acompañarás?</label>
+            <select id="asistencia" name="asistencia" required>
+              <option value="si" selected>¡Sí, ahí estaré!</option>
+              <option value="no">No podré asistir</option>
+            </select>
           </div>
 
-          <!-- Selector de Asistencia con 2 Grandes Botones -->
-          <div class="flex flex-col gap-2">
-            <label class="font-label-caps text-[10.5px] text-deep-onyx uppercase tracking-[0.2em] font-semibold text-center block">
-              ¿Nos acompañarán?
-            </label>
-            <div class="grid grid-cols-2 gap-2.5">
-              <label id="labelAsistenciaSi" class="flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border-2 border-antique-gold rounded-2xl bg-antique-gold/10 hover:bg-antique-gold/20 transition-all text-center">
-                <input class="hidden" name="rsvp" value="si" checked type="radio" id="radioAsistenciaSi"/>
-                <span class="text-xl">✨</span>
-                <span class="font-body-lg text-xs font-bold text-deep-onyx">¡Sí, asistiremos!</span>
-              </label>
-              <label id="labelAsistenciaNo" class="flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border border-neutral-300 rounded-2xl bg-white/50 hover:bg-neutral-100 transition-all text-center opacity-70">
-                <input class="hidden" name="rsvp" value="no" type="radio" id="radioAsistenciaNo"/>
-                <span class="text-xl">💌</span>
-                <span class="font-body-lg text-xs font-medium text-neutral-600">No podré asistir</span>
-              </label>
-            </div>
+          <div class="form-group-clean" id="campo-pases-container">
+            <label for="pases">Número de Lugares</label>
+            <input type="number" id="pases" name="pases" min="1" value="1" required>
           </div>
 
-          <!-- Selector de Pases con Pastillas / Chips Rápidos -->
-          <div id="rsvpTicketsRow" class="flex flex-col gap-2 p-3 bg-champagne-cream/60 border border-antique-gold/30 rounded-2xl">
-            <div class="flex items-center justify-between">
-              <span class="font-label-caps text-[10.5px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">¿Cuántos asistirán?</span>
-              <span id="allowedTicketsHint" class="text-[11px] text-antique-gold font-bold">2 Pases</span>
-            </div>
-            <div id="pillsContainer" class="flex flex-wrap gap-2 justify-center pt-1">
-              <!-- Se generan dinámicamente según urlTickets (1, 2, 3, 4...) -->
-            </div>
+          <div class="form-group-clean" id="campo-dietas-container">
+            <label for="alergias">Mensaje o Dieta Especial (Opcional)</label>
+            <input type="text" id="alergias" name="alergias" placeholder="Ej: Vegetariano, felicitaciones...">
           </div>
 
-          <!-- Campo Opcional de Mensaje / Dieta -->
-          <div id="rsvpDietaryBlock" class="flex flex-col gap-1 pt-1">
-            <label class="font-label-caps text-[10px] text-tertiary uppercase tracking-[0.2em]">
-              💬 Mensaje o dieta especial (Opcional)
-            </label>
-            <input type="text" name="alergias" id="formGuestAllergies" placeholder="Ej: 1 vegetariano, felicitaciones..." 
-                   class="w-full bg-[#FAF8F5] border border-antique-gold/30 rounded-xl px-3.5 py-2.5 text-xs text-deep-onyx focus:outline-none focus:border-antique-gold placeholder:text-neutral-400">
-          </div>
-
-          <!-- Botón de Confirmación Principal -->
-          <button type="submit" id="rsvpSubmit" class="btn-luxury-primary w-full py-4 text-xs tracking-[0.2em] uppercase font-bold shadow-[0_4px_20px_rgba(165,110,14,0.35)] mt-1 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2">
-            <span>📲 Confirmar Asistencia por WhatsApp</span>
-          </button>
+          <button type="submit" id="rsvpSubmit" class="btn-rsvp-submit-clean">Enviar Confirmación</button>
         </form>
 
         <!-- Vista de Éxito / Pase Digital Pergamino -->
         <div id="rsvpSuccess" class="hidden text-center py-2">
           <span class="text-4xl text-antique-gold block mb-1">📜</span>
           <h3 class="font-display-lg text-2xl font-normal text-deep-onyx uppercase tracking-wide">
-            ¡Asistencia Confirmada!
+            ¡Confirmación Registrada!
           </h3>
           <p class="font-display-lg text-xs text-tertiary mt-1" id="rsvpSuccessMsg">
             Tu respuesta ha sido registrada exitosamente.
@@ -2398,15 +2430,14 @@ if (musicPlayer && audio) {
   audio.addEventListener('ended', () => updatePlayerState(false));
 }
 
-// 6. RSVP Pergamino: Detección, Stepper, Folio Logístico, Dietas y QR Pass
+// 6. RSVP Pergamino: Detección Automática, Asignación de Pases, WhatsApp y QR Pass
 (function initRsvpPergamino() {
-  const saludoCont = document.getElementById('contenedor-saludo-pergamino');
-  const campoNombre = document.getElementById('campoNombrePergamino');
-  const inputNombre = document.getElementById('formGuestName');
-  const guestOut = document.getElementById('guestCount');
-  const ticketsRow = document.getElementById('rsvpTicketsRow');
-  const ticketsHint = document.getElementById('allowedTicketsHint');
-  const dietaryBlock = document.getElementById('rsvpDietaryBlock');
+  const campoNombreContainer = document.getElementById('campo-nombre-container');
+  const contenedorSaludo = document.getElementById('contenedor-saludo');
+  const inputNombre = document.getElementById('nombre');
+  const inputAsistencia = document.getElementById('asistencia');
+  const inputPases = document.getElementById('pases');
+  const inputAlergias = document.getElementById('alergias');
   const rsvpForm = document.getElementById('rsvpForm');
   const rsvpSuccess = document.getElementById('rsvpSuccess');
   const btnSubmit = document.getElementById('rsvpSubmit');
@@ -2414,105 +2445,50 @@ if (musicPlayer && audio) {
   const btnSharePassWhatsapp = document.getElementById('btnSharePassWhatsapp');
   const btnDownloadPassImage = document.getElementById('btnDownloadPassImage');
 
-  let guestCount = Math.min(urlTickets, Math.max(1, urlTickets));
+  const guestParam = urlParams.get('guest') || urlParams.get('invitado');
+  const ticketsParam = parseInt(urlParams.get('passes') || urlParams.get('pases') || urlParams.get('tickets'), 10) || 2;
   const urlMesaParam = urlParams.get('mesa') || urlParams.get('table') || urlParams.get('m') || '';
 
-  const pillsContainer = document.getElementById('pillsContainer');
-  const labelAsistenciaSi = document.getElementById('labelAsistenciaSi');
-  const labelAsistenciaNo = document.getElementById('labelAsistenciaNo');
-  const radioSi = document.getElementById('radioAsistenciaSi');
-  const radioNo = document.getElementById('radioAsistenciaNo');
-
-  let guestCount = Math.max(1, urlTickets || 2);
-  const urlMesaParam = urlParams.get('mesa') || urlParams.get('table') || urlParams.get('m') || '';
-  const isVipGuest = !!(urlGuest && urlGuest.trim());
-
-  // Render Pill Chips for Pass Selection
-  const renderPillChips = (maxPasses) => {
-    if (!pillsContainer) return;
-    pillsContainer.innerHTML = '';
-    const total = Math.max(1, Math.min(12, maxPasses));
-    for (let i = 1; i <= total; i++) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'pill-ticket-btn px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer select-none ' + 
-        (i === guestCount 
-          ? 'bg-antique-gold text-white shadow-md scale-105 border border-antique-gold' 
-          : 'bg-white/80 border border-antique-gold/30 text-deep-onyx hover:bg-champagne-cream');
-      btn.textContent = i === total && total > 1 ? (i + ' (Todos)') : (i + (i === 1 ? ' Pase' : ' Pases'));
-      btn.onclick = () => {
-        guestCount = i;
-        renderPillChips(maxPasses);
-      };
-      pillsContainer.appendChild(btn);
-    }
-  };
-
-  if (isVipGuest) {
+  if (guestParam && guestParam.trim()) {
+    const nombreDecodificado = guestParam.replace(/-/g, ' ').replace(/_/g, ' ').trim();
     let mesaLabelTxt = '';
     if (urlMesaParam) {
-      mesaLabelTxt = urlMesaParam.toLowerCase().includes('imp') ? ' en la <strong class="text-primary font-bold">Mesa Imperial</strong>' : (' en la <strong class="text-primary font-bold">Mesa ' + urlMesaParam.replace(/\D/g, '') + '</strong>');
+      mesaLabelTxt = urlMesaParam.toLowerCase().includes('imp') ? ' (Mesa Imperial)' : (' (Mesa ' + urlMesaParam.replace(/\D/g, '') + ')');
     }
 
-    if (saludoCont) {
-      saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino shadow-sm border border-antique-gold/40 rounded-2xl bg-amber-500/10 p-4 mb-2 text-left">' +
-        '<div class="flex items-center gap-2 mb-1 text-antique-gold font-bold">' +
-          '<span class="text-xl">⚜️</span>' +
-          '<strong class="font-display-lg text-xs uppercase tracking-wider text-deep-onyx">Pase de Honor Pre-Asignado</strong>' +
-        '</div>' +
-        '<p class="text-sm text-deep-onyx leading-relaxed">' +
-          '¡Qué alegría tenerles aquí, <strong class="text-primary font-bold text-base">' + urlGuest + '</strong>!<br>' +
-          'Tienen <strong class="text-primary font-bold">' + urlTickets + (urlTickets === 1 ? ' pase reservado' : ' pases reservados') + '</strong>' +
-          mesaLabelTxt + ' para celebrar con nosotros.' +
-        '</p>' +
-      '</div>';
+    if (contenedorSaludo) {
+      contenedorSaludo.innerHTML = '<div class="mensaje-personalizado">' +
+        '¡Qué alegría tenerte aquí, <strong class="text-deep-onyx">' + nombreDecodificado + '</strong>! Tus <strong>' + ticketsParam + (ticketsParam === 1 ? ' pase' : ' pases') + '</strong> ya están reservados' + mesaLabelTxt + '.' +
+        '</div>';
     }
-    if (campoNombre) campoNombre.style.display = 'none';
-    if (document.getElementById('campoTelefonoPergamino')) document.getElementById('campoTelefonoPergamino').style.display = 'none';
-    if (inputNombre) inputNombre.value = urlGuest;
-    if (ticketsHint) ticketsHint.textContent = urlTickets + ' Pase' + (urlTickets === 1 ? '' : 's');
-    if (btnSubmit) btnSubmit.innerHTML = '<span>✨ Confirmar Asistencia y Obtener Pase QR</span>';
+
+    if (inputNombre) inputNombre.value = nombreDecodificado;
+    if (campoNombreContainer) campoNombreContainer.style.display = 'none';
+    if (inputPases) {
+      inputPases.value = ticketsParam;
+      inputPases.max = ticketsParam;
+    }
   } else {
-    if (saludoCont) {
-      saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino shadow-sm border border-antique-gold/30 rounded-2xl bg-champagne-cream/50 p-3.5 mb-2 text-left">' +
-        '<div class="flex items-center gap-1.5 mb-0.5 text-antique-gold font-bold">' +
-          '<span class="text-base">⚜️</span>' +
-          '<strong class="font-display-lg text-[11px] uppercase tracking-wider text-deep-onyx">Solicitud de Registro</strong>' +
-        '</div>' +
-        '<p class="text-xs text-deep-onyx/85 leading-relaxed">' +
-          'Para proteger el acomodo del salón, ingresa tus datos. Los novios te asignarán tu mesa oficial y recibirás tu pase QR definitivo.' +
-        '</p>' +
-      '</div>';
+    if (contenedorSaludo) {
+      contenedorSaludo.innerHTML = '<div class="mensaje-personalizado">' +
+        'Por favor ingresa tus datos para registrar tu confirmación de asistencia.' +
+        '</div>';
     }
-    if (campoNombre) campoNombre.style.display = 'flex';
-    if (document.getElementById('campoTelefonoPergamino')) document.getElementById('campoTelefonoPergamino').style.display = 'flex';
+    if (campoNombreContainer) campoNombreContainer.style.display = 'block';
     if (inputNombre) inputNombre.value = '';
-    if (ticketsHint) ticketsHint.textContent = urlTickets + ' Pase' + (urlTickets === 1 ? '' : 's');
-    if (btnSubmit) btnSubmit.innerHTML = '<span>📲 Enviar Solicitud a los Novios</span>';
+    if (inputPases) inputPases.value = 1;
   }
 
-  // Render pills
-  renderPillChips(urlTickets);
-
-  // Quick 1-touch Attendance selection
-  if (labelAsistenciaSi && labelAsistenciaNo && radioSi && radioNo) {
-    labelAsistenciaSi.onclick = () => {
-      radioSi.checked = true;
-      labelAsistenciaSi.className = 'flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border-2 border-antique-gold rounded-2xl bg-antique-gold/15 transition-all text-center';
-      labelAsistenciaNo.className = 'flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border border-neutral-300 rounded-2xl bg-white/50 hover:bg-neutral-100 transition-all text-center opacity-60';
-      if (ticketsRow) ticketsRow.style.display = 'flex';
-      if (dietaryBlock) dietaryBlock.style.display = 'flex';
-      if (btnSubmit) btnSubmit.innerHTML = isVipGuest ? '<span>✨ Confirmar Asistencia y Obtener Pase QR</span>' : '<span>📲 Enviar Solicitud a los Novios</span>';
-    };
-
-    labelAsistenciaNo.onclick = () => {
-      radioNo.checked = true;
-      labelAsistenciaNo.className = 'flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border-2 border-neutral-600 rounded-2xl bg-neutral-200 transition-all text-center';
-      labelAsistenciaSi.className = 'flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border border-neutral-300 rounded-2xl bg-white/50 hover:bg-neutral-100 transition-all text-center opacity-60';
-      if (ticketsRow) ticketsRow.style.display = 'none';
-      if (dietaryBlock) dietaryBlock.style.display = 'none';
-      if (btnSubmit) btnSubmit.innerHTML = '<span>💌 Enviar Aviso (No podré asistir)</span>';
-    };
+  // Toggle pases input depending on asistencia
+  if (inputAsistencia) {
+    inputAsistencia.addEventListener('change', () => {
+      const isNo = inputAsistencia.value === 'no';
+      const campoPases = document.getElementById('campo-pases-container');
+      const campoDietas = document.getElementById('campo-dietas-container');
+      if (campoPases) campoPases.style.display = isNo ? 'none' : 'block';
+      if (campoDietas) campoDietas.style.display = isNo ? 'none' : 'block';
+      if (btnSubmit) btnSubmit.textContent = isNo ? 'Enviar Aviso (No podré asistir)' : 'Enviar Confirmación';
+    });
   }
 
   // Reset button
@@ -2525,30 +2501,27 @@ if (musicPlayer && audio) {
       }
       if (btnSubmit) {
         btnSubmit.disabled = false;
-        btnSubmit.innerHTML = isVipGuest ? '<span>✨ Confirmar Asistencia y Obtener Pase QR</span>' : '<span>📲 Enviar Solicitud a los Novios</span>';
+        btnSubmit.textContent = 'Enviar Confirmación';
       }
-      if (urlGuest && inputNombre) inputNombre.value = urlGuest;
-      if (ticketsRow) ticketsRow.style.display = 'flex';
-      if (dietaryBlock) dietaryBlock.style.display = 'flex';
-      guestCount = Math.max(1, urlTickets);
-      renderPillChips(urlTickets);
+      if (guestParam && inputNombre) {
+        inputNombre.value = guestParam.replace(/-/g, ' ').replace(/_/g, ' ').trim();
+        if (inputPases) inputPases.value = ticketsParam;
+      }
     });
   }
 
-  // Submit handler
+  // Form submit handler
   if (rsvpForm) {
     rsvpForm.addEventListener('submit', (e) => {
       e.preventDefault();
       if (!rsvpForm.checkValidity()) { rsvpForm.reportValidity(); return; }
 
-      const data = new FormData(rsvpForm);
-      const isAttending = data.get('rsvp') === 'si';
-      const guestName = (data.get('nombre') || urlGuest || 'Invitado de Honor').trim();
-      const phone = (data.get('telefono') || '').trim();
-      const confirmedTickets = isAttending ? guestCount : 0;
-      const allergies = (data.get('alergias') || '').trim();
+      const isAttending = inputAsistencia ? inputAsistencia.value === 'si' : true;
+      const guestName = (inputNombre ? inputNombre.value : (guestParam || 'Invitado de Honor')).trim();
+      const confirmedTickets = isAttending ? (parseInt(inputPases.value, 10) || 1) : 0;
+      const allergies = inputAlergias ? inputAlergias.value.trim() : '';
 
-      // Generar Folio Logístico Opción B: [MESA]-[APELLIDO]-[PASES]
+      // Generar Folio Logístico: [MESA]-[APELLIDO]-[PASES]
       const cleanTokens = guestName
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         .replace(/[^a-zA-Z0-9\s]/g, '')
@@ -2565,16 +2538,15 @@ if (musicPlayer && audio) {
           apellidoCode = (cleanTokens.length > 1 ? cleanTokens[cleanTokens.length - 1] : cleanTokens[0]).toUpperCase().substring(0, 10);
         }
       }
-      
+
       let mesaCode = 'MGEN';
       let tableDisplay = 'Mesa General';
-      const urlMesa = urlParams.get('mesa') || urlParams.get('table') || urlParams.get('m');
-      if (urlMesa) {
-        if (String(urlMesa).toLowerCase().includes('imp')) {
+      if (urlMesaParam) {
+        if (String(urlMesaParam).toLowerCase().includes('imp')) {
           mesaCode = 'MIMP';
           tableDisplay = 'Mesa Imperial';
         } else {
-          const mMatch = String(urlMesa).match(/\d+/);
+          const mMatch = String(urlMesaParam).match(/\d+/);
           mesaCode = mMatch ? 'M' + mMatch[0].padStart(2, '0') : 'MGEN';
           tableDisplay = mMatch ? 'Mesa ' + parseInt(mMatch[0], 10) : 'Mesa General';
         }
@@ -2626,13 +2598,9 @@ if (musicPlayer && audio) {
             '💌 *Estado:* ' + attendLine
           ];
           if (isAttending) {
-            lines.push('🎟️ *Pases Confirmados:* ' + confirmedTickets + ' de ' + urlTickets);
-            if (isVipGuest) {
-              lines.push('🪑 *Mesa Asignada:* ' + tableDisplay);
-              lines.push('🔖 *Folio de Acceso:* ' + folio);
-            } else {
-              lines.push('⏳ *Mesa:* Pendiente de asignación por los Novios');
-            }
+            lines.push('🎟️ *Pases Confirmados:* ' + confirmedTickets + ' de ' + ticketsParam);
+            lines.push('🪑 *Mesa Asignada:* ' + tableDisplay);
+            lines.push('🔖 *Folio de Acceso:* ' + folio);
             if (allergies) lines.push('🍽️ *Nota / Dieta:* ' + allergies);
           }
           const text = encodeURIComponent(lines.join('\n'));
@@ -2651,12 +2619,12 @@ if (musicPlayer && audio) {
         };
       }
 
-      // Auto-trigger WhatsApp on confirm
+      // Auto-trigger WhatsApp
       triggerWhatsApp();
 
       if (btnSubmit) {
         btnSubmit.disabled = true;
-        btnSubmit.textContent = 'Procesando...';
+        btnSubmit.textContent = 'Enviando...';
       }
 
       setTimeout(() => {
@@ -2676,41 +2644,32 @@ if (musicPlayer && audio) {
           if (folioEl) folioEl.textContent = 'FOLIO: ' + folio;
 
           if (isAttending) {
-            if (isVipGuest) {
-              if (ticketsEl) ticketsEl.textContent = 'Pase autorizado para: ' + confirmedTickets + ' persona' + (confirmedTickets === 1 ? '' : 's');
-              if (msgEl) msgEl.textContent = '¡Pase Digital Sellado! Presenta este código QR en la entrada del salón.';
-              if (labelTableEl) labelTableEl.textContent = tableDisplay.toUpperCase();
-              if (badgeTableEl) badgeTableEl.classList.remove('hidden');
+            if (ticketsEl) ticketsEl.textContent = 'Pase autorizado para: ' + confirmedTickets + ' persona' + (confirmedTickets === 1 ? '' : 's');
+            if (msgEl) msgEl.textContent = 'Tu respuesta ha sido registrada exitosamente en el sistema oficial.';
+            if (labelTableEl) labelTableEl.textContent = tableDisplay.toUpperCase();
+            if (badgeTableEl) badgeTableEl.classList.remove('hidden');
 
-              if (allergies && dietarySumEl) {
-                dietarySumEl.textContent = '🍽️ Nota: ' + allergies;
-                dietarySumEl.classList.remove('hidden');
-              } else if (dietarySumEl) {
-                dietarySumEl.classList.add('hidden');
-              }
+            if (allergies && dietarySumEl) {
+              dietarySumEl.textContent = '🍽️ Nota: ' + allergies;
+              dietarySumEl.classList.remove('hidden');
+            } else if (dietarySumEl) {
+              dietarySumEl.classList.add('hidden');
+            }
 
-              const qrData = JSON.stringify({
-                folio: folio,
-                titular: guestName,
-                pases: confirmedTickets,
-                mesa: mesaCode,
-                evento: calcDisplayName,
-                fecha: CONFIG.eventDateShort || ''
-              });
-              const qrContainer = document.getElementById('qrContainer');
-              if (qrContainer) {
-                qrContainer.innerHTML = '';
-                if (typeof QRCode !== 'undefined') {
-                  new QRCode(qrContainer, { text: qrData, width: 140, height: 140, colorDark: "#222222", colorLight: "#ffffff" });
-                }
+            const qrData = JSON.stringify({
+              folio: folio,
+              titular: guestName,
+              pases: confirmedTickets,
+              mesa: mesaCode,
+              evento: calcDisplayName,
+              fecha: CONFIG.eventDateShort || ''
+            });
+            const qrContainer = document.getElementById('qrContainer');
+            if (qrContainer) {
+              qrContainer.innerHTML = '';
+              if (typeof QRCode !== 'undefined') {
+                new QRCode(qrContainer, { text: qrData, width: 140, height: 140, colorDark: "#222222", colorLight: "#ffffff" });
               }
-            } else {
-              // Invitado en Lista de Espera / Sin Mesa Asignada aún
-              if (ticketsEl) ticketsEl.textContent = 'Solicitud por ' + confirmedTickets + ' pase' + (confirmedTickets === 1 ? '' : 's');
-              if (msgEl) msgEl.textContent = 'Tu solicitud ha sido enviada a los Novios. Te notificarán tu mesa y te enviarán tu Pase QR definitivo.';
-              if (badgeTableEl) badgeTableEl.classList.add('hidden');
-              const qrContainer = document.getElementById('qrContainer');
-              if (qrContainer) qrContainer.innerHTML = '<div class="p-3 bg-amber-500/10 border border-antique-gold/30 rounded-2xl my-2"><span class="text-3xl block mb-1">⏳</span><span class="text-xs font-bold text-deep-onyx">Mesa en proceso de asignación</span></div>';
             }
           } else {
             if (ticketsEl) ticketsEl.textContent = 'Lamentamos que no puedas acompañarnos.';
@@ -2721,7 +2680,7 @@ if (musicPlayer && audio) {
             if (qrContainer) qrContainer.innerHTML = '<span class="text-3xl">💌</span>';
           }
         }
-      }, 400);
+      }, 350);
     });
   }
 })();
