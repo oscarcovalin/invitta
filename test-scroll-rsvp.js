@@ -61,6 +61,7 @@ assert(html.includes('pergamino-ornament'), 'invitacion.html includes .pergamino
 assert(html.includes('id="contenedor-saludo"'), 'invitacion.html includes #contenedor-saludo dynamic greeting container');
 assert(html.includes('id="campo-nombre-container"'), 'invitacion.html includes #campo-nombre-container');
 assert(html.includes('id="nombre"'), 'invitacion.html includes #nombre');
+assert(html.includes('id="email"'), 'invitacion.html includes #email field');
 assert(html.includes('id="asistencia"'), 'invitacion.html includes #asistencia');
 assert(html.includes('id="pases"'), 'invitacion.html includes #pases');
 assert(html.includes('id="dieta"'), 'invitacion.html includes #dieta select dropdown');

@@ -1620,6 +1620,11 @@ tailwind.config = {
             <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre y apellido" required>
           </div>
 
+          <div id="campo-email-container" class="form-group-clean">
+            <label for="email">Correo Electrónico (Opcional)</label>
+            <input type="email" id="email" name="email" placeholder="ejemplo@correo.com">
+          </div>
+
           <div class="form-group-clean">
             <label for="asistencia">¿Nos acompañarás?</label>
             <select id="asistencia" name="asistencia" required>
@@ -2440,6 +2445,7 @@ if (musicPlayer && audio) {
   const campoNombreContainer = document.getElementById('campo-nombre-container');
   const contenedorSaludo = document.getElementById('contenedor-saludo');
   const inputNombre = document.getElementById('nombre');
+  const inputEmail = document.getElementById('email');
   const inputAsistencia = document.getElementById('asistencia');
   const inputPases = document.getElementById('pases');
   const inputDieta = document.getElementById('dieta');
@@ -2514,6 +2520,7 @@ if (musicPlayer && audio) {
         btnSubmit.disabled = false;
         btnSubmit.textContent = 'Enviar Confirmación';
       }
+      if (inputEmail) inputEmail.value = '';
       if (inputDieta) inputDieta.value = '';
       if (guestParam && inputNombre) {
         inputNombre.value = guestParam.replace(/-/g, ' ').replace(/_/g, ' ').trim();
@@ -2530,6 +2537,7 @@ if (musicPlayer && audio) {
 
       const isAttending = inputAsistencia ? inputAsistencia.value === 'si' : true;
       const guestName = (inputNombre ? inputNombre.value : (guestParam || 'Invitado de Honor')).trim();
+      const guestEmail = inputEmail ? inputEmail.value.trim() : '';
       const confirmedTickets = isAttending ? (parseInt(inputPases.value, 10) || 1) : 0;
       const allergies = inputDieta ? inputDieta.value.trim() : '';
 
@@ -2588,6 +2596,7 @@ if (musicPlayer && audio) {
                   found.status = isAttending ? 'CONFIRMED' : 'DECLINED';
                   found.confirmedPasses = confirmedTickets;
                   found.respondedAt = new Date().toISOString();
+                  if (guestEmail) found.email = guestEmail;
                   if (allergies) found.dietary = allergies;
                   localStorage.setItem('invitta_2_guest_db', JSON.stringify(db));
                 }
@@ -2609,6 +2618,7 @@ if (musicPlayer && audio) {
             '👤 *Titular:* ' + guestName,
             '💌 *Estado:* ' + attendLine
           ];
+          if (guestEmail) lines.push('✉️ *Correo:* ' + guestEmail);
           if (isAttending) {
             lines.push('🎟️ *Pases Confirmados:* ' + confirmedTickets + ' de ' + ticketsParam);
             lines.push('🪑 *Mesa Asignada:* ' + tableDisplay);
