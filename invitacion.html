@@ -290,16 +290,16 @@ tailwind.config = {
     transform: translateY(-1px);
   }
 
-  /* ==================== ESTILO PERGAMINO RSVP (USUARIO) ==================== */
+  /* ==================== ESTILO PERGAMINO RSVP (COHERENCIA TOTAL) ==================== */
   .pergamino-container {
     background: #ffffff;
-    border: 2px solid var(--gold);
-    border-radius: 12px;
+    border: 1.5px solid var(--gold);
+    border-radius: 16px;
     padding: 36px 28px;
     width: 92%;
     max-width: 480px;
     margin: 0 auto;
-    box-shadow: 0 10px 30px rgba(22, 60, 43, 0.12);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
     transform: translateY(20px);
     opacity: 0;
     animation: desplegarPergamino 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -337,56 +337,70 @@ tailwind.config = {
     display: block;
     margin-bottom: 6px;
     color: var(--onyx);
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.06em;
     font-weight: 600;
+    font-family: inherit;
   }
 
   .form-group-clean input, .form-group-clean select {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid #D1C7BD;
-    border-radius: 6px;
-    background-color: #FAF8F5;
+    border: 1px solid var(--border-medium, #D1C7BD);
+    border-radius: 8px;
+    background-color: var(--bg-primary, #FAF8F5);
     font-size: 0.95rem;
-    color: #2C2C2C;
+    color: var(--onyx, #2C2C2C);
     box-sizing: border-box;
-    transition: border-color 0.2s ease;
+    font-family: inherit;
+    transition: all 0.2s ease;
   }
 
   .form-group-clean input:focus, .form-group-clean select:focus {
     outline: none;
     border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(163, 128, 71, 0.15);
+    background-color: #ffffff;
   }
 
   .btn-rsvp-submit-clean {
     width: 100%;
-    padding: 14px;
-    background-color: #163C2B;
+    padding: 15px;
+    background-color: var(--primary);
     color: #ffffff;
     border: none;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    letter-spacing: 1px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    letter-spacing: 1.2px;
     font-weight: 600;
+    text-transform: uppercase;
+    font-family: inherit;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     margin-top: 10px;
   }
 
   .btn-rsvp-submit-clean:hover {
     background-color: var(--gold);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-rsvp-submit-clean:active {
+    transform: translateY(0);
   }
 
   .mensaje-personalizado-pergamino, .mensaje-personalizado {
-    background-color: rgba(163, 128, 71, 0.1);
-    border-left: 4px solid var(--gold);
-    padding: 12px 14px;
+    background-color: rgba(163, 128, 71, 0.08);
+    border-left: 3px solid var(--gold);
+    padding: 14px 16px;
     margin-bottom: 20px;
     font-size: 0.92rem;
-    color: #163C2B;
-    border-radius: 0 8px 8px 0;
+    color: var(--onyx);
+    border-radius: 0 10px 10px 0;
     text-align: left;
     line-height: 1.5;
   }
@@ -1635,7 +1649,13 @@ tailwind.config = {
 
           <div class="form-group-clean" id="campo-pases-container">
             <label for="pases">Número de Lugares</label>
-            <input type="number" id="pases" name="pases" min="1" value="1" required>
+            <select id="pases" name="pases" required>
+              <option value="1" selected>1 Lugar</option>
+              <option value="2">2 Lugares</option>
+              <option value="3">3 Lugares</option>
+              <option value="4">4 Lugares</option>
+              <option value="5">5 Lugares</option>
+            </select>
           </div>
 
           <div class="form-group-clean" id="campo-dietas-container">
@@ -2482,8 +2502,14 @@ if (musicPlayer && audio) {
     if (inputNombre) inputNombre.value = nombreDecodificado;
     if (campoNombreContainer) campoNombreContainer.style.display = 'none';
     if (inputPases) {
-      inputPases.value = ticketsParam;
-      inputPases.max = ticketsParam;
+      inputPases.innerHTML = '';
+      for (let i = 1; i <= ticketsParam; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = i === 1 ? '1 Lugar' : (i + ' Lugares');
+        if (i === ticketsParam) opt.selected = true;
+        inputPases.appendChild(opt);
+      }
     }
   } else {
     if (contenedorSaludo) {
@@ -2493,7 +2519,16 @@ if (musicPlayer && audio) {
     }
     if (campoNombreContainer) campoNombreContainer.style.display = 'block';
     if (inputNombre) inputNombre.value = '';
-    if (inputPases) inputPases.value = 1;
+    if (inputPases) {
+      inputPases.innerHTML = '';
+      for (let i = 1; i <= 6; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = i === 1 ? '1 Lugar' : (i + ' Lugares');
+        if (i === 1) opt.selected = true;
+        inputPases.appendChild(opt);
+      }
+    }
   }
 
   // Toggle pases input depending on asistencia

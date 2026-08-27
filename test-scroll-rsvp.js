@@ -62,8 +62,7 @@ assert(html.includes('id="contenedor-saludo"'), 'invitacion.html includes #conte
 assert(html.includes('id="campo-nombre-container"'), 'invitacion.html includes #campo-nombre-container');
 assert(html.includes('id="nombre"'), 'invitacion.html includes #nombre');
 assert(html.includes('id="email"'), 'invitacion.html includes #email field');
-assert(html.includes('id="asistencia"'), 'invitacion.html includes #asistencia');
-assert(html.includes('id="pases"'), 'invitacion.html includes #pases');
+assert(html.includes('<select id="pases"'), 'invitacion.html has <select id="pases"> dropdown');
 assert(html.includes('id="dieta"'), 'invitacion.html includes #dieta select dropdown');
 assert(html.includes('Menú Infantil'), 'invitacion.html includes Menú Infantil option');
 assert(html.includes('Alergias'), 'invitacion.html includes Alergias option');

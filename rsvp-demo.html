@@ -137,7 +137,12 @@
 
             <div class="form-group">
                 <label for="pases">Número de Lugares</label>
-                <input type="number" id="pases" name="pases" min="1" value="1" required>
+                <select id="pases" name="pases" required>
+                    <option value="1" selected>1 Lugar</option>
+                    <option value="2">2 Lugares</option>
+                    <option value="3">3 Lugares</option>
+                    <option value="4">4 Lugares</option>
+                </select>
             </div>
 
             <div class="form-group" id="campo-dieta-container">
@@ -159,6 +164,7 @@
             // Lógica de detección automática de URL (Parámetro ?guest=)
             const urlParams = new URLSearchParams(window.location.search);
             const guestParam = urlParams.get('guest') || urlParams.get('invitado');
+            const ticketsParam = parseInt(urlParams.get('passes') || urlParams.get('pases') || '2', 10);
             
             const campoNombreContainer = document.getElementById('campo-nombre-container');
             const contenedorSaludo = document.getElementById('contenedor-saludo');
@@ -178,7 +184,16 @@
                 // Precargamos los datos y bloqueamos la edición del nombre si viene personalizado
                 inputNombre.value = nombreDecodificado;
                 campoNombreContainer.style.display = 'none';
-                inputPases.value = parseInt(urlParams.get('passes') || urlParams.get('pases') || '2', 10);
+                if (inputPases) {
+                    inputPases.innerHTML = '';
+                    for (let i = 1; i <= ticketsParam; i++) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.textContent = i === 1 ? '1 Lugar' : `${i} Lugares`;
+                        if (i === ticketsParam) opt.selected = true;
+                        inputPases.appendChild(opt);
+                    }
+                }
             } else {
                 // Modo formulario abierto (enlace genérico)
                 contenedorSaludo.innerHTML = `
