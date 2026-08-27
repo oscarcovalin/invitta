@@ -97,6 +97,10 @@
 
         <!-- Botones de Acción Global -->
         <div class="flex flex-wrap items-center gap-3">
+          <span id="cloudVaultStatus" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-400/25 text-emerald-300 text-[10px] font-mono">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span>Consultando nube…</span>
+          </span>
           <button id="btnNewProjectModal" type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
             <span class="material-symbols-outlined text-lg">add_circle</span>
             <span>+ Nueva Invitación</span>
@@ -372,9 +376,20 @@
   <!-- Scripts de la Bóveda de Proyectos -->
   <script src="projects-vault.js"></script>
   <script src="template-engine.js"></script>
+  <script src="vendor/supabase-2.112.3.js"></script>
+  <script src="cloud-config.js"></script>
+  <script src="portal-cloud-vault.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       renderVaultProjects();
+
+      if (window.InvittaCloudVault) {
+        window.InvittaCloudVault.load().finally(() => {
+          const search = document.getElementById('vaultSearchInput');
+          renderVaultProjects(search ? search.value : '', currentFilter);
+          updateCloudVaultStatus();
+        });
+      }
 
       // Buscador
       const searchInput = document.getElementById('vaultSearchInput');
@@ -445,13 +460,56 @@
           }
         });
       }
+
+      const projectGrid = document.getElementById('vaultProjectsGrid');
+      if (projectGrid) {
+        projectGrid.addEventListener('click', (event) => {
+          const actionButton = event.target.closest('[data-vault-action]');
+          if (!actionButton) return;
+          const id = actionButton.dataset.projectId;
+          const project = ProjectsVault.getById(id);
+          if (!project) return;
+
+          if (actionButton.dataset.vaultAction === 'duplicate') {
+            ProjectsVault.duplicate(id);
+            renderVaultProjects(searchInput ? searchInput.value : '', currentFilter);
+          } else if (actionButton.dataset.vaultAction === 'export') {
+            ProjectsVault.exportJSON(id);
+          } else if (actionButton.dataset.vaultAction === 'delete') {
+            if (confirm(`¿Eliminar la invitación "${project.hosts || project.title}" de la bóveda local?`)) {
+              ProjectsVault.delete(id);
+              renderVaultProjects(searchInput ? searchInput.value : '', currentFilter);
+            }
+          }
+        });
+      }
     });
+
+    function escapeVaultText(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function updateCloudVaultStatus() {
+      const status = document.getElementById('cloudVaultStatus');
+      if (!status || !window.InvittaCloudVault) return;
+      const cloudState = window.InvittaCloudVault.getStatus();
+      const label = status.querySelector('span:last-child');
+      if (label) label.textContent = cloudState.message;
+      status.classList.toggle('text-rose-300', cloudState.status === 'error');
+    }
 
     function renderVaultProjects(query = '', filter = 'all') {
       const grid = document.getElementById('vaultProjectsGrid');
       if (!grid) return;
 
-      const projects = ProjectsVault.getAll();
+      const localProjects = ProjectsVault.getAll().map(project => ({ ...project, source: 'local' }));
+      const cloudProjects = window.InvittaCloudVault ? window.InvittaCloudVault.getAll() : [];
+      const projects = [...cloudProjects, ...localProjects];
       
       // Actualizar contadores
       const cAll = document.getElementById('countFilterAll');
@@ -487,8 +545,21 @@
 
       grid.innerHTML = filtered.map(p => {
         const isBoda = p.eventType === 'boda';
+        const isCloud = p.source === 'cloud';
+        const isArchived = p.status === 'archived';
         const dateStr = p.date ? new Date(p.date + 'T00:00:00').toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Fecha por definir';
-        const themeColor = p.theme === 'rosa' ? '#f472b6' : (p.theme === 'esmeralda' ? '#34d399' : (p.theme === 'medianoche' ? '#60a5fa' : '#fbbf24'));
+        const safeTitle = escapeVaultText(p.title || 'Invitación');
+        const safeHosts = escapeVaultText(p.hosts || p.title || 'Invitación');
+        const safeVenue = escapeVaultText(p.venue || 'Salón por definir');
+        const safeDate = escapeVaultText(dateStr);
+        const safeLocalId = escapeVaultText(p.id);
+        const projectParam = encodeURIComponent(isCloud ? p.cloudProjectId : p.id);
+        const studioHref = isCloud
+          ? `invitacion-estudio.html?cloudProject=${projectParam}`
+          : `invitacion-estudio.html?project=${projectParam}`;
+        const statusLabel = isCloud
+          ? (isArchived ? 'Archivada · Nube' : `Nube v${Number(p.version) || 1}`)
+          : 'Local';
 
         return `
           <div class="glass-portal-card rounded-2xl p-5 flex flex-col justify-between border border-amber-500/25 bg-black/40 hover:border-amber-400 transition-all group">
@@ -499,26 +570,26 @@
                   <span>${isBoda ? '💍 Boda' : '👑 Mis XV'}</span>
                 </span>
                 
-                <span class="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 font-semibold">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  <span>Activa</span>
+                <span class="inline-flex items-center gap-1 text-[10px] font-mono ${isArchived ? 'text-neutral-400' : (isCloud ? 'text-emerald-400' : 'text-sky-300')} font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full ${isArchived ? 'bg-neutral-500' : (isCloud ? 'bg-emerald-400' : 'bg-sky-300')}"></span>
+                  <span>${statusLabel}</span>
                 </span>
               </div>
 
               <!-- Título / Nombres -->
-              <h3 class="font-['Cinzel'] text-lg font-bold text-white group-hover:text-amber-300 transition-colors mb-1 truncate" title="${p.title}">
-                ${p.hosts || p.title}
+              <h3 class="font-['Cinzel'] text-lg font-bold text-white group-hover:text-amber-300 transition-colors mb-1 truncate" title="${safeTitle}">
+                ${safeHosts}
               </h3>
 
               <!-- Detalles de Fecha y Salón -->
               <div class="space-y-1 text-xs text-neutral-400 font-light mb-4">
                 <p class="flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-[15px] text-amber-400/80">calendar_today</span>
-                  <span>${dateStr}</span>
+                  <span>${safeDate}</span>
                 </p>
-                <p class="flex items-center gap-1.5 truncate" title="${p.venue || 'Salón por definir'}">
+                <p class="flex items-center gap-1.5 truncate" title="${safeVenue}">
                   <span class="material-symbols-outlined text-[15px] text-amber-400/80">location_on</span>
-                  <span class="truncate">${p.venue || 'Salón por definir'}</span>
+                  <span class="truncate">${safeVenue}</span>
                 </p>
               </div>
             </div>
@@ -526,31 +597,45 @@
             <!-- Suite de Acciones Rápidas -->
             <div class="pt-4 border-t border-white/10 space-y-2">
               <div class="grid grid-cols-2 gap-2">
-                <a href="invitacion.html?project=${p.id}" target="_blank" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-300 text-xs font-semibold tracking-wider transition-all">
+                ${isCloud ? `
+                <span class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-400/25 text-emerald-300 text-xs font-semibold tracking-wider">
+                  <span class="material-symbols-outlined text-sm">cloud_done</span>
+                  <span>${isArchived ? 'Solo lectura' : 'Protegida'}</span>
+                </span>
+                ` : `
+                <a href="invitacion.html?project=${projectParam}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-300 text-xs font-semibold tracking-wider transition-all">
                   <span class="material-symbols-outlined text-sm">visibility</span>
                   <span>Ver en Vivo ↗</span>
                 </a>
+                `}
                 
-                <a href="invitacion-estudio.html?project=${p.id}" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 text-xs font-semibold tracking-wider transition-all">
+                <a href="${studioHref}" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 text-xs font-semibold tracking-wider transition-all">
                   <span class="material-symbols-outlined text-sm">edit</span>
-                  <span>Editar</span>
+                  <span>${isArchived ? 'Abrir' : 'Editar'}</span>
                 </a>
               </div>
 
               <!-- Menú de Acciones Secundarias -->
               <div class="flex items-center justify-between pt-1 text-[11px] text-neutral-400">
-                <a href="organizador-mesas.html?project=${p.id}" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1">
+                ${isCloud ? `
+                <span class="inline-flex items-center gap-1 text-emerald-300/80">
+                  <span class="material-symbols-outlined text-xs">history</span> Historial v${Number(p.version) || 1}
+                </span>
+                <span class="text-neutral-500">Gestionado en Studio</span>
+                ` : `
+                <a href="organizador-mesas.html?project=${projectParam}" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1">
                   <span class="material-symbols-outlined text-xs">table_restaurant</span> Mesas
                 </a>
-                <button type="button" onclick="ProjectsVault.duplicate('${p.id}'); renderVaultProjects();" class="hover:text-white transition-colors inline-flex items-center gap-1">
+                <button type="button" data-vault-action="duplicate" data-project-id="${safeLocalId}" class="hover:text-white transition-colors inline-flex items-center gap-1">
                   <span class="material-symbols-outlined text-xs">content_copy</span> Duplicar
                 </button>
-                <button type="button" onclick="ProjectsVault.exportJSON('${p.id}')" class="hover:text-white transition-colors inline-flex items-center gap-1">
+                <button type="button" data-vault-action="export" data-project-id="${safeLocalId}" class="hover:text-white transition-colors inline-flex items-center gap-1">
                   <span class="material-symbols-outlined text-xs">download</span> JSON
                 </button>
-                <button type="button" onclick="if(confirm('¿Eliminar la invitación \'${p.hosts}\' de la bóveda?')){ ProjectsVault.delete('${p.id}'); renderVaultProjects(); }" class="hover:text-rose-400 transition-colors inline-flex items-center gap-1">
+                <button type="button" data-vault-action="delete" data-project-id="${safeLocalId}" class="hover:text-rose-400 transition-colors inline-flex items-center gap-1" aria-label="Eliminar proyecto local">
                   <span class="material-symbols-outlined text-xs">delete</span>
                 </button>
+                `}
               </div>
             </div>
 
