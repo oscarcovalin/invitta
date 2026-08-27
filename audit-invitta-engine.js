@@ -41,6 +41,7 @@ runTest('1. Template Engine & Themes', 'defaultConfig contiene todas las propied
   assert(cfg.dressCode && cfg.giftRegistry, 'Falta código de vestimenta o mesa de regalos');
   assert(cfg.sharedAlbum && cfg.sharedAlbum.accessCode, 'Falta configuración del álbum colaborativo');
   assert(cfg.whatsappNumber, 'Falta whatsappNumber');
+  assert(cfg.whatsappHosts && Array.isArray(cfg.whatsappHosts), 'Falta whatsappHosts como array');
   assert(cfg.rsvpTitle, 'Falta rsvpTitle');
 });
 
@@ -56,15 +57,17 @@ runTest('1. Template Engine & Themes', 'Todos los temas predeterminados compilan
   });
 });
 
-runTest('1. Template Engine & Themes', 'Soporte completo para Boda y XV Años', () => {
+runTest('1. Template Engine & Themes', 'Soporte completo para Boda y XV Años con Mis Chambelanes', () => {
   const cfgBoda = Object.assign({}, templateEngine.defaultConfig, { eventType: 'boda' });
   const htmlBoda = templateEngine.generateHTML(cfgBoda, 'vino');
   assert(htmlBoda.includes('heroBrideName'), 'No renderiza nombres de boda');
+  assert(htmlBoda.includes('Damas de Honor & Best Men'), 'No incluye Damas de Honor en boda');
 
   const cfgXv = Object.assign({}, templateEngine.defaultConfig, { eventType: 'xv', name: 'Valentina Martínez' });
   const htmlXv = templateEngine.generateHTML(cfgXv, 'vino');
   assert(htmlXv.includes('heroName'), 'No renderiza nombre de XV');
   assert(htmlXv.includes('Valentina Martínez'), 'No incluye el nombre de la quinceañera');
+  assert(htmlXv.includes('Mis Chambelanes'), 'No incluye Mis Chambelanes en XV Años');
 });
 
 // 2. MÓDULO RSVP & PASES VIP PERGAMINO
@@ -81,6 +84,16 @@ runTest('2. Módulo RSVP & Pases', 'Estructura pergamino limpia sin campos obsol
   assert(html.includes('id="rsvpSubmit"'), 'Falta botón de envío #rsvpSubmit');
   assert(html.includes('id="rsvpSuccess"'), 'Falta vista de éxito #rsvpSuccess');
   assert(html.includes('id="passTicketPergamino"'), 'Falta boleto digital oficial');
+});
+
+runTest('2. Módulo RSVP & Pases', 'Multi-Anfitrión WhatsApp y Devolución de QR al Invitado', () => {
+  const html = templateEngine.generateHTML(templateEngine.defaultConfig, 'vino');
+  assert(html.includes('id="btnSharePassWhatsapp"'), 'Falta botón de notificar anfitrión');
+  assert(html.includes('id="btnSendToMyWhatsapp"'), 'Falta botón de enviar a WhatsApp del invitado');
+  assert(html.includes('id="btnDownloadPassImage"'), 'Falta botón de guardar/imprimir pase');
+  assert(html.includes('id="multiHostWhatsappContainer"'), 'Falta contenedor de anfitriones secundarios');
+  assert(html.includes('buildGuestMessageText'), 'Falta generador de mensaje para el invitado');
+  assert(html.includes('buildHostMessageText'), 'Falta generador de mensaje para el anfitrión');
 });
 
 runTest('2. Módulo RSVP & Pases', 'Estilo responsivo para títulos largos vs RSVP', () => {
@@ -116,7 +129,7 @@ runTest('3. Álbum Colaborativo', 'Seguridad anti-spam y PIN maestro de los novi
 });
 
 // 4. POLVO DE ESTRELLAS (MOMENTO MÁGICO)
-runTest('4. Polvo de EstRELLAS', 'Animación y pantalla completa interactiva', () => {
+runTest('4. Polvo de Estrellas', 'Animación y pantalla completa interactiva', () => {
   const html = templateEngine.generateHTML(templateEngine.defaultConfig, 'vino');
   assert(html.includes('id="stardustTransitionCanvas"'), 'Falta canvas de transición');
   assert(html.includes('id="stardustFullScreenOverlay"'), 'Falta overlay a pantalla completa');
@@ -134,20 +147,26 @@ runTest('5. Ubicaciones & Calendarios', 'Enlaces directos de Google Maps, Waze y
 });
 
 // 6. PANEL DE CONTROL (INVIITTA ESTUDIO & APP.JS)
-runTest('6. Panel Invitta Estudio', 'Integridad de archivos HTML y JS del Estudio', () => {
+runTest('6. Panel Invitta Estudio', 'Integridad de archivos HTML y JS del Estudio con Multi-Host', () => {
   const studioHtml = fs.readFileSync(path.join(__dirname, 'invitacion-estudio.html'), 'utf-8');
   assert(studioHtml.includes('id="selectRsvpTitle"'), 'Estudio no tiene el selector de título RSVP');
   assert(studioHtml.includes('id="selectRsvpDay"'), 'Estudio no tiene el selector de día');
   assert(studioHtml.includes('id="selectRsvpMonth"'), 'Estudio no tiene el selector de mes');
+  assert(studioHtml.includes('id="inputHostPhone1"'), 'Estudio no tiene inputHostPhone1');
+  assert(studioHtml.includes('id="inputHostPhone2"'), 'Estudio no tiene inputHostPhone2');
+  assert(studioHtml.includes('id="inputHostPhone3"'), 'Estudio no tiene inputHostPhone3');
+  assert(studioHtml.includes('id="inputRsvpWebhook"'), 'Estudio no tiene inputRsvpWebhook');
   assert(!studioHtml.includes('btn-simulate-vip'), 'Estudio todavía contiene el simulador eliminado');
 
   const appJs = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf-8');
   assert(appJs.includes('setupRsvpTitleControls'), 'app.js no contiene setupRsvpTitleControls');
+  assert(appJs.includes('INVITTA_GUEST_CONFIRMED'), 'app.js no tiene receptor de confirmación en tiempo real');
   assert(!appJs.includes('setupVipPassGenerator'), 'app.js todavía tiene la función obsoleta setupVipPassGenerator');
 });
 
 // 7. PRUEBAS DE ECOSISTEMA PREEXISTENTES
 const existingSuites = [
+  'test-multi-host-rsvp.js',
   'test-scroll-rsvp.js',
   'test-album-security.js',
   'test-shared-album.js',

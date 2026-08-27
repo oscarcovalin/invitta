@@ -1,0 +1,26 @@
+{
+  "label": "v2.45_multi_host_whatsapp_rsvp_guest_return_and_cloud_webhook",
+  "timestamp": "2026-08-27T02:31:52.585Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 216312
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 102566
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

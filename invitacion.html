@@ -1800,16 +1800,32 @@ tailwind.config = {
             <div id="passDietarySummary" class="text-[10px] text-tertiary italic mt-2 hidden"></div>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-2 justify-center mb-3">
-            <button type="button" id="btnSharePassWhatsapp" class="btn-luxury-primary text-[11px] py-2 px-4 uppercase tracking-wider font-semibold inline-flex items-center justify-center gap-1.5">
-              <span>📲 Reenviar por WhatsApp</span>
-            </button>
-            <button type="button" id="btnDownloadPassImage" class="btn-luxury-secondary text-[11px] py-2 px-4 uppercase tracking-wider font-semibold inline-flex items-center justify-center gap-1.5">
-              <span>💾 Guardar Pase</span>
-            </button>
+          <!-- Acciones de Notificación & Devolución -->
+          <div class="flex flex-col gap-2 justify-center mb-3">
+            <div class="flex flex-col sm:flex-row gap-2 justify-center">
+              <button type="button" id="btnSharePassWhatsapp" class="btn-luxury-primary text-[11px] py-2.5 px-4 uppercase tracking-wider font-semibold inline-flex items-center justify-center gap-1.5 shadow-sm">
+                <span>📲 Notificar a Anfitrión</span>
+              </button>
+              <button type="button" id="btnSendToMyWhatsapp" class="btn-luxury-secondary text-[11px] py-2.5 px-4 uppercase tracking-wider font-semibold inline-flex items-center justify-center gap-1.5 shadow-sm">
+                <span>💬 Guardar en mi WhatsApp</span>
+              </button>
+            </div>
+            <div class="flex justify-center">
+              <button type="button" id="btnDownloadPassImage" class="text-[10.5px] py-1.5 px-3.5 rounded-full border border-antique-gold/40 text-deep-onyx hover:border-antique-gold font-medium inline-flex items-center justify-center gap-1.5 bg-white/40">
+                <span>💾 Guardar / Imprimir Pase</span>
+              </button>
+            </div>
           </div>
 
-          <button type="button" id="btnResetRsvp" class="text-xs text-antique-gold hover:underline font-medium cursor-pointer">
+          <!-- Botones de WhatsApp para Anfitriones Secundarios (si están configurados) -->
+          <div id="multiHostWhatsappContainer" class="my-2 p-2.5 bg-champagne-cream/60 border border-antique-gold/30 rounded-xl hidden">
+            <span class="font-label-caps text-[9px] uppercase tracking-wider text-antique-gold font-bold block mb-1.5">
+              Enviar confirmación a:
+            </span>
+            <div id="multiHostButtonsList" class="flex flex-wrap gap-1.5 justify-center"></div>
+          </div>
+
+          <button type="button" id="btnResetRsvp" class="text-xs text-antique-gold hover:underline font-medium cursor-pointer mt-1">
             ↺ Modificar respuesta
           </button>
         </div>
@@ -2332,6 +2348,21 @@ const CONFIG = {
   "footerClosing": "Con amor,",
   "footerText": "",
   "whatsappNumber": "5215512345678",
+  "whatsappHosts": [
+    {
+      "label": "Anfitrión Principal / Novia",
+      "phone": "5215512345678"
+    },
+    {
+      "label": "Segundo Anfitrión / Novio",
+      "phone": ""
+    },
+    {
+      "label": "Coordinador / Planner",
+      "phone": ""
+    }
+  ],
+  "rsvpWebhookUrl": "",
   "defaultPassCount": 2,
   "music": {
     "enabled": true,
@@ -2737,24 +2768,99 @@ if (musicPlayer && audio) {
       const folio = mesaCode + '-' + apellidoCode + '-' + (confirmedTickets || 1) + 'P';
       const calcDisplayName = isWedding ? ((CONFIG.brideName || '') + ' & ' + (CONFIG.groomName || '')) : (CONFIG.name || 'Invitación');
 
-      // WhatsApp trigger helper
+      // ── Mensajes Estructurados ──
+      const buildHostMessageText = () => {
+        const attendLine = isAttending ? '✅ Sí, confirmamos nuestra asistencia' : '❌ No podremos asistir';
+        const lines = [
+          '✨ *Confirmación Pergamino · ' + (CONFIG.eyebrow || 'Evento') + ' de ' + calcDisplayName + '*',
+          '👤 *Titular:* ' + guestName,
+          '💌 *Estado:* ' + attendLine
+        ];
+        if (guestEmail) lines.push('✉️ *Correo:* ' + guestEmail);
+        if (isAttending) {
+          lines.push('🎟️ *Pases Confirmados:* ' + confirmedTickets + ' de ' + ticketsParam);
+          lines.push('🪑 *Mesa Asignada:* ' + tableDisplay);
+          lines.push('🔖 *Folio de Acceso:* ' + folio);
+          if (allergies) lines.push('🍽️ *Nota / Dieta:* ' + allergies);
+        }
+        return lines.join('
+');
+      };
+
+      const buildGuestMessageText = () => {
+        const lines = [
+          '🎟️ *Mi Pase Digital Oficial · ' + (CONFIG.eyebrow || 'Evento') + ' de ' + calcDisplayName + '*',
+          '👤 *Invitado:* ' + guestName,
+          '🎫 *Pases Confirmados:* ' + (isAttending ? confirmedTickets : 0),
+          '🪑 *Mesa Asignada:* ' + tableDisplay,
+          '🔖 *Folio de Acceso:* ' + folio
+        ];
+        if (CONFIG.eventDateShort) lines.push('📅 *Fecha:* ' + CONFIG.eventDateShort);
+        if (CONFIG.reception && CONFIG.reception.venue) lines.push('📍 *Recepción:* ' + CONFIG.reception.venue);
+        lines.push('✨ *¡Nos vemos pronto!*');
+        return lines.join('
+');
+      };
+
+      // ── Resolución de Anfitriones Multi-WhatsApp ──
+      const hostPhones = [];
+      if (Array.isArray(CONFIG.whatsappHosts) && CONFIG.whatsappHosts.length > 0) {
+        CONFIG.whatsappHosts.forEach(h => {
+          if (h && h.phone && h.phone.trim()) hostPhones.push(h);
+        });
+      }
+      if (hostPhones.length === 0 && CONFIG.whatsappNumber && CONFIG.whatsappNumber.trim()) {
+        hostPhones.push({ label: 'Anfitrión Principal', phone: CONFIG.whatsappNumber });
+      }
+      const primaryPhone = hostPhones.length > 0 ? hostPhones[0].phone : '';
+
+      // ── Disparo a Webhook en la Nube (Opcional) ──
+      if (CONFIG.rsvpWebhookUrl && CONFIG.rsvpWebhookUrl.trim()) {
+        try {
+          fetch(CONFIG.rsvpWebhookUrl.trim(), {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event: calcDisplayName,
+              guest: guestName,
+              status: isAttending ? 'CONFIRMED' : 'DECLINED',
+              passes: confirmedTickets,
+              table: tableDisplay,
+              folio: folio,
+              email: guestEmail,
+              dietary: allergies,
+              hosts: hostPhones.map(h => h.phone),
+              timestamp: new Date().toISOString()
+            })
+          }).catch(() => {});
+        } catch (e) {}
+      }
+
+      // ── Transmisión al Monitor en Vivo / Centro de Envíos ──
+      try {
+        window.dispatchEvent(new CustomEvent('invitta_guest_confirmed', {
+          detail: { guestName, isAttending, confirmedTickets, tableDisplay, folio, dietary: allergies, email: guestEmail }
+        }));
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            type: 'INVITTA_GUEST_CONFIRMED',
+            guestName,
+            isAttending,
+            confirmedTickets,
+            tableDisplay,
+            folio,
+            dietary: allergies,
+            email: guestEmail
+          }, '*');
+        }
+      } catch (e) {}
+
+      // WhatsApp trigger helper al anfitrión principal
       const triggerWhatsApp = () => {
-        if (CONFIG.whatsappNumber && CONFIG.whatsappNumber.trim()) {
-          const attendLine = isAttending ? '✅ Sí, confirmamos nuestra asistencia' : '❌ No podremos asistir';
-          const lines = [
-            '✨ *Confirmación Pergamino · ' + (CONFIG.eyebrow || 'Boda') + ' de ' + calcDisplayName + '*',
-            '👤 *Titular:* ' + guestName,
-            '💌 *Estado:* ' + attendLine
-          ];
-          if (guestEmail) lines.push('✉️ *Correo:* ' + guestEmail);
-          if (isAttending) {
-            lines.push('🎟️ *Pases Confirmados:* ' + confirmedTickets + ' de ' + ticketsParam);
-            lines.push('🪑 *Mesa Asignada:* ' + tableDisplay);
-            lines.push('🔖 *Folio de Acceso:* ' + folio);
-            if (allergies) lines.push('🍽️ *Nota / Dieta:* ' + allergies);
-          }
-          const text = encodeURIComponent(lines.join('\n'));
-          const waPhone = CONFIG.whatsappNumber.replace(/[^\d]/g, '');
+        if (primaryPhone) {
+          const text = encodeURIComponent(buildHostMessageText());
+          const waPhone = primaryPhone.replace(/[^d]/g, '');
           window.open('https://wa.me/' + waPhone + '?text=' + text, '_blank', 'noopener,noreferrer');
         }
       };
@@ -2763,13 +2869,43 @@ if (musicPlayer && audio) {
         btnSharePassWhatsapp.onclick = triggerWhatsApp;
       }
 
+      const btnSendToMyWhatsapp = document.getElementById('btnSendToMyWhatsapp');
+      if (btnSendToMyWhatsapp) {
+        btnSendToMyWhatsapp.onclick = () => {
+          const text = encodeURIComponent(buildGuestMessageText());
+          window.open('https://wa.me/?text=' + text, '_blank', 'noopener,noreferrer');
+        };
+      }
+
+      // Render de botones para Anfitriones Secundarios
+      const multiHostContainer = document.getElementById('multiHostWhatsappContainer');
+      const multiHostList = document.getElementById('multiHostButtonsList');
+      if (multiHostContainer && multiHostList) {
+        multiHostList.innerHTML = '';
+        if (hostPhones.length > 1) {
+          multiHostContainer.classList.remove('hidden');
+          hostPhones.slice(1).forEach(h => {
+            const btn = document.createElement('a');
+            btn.className = 'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/90 border border-antique-gold/40 text-[10.5px] font-semibold text-deep-onyx hover:bg-champagne-cream transition-colors shadow-xs';
+            btn.target = '_blank';
+            btn.rel = 'noopener,noreferrer';
+            const cleanP = h.phone.replace(/[^d]/g, '');
+            btn.href = 'https://wa.me/' + cleanP + '?text=' + encodeURIComponent(buildHostMessageText());
+            btn.innerHTML = '<span>📲 ' + (h.label || 'Anfitrión') + '</span>';
+            multiHostList.appendChild(btn);
+          });
+        } else {
+          multiHostContainer.classList.add('hidden');
+        }
+      }
+
       if (btnDownloadPassImage) {
         btnDownloadPassImage.onclick = () => {
           window.print();
         };
       }
 
-      // Auto-trigger WhatsApp
+      // Auto-trigger WhatsApp principal
       triggerWhatsApp();
 
       if (btnSubmit) {
