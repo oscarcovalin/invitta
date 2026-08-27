@@ -293,13 +293,13 @@ tailwind.config = {
   /* ==================== ESTILO PERGAMINO RSVP (COHERENCIA TOTAL) ==================== */
   .pergamino-container {
     background: #ffffff;
-    border: 1.5px solid var(--gold);
-    border-radius: 16px;
-    padding: 36px 28px;
+    border: 1px solid rgba(163, 128, 71, 0.4);
+    border-radius: 18px;
+    padding: 38px 26px;
     width: 92%;
     max-width: 480px;
     margin: 0 auto;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
     transform: translateY(20px);
     opacity: 0;
     animation: desplegarPergamino 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -318,7 +318,7 @@ tailwind.config = {
     justify-content: center;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     color: var(--gold);
   }
   .ornament-line {
@@ -336,25 +336,32 @@ tailwind.config = {
   .form-group-clean label {
     display: block;
     margin-bottom: 6px;
-    color: var(--onyx);
+    color: var(--gold);
+    font-family: var(--font-display, var(--font-names, 'Cormorant Garamond', serif));
     font-size: 0.78rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.2em;
     font-weight: 600;
-    font-family: inherit;
   }
 
   .form-group-clean input, .form-group-clean select {
     width: 100%;
     padding: 12px 14px;
-    border: 1px solid var(--border-medium, #D1C7BD);
+    border: 1px solid rgba(163, 128, 71, 0.35);
     border-radius: 8px;
     background-color: var(--bg-primary, #FAF8F5);
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     color: var(--onyx, #2C2C2C);
     box-sizing: border-box;
-    font-family: inherit;
+    font-family: var(--font-body, 'Montserrat', sans-serif);
+    font-weight: 300;
     transition: all 0.2s ease;
+  }
+
+  .form-group-clean input::placeholder {
+    color: #9C958E;
+    font-family: var(--font-body, 'Montserrat', sans-serif);
+    font-weight: 300;
   }
 
   .form-group-clean input:focus, .form-group-clean select:focus {
@@ -367,23 +374,23 @@ tailwind.config = {
   .btn-rsvp-submit-clean {
     width: 100%;
     padding: 15px;
-    background-color: var(--primary);
+    background: var(--gold, #A38047);
     color: #ffffff;
     border: none;
     border-radius: 8px;
-    font-size: 0.9rem;
-    letter-spacing: 1.2px;
+    font-family: var(--font-display, var(--font-names, 'Cormorant Garamond', serif));
+    font-size: 0.92rem;
+    letter-spacing: 0.2em;
     font-weight: 600;
     text-transform: uppercase;
-    font-family: inherit;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 14px rgba(163, 128, 71, 0.25);
     margin-top: 10px;
   }
 
   .btn-rsvp-submit-clean:hover {
-    background-color: var(--gold);
+    background-color: var(--primary, #163C2B);
     color: #ffffff;
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
@@ -403,6 +410,7 @@ tailwind.config = {
     border-radius: 0 10px 10px 0;
     text-align: left;
     line-height: 1.5;
+    font-family: var(--font-body, 'Montserrat', sans-serif);
   }
 
   .pass-ticket-pergamino {

@@ -1,0 +1,26 @@
+{
+  "label": "v2.37_harmonized_luxury_typography_rsvp",
+  "timestamp": "2026-08-27T01:55:07.148Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 203506
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 96769
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

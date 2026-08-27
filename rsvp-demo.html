@@ -58,45 +58,53 @@
 
         label {
             display: block;
-            margin-bottom: 8px;
-            color: var(--wine-primary);
-            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: var(--gold-accent);
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+            font-family: 'Cormorant Garamond', serif;
         }
 
         input, select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #D1C7BD;
-            border-radius: 6px;
+            padding: 12px 14px;
+            border: 1px solid rgba(163, 128, 71, 0.35);
+            border-radius: 8px;
             background-color: var(--bg-color);
-            font-size: 1rem;
+            font-size: 0.92rem;
             color: var(--text-main);
             box-sizing: border-box;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-weight: 300;
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: var(--gold-accent);
+            box-shadow: 0 0 0 3px rgba(163, 128, 71, 0.15);
         }
 
         button {
             width: 100%;
-            padding: 14px;
-            background-color: var(--wine-primary);
+            padding: 15px;
+            background-color: var(--gold-accent);
             color: #ffffff;
             border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            letter-spacing: 1px;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+            font-family: 'Cormorant Garamond', serif;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
             margin-top: 10px;
         }
 
         button:hover {
-            background-color: var(--gold-accent);
+            background-color: var(--wine-primary);
         }
 
         .mensaje-personalizado {
