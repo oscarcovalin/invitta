@@ -10,6 +10,8 @@ console.log('Contains albumLockBlock:', htmlDefault.includes('id="albumLockBlock
 console.log('Contains access code "BODA2027":', htmlDefault.includes('BODA2027'));
 console.log('Contains btnUnlockAlbumUpload:', htmlDefault.includes('id="btnUnlockAlbumUpload"'));
 console.log('Contains albumUploadBlock:', htmlDefault.includes('id="albumUploadBlock"'));
+console.log('Contains albumRecentPhotosCard:', htmlDefault.includes('id="albumRecentPhotosCard"'));
+console.log('Contains albumRecentPhotosGrid:', htmlDefault.includes('id="albumRecentPhotosGrid"'));
 console.log('Contains modalBrideGallery:', htmlDefault.includes('id="modalBrideGallery"'));
 
 const idxItinerario = htmlDefault.indexOf('id="itinerario"');

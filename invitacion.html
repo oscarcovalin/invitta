@@ -1538,6 +1538,28 @@ tailwind.config = {
         ¡Ayúdanos a capturar cada momento! Sube aquí todas las fotos y videos que tomes durante nuestro gran día usando tu código personalizado de invitado.
       </p>
 
+      <!-- TARJETA MOTIVACIONAL: ÚLTIMAS 3 FOTOS DE INVITADOS -->
+      <div id="albumRecentPhotosCard" class="bg-champagne-cream/70 border border-antique-gold/40 rounded-2xl p-4 sm:p-5 max-w-md mx-auto mb-6 text-center shadow-sm">
+        <div class="flex items-center justify-center gap-1.5 text-antique-gold mb-1">
+          <span class="text-sm">📸</span>
+          <span class="font-label-caps text-[10.5px] uppercase tracking-[0.2em] font-bold text-antique-gold">
+            Últimas fotos compartidas
+          </span>
+        </div>
+        <p class="text-[11.5px] text-deep-onyx/75 font-light mb-3 italic">
+          Los invitados ya están subiendo sus momentos. ¡Suma los tuyos al álbum!
+        </p>
+
+        <!-- Cuadrícula de 3 Fotos Recientes -->
+        <div id="albumRecentPhotosGrid" class="grid grid-cols-3 gap-2 sm:gap-3 mb-1">
+          <!-- Render dinámico de las 3 fotos o placeholders motivacionales -->
+        </div>
+
+        <span id="albumRecentCounter" class="text-[10px] font-mono text-antique-gold font-semibold uppercase tracking-wider block mt-2">
+          ✨ 0 fotos en la cápsula
+        </span>
+      </div>
+
       <!-- 1. BLOQUE CANDADO DE ACCESO (PROTECCIÓN ANTI-INTRUSOS / ANTI-SPAM) -->
       <div id="albumLockBlock" class="bg-champagne-cream/90 border border-antique-gold/50 rounded-2xl p-5 max-w-sm mx-auto mb-4 shadow-sm text-center">
         <div class="flex items-center justify-center gap-2 mb-2 text-antique-gold">
@@ -3206,6 +3228,7 @@ if (musicPlayer && audio) {
         selectedFiles = [];
         if (dedicationInput) dedicationInput.value = '';
         renderSelectedPreviews();
+        renderRecentGuestPhotos();
 
         btnSubmit.disabled = false;
         btnSubmit.innerHTML = '<span>✦ Depositar en la Cápsula de Recuerdos</span>';
@@ -3223,7 +3246,62 @@ if (musicPlayer && audio) {
     });
   }
 
-  // 5. Galería Privada de los Novios
+  // 5. Renderizado de las 3 últimas fotos para motivar a los invitados
+  function renderRecentGuestPhotos() {
+    const grid = document.getElementById('albumRecentPhotosGrid');
+    const counter = document.getElementById('albumRecentCounter');
+    if (!grid) return;
+
+    const photos = loadPhotosFromStorage();
+    if (counter) {
+      counter.textContent = '✨ ' + photos.length + ' foto' + (photos.length === 1 ? '' : 's') + ' en la cápsula';
+    }
+
+    if (photos.length === 0) {
+      grid.innerHTML = 
+        '<div class="bg-white/80 border border-dashed border-antique-gold/40 rounded-xl p-2 sm:p-3 flex flex-col items-center justify-center aspect-square shadow-sm">' +
+          '<span class="text-xl sm:text-2xl mb-1 opacity-70">📷</span>' +
+          '<span class="text-[9px] sm:text-[10px] text-deep-onyx/70 font-medium">Sé el 1°</span>' +
+        '</div>' +
+        '<div class="bg-white/80 border border-dashed border-antique-gold/40 rounded-xl p-2 sm:p-3 flex flex-col items-center justify-center aspect-square shadow-sm">' +
+          '<span class="text-xl sm:text-2xl mb-1 opacity-70">✨</span>' +
+          '<span class="text-[9px] sm:text-[10px] text-deep-onyx/70 font-medium">Tu foto aquí</span>' +
+        '</div>' +
+        '<div class="bg-white/80 border border-dashed border-antique-gold/40 rounded-xl p-2 sm:p-3 flex flex-col items-center justify-center aspect-square shadow-sm">' +
+          '<span class="text-xl sm:text-2xl mb-1 opacity-70">🎉</span>' +
+          '<span class="text-[9px] sm:text-[10px] text-deep-onyx/70 font-medium">¡Únete!</span>' +
+        '</div>';
+      return;
+    }
+
+    const recent = photos.slice(-3).reverse();
+    let html = '';
+    recent.forEach(p => {
+      html += 
+        '<div class="group relative rounded-xl overflow-hidden aspect-square border border-antique-gold/50 shadow-sm bg-neutral-900 flex flex-col">' +
+          '<img src="' + p.photoData + '" alt="Foto de ' + (p.guestName || 'Invitado') + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>' +
+          '<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-1 sm:p-1.5 text-left">' +
+            '<p class="text-[9px] sm:text-[10px] text-amber-200 font-bold truncate leading-tight">' + (p.guestName || 'Invitado') + '</p>' +
+            '<p class="text-[8px] text-neutral-300 font-mono">' + (p.time || '') + '</p>' +
+          </div>' +
+        '</div>';
+    });
+
+    for (let i = recent.length; i < 3; i++) {
+      html += 
+        '<div class="bg-white/80 border border-dashed border-antique-gold/40 rounded-xl p-2 sm:p-3 flex flex-col items-center justify-center aspect-square shadow-sm">' +
+          '<span class="text-xl sm:text-2xl mb-1 opacity-70">📸</span>' +
+          '<span class="text-[9px] sm:text-[10px] text-deep-onyx/70 font-medium">Sube la tuya</span>' +
+        '</div>';
+    }
+
+    grid.innerHTML = html;
+  }
+
+  // Render inicial
+  renderRecentGuestPhotos();
+
+  // 6. Galería Privada de los Novios
   if (btnOpenBrideModal && modalBride) {
     btnOpenBrideModal.addEventListener('click', () => {
       modalBride.classList.remove('hidden');
@@ -3314,6 +3392,7 @@ if (musicPlayer && audio) {
       if (confirm('¿Deseas vaciar todas las fotos recopiladas en la cápsula?')) {
         localStorage.removeItem('invitta_album_photos_db');
         renderBrideGallery();
+        renderRecentGuestPhotos();
       }
     });
   }
