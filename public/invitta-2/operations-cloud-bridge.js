@@ -25,7 +25,8 @@
     applying: false,
     saving: false,
     saveTimer: null,
-    active: false
+    active: false,
+    dirty: false
   };
 
   function cloneSeatingState() {
@@ -101,6 +102,7 @@
       if (typeof updateFooterStats === 'function') updateFooterStats();
       state.version = Number(record.version) || 1;
       state.active = true;
+      state.dirty = false;
     } finally {
       state.applying = false;
     }
@@ -176,6 +178,7 @@
 
       state.version = Number(data.version) || expectedVersion + 1;
       state.active = true;
+      state.dirty = false;
       setStatus(`${state.project.name} · Mesas nube v${state.version}`, 'ready', { mode: 'save', label: 'Guardar ahora' });
       return true;
     } catch (error) {
@@ -194,6 +197,7 @@
 
   function scheduleSave() {
     if (!state.active || state.applying || state.project?.status === 'archived') return;
+    state.dirty = true;
     clearTimeout(state.saveTimer);
     setStatus(`${state.project.name} · Cambios pendientes…`, 'saving', { mode: 'save', label: 'Guardar ahora' });
     state.saveTimer = setTimeout(() => saveOperations(), 1200);
@@ -220,7 +224,7 @@
   window.addEventListener('seating:updated', scheduleSave);
   window.addEventListener('guests:updated', scheduleSave);
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden' && state.active) {
+    if (document.visibilityState === 'hidden' && state.active && state.dirty) {
       clearTimeout(state.saveTimer);
       saveOperations();
     }

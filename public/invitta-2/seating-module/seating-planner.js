@@ -41,7 +41,7 @@ class SeatingPlanner {
         const raw = localStorage.getItem(this.storageKey);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (parsed && Array.isArray(parsed.guests) && Array.isArray(parsed.tables) && parsed.guests.length > 0) {
+          if (parsed && Array.isArray(parsed.guests) && Array.isArray(parsed.tables)) {
             return {
               guests: parsed.guests,
               tables: parsed.tables,
