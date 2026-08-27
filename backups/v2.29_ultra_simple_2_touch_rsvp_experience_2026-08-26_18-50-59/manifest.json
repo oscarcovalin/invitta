@@ -1,0 +1,26 @@
+{
+  "label": "v2.29_ultra_simple_2_touch_rsvp_experience",
+  "timestamp": "2026-08-27T00:50:59.754Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 206608
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 96769
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

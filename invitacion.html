@@ -1521,166 +1521,134 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- ==================== 10. RSVP PERGAMINO (CONFIRMACIÓN & PASE DE HONOR) ==================== -->
-  <section id="rsvp" class="pt-20 pb-36 px-margin-mobile bg-emerald-dark text-center relative overflow-hidden border-t border-antique-gold/30 ">
+  <!-- ==================== 10. RSVP PERGAMINO (CONFIRMACIÓN ULTRA-SIMPLE) ==================== -->
+  <section id="rsvp" class="pt-16 pb-36 px-margin-mobile bg-emerald-dark text-center relative overflow-hidden border-t border-antique-gold/30 ">
     
     
-    <div class="relative z-10 max-w-lg mx-auto gsap-scale-up overflow-visible">
+    <div class="relative z-10 max-w-md mx-auto gsap-scale-up overflow-visible">
       
-      <!-- Contenedor Pergamino de Lujo -->
+      <!-- Tarjeta Pergamino Minimalista y Elegante -->
       <div class="pergamino-container text-deep-onyx" id="pergaminoCard">
         
-        <!-- Ribete / Adorno Superior -->
         <div class="pergamino-ornament">
           <div class="ornament-line"></div>
           <span class="text-antique-gold text-lg">⚜️</span>
           <div class="ornament-line"></div>
         </div>
 
-        <h2 class="font-display-lg text-[25px] sm:text-[29px] font-normal text-deep-onyx mb-1 tracking-wide uppercase">
+        <h2 class="font-display-lg text-2xl sm:text-3xl font-normal text-deep-onyx mb-1 tracking-wide uppercase">
           Confirmación de Asistencia
         </h2>
-        <p class="font-display-lg italic text-[14.5px] sm:text-[16px] text-antique-gold mb-5 font-light" id="subEventoRsvp">
+        <p class="font-display-lg italic text-sm sm:text-base text-antique-gold mb-4 font-light" id="subEventoRsvp">
           Catalina & Julián · 20 · Marzo · 2027
         </p>
 
-        <!-- Saludo Personalizado Dinámico -->
-        <div id="contenedor-saludo-pergamino"></div>
+        <!-- Saludo Personalizado VIP / Tarjeta de Honor -->
+        <div id="contenedor-saludo-pergamino" class="mb-4"></div>
 
-        <!-- Formulario RSVP -->
+        <!-- Formulario RSVP Ultra-Simple -->
         <form id="rsvpForm" class="flex flex-col gap-4 text-left" novalidate>
           
-          <!-- Nombre (se oculta si viene por URL personalizada) -->
-          <div id="campoNombrePergamino" class="flex flex-col gap-1.5">
-            <label class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">
-              Nombre Completo
+          <!-- Nombre (solo si no viene por URL) -->
+          <div id="campoNombrePergamino" class="flex flex-col gap-1">
+            <label class="font-label-caps text-[10.5px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">
+              Tu Nombre y Apellidos
             </label>
-            <input id="formGuestName" name="nombre" required class="w-full bg-[#FAF8F5] border border-antique-gold/40 rounded-xl px-4 py-2.5 font-body-lg text-deep-onyx focus:outline-none focus:border-antique-gold focus:ring-2 focus:ring-antique-gold/20 transition-all text-sm placeholder:text-neutral-400" placeholder="Escribe tu nombre y apellidos" type="text"/>
+            <input id="formGuestName" name="nombre" required class="w-full bg-[#FAF8F5] border border-antique-gold/40 rounded-xl px-4 py-2.5 font-body-lg text-deep-onyx focus:outline-none focus:border-antique-gold text-sm placeholder:text-neutral-400" placeholder="Escribe tu nombre..." type="text"/>
           </div>
 
-          <!-- Teléfono / WhatsApp -->
-          <div id="campoTelefonoPergamino" class="flex flex-col gap-1.5">
-            <label class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">
+          <div id="campoTelefonoPergamino" class="flex flex-col gap-1">
+            <label class="font-label-caps text-[10.5px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">
               Teléfono / WhatsApp
             </label>
-            <input id="formGuestPhone" name="telefono" class="w-full bg-[#FAF8F5] border border-antique-gold/40 rounded-xl px-4 py-2.5 font-body-lg text-deep-onyx focus:outline-none focus:border-antique-gold focus:ring-2 focus:ring-antique-gold/20 transition-all text-sm placeholder:text-neutral-400" placeholder="Para enviar confirmación y recordatorios" type="tel"/>
+            <input id="formGuestPhone" name="telefono" class="w-full bg-[#FAF8F5] border border-antique-gold/40 rounded-xl px-4 py-2.5 font-body-lg text-deep-onyx focus:outline-none focus:border-antique-gold text-sm placeholder:text-neutral-400" placeholder="Número de celular" type="tel"/>
           </div>
 
-          <!-- ¿Nos acompañarás? -->
-          <div class="flex flex-col gap-2 pt-1">
-            <label class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">
-              ¿Nos acompañarás?
+          <!-- Selector de Asistencia con 2 Grandes Botones -->
+          <div class="flex flex-col gap-2">
+            <label class="font-label-caps text-[10.5px] text-deep-onyx uppercase tracking-[0.2em] font-semibold text-center block">
+              ¿Nos acompañarán?
             </label>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <label class="flex items-center gap-2.5 cursor-pointer p-3 border border-antique-gold/40 rounded-xl bg-champagne-cream/60 hover:bg-champagne-cream transition-colors text-deep-onyx">
-                <input class="accent-antique-gold w-4 h-4" name="rsvp" value="si" checked type="radio" id="radioAsistenciaSi"/>
-                <span class="font-body-lg text-[13px] font-medium">¡Sí, ahí estaré!</span>
+            <div class="grid grid-cols-2 gap-2.5">
+              <label id="labelAsistenciaSi" class="flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border-2 border-antique-gold rounded-2xl bg-antique-gold/10 hover:bg-antique-gold/20 transition-all text-center">
+                <input class="hidden" name="rsvp" value="si" checked type="radio" id="radioAsistenciaSi"/>
+                <span class="text-xl">✨</span>
+                <span class="font-body-lg text-xs font-bold text-deep-onyx">¡Sí, asistiremos!</span>
               </label>
-              <label class="flex items-center gap-2.5 cursor-pointer p-3 border border-antique-gold/40 rounded-xl bg-champagne-cream/60 hover:bg-champagne-cream transition-colors text-deep-onyx">
-                <input class="accent-antique-gold w-4 h-4" name="rsvp" value="no" type="radio" id="radioAsistenciaNo"/>
-                <span class="font-body-lg text-[13px] font-medium">No podré asistir</span>
+              <label id="labelAsistenciaNo" class="flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border border-neutral-300 rounded-2xl bg-white/50 hover:bg-neutral-100 transition-all text-center opacity-70">
+                <input class="hidden" name="rsvp" value="no" type="radio" id="radioAsistenciaNo"/>
+                <span class="text-xl">💌</span>
+                <span class="font-body-lg text-xs font-medium text-neutral-600">No podré asistir</span>
               </label>
             </div>
           </div>
 
-          <!-- Selector de Pases (Stepper) -->
-          <div id="rsvpTicketsRow" class="flex flex-col sm:flex-row items-center justify-between p-3.5 bg-champagne-cream/70 border border-antique-gold/40 rounded-xl mt-1 gap-2">
-            <div class="text-center sm:text-left">
-              <span class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] block font-semibold">Pases a Confirmar</span>
-              <span id="allowedTicketsHint" class="text-[11px] text-tertiary font-normal">Máximo 2 personas</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <button type="button" class="stepper__btn w-8 h-8 rounded-full border border-antique-gold bg-antique-gold text-white flex items-center justify-center font-bold text-base hover:opacity-90 active:scale-95 transition-all" data-step="-1">-</button>
-              <span id="guestCount" class="font-display-lg text-lg text-deep-onyx font-semibold tabular-nums min-w-[20px] text-center">1</span>
-              <button type="button" class="stepper__btn w-8 h-8 rounded-full border border-antique-gold bg-antique-gold text-white flex items-center justify-center font-bold text-base hover:opacity-90 active:scale-95 transition-all" data-step="1">+</button>
-            </div>
-          </div>
-
-          <!-- Preferencias Dietarias y Alergias (Conexión Catering) -->
-          <div id="rsvpDietaryBlock" class="flex flex-col gap-2 pt-2 border-t border-antique-gold/25 mt-1">
+          <!-- Selector de Pases con Pastillas / Chips Rápidos -->
+          <div id="rsvpTicketsRow" class="flex flex-col gap-2 p-3 bg-champagne-cream/60 border border-antique-gold/30 rounded-2xl">
             <div class="flex items-center justify-between">
-              <label class="font-label-caps text-[11px] text-deep-onyx uppercase tracking-[0.2em] font-semibold flex items-center gap-1">
-                <span>🍽️</span> Preferencias Dietarias
-              </label>
-              <span class="text-[10px] text-antique-gold/90 font-medium">(Opcional)</span>
+              <span class="font-label-caps text-[10.5px] text-deep-onyx uppercase tracking-[0.2em] font-semibold">¿Cuántos asistirán?</span>
+              <span id="allowedTicketsHint" class="text-[11px] text-antique-gold font-bold">2 Pases</span>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <label class="flex items-center gap-2 p-2 border border-antique-gold/30 rounded-lg bg-champagne-cream/40 cursor-pointer">
-                <input type="checkbox" name="diet" value="Vegetariano/Vegano" class="accent-antique-gold">
-                <span class="text-[11px] text-deep-onyx font-medium">Vegetariano / Vegano</span>
-              </label>
-              <label class="flex items-center gap-2 p-2 border border-antique-gold/30 rounded-lg bg-champagne-cream/40 cursor-pointer">
-                <input type="checkbox" name="diet" value="Sin Gluten (Celíaco)" class="accent-antique-gold">
-                <span class="text-[11px] text-deep-onyx font-medium">Sin Gluten / Celíaco</span>
-              </label>
-              <label class="flex items-center gap-2 p-2 border border-antique-gold/30 rounded-lg bg-champagne-cream/40 cursor-pointer">
-                <input type="checkbox" name="diet" value="Menú Infantil" class="accent-antique-gold">
-                <span class="text-[11px] text-deep-onyx font-medium">Menú Infantil</span>
-              </label>
-              <label class="flex items-center gap-2 p-2 border border-antique-gold/30 rounded-lg bg-champagne-cream/40 cursor-pointer">
-                <input type="checkbox" name="diet" value="Sin Lácteos" class="accent-antique-gold">
-                <span class="text-[11px] text-deep-onyx font-medium">Sin Lácteos</span>
-              </label>
+            <div id="pillsContainer" class="flex flex-wrap gap-2 justify-center pt-1">
+              <!-- Se generan dinámicamente según urlTickets (1, 2, 3, 4...) -->
             </div>
-            <input type="text" name="alergias" id="formGuestAllergies" placeholder="Alergias o notas para cocina (ej: nueces, mariscos...)" 
-                   class="w-full bg-[#FAF8F5] border border-antique-gold/40 rounded-xl px-3.5 py-2 text-xs text-deep-onyx focus:outline-none focus:border-antique-gold placeholder:text-neutral-400">
           </div>
 
-          <!-- Botón de Envío -->
-          <button type="submit" id="rsvpSubmit" class="btn-luxury-primary w-full py-3.5 text-[11.5px] tracking-[0.25em] uppercase font-semibold shadow-[0_4px_20px_rgba(165,110,14,0.35)] mt-2 mb-4 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]">
-            Enviar Confirmación en Pergamino
+          <!-- Campo Opcional de Mensaje / Dieta -->
+          <div id="rsvpDietaryBlock" class="flex flex-col gap-1 pt-1">
+            <label class="font-label-caps text-[10px] text-tertiary uppercase tracking-[0.2em]">
+              💬 Mensaje o dieta especial (Opcional)
+            </label>
+            <input type="text" name="alergias" id="formGuestAllergies" placeholder="Ej: 1 vegetariano, felicitaciones..." 
+                   class="w-full bg-[#FAF8F5] border border-antique-gold/30 rounded-xl px-3.5 py-2.5 text-xs text-deep-onyx focus:outline-none focus:border-antique-gold placeholder:text-neutral-400">
+          </div>
+
+          <!-- Botón de Confirmación Principal -->
+          <button type="submit" id="rsvpSubmit" class="btn-luxury-primary w-full py-4 text-xs tracking-[0.2em] uppercase font-bold shadow-[0_4px_20px_rgba(165,110,14,0.35)] mt-1 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2">
+            <span>📲 Confirmar Asistencia por WhatsApp</span>
           </button>
         </form>
 
-        <!-- Vista de Éxito / Pase Digital Pergamino de Alta Costura -->
-        <div id="rsvpSuccess" class="hidden text-center py-3">
-          <span class="text-4xl text-antique-gold block mb-2">📜</span>
+        <!-- Vista de Éxito / Pase Digital Pergamino -->
+        <div id="rsvpSuccess" class="hidden text-center py-2">
+          <span class="text-4xl text-antique-gold block mb-1">📜</span>
           <h3 class="font-display-lg text-2xl font-normal text-deep-onyx uppercase tracking-wide">
-            ¡Confirmación Registrada!
+            ¡Asistencia Confirmada!
           </h3>
-          <p class="font-display-lg text-sm text-tertiary mt-1" id="rsvpSuccessMsg">
-            Tu respuesta ha sido registrada exitosamente en el sistema oficial.
+          <p class="font-display-lg text-xs text-tertiary mt-1" id="rsvpSuccessMsg">
+            Tu respuesta ha sido registrada exitosamente.
           </p>
 
           <!-- Tarjeta del Pase Pergamino -->
-          <div class="pass-ticket-pergamino" id="passTicketPergamino">
-            <span class="font-label-caps text-[10px] uppercase tracking-[0.25em] text-antique-gold font-bold block mb-1">
-              Pase Digital de Acceso Oficial
+          <div class="pass-ticket-pergamino my-3" id="passTicketPergamino">
+            <span class="font-label-caps text-[9.5px] uppercase tracking-[0.25em] text-antique-gold font-bold block mb-1">
+              Pase Digital Oficial
             </span>
-            <h4 class="font-display-lg text-xl sm:text-2xl text-deep-onyx font-normal my-1" id="qrGuestName">
+            <h4 class="font-display-lg text-xl text-deep-onyx font-normal my-0.5" id="qrGuestName">
               Invitado de Honor
             </h4>
             <p class="font-body-lg text-xs text-tertiary mb-2" id="qrGuestTickets">
               Pase autorizado
             </p>
 
-            <!-- Badge de Mesa Asignada -->
-            <div id="badgePassTable" class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-antique-gold/15 border border-antique-gold/40 text-deep-onyx font-bold text-xs mb-3 font-mono">
+            <div id="badgePassTable" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-antique-gold/15 border border-antique-gold/40 text-deep-onyx font-bold text-xs mb-2 font-mono">
               <span>🪑</span> <span id="labelPassTable">MESA ASIGNADA</span>
             </div>
 
-            <!-- Contenedor QR -->
             <div id="qrContainer" class="flex justify-center my-2"></div>
 
-            <!-- Folio Logístico -->
-            <div class="inline-block px-4 py-1.5 rounded-full bg-black/5 border border-antique-gold/40 mt-1">
+            <div class="inline-block px-3.5 py-1 rounded-full bg-black/5 border border-antique-gold/40 mt-1">
               <p class="font-mono text-xs text-deep-onyx font-bold tracking-widest uppercase" id="qrFolio">
                 M03-MARTINEZ-4P
               </p>
             </div>
 
-            <!-- Dietas Resumidas en el Pase -->
             <div id="passDietarySummary" class="text-[10px] text-tertiary italic mt-2 hidden"></div>
           </div>
 
-          <p class="font-body-lg text-[11.5px] text-tertiary/90 max-w-xs mx-auto mb-4 font-normal">
-            Presenta este folio y código QR en la recepción para agilizar tu ingreso al salón.
-          </p>
-
-          <!-- Acciones del Pase -->
           <div class="flex flex-col sm:flex-row gap-2 justify-center mb-3">
             <button type="button" id="btnSharePassWhatsapp" class="btn-luxury-primary text-[11px] py-2 px-4 uppercase tracking-wider font-semibold inline-flex items-center justify-center gap-1.5">
-              <span>📲 Avisar por WhatsApp</span>
+              <span>📲 Reenviar por WhatsApp</span>
             </button>
             <button type="button" id="btnDownloadPassImage" class="btn-luxury-secondary text-[11px] py-2 px-4 uppercase tracking-wider font-semibold inline-flex items-center justify-center gap-1.5">
               <span>💾 Guardar Pase</span>
@@ -1688,7 +1656,7 @@ tailwind.config = {
           </div>
 
           <button type="button" id="btnResetRsvp" class="text-xs text-antique-gold hover:underline font-medium cursor-pointer">
-            ↺ Modificar o registrar otra respuesta
+            ↺ Modificar respuesta
           </button>
         </div>
 
@@ -2449,6 +2417,36 @@ if (musicPlayer && audio) {
   let guestCount = Math.min(urlTickets, Math.max(1, urlTickets));
   const urlMesaParam = urlParams.get('mesa') || urlParams.get('table') || urlParams.get('m') || '';
 
+  const pillsContainer = document.getElementById('pillsContainer');
+  const labelAsistenciaSi = document.getElementById('labelAsistenciaSi');
+  const labelAsistenciaNo = document.getElementById('labelAsistenciaNo');
+  const radioSi = document.getElementById('radioAsistenciaSi');
+  const radioNo = document.getElementById('radioAsistenciaNo');
+
+  let guestCount = Math.max(1, urlTickets || 2);
+  const urlMesaParam = urlParams.get('mesa') || urlParams.get('table') || urlParams.get('m') || '';
+
+  // Render Pill Chips for Pass Selection
+  const renderPillChips = (maxPasses) => {
+    if (!pillsContainer) return;
+    pillsContainer.innerHTML = '';
+    const total = Math.max(1, Math.min(12, maxPasses));
+    for (let i = 1; i <= total; i++) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pill-ticket-btn px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer select-none ' + 
+        (i === guestCount 
+          ? 'bg-antique-gold text-white shadow-md scale-105 border border-antique-gold' 
+          : 'bg-white/80 border border-antique-gold/30 text-deep-onyx hover:bg-champagne-cream');
+      btn.textContent = i === total && total > 1 ? (i + ' (Todos)') : (i + (i === 1 ? ' Pase' : ' Pases'));
+      btn.onclick = () => {
+        guestCount = i;
+        renderPillChips(maxPasses);
+      };
+      pillsContainer.appendChild(btn);
+    }
+  };
+
   if (urlGuest && urlGuest.trim()) {
     let mesaLabelTxt = '';
     if (urlMesaParam) {
@@ -2456,8 +2454,8 @@ if (musicPlayer && audio) {
     }
 
     if (saludoCont) {
-      saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino shadow-sm border border-antique-gold/40 rounded-2xl bg-amber-500/10 p-4 mb-4 text-left">' +
-        '<div class="flex items-center gap-2 mb-1.5 text-antique-gold font-bold">' +
+      saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino shadow-sm border border-antique-gold/40 rounded-2xl bg-amber-500/10 p-4 mb-2 text-left">' +
+        '<div class="flex items-center gap-2 mb-1 text-antique-gold font-bold">' +
           '<span class="text-xl">⚜️</span>' +
           '<strong class="font-display-lg text-xs uppercase tracking-wider text-deep-onyx">Pase de Honor Personalizado</strong>' +
         '</div>' +
@@ -2469,50 +2467,50 @@ if (musicPlayer && audio) {
       '</div>';
     }
     if (campoNombre) campoNombre.style.display = 'none';
+    if (document.getElementById('campoTelefonoPergamino')) document.getElementById('campoTelefonoPergamino').style.display = 'none';
     if (inputNombre) inputNombre.value = urlGuest;
-    if (ticketsHint) ticketsHint.textContent = 'Máximo ' + urlTickets + ' persona' + (urlTickets === 1 ? '' : 's');
+    if (ticketsHint) ticketsHint.textContent = urlTickets + ' Pase' + (urlTickets === 1 ? '' : 's');
   } else {
     if (saludoCont) {
-      saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino shadow-sm border border-antique-gold/30 rounded-2xl bg-champagne-cream/50 p-3.5 mb-3 text-left">' +
-        '<div class="flex items-center gap-1.5 mb-1 text-antique-gold font-bold">' +
+      saludoCont.innerHTML = '<div class="mensaje-personalizado-pergamino shadow-sm border border-antique-gold/30 rounded-2xl bg-champagne-cream/50 p-3.5 mb-2 text-left">' +
+        '<div class="flex items-center gap-1.5 mb-0.5 text-antique-gold font-bold">' +
           '<span class="text-base">⚜️</span>' +
           '<strong class="font-display-lg text-[11px] uppercase tracking-wider text-deep-onyx">Registro de Asistencia</strong>' +
         '</div>' +
         '<p class="text-xs text-deep-onyx/85 leading-relaxed">' +
-          'Ingresa tu nombre para generar tu pase digital de acceso y asignar tu mesa oficial.' +
+          'Por favor ingresa tus datos para confirmar tus pases y generar tu boleto de acceso.' +
         '</p>' +
       '</div>';
     }
     if (campoNombre) campoNombre.style.display = 'flex';
+    if (document.getElementById('campoTelefonoPergamino')) document.getElementById('campoTelefonoPergamino').style.display = 'flex';
     if (inputNombre) inputNombre.value = '';
-    if (ticketsHint) ticketsHint.textContent = 'Máximo ' + urlTickets + ' persona' + (urlTickets === 1 ? '' : 's');
+    if (ticketsHint) ticketsHint.textContent = urlTickets + ' Pase' + (urlTickets === 1 ? '' : 's');
   }
 
-  if (guestOut) guestOut.textContent = guestCount;
+  // Render pills
+  renderPillChips(urlTickets);
 
-  // Stepper buttons
-  document.querySelectorAll('.stepper__btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      guestCount = Math.min(urlTickets, Math.max(1, guestCount + parseInt(btn.dataset.step, 10)));
-      if (guestOut) guestOut.textContent = guestCount;
-    });
-  });
+  // Quick 1-touch Attendance selection
+  if (labelAsistenciaSi && labelAsistenciaNo && radioSi && radioNo) {
+    labelAsistenciaSi.onclick = () => {
+      radioSi.checked = true;
+      labelAsistenciaSi.className = 'flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border-2 border-antique-gold rounded-2xl bg-antique-gold/15 transition-all text-center';
+      labelAsistenciaNo.className = 'flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border border-neutral-300 rounded-2xl bg-white/50 hover:bg-neutral-100 transition-all text-center opacity-60';
+      if (ticketsRow) ticketsRow.style.display = 'flex';
+      if (dietaryBlock) dietaryBlock.style.display = 'flex';
+      if (btnSubmit) btnSubmit.innerHTML = '<span>📲 Confirmar Asistencia por WhatsApp</span>';
+    };
 
-  // Asistencia radio changes
-  document.querySelectorAll('input[name="rsvp"]').forEach(r => {
-    r.addEventListener('change', () => {
-      if (r.value === 'no') {
-        if (ticketsRow) ticketsRow.style.display = 'none';
-        if (dietaryBlock) dietaryBlock.style.display = 'none';
-        if (btnSubmit) btnSubmit.textContent = 'Enviar Aviso (No podré asistir)';
-      } else {
-        if (ticketsRow) ticketsRow.style.display = 'flex';
-        if (dietaryBlock) dietaryBlock.style.display = 'flex';
-        if (btnSubmit) btnSubmit.textContent = 'Enviar Confirmación en Pergamino';
-      }
-    });
-  });
+    labelAsistenciaNo.onclick = () => {
+      radioNo.checked = true;
+      labelAsistenciaNo.className = 'flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border-2 border-neutral-600 rounded-2xl bg-neutral-200 transition-all text-center';
+      labelAsistenciaSi.className = 'flex flex-col items-center justify-center gap-1 cursor-pointer p-3.5 border border-neutral-300 rounded-2xl bg-white/50 hover:bg-neutral-100 transition-all text-center opacity-60';
+      if (ticketsRow) ticketsRow.style.display = 'none';
+      if (dietaryBlock) dietaryBlock.style.display = 'none';
+      if (btnSubmit) btnSubmit.innerHTML = '<span>💌 Enviar Aviso (No podré asistir)</span>';
+    };
+  }
 
   // Reset button
   if (btnReset) {
@@ -2524,13 +2522,13 @@ if (musicPlayer && audio) {
       }
       if (btnSubmit) {
         btnSubmit.disabled = false;
-        btnSubmit.textContent = 'Enviar Confirmación en Pergamino';
+        btnSubmit.innerHTML = '<span>📲 Confirmar Asistencia por WhatsApp</span>';
       }
       if (urlGuest && inputNombre) inputNombre.value = urlGuest;
       if (ticketsRow) ticketsRow.style.display = 'flex';
       if (dietaryBlock) dietaryBlock.style.display = 'flex';
-      guestCount = Math.min(urlTickets, Math.max(1, urlTickets));
-      if (guestOut) guestOut.textContent = guestCount;
+      guestCount = Math.max(1, urlTickets);
+      renderPillChips(urlTickets);
     });
   }
 
