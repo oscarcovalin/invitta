@@ -330,14 +330,22 @@ tailwind.config = {
 
   #tituloRsvpPergamino {
     font-family: var(--font-names, var(--font-display, 'Cormorant Garamond', serif)) !important;
-    font-size: clamp(32px, 6.5vw, 54px) !important;
-    letter-spacing: 0.22em !important;
     font-weight: 400 !important;
     text-transform: uppercase !important;
     color: var(--onyx) !important;
     margin-top: 2px !important;
     margin-bottom: 4px !important;
-    line-height: 1.15 !important;
+    line-height: 1.2 !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+  .rsvp-title-short {
+    font-size: clamp(34px, 7.5vw, 54px) !important;
+    letter-spacing: 0.28em !important;
+  }
+  .rsvp-title-long {
+    font-size: clamp(19px, 4.2vw, 27px) !important;
+    letter-spacing: 0.1em !important;
   }
 
   .form-group-clean {
@@ -524,7 +532,7 @@ tailwind.config = {
     </div>
     
     <div class="flex items-center gap-2">
-      <button type="button" data-nav="rsvp" class="btn-luxury-secondary text-[10px] px-4 py-1.5 shadow-sm bg-transparent cursor-pointer">
+      <button type="button" id="btnHeaderRsvp" data-nav="rsvp" onclick="window.scrollToSection ? window.scrollToSection('rsvp') : (document.getElementById('rsvp') && document.getElementById('rsvp').scrollIntoView({behavior:'smooth'}))" class="btn-luxury-secondary text-[10px] px-4 py-1.5 shadow-sm bg-transparent cursor-pointer select-none">
         RSVP
       </button>
     </div>
@@ -1663,11 +1671,17 @@ tailwind.config = {
           <div class="ornament-line"></div>
         </div>
 
-        <h2 class="font-display-lg text-2xl sm:text-3xl font-normal text-deep-onyx mb-1 tracking-wide uppercase" id="tituloRsvpPergamino">
-          Confirmación de Asistencia
-        </h2>
-        <p class="font-display-lg italic text-sm sm:text-base text-antique-gold mb-4 font-light" id="subEventoRsvp">
+        
+            <h2 class="font-display-lg font-normal text-deep-onyx mb-1 uppercase rsvp-title-long" id="tituloRsvpPergamino">
+              Confirmación de Asistencia
+            </h2>
+          
+        <p class="font-display-lg italic text-sm sm:text-base text-antique-gold mb-2 font-light" id="subEventoRsvp">
           Catalina & Julián · 20 · Marzo · 2027
+        </p>
+        
+        <p class="font-body text-xs text-deep-onyx/75 mb-4 font-light leading-relaxed max-w-sm mx-auto" id="rsvpDeadlineText">
+          Por favor, haznos saber si podrás acompañarnos antes del 20 de Febrero.
         </p>
 
         <!-- Saludo Personalizado Dinámico -->
@@ -3316,6 +3330,7 @@ function scrollToSection(targetId) {
     });
   }
 }
+window.scrollToSection = scrollToSection;
 
 document.querySelectorAll('[data-nav]').forEach(btn => {
   btn.addEventListener('click', function(e) {

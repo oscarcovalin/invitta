@@ -1,0 +1,26 @@
+{
+  "label": "v2.40_rsvp_deadline_selectors_title_responsiveness_and_header_nav_fix",
+  "timestamp": "2026-08-27T02:09:00.376Z",
+  "files": [
+    {
+      "filename": "template-engine.js",
+      "size": 205929
+    },
+    {
+      "filename": "index.html",
+      "size": 96595
+    },
+    {
+      "filename": "app.js",
+      "size": 99225
+    },
+    {
+      "filename": "style.css",
+      "size": 17942
+    },
+    {
+      "filename": "decor-assets.js",
+      "size": 1085684
+    }
+  ]
+}

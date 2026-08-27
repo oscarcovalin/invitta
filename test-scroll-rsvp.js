@@ -80,8 +80,11 @@ assert(html.includes('initRsvpPergamino'), 'invitacion.html includes initRsvpPer
 // 7. Verification of RSVP Controls in invitacion-estudio.html
 const studioHtml = fs.readFileSync('./invitacion-estudio.html', 'utf-8');
 assert(studioHtml.includes('id="selectRsvpTitle"'), 'invitacion-estudio.html contains selectRsvpTitle dropdown');
+assert(studioHtml.includes('id="selectRsvpDay"'), 'invitacion-estudio.html contains selectRsvpDay dropdown');
+assert(studioHtml.includes('id="selectRsvpMonth"'), 'invitacion-estudio.html contains selectRsvpMonth dropdown');
 assert(!studioHtml.includes('btn-simulate-vip'), 'invitacion-estudio.html removed redundant VIP simulator');
 assert(!studioHtml.includes('Simulador de Vista Previa VIP'), 'invitacion-estudio.html removed simulator container');
+assert(html.includes('id="btnHeaderRsvp"'), 'invitacion.html contains active #btnHeaderRsvp top button');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed.\n`);
 if (failed > 0) process.exit(1);
