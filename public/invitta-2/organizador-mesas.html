@@ -489,7 +489,10 @@
             class="w-full bg-surface-container rounded-xl py-2 px-3 text-xs border border-outline-variant focus:border-primary focus:outline-none">
         </div>
 
-        <div class="flex justify-end gap-2 pt-3 border-t border-outline-variant">
+        <div class="flex justify-end gap-2 flex-wrap pt-3 border-t border-outline-variant">
+          <button type="button" id="btnPrintGuests" class="px-3 py-2 rounded-xl bg-surface border border-outline-variant text-on-surface-variant text-xs font-semibold flex items-center gap-1.5" title="Abre una lista limpia para imprimir">
+            <span class="material-symbols-outlined text-sm">print</span> Imprimir
+          </button>
           <button type="button" id="btnExportGuestsCsv" class="px-3 py-2 rounded-xl bg-surface border border-outline-variant text-on-surface-variant text-xs font-semibold flex items-center gap-1.5" title="Descarga la lista actual para Excel">
             <span class="material-symbols-outlined text-sm">download</span> Lista CSV
           </button>
@@ -1319,6 +1322,29 @@
         ];
       });
       downloadCsv(`invitta-lista-invitados-${new Date().toISOString().slice(0, 10)}.csv`, [headers, ...rows]);
+    });
+
+    document.getElementById('btnPrintGuests').addEventListener('click', () => {
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert('El navegador bloqueó la ventana de impresión. Permite ventanas emergentes e inténtalo de nuevo.');
+        return;
+      }
+      const statusLabel = { DRAFT: 'Sin enviar', SENT: 'Pendiente', CONFIRMED: 'Confirmado', DECLINED: 'Declinado' };
+      const rows = planner.state.guests
+        .slice()
+        .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'es-MX'))
+        .map(guest => {
+          const table = planner.state.tables.find(item => item.id === guest.tableId);
+          return `<tr><td>${escapeDispatchHtml(guest.name)}</td><td>${escapeDispatchHtml(guest.pases || guest.passes || 1)}</td><td>${escapeDispatchHtml(statusLabel[guest.status] || 'Sin enviar')}</td><td>${escapeDispatchHtml(table ? table.name : 'Sin asignar')}</td><td>${escapeDispatchHtml(guest.tag || guest.notes || '')}</td></tr>`;
+        }).join('');
+      printWindow.opener = null;
+      printWindow.document.open();
+      printWindow.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Lista de invitados · Invitta</title><style>
+        body{font-family:Arial,sans-serif;color:#202020;margin:32px}h1{font-family:Georgia,serif;font-size:26px;margin:0}p{color:#555;margin:7px 0 22px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #d5d0c5;padding:8px;text-align:left;vertical-align:top}th{background:#f5f1e8;text-transform:uppercase;font-size:10px;letter-spacing:.06em}.print-actions{margin:0 0 20px}@media print{body{margin:12mm}.print-actions{display:none}th{background:#f5f1e8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+      </style></head><body><div class="print-actions"><button onclick="window.print()">Imprimir</button></div><h1>Lista de invitados</h1><p>Generada localmente el ${escapeDispatchHtml(new Date().toLocaleString('es-MX'))} · ${planner.state.guests.length} registros</p><table><thead><tr><th>Invitado o familia</th><th>Pases</th><th>RSVP</th><th>Mesa</th><th>Notas</th></tr></thead><tbody>${rows || '<tr><td colspan="5">No hay invitados registrados.</td></tr>'}</tbody></table></body></html>`);
+      printWindow.document.close();
+      printWindow.focus();
     });
 
     document.getElementById('inputImportGuestsCsv').addEventListener('change', async (event) => {
