@@ -2636,7 +2636,10 @@ function escapeHTML(str) {
 
 const urlParams = new URLSearchParams(window.location.search);
 const urlGuest = urlParams.get('invitado') || urlParams.get('guest');
-const urlTickets = parseInt(urlParams.get('pases') || urlParams.get('tickets'), 10) || CONFIG.defaultPassCount || 2;
+// Acepta los tres nombres usados por los enlaces del Estudio y del Pase Express.
+// `passes` es el parámetro que emite GuestManager; omitirlo mostraba el valor
+// predeterminado aunque el enlace llevara una cantidad distinta.
+const urlTickets = parseInt(urlParams.get('passes') || urlParams.get('pases') || urlParams.get('tickets'), 10) || CONFIG.defaultPassCount || 2;
 const isWedding = CONFIG.eventType === 'boda';
 
 // 1. VIP Personalization
