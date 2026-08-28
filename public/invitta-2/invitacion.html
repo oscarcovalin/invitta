@@ -2892,6 +2892,44 @@ if (musicPlayer && audio) {
   const guestParam = urlParams.get('guest') || urlParams.get('invitado');
   const ticketsParam = parseInt(urlParams.get('passes') || urlParams.get('pases') || urlParams.get('tickets'), 10) || 2;
   const urlMesaParam = urlParams.get('mesa') || urlParams.get('table') || urlParams.get('m') || '';
+  const localProjectId = urlParams.get('cloudProject');
+  const localStorageSuffix = localProjectId ? `_cloud_${localProjectId}` : '';
+
+  function normalizeGuestIdentity(value) {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  function saveLocalRsvpResponse({ guestName, isAttending, confirmedTickets, email, dietary }) {
+    if (typeof localStorage === 'undefined') return;
+    const requestedIdentity = normalizeGuestIdentity(guestParam || guestName);
+    const storageKeys = [
+      `invitta_2_guest_db${localStorageSuffix}`,
+      `invitta_seating_state_v2${localStorageSuffix}`
+    ];
+
+    storageKeys.forEach(storageKey => {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (!state || !Array.isArray(state.guests)) return;
+        const found = state.guests.find(guest => {
+          const guestId = normalizeGuestIdentity(guest.id);
+          const guestNameValue = normalizeGuestIdentity(guest.name || guest.contactName);
+          return guestId === requestedIdentity || guestNameValue === requestedIdentity;
+        });
+        if (!found) return;
+        found.status = isAttending ? 'CONFIRMED' : 'DECLINED';
+        found.confirmedPasses = confirmedTickets;
+        found.respondedAt = new Date().toISOString();
+        if (email) found.email = email;
+        if (dietary) found.dietary = dietary;
+        localStorage.setItem(storageKey, JSON.stringify(state));
+      } catch (error) {
+        console.warn('No fue posible guardar el RSVP local:', error);
+      }
+    });
+  }
 
   if (guestParam && guestParam.trim()) {
     const nombreDecodificado = guestParam.replace(/-/g, ' ').replace(/_/g, ' ').trim();
@@ -3022,41 +3060,17 @@ if (musicPlayer && audio) {
           mesaCode = mMatch ? 'M' + mMatch[0].padStart(2, '0') : 'MGEN';
           tableDisplay = mMatch ? 'Mesa ' + parseInt(mMatch[0], 10) : 'Mesa General';
         }
-      } else {
-        try {
-          if (typeof localStorage !== 'undefined') {
-            const rawDb = localStorage.getItem('invitta_2_guest_db');
-            if (rawDb) {
-              const db = JSON.parse(rawDb);
-              if (db && Array.isArray(db.guests)) {
-                const cleanN = guestName.toLowerCase().replace(/[^a-z0-9]/g, '');
-                const found = db.guests.find(g => {
-                  const gClean = (g.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-                  return cleanN.includes(gClean) || gClean.includes(cleanN);
-                });
-                if (found) {
-                  if (found.tableId === 'tbl_imperial' || String(found.tableId).includes('imp') || found.court || found.vip) {
-                    mesaCode = 'MIMP';
-                    tableDisplay = 'Mesa Imperial';
-                  } else if (found.tableId) {
-                    const mMatch = String(found.tableId).match(/\d+/);
-                    if (mMatch) {
-                      mesaCode = 'M' + mMatch[0].padStart(2, '0');
-                      tableDisplay = 'Mesa ' + parseInt(mMatch[0], 10);
-                    }
-                  }
-                  found.status = isAttending ? 'CONFIRMED' : 'DECLINED';
-                  found.confirmedPasses = confirmedTickets;
-                  found.respondedAt = new Date().toISOString();
-                  if (guestEmail) found.email = guestEmail;
-                  if (allergies) found.dietary = allergies;
-                  localStorage.setItem('invitta_2_guest_db', JSON.stringify(db));
-                }
-              }
-            }
-          }
-        } catch (err) {}
       }
+
+      // La respuesta debe reflejarse aunque el enlace ya incluya una mesa.
+      // Se actualizan las dos vistas locales que consumen el organizador.
+      saveLocalRsvpResponse({
+        guestName,
+        isAttending,
+        confirmedTickets,
+        email: guestEmail,
+        dietary: allergies
+      });
 
       const folio = mesaCode + '-' + apellidoCode + '-' + (confirmedTickets || 1) + 'P';
       const calcDisplayName = isWedding ? ((CONFIG.brideName || '') + ' & ' + (CONFIG.groomName || '')) : (CONFIG.name || 'Invitación');

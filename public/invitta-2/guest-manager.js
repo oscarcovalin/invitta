@@ -403,6 +403,13 @@ class GuestManager {
         if (match) url += `&mesa=${match[0]}`;
       }
     }
+    // Conserva el contexto del proyecto local al abrir la invitación. Sin este
+    // parámetro el RSVP podría actualizar el almacenamiento genérico y no el
+    // plano del salón que generó el enlace.
+    if (typeof window !== 'undefined' && window.location) {
+      const cloudProject = new URLSearchParams(window.location.search).get('cloudProject');
+      if (cloudProject) url += `&cloudProject=${encodeURIComponent(cloudProject)}`;
+    }
     return url;
   }
 
