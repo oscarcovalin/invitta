@@ -490,6 +490,9 @@
         </div>
 
         <div class="flex justify-end gap-2 pt-3 border-t border-outline-variant">
+          <button type="button" id="btnExportGuestsCsv" class="px-3 py-2 rounded-xl bg-surface border border-outline-variant text-on-surface-variant text-xs font-semibold flex items-center gap-1.5" title="Descarga la lista actual para Excel">
+            <span class="material-symbols-outlined text-sm">download</span> Lista CSV
+          </button>
           <button type="button" id="btnDownloadGuestsCsvTemplate" class="px-3 py-2 rounded-xl bg-surface border border-outline-variant text-on-surface-variant text-xs font-semibold flex items-center gap-1.5" title="Descarga un ejemplo de columnas compatibles">
             <span class="material-symbols-outlined text-sm">file_download</span> Plantilla
           </button>
@@ -1269,25 +1272,53 @@
       return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
     }
 
+    function csvCell(value) {
+      const text = String(value ?? '');
+      return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+    }
+
+    function downloadCsv(filename, rows) {
+      const csv = rows.map(row => row.map(csvCell).join(',')).join('\r\n');
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
     document.getElementById('btnImportGuestsCsv').addEventListener('click', () => {
       document.getElementById('inputImportGuestsCsv').click();
     });
 
     document.getElementById('btnDownloadGuestsCsvTemplate').addEventListener('click', () => {
-      const csv = [
-        'Nombre,Pases,Rol,Teléfono,Correo,Notas,Familia,Estado',
-        'Familia Martínez,4,family_bride,+525512345678,familia.martinez@ejemplo.com,Menú vegetariano,Familia Martínez,DRAFT',
-        'Ana López,1,friends,+525598765432,ana.lopez@ejemplo.com,,Amigos,SENT'
-      ].join('\r\n');
-      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = 'invitta-plantilla-invitados.csv';
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+      downloadCsv('invitta-plantilla-invitados.csv', [
+        ['Nombre', 'Pases', 'Rol', 'Teléfono', 'Correo', 'Notas', 'Familia', 'Estado'],
+        ['Familia Martínez', 4, 'family_bride', '+525512345678', 'familia.martinez@ejemplo.com', 'Menú vegetariano', 'Familia Martínez', 'DRAFT'],
+        ['Ana López', 1, 'friends', '+525598765432', 'ana.lopez@ejemplo.com', '', 'Amigos', 'SENT']
+      ]);
+    });
+
+    document.getElementById('btnExportGuestsCsv').addEventListener('click', () => {
+      const headers = ['Nombre', 'Pases', 'Rol', 'Teléfono', 'Correo', 'Notas', 'Familia', 'Estado', 'Mesa'];
+      const rows = planner.state.guests.map(guest => {
+        const table = planner.state.tables.find(item => item.id === guest.tableId);
+        return [
+          guest.name,
+          guest.pases || guest.passes || 1,
+          guest.role || 'general',
+          guest.phone || '',
+          guest.email || '',
+          guest.tag || guest.notes || '',
+          guest.familyKey || '',
+          guest.status || 'DRAFT',
+          table ? table.name : 'Sin asignar'
+        ];
+      });
+      downloadCsv(`invitta-lista-invitados-${new Date().toISOString().slice(0, 10)}.csv`, [headers, ...rows]);
     });
 
     document.getElementById('inputImportGuestsCsv').addEventListener('change', async (event) => {
