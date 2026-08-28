@@ -3774,8 +3774,8 @@ if (musicPlayer && audio) {
         };
       }
 
-      // Auto-trigger WhatsApp principal
-      triggerWhatsApp();
+      // Compartir por WhatsApp es una decisión explícita del invitado. Abrirlo
+      // automáticamente tras un RSVP genera pestañas no solicitadas.
 
       if (btnSubmit) {
         btnSubmit.disabled = true;

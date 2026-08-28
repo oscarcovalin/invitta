@@ -698,6 +698,16 @@
         <button type="button" class="btn-close-modal text-on-surface-variant hover:text-primary text-2xl font-light">&times;</button>
       </div>
 
+      <div class="rounded-xl border border-amber-300 bg-amber-50/70 px-4 py-3 text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <strong class="block">Publicación y envío</strong>
+          <span>El diseño se entrega desde el Estudio como archivo HTML; aquí generas y compartes los accesos personales.</span>
+        </div>
+        <a id="btnOpenStudioFromDispatch" href="invitacion-estudio.html" data-operations-link class="inline-flex items-center justify-center gap-1 rounded-lg border border-amber-500/50 bg-white px-3 py-2 font-semibold hover:bg-amber-100 transition-colors">
+          <span class="material-symbols-outlined text-sm">auto_fix_high</span> Abrir Estudio
+        </a>
+      </div>
+
       <!-- KPIs en Vivo -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
         <div class="p-3 rounded-xl bg-surface border border-outline-variant text-center">
@@ -1656,9 +1666,29 @@
         }
       }
 
+      // Sin nube, el enlace sigue siendo útil para una prueba local del flujo
+      // RSVP. No se marca como "seguro" porque el estado vive en este navegador.
+      const getLocalRsvpUrl = (guest) => {
+        const url = new URL('invitacion.html', window.location.href);
+        url.searchParams.set('guest', guest.name || guest.contactName || guest.id);
+        url.searchParams.set('passes', String(guest.pases || guest.passes || 1));
+        const projectId = new URLSearchParams(window.location.search).get('cloudProject');
+        if (projectId) url.searchParams.set('cloudProject', projectId);
+        if (guest.tableId) {
+          if (guest.tableId === 'tbl_imperial' || String(guest.tableId).includes('imp') || guest.court || guest.vip) {
+            url.searchParams.set('mesa', 'imperial');
+          } else {
+            const tableNumber = String(guest.tableId).match(/\d+/);
+            if (tableNumber) url.searchParams.set('mesa', tableNumber[0]);
+          }
+        }
+        return url.toString();
+      };
+
       list.innerHTML = guests.map(g => {
         const passes = g.pases || g.passes || 1;
-        const inviteUrl = secureLinks.get(g.id);
+        const cloudInvite = secureLinks.get(g.id);
+        const inviteUrl = cloudInvite || getLocalRsvpUrl(g);
         const safeName = escapeDispatchHtml(g.name);
         const safePhone = escapeDispatchHtml(g.phone || 'Sin número');
         const safeTag = escapeDispatchHtml(g.tag || 'Sin notas');
@@ -1711,10 +1741,8 @@
               ${inviteUrl ? `
                 <button type="button" class="btn-copy-rsvp-link px-2 py-1.5 rounded-lg bg-surface-container border border-outline-variant hover:border-primary text-primary text-[11px] flex items-center gap-1 transition-colors" data-url="${safeInviteUrl}">
                   <span class="material-symbols-outlined text-sm">link</span>
-                  <span>Link seguro</span>
+                  <span>${cloudInvite ? 'Link seguro' : 'Link local'}</span>
                 </button>
-              ` : `
-                <span class="px-2 py-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[11px]">Sin enlace</span>
               `}
 
               <button type="button" class="btn-modal-edit-guest p-1.5 rounded-lg bg-surface-container hover:bg-surface-variant text-primary text-xs" title="Editar datos" data-id="${safeGuestId}">
