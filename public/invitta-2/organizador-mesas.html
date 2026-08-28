@@ -635,10 +635,14 @@
         </div>
 
         <!-- Exportación y Reseteo -->
-        <div class="pt-2 border-t border-outline-variant flex gap-2">
+        <div class="pt-2 border-t border-outline-variant flex gap-2 flex-wrap">
           <button type="button" id="btnExportSeatingJson" class="flex-1 py-2 px-3 rounded-xl bg-surface-container border border-outline-variant hover:border-charcoal text-primary font-medium flex items-center justify-center gap-1.5 transition-colors text-xs">
             <span class="material-symbols-outlined text-sm">download</span> Exportar JSON
           </button>
+          <button type="button" id="btnImportSeatingJson" class="flex-1 py-2 px-3 rounded-xl bg-surface-container border border-outline-variant hover:border-charcoal text-primary font-medium flex items-center justify-center gap-1.5 transition-colors text-xs">
+            <span class="material-symbols-outlined text-sm">upload</span> Importar respaldo
+          </button>
+          <input id="inputImportSeatingJson" type="file" accept="application/json,.json" class="hidden">
           <button type="button" id="btnResetAllTables" class="py-2 px-3 rounded-xl bg-rose-50 border border-rose-400/40 text-rose-700 hover:bg-rose-100 font-medium flex items-center justify-center gap-1.5 transition-colors text-xs">
             <span class="material-symbols-outlined text-sm">restart_alt</span> Reiniciar Mesas
           </button>
@@ -1519,6 +1523,40 @@
       anchor.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 0);
       alert('✅ Respaldo local descargado. Guárdalo para recuperar el plano y las asignaciones sin depender de la nube.');
+    });
+
+    document.getElementById('btnImportSeatingJson').addEventListener('click', () => {
+      document.getElementById('inputImportSeatingJson').click();
+    });
+
+    document.getElementById('inputImportSeatingJson').addEventListener('change', async (event) => {
+      const file = event.target.files && event.target.files[0];
+      event.target.value = '';
+      if (!file) return;
+
+      try {
+        const backup = JSON.parse(await file.text());
+        const tables = Array.isArray(backup.tables) ? backup.tables : null;
+        const guests = Array.isArray(backup.guests) ? backup.guests : null;
+        const tableIds = new Set((tables || []).map(table => table && table.id));
+        const validTables = tables && tables.length && tables.every(table =>
+          table && typeof table.id === 'string' && typeof table.name === 'string' && Number(table.capacity) > 0
+        );
+        const validGuests = guests && guests.every(guest =>
+          guest && typeof guest.id === 'string' && typeof guest.name === 'string' &&
+          (!guest.tableId || tableIds.has(guest.tableId))
+        );
+        if (!validTables || !validGuests) throw new Error('Formato no compatible');
+
+        if (!confirm(`Vas a reemplazar el plano local por “${file.name}” (${guests.length} invitados y ${tables.length} mesas).\n\nEsta acción no usa nube. ¿Continuar?`)) return;
+        planner.state = { guests, tables, draggedItem: null };
+        planner.updateStateAndDOM();
+        updateFooterStats();
+        modalSettings.classList.add('hidden');
+        alert('✅ Respaldo restaurado localmente. El plano y las asignaciones ya están disponibles.');
+      } catch (error) {
+        alert('No se pudo importar el archivo. Selecciona un respaldo JSON creado desde este organizador.');
+      }
     });
 
     // 10. Resetear Asignaciones (Protegido si no es Admin)
