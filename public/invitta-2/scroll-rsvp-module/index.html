@@ -424,7 +424,7 @@
                         const found = db.guests.find(g => {
                             const idClean = g.id.toLowerCase().replace(/[^a-z0-9]/g, '');
                             const nameClean = g.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-                            return idClean.includes(paramClean) || nameClean.includes(paramClean);
+                            return idClean === paramClean || nameClean === paramClean;
                         });
                         if (found) return found;
                     }
@@ -438,7 +438,7 @@
                         const found = seating.guests.find(g => {
                             const idClean = g.id.toLowerCase().replace(/[^a-z0-9]/g, '');
                             const nameClean = g.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-                            return idClean.includes(paramClean) || nameClean.includes(paramClean);
+                            return idClean === paramClean || nameClean === paramClean;
                         });
                         if (found) return found;
                     }
@@ -455,11 +455,11 @@
                 const guestParamClean = (guestParam || '').toLowerCase().replace(/[^a-z0-9]/g, '');
                 const updateGuest = (guest) => {
                     const idClean = (guest.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-                    const nameClean = (guest.name || '').toLowerCase();
-                    const requestedName = nombre.toLowerCase();
+                    const nameClean = (guest.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                    const requestedName = nombre.toLowerCase().replace(/[^a-z0-9]/g, '');
                     const matches = guestParamClean
-                        ? idClean === guestParamClean
-                        : nameClean.includes(requestedName) || requestedName.includes(nameClean);
+                        ? (idClean === guestParamClean || nameClean === guestParamClean)
+                        : nameClean === requestedName;
                     if (!matches) return false;
                     guest.status = status;
                     guest.confirmedPasses = isConfirmed ? parseInt(pases, 10) : 0;
@@ -578,12 +578,16 @@
                 e.preventDefault();
 
                 const nombre = (rsvpCloudGuest && rsvpCloudGuest.name) || document.getElementById('nombre').value || 'Invitado de Honor';
-                const pases = document.getElementById('pases').value || '1';
+                const requestedPasses = parseInt(document.getElementById('pases').value || '1', 10) || 1;
                 const asistencia = document.getElementById('asistencia').value;
 
                 // Folio Logístico Opción B: [MESA]-[APELLIDO]-[PASES] (ej: M03-MARTINEZ-4P)
                 let mesaCode = 'MGEN';
                 const matched = rsvpCloudGuest || buscarInvitadoEnStorage(guestParam || nombre);
+                const assignedPasses = parseInt(matched?.passes || matched?.pases || rsvpCloudGuest?.passes || requestedPasses, 10) || requestedPasses;
+                const pases = asistencia === 'si'
+                    ? Math.max(1, Math.min(requestedPasses, assignedPasses))
+                    : 0;
                 if (matched) {
                     if (matched.court || matched.vip || matched.tableId === 'tbl_imperial' || String(matched.tableId).includes('imp')) {
                         mesaCode = 'MIMP';
