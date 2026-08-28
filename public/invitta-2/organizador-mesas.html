@@ -1505,12 +1505,20 @@
       alert('🔔 Se ha generado la lista de recordatorios. Puedes enviar mensaje con 1 clic a cada invitado pendiente.');
     });
 
-    // 9. Exportar JSON
+    // 9. Exportar respaldo local del salón
     document.getElementById('btnExportSeatingJson').addEventListener('click', () => {
       const jsonStr = JSON.stringify(planner.state, null, 2);
-      navigator.clipboard.writeText(jsonStr).then(() => {
-        alert('✅ Distribución del salón y asignación de mesas copiada al portapapeles en formato JSON.');
-      });
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      const date = new Date().toISOString().slice(0, 10);
+      anchor.href = url;
+      anchor.download = `invitta-respaldo-salon-${date}.json`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+      alert('✅ Respaldo local descargado. Guárdalo para recuperar el plano y las asignaciones sin depender de la nube.');
     });
 
     // 10. Resetear Asignaciones (Protegido si no es Admin)
