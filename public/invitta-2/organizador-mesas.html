@@ -717,8 +717,8 @@
 
       <div class="flex justify-between items-center pt-3 border-t border-outline-variant text-xs">
         <button type="button" id="btnSendAllReminders" class="px-4 py-2 rounded-xl bg-amber-50 border border-amber-400 text-amber-900 font-medium hover:bg-amber-100 flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-sm">notification_important</span>
-          <span>Recordatorio a Pendientes</span>
+          <span class="material-symbols-outlined text-sm">download</span>
+          <span>Exportar Recordatorios</span>
         </button>
         <button type="button" class="btn-close-modal px-5 py-2 rounded-xl bg-primary text-white font-semibold uppercase tracking-wider hover:bg-charcoal transition-colors">
           Cerrar
@@ -1707,7 +1707,25 @@
     }
 
     document.getElementById('btnSendAllReminders').addEventListener('click', () => {
-      alert('🔔 Se ha generado la lista de recordatorios. Puedes enviar mensaje con 1 clic a cada invitado pendiente.');
+      const pending = planner.state.guests.filter(guest => !['CONFIRMED', 'DECLINED'].includes(guest.status));
+      if (!pending.length) {
+        alert('✅ No hay invitados pendientes de confirmación.');
+        return;
+      }
+      const message = 'Hola, nos encantará contar contigo. Por favor confirma tu asistencia para ayudarnos con la organización del evento.';
+      const rows = pending.map(guest => [
+        guest.name,
+        guest.pases || guest.passes || 1,
+        guest.phone || '',
+        guest.email || '',
+        guest.status === 'SENT' ? 'Enviado · sin respuesta' : 'Sin enviar',
+        message
+      ]);
+      downloadCsv(`invitta-recordatorios-pendientes-${new Date().toISOString().slice(0, 10)}.csv`, [
+        ['Invitado o familia', 'Pases', 'Teléfono', 'Correo', 'Estado', 'Mensaje sugerido'],
+        ...rows
+      ]);
+      alert(`✅ Se descargó la lista local de ${pending.length} recordatorio(s). Revísala antes de enviar cualquier mensaje.`);
     });
 
     // 9. Exportar respaldo local del salón
