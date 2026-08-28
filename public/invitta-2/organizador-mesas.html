@@ -1325,6 +1325,25 @@
       window.setTimeout(() => URL.revokeObjectURL(url), 0);
     }
 
+    async function copyLocalText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (error) {}
+      }
+      const helper = document.createElement('textarea');
+      helper.value = text;
+      helper.setAttribute('readonly', '');
+      helper.style.position = 'fixed';
+      helper.style.opacity = '0';
+      document.body.appendChild(helper);
+      helper.select();
+      const copied = document.execCommand('copy');
+      helper.remove();
+      return copied;
+    }
+
     document.getElementById('btnImportGuestsCsv').addEventListener('click', () => {
       document.getElementById('inputImportGuestsCsv').click();
     });
@@ -1694,7 +1713,9 @@
 
       list.querySelectorAll('.btn-copy-rsvp-link').forEach(btn => {
         btn.addEventListener('click', () => {
-          navigator.clipboard.writeText(btn.dataset.url).then(() => alert('📋 Enlace copiado:\n' + btn.dataset.url));
+          copyLocalText(btn.dataset.url).then(copied => {
+            alert(copied ? `📋 Enlace copiado:\n${btn.dataset.url}` : `No se pudo copiar automáticamente. Copia este enlace:\n${btn.dataset.url}`);
+          });
         });
       });
 
@@ -1873,8 +1894,10 @@
       const links = gm.getDelegationLinks();
       const target = links[roleKey];
       if (target && target.url) {
-        navigator.clipboard.writeText(target.url).then(() => {
-          alert(`📋 ¡Enlace copiado para ${target.title}!\n\n${target.url}`);
+        copyLocalText(target.url).then(copied => {
+          alert(copied
+            ? `📋 ¡Enlace copiado para ${target.title}!\n\n${target.url}`
+            : `No se pudo copiar automáticamente. Copia este enlace para ${target.title}:\n\n${target.url}`);
         });
       }
     };
@@ -1899,8 +1922,9 @@
       btnGenerateMasterPin.addEventListener('click', () => {
         const newPin = gm.generateRandomMasterPin();
         document.getElementById('inputMasterPin').value = newPin;
-        navigator.clipboard.writeText(newPin).catch(() => {});
-        alert(`🎲 ¡Nuevo PIN Maestro generado y guardado!\n\nPIN: ${newPin}\n(Copiado al portapapeles)`);
+        copyLocalText(newPin).then(copied => {
+          alert(`🎲 ¡Nuevo PIN Maestro generado y guardado!\n\nPIN: ${newPin}${copied ? '\n(Copiado al portapapeles)' : '\n(Cópialo y guárdalo en un lugar seguro)'}`);
+        });
       });
     }
 
