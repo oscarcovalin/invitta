@@ -490,6 +490,10 @@
         </div>
 
         <div class="flex justify-end gap-2 pt-3 border-t border-outline-variant">
+          <button type="button" id="btnImportGuestsCsv" class="px-4 py-2 rounded-xl bg-surface border border-outline-variant text-primary text-xs font-semibold flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">upload_file</span> Importar CSV
+          </button>
+          <input id="inputImportGuestsCsv" type="file" accept=".csv,text/csv,.txt" class="hidden">
           <button type="button" class="btn-close-guest-modal px-4 py-2 rounded-xl bg-surface border border-outline-variant text-on-surface-variant text-xs">Cancelar</button>
           <button type="submit" id="btnSubmitGuest" class="px-5 py-2 rounded-xl bg-primary text-white text-xs font-semibold uppercase tracking-wider hover:bg-charcoal transition-all">Guardar Invitado</button>
         </div>
@@ -1233,6 +1237,93 @@
 
     document.getElementById('btnOpenGuestDirectory').addEventListener('click', openModalGuestCreate);
     document.getElementById('btnQuickAddGuest').addEventListener('click', openModalGuestCreate);
+
+    function parseGuestCsv(text) {
+      const rows = [];
+      let row = [];
+      let value = '';
+      let quoted = false;
+      for (let index = 0; index < text.length; index += 1) {
+        const char = text[index];
+        if (char === '"') {
+          if (quoted && text[index + 1] === '"') { value += '"'; index += 1; }
+          else quoted = !quoted;
+        } else if (!quoted && (char === ',' || char === ';')) {
+          row.push(value.trim()); value = '';
+        } else if (!quoted && (char === '\n' || char === '\r')) {
+          if (char === '\r' && text[index + 1] === '\n') index += 1;
+          row.push(value.trim());
+          if (row.some(cell => cell)) rows.push(row);
+          row = []; value = '';
+        } else value += char;
+      }
+      row.push(value.trim());
+      if (row.some(cell => cell)) rows.push(row);
+      return rows;
+    }
+
+    function normalizedCsvHeader(value) {
+      return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    }
+
+    document.getElementById('btnImportGuestsCsv').addEventListener('click', () => {
+      document.getElementById('inputImportGuestsCsv').click();
+    });
+
+    document.getElementById('inputImportGuestsCsv').addEventListener('change', async (event) => {
+      const file = event.target.files && event.target.files[0];
+      event.target.value = '';
+      if (!file) return;
+      try {
+        const rows = parseGuestCsv(await file.text());
+        if (rows.length < 2) throw new Error('Sin filas');
+        const headers = rows[0].map(normalizedCsvHeader);
+        const column = aliases => headers.findIndex(header => aliases.includes(header));
+        const nameColumn = column(['nombre', 'name', 'invitado', 'guest']);
+        if (nameColumn < 0) throw new Error('Sin columna nombre');
+        const passesColumn = column(['pases', 'passes', 'acompanantes']);
+        const roleColumn = column(['rol', 'role']);
+        const phoneColumn = column(['telefono', 'tel', 'phone', 'whatsapp']);
+        const emailColumn = column(['correo', 'email', 'e-mail']);
+        const notesColumn = column(['notas', 'nota', 'restricciones', 'notes']);
+        const familyColumn = column(['familia', 'family']);
+        const statusColumn = column(['estado', 'status', 'rsvp']);
+        const existingEmails = new Set(planner.state.guests.map(guest => String(guest.email || '').trim().toLowerCase()).filter(Boolean));
+        const imported = [];
+        let skipped = 0;
+        rows.slice(1).forEach((row, index) => {
+          const name = String(row[nameColumn] || '').trim();
+          if (!name) { skipped += 1; return; }
+          const email = emailColumn < 0 ? '' : String(row[emailColumn] || '').trim();
+          if (email && existingEmails.has(email.toLowerCase())) { skipped += 1; return; }
+          const passes = Math.min(12, Math.max(1, Number.parseInt(row[passesColumn], 10) || 1));
+          const importedStatus = statusColumn < 0 ? 'DRAFT' : String(row[statusColumn] || '').trim().toUpperCase();
+          imported.push({
+            id: `csv_${Date.now()}_${index}`,
+            name,
+            passes,
+            pases: passes,
+            tableId: null,
+            role: roleColumn < 0 ? 'general' : String(row[roleColumn] || '').trim() || 'general',
+            phone: phoneColumn < 0 ? '' : String(row[phoneColumn] || '').trim(),
+            email,
+            tag: notesColumn < 0 ? '' : String(row[notesColumn] || '').trim(),
+            familyKey: familyColumn < 0 ? '' : String(row[familyColumn] || '').trim(),
+            status: ['DRAFT', 'SENT', 'CONFIRMED', 'DECLINED'].includes(importedStatus) ? importedStatus : 'DRAFT'
+          });
+          if (email) existingEmails.add(email.toLowerCase());
+        });
+        if (!imported.length) throw new Error('Sin invitados válidos');
+        if (!confirm(`Se agregarán ${imported.length} invitado(s) desde “${file.name}”.${skipped ? ` Se omitieron ${skipped} fila(s) vacía(s) o con correo repetido.` : ''}\n\nColumnas requeridas: Nombre. Opcionales: Pases, Rol, Teléfono, Correo, Notas, Familia, Estado.\n\n¿Continuar?`)) return;
+        planner.state.guests.push(...imported);
+        planner.updateStateAndDOM();
+        updateFooterStats();
+        modalGuestForm.classList.add('hidden');
+        alert(`✅ ${imported.length} invitado(s) agregados localmente.${skipped ? ` ${skipped} fila(s) se omitieron.` : ''}`);
+      } catch (error) {
+        alert('No se pudo importar el archivo. Usa un CSV con encabezado “Nombre” y una fila por invitado.');
+      }
+    });
 
     document.getElementById('formGuest').addEventListener('submit', (e) => {
       e.preventDefault();
