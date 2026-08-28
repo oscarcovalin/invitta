@@ -355,11 +355,19 @@
               </button>
             </div>
 
-            <!-- Búsqueda reactiva -->
+            <!-- Búsqueda y filtro reactivos, sólo sobre invitados aún sin mesa -->
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">search</span>
               <input id="searchGuestsInput" class="w-full bg-surface-container rounded-xl py-2 pl-9 pr-3 text-xs text-on-surface placeholder-on-surface-variant focus:outline-none border border-outline-variant focus:border-charcoal transition-all" placeholder="Buscar familia o invitado..." type="text">
             </div>
+            <select id="guestStatusFilter" aria-label="Filtrar invitados sin mesa por estado RSVP" class="w-full bg-surface-container rounded-xl py-2 px-3 text-xs text-on-surface border border-outline-variant focus:border-charcoal focus:outline-none transition-all">
+              <option value="ALL">Todos los estados</option>
+              <option value="PENDING">Pendientes / sin enviar</option>
+              <option value="CONFIRMED">Confirmados</option>
+              <option value="DECLINED">Declinados</option>
+              <option value="CHECKED_IN">En salón</option>
+              <option value="EMERGENCY">Pase de emergencia</option>
+            </select>
           </div>
 
           <!-- LISTA SCROLLABLE DE INVITADOS ARRASTRABLES -->

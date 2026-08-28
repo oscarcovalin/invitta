@@ -17,6 +17,7 @@ class SeatingPlanner {
       statsPercentSelector: '#statPercent',
       statsOvercapacityBadgeSelector: '#statOvercapacityBadge',
       searchInputSelector: '#searchGuestsInput',
+      statusFilterSelector: '#guestStatusFilter',
       overCapacityColor: '#A38047',
       storageKey: 'invitta_seating_state_v2',
       onStateChange: null
@@ -24,6 +25,7 @@ class SeatingPlanner {
 
     this.storageKey = this.options.storageKey;
     this.searchQuery = '';
+    this.statusFilter = 'ALL';
 
     // Estado reactivo centralizado con persistencia local
     this.state = this.loadPersistedState(options.initialGuests, options.initialTables);
@@ -176,7 +178,18 @@ class SeatingPlanner {
       );
     }
 
+    if (this.statusFilter && this.statusFilter !== 'ALL') {
+      unassigned = unassigned.filter(g => this.guestMatchesStatusFilter(g, this.statusFilter));
+    }
+
     return unassigned;
+  }
+
+  guestMatchesStatusFilter(guest, filter) {
+    const status = guest?.status || 'DRAFT';
+    if (filter === 'PENDING') return status === 'DRAFT' || status === 'SENT';
+    if (filter === 'EMERGENCY') return Boolean(guest?.isEmergency) || status === 'EMERGENCY';
+    return status === filter;
   }
 
   assignGuestToTable(guestId, targetTableId) {
@@ -248,6 +261,14 @@ class SeatingPlanner {
       this.searchQuery = e.target.value;
       this.renderUnassignedList();
     });
+
+    const statusFilter = document.querySelector(this.options.statusFilterSelector);
+    if (statusFilter) {
+      statusFilter.addEventListener('change', (e) => {
+        this.statusFilter = e.target.value;
+        this.renderUnassignedList();
+      });
+    }
   }
 
   getGuestStatusClasses(g) {
@@ -312,11 +333,12 @@ class SeatingPlanner {
     const unassigned = this.getUnassignedGuests();
 
     if (unassigned.length === 0) {
+      const hasActiveFilter = Boolean(this.searchQuery || this.statusFilter !== 'ALL');
       container.innerHTML = `
         <div class="text-center py-16 px-4 text-on-surface-variant select-none">
           <span class="material-symbols-outlined text-4xl mb-3 text-secondary block opacity-70">task_alt</span>
-          <p class="font-headline-lg-mobile text-primary text-base">Todos Asignados</p>
-          <p class="font-label-sm text-warm-grey mt-1">No hay invitaciones pendientes en este momento.</p>
+          <p class="font-headline-lg-mobile text-primary text-base">${hasActiveFilter ? 'Sin coincidencias' : 'Todos Asignados'}</p>
+          <p class="font-label-sm text-warm-grey mt-1">${hasActiveFilter ? 'Prueba con otra búsqueda o estado.' : 'No hay invitaciones pendientes en este momento.'}</p>
         </div>
       `;
       return;
