@@ -372,7 +372,6 @@
 
       if (parsed) {
         isScanningActive = false;
-        playBeep('success');
         openCheckinModal(parsed);
       }
     }
@@ -416,6 +415,7 @@
       }
 
       currentScannedGuest = foundGuest;
+      playBeep('success');
       maxAuthorizedPasses = foundGuest.passes || 1;
       admittedPassesCount = foundGuest.confirmedPasses || maxAuthorizedPasses;
 
