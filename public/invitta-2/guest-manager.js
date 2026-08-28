@@ -578,6 +578,10 @@ class GuestManager {
       return { success: false, error: 'Invitado no encontrado con el folio o nombre proporcionado' };
     }
 
+    if (guest.status === 'CHECKED_IN') {
+      return { success: false, error: 'Este pase ya registró ingreso' };
+    }
+
     const totalAllowed = guest.passes || 1;
     const finalAdmitted = admittedPasses !== undefined ? Math.min(totalAllowed, Math.max(1, parseInt(admittedPasses, 10))) : (guest.confirmedPasses || totalAllowed);
 

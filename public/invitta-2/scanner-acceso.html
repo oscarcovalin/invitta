@@ -377,6 +377,17 @@
       }
     }
 
+    function rejectScan(message) {
+      playBeep('error');
+      scanStatus.textContent = message;
+      scanStatus.classList.add('text-rose-300', 'border-rose-500/40');
+      setTimeout(() => {
+        scanStatus.textContent = 'Buscando código...';
+        scanStatus.classList.remove('text-rose-300', 'border-rose-500/40');
+        isScanningActive = true;
+      }, 1800);
+    }
+
     // 5. ABRIR MODAL DE VALIDACIÓN Y CHECK-IN
     function openCheckinModal(payload) {
       let query = payload.folio || payload.titular || payload.guest || '';
@@ -392,17 +403,16 @@
         return false;
       });
 
-      // Si no existe (ej. QR generado de forma externa u offline puro), crear registro al vuelo
+      // Un QR desconocido no crea invitados automáticamente: la excepción debe emitirse
+      // deliberadamente desde el Generador de Emergencia para conservar la trazabilidad.
       if (!foundGuest) {
-        const guestName = payload.titular || payload.nombre || query || 'Invitado de Honor';
-        const passes = parseInt(payload.pases || 2, 10);
-        const res = guestManager.createEmergencyGuest({
-          name: guestName,
-          passes: passes,
-          tableId: payload.mesa ? `tbl_${payload.mesa.replace(/[^0-9]/g, '')}` : 'tbl_1',
-          autoCheckIn: false
-        });
-        foundGuest = res.guest;
+        rejectScan('Pase no reconocido · usa Pase Express si es una excepción');
+        return;
+      }
+
+      if (foundGuest.status === 'CHECKED_IN') {
+        rejectScan('Este pase ya registró ingreso');
+        return;
       }
 
       currentScannedGuest = foundGuest;
@@ -444,6 +454,12 @@
       if (!currentScannedGuest) return;
 
       const result = guestManager.checkInGuest(currentScannedGuest.id, admittedPassesCount);
+      if (!result.success) {
+        checkinModal.classList.add('hidden');
+        rejectScan(result.error || 'No se pudo registrar el acceso');
+        currentScannedGuest = null;
+        return;
+      }
       playBeep('success');
       
       checkinModal.classList.add('hidden');
