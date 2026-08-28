@@ -654,6 +654,48 @@
     return true;
   }
 
+  function proposedSlug(project) {
+    const configValue = project.config || {};
+    const identity = configValue.eventType === 'boda'
+      ? `${configValue.brideName || 'boda'} ${configValue.groomName || ''}`
+      : `${configValue.eventType || 'evento'} ${configValue.name || ''}`;
+    return identity.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'mi-evento';
+  }
+
+  async function publish() {
+    if (!state.client || !state.session) {
+      openModal();
+      notify('Inicia sesión para publicar la invitación');
+      return false;
+    }
+    const project = studio().getState();
+    await save(project);
+    if (!state.projectId || !state.designId || !window.TemplateEngine) return false;
+
+    const slug = window.prompt('Elige el enlace público (solo minúsculas, números y guiones):', proposedSlug(project));
+    if (!slug) return false;
+    setCloudStatus('Publicando…', '#b7791f', 'Generando la invitación pública');
+    const { data: published, error: publishError } = await state.client.rpc('publish_invitation_project', {
+      p_project_id: state.projectId,
+      p_slug: slug
+    });
+    if (publishError) throw publishError;
+    const details = Array.isArray(published) ? published[0] : published;
+    const html = window.TemplateEngine.generateHTML(project.config, project.themeName, project.customTheme, window.DECOR_ASSETS || {});
+    const { error: uploadError } = await state.client.storage.from('invitta-2-published').upload(
+      details.storage_path,
+      new Blob([html], { type: 'text/html;charset=utf-8' }),
+      { contentType: 'text/html;charset=utf-8', upsert: true }
+    );
+    if (uploadError) throw uploadError;
+    const { data: publicUrl } = state.client.storage.from('invitta-2-published').getPublicUrl(details.storage_path);
+    setCloudStatus('Publicada', '#1d8a55', 'Invitación publicada y lista para compartir');
+    notify('Invitación publicada. Copia el enlace para compartirla.');
+    window.prompt('Invitación publicada. Copia este enlace:', publicUrl.publicUrl);
+    return true;
+  }
+
   async function initialize() {
     const ui = indicator();
     if (ui.root) {
@@ -723,6 +765,7 @@
 
   window.InvittaCloudBridge = Object.freeze({
     save,
+    publish,
     open: openModal,
     reload() {
       const targetProject = cloudProjectFromUrl() || state.projectId;

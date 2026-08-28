@@ -2665,6 +2665,23 @@ function setupHeaderActions() {
       newTab.document.close();
     }
   });
+
+  // 5. Publicar en la URL pública independiente.
+  const publishButton = document.getElementById('btnPublishInvitation');
+  if (publishButton) {
+    publishButton.addEventListener('click', async () => {
+      if (!window.InvittaCloudBridge || typeof window.InvittaCloudBridge.publish !== 'function') {
+        showToast('La publicación en nube no está disponible');
+        return;
+      }
+      publishButton.disabled = true;
+      try {
+        await window.InvittaCloudBridge.publish();
+      } finally {
+        publishButton.disabled = false;
+      }
+    });
+  }
 }
 
 // ==================== TOAST HELPER ====================
