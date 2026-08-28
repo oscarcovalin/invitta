@@ -694,10 +694,10 @@
         { contentType: 'text/html;charset=utf-8', upsert: true }
       );
       if (uploadError) throw uploadError;
-      const { data: publicUrl } = state.client.storage.from('invitta-2-published').getPublicUrl(details.storage_path);
+      const publicUrl = `${window.location.origin}/i/${encodeURIComponent(details.slug)}`;
       setCloudStatus('Publicada', '#1d8a55', 'Invitación publicada y lista para compartir');
       notify('Invitación publicada. Copia el enlace para compartirla.');
-      window.prompt('Invitación publicada. Copia este enlace:', publicUrl.publicUrl);
+      window.prompt('Invitación publicada. Copia este enlace:', publicUrl);
       return true;
     } catch (error) {
       console.error('Invitta Cloud publish error:', error);
