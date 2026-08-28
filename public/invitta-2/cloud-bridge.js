@@ -4,6 +4,8 @@
   const config = window.INVITTA2_CLOUD_CONFIG || {};
   const sdk = window.supabase;
   const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const MAGIC_LINK_COOLDOWN_MS = 60 * 1000;
+  const magicLinkCooldownKey = `${config.authStorageKey || 'invitta-2-dev-auth'}:magic-link-requested-at`;
   const state = {
     client: null,
     session: null,
@@ -12,7 +14,8 @@
     version: null,
     identity: null,
     projectStatus: null,
-    loadingProject: false
+    loadingProject: false,
+    cooldownTimer: null
   };
 
   function clone(value) {
@@ -48,6 +51,47 @@
   function cloudProjectFromUrl() {
     const value = new URLSearchParams(window.location.search).get('cloudProject');
     return value && UUID_PATTERN.test(value) ? value : null;
+  }
+
+  function studioRedirectUrl() {
+    const fallback = `${window.location.origin}${window.location.pathname}`;
+    const url = new URL(config.studioPublicBaseUrl || fallback, window.location.origin);
+    const projectId = cloudProjectFromUrl();
+    if (projectId) url.searchParams.set('cloudProject', projectId);
+    return url.toString();
+  }
+
+  function magicLinkCooldownRemaining() {
+    const requestedAt = Number(window.localStorage.getItem(magicLinkCooldownKey) || 0);
+    return Math.max(0, MAGIC_LINK_COOLDOWN_MS - (Date.now() - requestedAt));
+  }
+
+  function refreshMagicLinkCooldown() {
+    const modal = document.getElementById('invittaCloudModal');
+    if (!modal || state.session) return;
+    const submit = modal.querySelector('button[type="submit"]');
+    const message = modal.querySelector('#invittaCloudMessage');
+    const remaining = magicLinkCooldownRemaining();
+    if (!submit || !message) return;
+
+    if (state.cooldownTimer) window.clearTimeout(state.cooldownTimer);
+    if (!remaining) {
+      submit.disabled = false;
+      return;
+    }
+
+    submit.disabled = true;
+    message.textContent = `Enlace enviado. Espera ${Math.ceil(remaining / 1000)} s antes de solicitar otro.`;
+    state.cooldownTimer = window.setTimeout(refreshMagicLinkCooldown, Math.min(1000, remaining));
+  }
+
+  function authCallbackError() {
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const code = hash.get('error_code');
+    if (!code) return '';
+    window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.search}`);
+    if (code === 'otp_expired') return 'El enlace de acceso ya venció o fue usado. Solicita uno nuevo desde este Studio publicado.';
+    return 'No se pudo completar el acceso. Solicita un enlace nuevo desde este Studio publicado.';
   }
 
   function projectName(projectData) {
@@ -301,6 +345,7 @@
     const modal = ensureModal();
     refreshModal();
     modal.classList.add('open');
+    refreshMagicLinkCooldown();
     const focusTarget = state.session
       ? modal.querySelector('[data-cloud-close].primary')
       : modal.querySelector('#invittaCloudEmail');
@@ -321,17 +366,30 @@
     const email = emailInput.value.trim();
     if (!email) return;
 
+    if (magicLinkCooldownRemaining()) {
+      refreshMagicLinkCooldown();
+      return;
+    }
+
     submit.disabled = true;
     message.textContent = 'Enviando enlace seguro…';
-    const redirectUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+    const redirectUrl = studioRedirectUrl();
     const { error } = await state.client.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: redirectUrl, shouldCreateUser: true }
     });
-    submit.disabled = false;
-    message.textContent = error
-      ? `No se pudo enviar: ${error.message}`
-      : 'Revisa tu correo y abre el enlace de acceso en este navegador.';
+    if (error) {
+      submit.disabled = false;
+      const isRateLimit = /rate limit|too many|over_email_send_rate_limit/i.test(`${error.code || ''} ${error.message || ''}`);
+      message.textContent = isRateLimit
+        ? 'El correo integrado alcanzó su límite. Espera antes de intentarlo de nuevo; para uso continuo configuraremos SMTP propio.'
+        : `No se pudo enviar: ${error.message}`;
+      return;
+    }
+
+    window.localStorage.setItem(magicLinkCooldownKey, String(Date.now()));
+    message.textContent = 'Revisa tu correo y abre el enlace en este navegador. El siguiente envío estará disponible en 60 s.';
+    refreshMagicLinkCooldown();
   }
 
   async function signOut() {
@@ -561,6 +619,8 @@
       }
     });
 
+    const callbackError = authCallbackError();
+
     const { data, error } = await state.client.auth.getSession();
     if (error) console.warn('Invitta Cloud session error:', error);
     state.session = data ? data.session : null;
@@ -585,7 +645,13 @@
       if (targetProject) await loadProject(targetProject);
     } else {
       setCloudStatus('Solo local', '#b7791f', 'Haz clic para conectar Invitta Cloud');
-      if (cloudProjectFromUrl()) openModal();
+      if (cloudProjectFromUrl() || callbackError) {
+        openModal();
+        if (callbackError) {
+          const message = ensureModal().querySelector('#invittaCloudMessage');
+          if (message) message.textContent = callbackError;
+        }
+      }
     }
 
     const saveButton = document.getElementById('btnExportJson');
