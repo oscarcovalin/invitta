@@ -75,7 +75,7 @@
       <button id="btnSwitchCam" class="p-2 rounded-lg bg-neutral-900/80 border border-white/10 text-neutral-300 hover:text-amber-300 transition-colors" title="Cambiar Cámara">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
       </button>
-      <a href="generador-emergencia.html" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 border border-blue-400/50 text-blue-200 text-xs font-bold flex items-center gap-1 hover:bg-blue-600/50 transition-colors">
+    <a href="generador-emergencia.html" data-operations-link class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 border border-blue-400/50 text-blue-200 text-xs font-bold flex items-center gap-1 hover:bg-blue-600/50 transition-colors">
         <span>⚡ Emergencia</span>
       </a>
     </div>
@@ -230,7 +230,16 @@
   <script src="guest-manager.js"></script>
   <script>
     // Inicializar Motor
-    const guestManager = new GuestManager();
+    const accessCloudProjectId = new URLSearchParams(window.location.search).get('cloudProject');
+    const accessStorageSuffix = accessCloudProjectId ? `_cloud_${accessCloudProjectId}` : '';
+    const guestManager = new GuestManager({ storageKey: `invitta_seating_state_v2${accessStorageSuffix}` });
+    if (accessCloudProjectId) {
+      document.querySelectorAll('[data-operations-link]').forEach(link => {
+        const target = new URL(link.getAttribute('href'), window.location.href);
+        target.searchParams.set('cloudProject', accessCloudProjectId);
+        link.href = target.pathname.split('/').pop() + target.search;
+      });
+    }
     let currentScannedGuest = null;
     let admittedPassesCount = 1;
     let maxAuthorizedPasses = 1;

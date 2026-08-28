@@ -16,7 +16,9 @@ class GuestManager {
         eventDate: '20 de Marzo, 2027',
         venue: 'Jardín Las Magnolias',
         rsvpDeadline: '15 de Febrero, 2027',
-        baseUrl: options.baseUrl || (typeof window !== 'undefined' && window.location ? window.location.href.split('index.html')[0] : '')
+        baseUrl: options.baseUrl || (typeof window !== 'undefined' && window.location
+          ? new URL('.', window.location.href).toString().replace(/\/$/, '')
+          : '')
       }
     }, options);
 
