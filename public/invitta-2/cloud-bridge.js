@@ -587,7 +587,7 @@
     if (!state.session) {
       openModal();
       setCloudStatus('Conectar nube', '#b7791f', 'Inicia sesión para guardar en invitta-2-dev');
-      return true;
+      return false;
     }
 
     const button = document.getElementById('btnExportJson');
@@ -602,7 +602,7 @@
         if (!createConfirmed) {
           setCloudStatus('Nube lista', '#1d8a55', 'Creación cancelada; no se guardaron cambios');
           notify('Creación de proyecto cancelada');
-          return true;
+          return false;
         }
         await createCloudProject(projectData);
       } else if (state.projectStatus === 'archived') {
@@ -612,7 +612,7 @@
         if (!copyConfirmed) {
           setCloudStatus(`Nube v${state.version}`, '#1d8a55', 'Proyecto archivado; guardado cancelado');
           notify('El proyecto archivado no fue modificado');
-          return true;
+          return false;
         }
         await createCloudProject(projectData);
       } else if (state.identity !== projectIdentity(projectData.config)) {
@@ -622,7 +622,7 @@
         if (!identityConfirmed) {
           setCloudStatus(`Nube v${state.version}`, '#1d8a55', 'Cambio de identidad cancelado');
           notify('El proyecto original no fue modificado');
-          return true;
+          return false;
         }
         await createCloudProject(projectData);
       } else {
@@ -641,6 +641,7 @@
 
       setCloudStatus(`Nube v${state.version}`, '#1d8a55', 'Guardado verificado en invitta-2-dev');
       notify(`Proyecto guardado en la nube · versión ${state.version}`);
+      return true;
     } catch (error) {
       console.error('Invitta Cloud save error:', error);
       const conflict = error.code === '40001' || /version conflict/i.test(error.message || '');
@@ -648,10 +649,10 @@
       notify(conflict
         ? 'Existe una versión más reciente. Recarga antes de guardar.'
         : `No se pudo guardar en la nube: ${error.message}`);
+      return false;
     } finally {
       if (button) button.disabled = false;
     }
-    return true;
   }
 
   function proposedSlug(project) {
@@ -669,31 +670,41 @@
       notify('Inicia sesión para publicar la invitación');
       return false;
     }
-    const project = studio().getState();
-    await save(project);
-    if (!state.projectId || !state.designId || !window.TemplateEngine) return false;
+    try {
+      const project = studio().getState();
+      const saved = await save(project);
+      if (!saved || !state.projectId || !state.designId || !window.TemplateEngine) {
+        notify('No se publicó: primero hay que guardar el proyecto correctamente.');
+        return false;
+      }
 
-    const slug = window.prompt('Elige el enlace público (solo minúsculas, números y guiones):', proposedSlug(project));
-    if (!slug) return false;
-    setCloudStatus('Publicando…', '#b7791f', 'Generando la invitación pública');
-    const { data: published, error: publishError } = await state.client.rpc('publish_invitation_project', {
-      p_project_id: state.projectId,
-      p_slug: slug
-    });
-    if (publishError) throw publishError;
-    const details = Array.isArray(published) ? published[0] : published;
-    const html = window.TemplateEngine.generateHTML(project.config, project.themeName, project.customTheme, window.DECOR_ASSETS || {});
-    const { error: uploadError } = await state.client.storage.from('invitta-2-published').upload(
-      details.storage_path,
-      new Blob([html], { type: 'text/html;charset=utf-8' }),
-      { contentType: 'text/html;charset=utf-8', upsert: true }
-    );
-    if (uploadError) throw uploadError;
-    const { data: publicUrl } = state.client.storage.from('invitta-2-published').getPublicUrl(details.storage_path);
-    setCloudStatus('Publicada', '#1d8a55', 'Invitación publicada y lista para compartir');
-    notify('Invitación publicada. Copia el enlace para compartirla.');
-    window.prompt('Invitación publicada. Copia este enlace:', publicUrl.publicUrl);
-    return true;
+      const slug = window.prompt('Elige el enlace público (solo minúsculas, números y guiones):', proposedSlug(project));
+      if (!slug) return false;
+      setCloudStatus('Publicando…', '#b7791f', 'Generando la invitación pública');
+      const { data: published, error: publishError } = await state.client.rpc('publish_invitation_project', {
+        p_project_id: state.projectId,
+        p_slug: slug
+      });
+      if (publishError) throw publishError;
+      const details = Array.isArray(published) ? published[0] : published;
+      const html = window.TemplateEngine.generateHTML(project.config, project.themeName, project.customTheme, window.DECOR_ASSETS || {});
+      const { error: uploadError } = await state.client.storage.from('invitta-2-published').upload(
+        details.storage_path,
+        new Blob([html], { type: 'text/html;charset=utf-8' }),
+        { contentType: 'text/html;charset=utf-8', upsert: true }
+      );
+      if (uploadError) throw uploadError;
+      const { data: publicUrl } = state.client.storage.from('invitta-2-published').getPublicUrl(details.storage_path);
+      setCloudStatus('Publicada', '#1d8a55', 'Invitación publicada y lista para compartir');
+      notify('Invitación publicada. Copia el enlace para compartirla.');
+      window.prompt('Invitación publicada. Copia este enlace:', publicUrl.publicUrl);
+      return true;
+    } catch (error) {
+      console.error('Invitta Cloud publish error:', error);
+      setCloudStatus('Error al publicar', '#b42318', error.message || 'No se pudo publicar la invitación');
+      notify(`No se pudo publicar: ${error.message || 'intenta de nuevo'}`);
+      return false;
+    }
   }
 
   async function initialize() {
