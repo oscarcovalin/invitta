@@ -205,6 +205,32 @@
       }
     });
 
+    async function copyLocalText(text) {
+      if (!text) return false;
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (error) {}
+      }
+      const helper = document.createElement('textarea');
+      helper.value = text;
+      helper.setAttribute('readonly', '');
+      helper.style.position = 'fixed';
+      helper.style.opacity = '0';
+      document.body.appendChild(helper);
+      helper.select();
+      const copied = document.execCommand('copy');
+      helper.remove();
+      return copied;
+    }
+
+    function getTableOccupancy(tableId) {
+      return guestManager.state.guests
+        .filter(guest => guest.tableId === tableId)
+        .reduce((total, guest) => total + (guest.passes || guest.pases || 1), 0);
+    }
+
     // Emisión de Pase de Emergencia
     function emitEmergencyPass() {
       const name = document.getElementById('inputEmergName').value.trim();
@@ -213,6 +239,15 @@
       const autoCheckin = document.getElementById('checkAutoCheckin').checked;
 
       if (!name) return;
+
+      const table = guestManager.state.tables.find(item => item.id === tableId);
+      const occupied = getTableOccupancy(tableId);
+      const available = Math.max(0, (table?.capacity || 0) - occupied);
+      if (table && currentPassCount > available) {
+        const excess = currentPassCount - available;
+        const proceed = confirm(`⚠️ ${table.name} tiene ${occupied}/${table.capacity} lugares ocupados.\n\nEste pase de ${currentPassCount} persona(s) excederá la capacidad por ${excess}.\n\n¿Emitirlo de todas formas como excepción de emergencia?`);
+        if (!proceed) return;
+      }
 
       const result = guestManager.createEmergencyGuest({
         name: name,
@@ -284,14 +319,16 @@
     // Copiar Enlace
     document.getElementById('btnCopyInviteLink').addEventListener('click', async () => {
       if (generatedGuestUrl) {
-        try {
-          await navigator.clipboard.writeText(generatedGuestUrl);
+        const copied = await copyLocalText(generatedGuestUrl);
+        if (copied) {
           const btn = document.getElementById('btnCopyInviteLink');
           btn.innerHTML = '<span>✓ ¡Copiado!</span>';
           setTimeout(() => {
             btn.innerHTML = '<span>📋 Copiar Enlace</span>';
           }, 2000);
-        } catch (e) {}
+        } else {
+          alert(`No se pudo copiar automáticamente. Copia este enlace:\n${generatedGuestUrl}`);
+        }
       }
     });
 
