@@ -53,12 +53,12 @@
 
       <!-- Enlaces Master / Salón (Ocultos en Modo Diseñador) -->
       <div id="adminNavigationLinks" style="display:inline-flex; align-items:center; gap:8px;">
-        <a href="index.html" class="btn btn-secondary" title="Ir al Portal de Módulos (Inicio)">
+        <a href="index.html" data-project-context-link class="btn btn-secondary" title="Ir al Portal de Módulos (Inicio)">
           <span class="material-symbols-outlined">apps</span>
           Portal
         </a>
 
-        <a href="organizador-mesas.html" class="btn btn-secondary" style="background:#163C2B; color:#C7B299; border-color:#A38047;" title="Ir al Organizador de Mesas y Centro de Envíos">
+        <a href="organizador-mesas.html" data-project-context-link class="btn btn-secondary" style="background:#163C2B; color:#C7B299; border-color:#A38047;" title="Ir al Organizador de Mesas y Centro de Envíos">
           <span class="material-symbols-outlined">table_restaurant</span>
           Mesas & Envíos
         </a>
@@ -1973,6 +1973,21 @@
         if (adminLinks) adminLinks.style.display = 'none';
         if (badge) badge.style.display = 'inline-flex';
       }
+    })();
+  </script>
+  <script>
+    // El Estudio sigue siendo un módulo independiente; esta capa solo conserva
+    // el evento activo cuando se navega al Portal o al Organizador.
+    (function preserveProjectContext() {
+      const params = new URLSearchParams(window.location.search);
+      const key = params.has('cloudProject') ? 'cloudProject' : (params.has('project') ? 'project' : '');
+      const value = key ? params.get(key) : '';
+      if (!value) return;
+      document.querySelectorAll('[data-project-context-link]').forEach(link => {
+        const target = new URL(link.getAttribute('href'), window.location.href);
+        target.searchParams.set(key, value);
+        link.href = target.pathname.split('/').pop() + target.search;
+      });
     })();
   </script>
 </body>
