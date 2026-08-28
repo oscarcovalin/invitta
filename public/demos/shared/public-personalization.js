@@ -467,6 +467,7 @@
     // in parents, RSVP or the closing never inherit the cover scale.
     Array.from(document.querySelectorAll("h1,h2,h3,span")).forEach(function(element) {
       if (element.dataset.invittaMidnightCouplePiece === "true") return;
+      if (element.tagName === "SPAN" && element.closest("[data-invitta-split-name='true']")) return;
       var visible = clean(element.textContent);
       var isExactFullName = visible.toLocaleLowerCase() === fullName.toLocaleLowerCase();
       var isHeroNamePart = nameParts.some(function(part) {
@@ -501,15 +502,28 @@
       document.head.appendChild(style);
     }
 
-    // Midnight Gold renders each member of the couple in a separate span. Its
-    // date must follow the complete couple block, not the first member.
-    var isMidnightWedding = templateId === "boda-midnight-gold-vip" && isWedding;
-    var midnightCouple = isMidnightWedding ? document.querySelector("#hero h2[data-invitta-midnight-couple]") : null;
-    var coverName = midnightCouple || Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
+    // Both premium wedding covers render each member of the couple in separate
+    // spans. Anchor editorial metadata to the complete heading so the date can
+    // never be inserted between the bride and groom.
+    var usesSplitWeddingHero = isWedding && (
+      templateId === "boda-classic-basic" ||
+      templateId === "boda-midnight-gold-vip" ||
+      templateId === "boda-golden-romance-premium"
+    );
+    var splitWeddingSelector = templateId === "boda-classic-basic"
+      ? "#hero h2.font-serif"
+      : "#hero h2.font-display";
+    var splitWeddingCouple = usesSplitWeddingHero ? document.querySelector(splitWeddingSelector) : null;
+    var coverName = splitWeddingCouple || Array.from(document.querySelectorAll("[data-invitta-cover-name-size]")).find(function(element) {
       return element.offsetParent !== null;
     });
     if (!coverName) return;
-    var hero = coverName.closest("#hero,#cover,#portada,#inv-hero,[class*='hero'],[class*='cover']") || coverName.parentElement;
+    // Prefer an explicit hero ancestor. A cover name such as `.hero__name`
+    // also matches `[class*='hero']`; treating that leaf as the container
+    // makes each observer pass append another date beside it.
+    var hero = coverName.closest("#hero,#cover,#portada,#inv-hero") ||
+      (coverName.parentElement && coverName.parentElement.closest("[class*='hero'],[class*='cover']")) ||
+      coverName.parentElement;
     if (!hero) return;
 
     var eventTitle = clean(data.eventTitle).toLocaleLowerCase();
@@ -530,20 +544,76 @@
       existingDate.textContent = dateText;
       existingDate.dataset.invittaEditorialDate = "true";
       if (!existingDate.dataset.invittaFontRole) existingDate.dataset.invittaFontRole = "label";
-      if (midnightCouple && existingDate.previousElementSibling !== midnightCouple) {
-        midnightCouple.insertAdjacentElement("afterend", existingDate);
+      if (splitWeddingCouple && existingDate.previousElementSibling !== splitWeddingCouple) {
+        splitWeddingCouple.insertAdjacentElement("afterend", existingDate);
       }
       return;
     }
 
     // Some React templates omit a hero date entirely. Add only that missing
-    // datum directly after the real name; never duplicate an existing date.
+    // datum directly after the complete real name block; never duplicate it.
     var date = document.createElement("p");
     date.className = "invitta-editorial-cover-date";
     date.dataset.invittaEditorialDate = "true";
     date.dataset.invittaFontRole = "label";
     date.textContent = dateText;
     coverName.insertAdjacentElement("afterend", date);
+  }
+
+  function applyRoseGoldXvHeroName() {
+    if (!isTemplate("xv-rose-gold-premium", "xv-premium-2")) return;
+
+    var heading = document.querySelector("#hero h2.font-display");
+    if (!heading) return;
+    var spans = Array.from(heading.children).filter(function(element) {
+      return element.tagName === "SPAN";
+    }).slice(0, 3);
+    if (spans.length < 2) return;
+
+    var parts = personNameParts(data.celebrantName);
+    var values = [parts.first, parts.middle, parts.last];
+    spans.forEach(function(span, index) {
+      var value = values[index] || "";
+      span.textContent = value;
+      span.style.setProperty("display", value ? "block" : "none", "important");
+      span.removeAttribute("data-invitta-cover-name-size");
+      span.dataset.invittaDynamicText = "true";
+    });
+
+    heading.dataset.invittaSplitName = "true";
+    heading.dataset.invittaCoverNameSize = "true";
+    heading.dataset.invittaFontRole = "cover-name";
+  }
+
+  function applyXvHeroSafety() {
+    var isElegance = isTemplate("xv-elegance-basic", "xv-elegance");
+    var isChampagne = isTemplate("xv-champagne-rose-vip", "xv-vip-3");
+    if (!isElegance && !isChampagne) return;
+
+    if (!document.getElementById("invitta-xv-hero-safety")) {
+      var style = document.createElement("style");
+      style.id = "invitta-xv-hero-safety";
+      style.textContent = [
+        "[data-invitta-xv-hero-quote]{width:100%!important;max-width:15rem!important;padding-right:1rem!important;box-sizing:border-box!important;white-space:normal!important;overflow-wrap:break-word!important;}",
+        "[data-invitta-xv-hero-name]{width:calc(100% - 3rem)!important;max-width:calc(100vw - 3rem)!important;margin-inline:1.5rem!important;box-sizing:border-box!important;}",
+        "[data-invitta-xv-hero-name]>span{max-width:100%!important;overflow-wrap:break-word!important;word-break:normal!important;}",
+        "@media(min-width:768px){[data-invitta-xv-hero-quote]{max-width:24rem!important;padding-right:2rem!important;}}"
+      ].join("");
+      document.head.appendChild(style);
+    }
+
+    if (isElegance) {
+      var expectedQuote = clean(data.quote);
+      var quote = Array.from(document.querySelectorAll("#hero p")).find(function(element) {
+        return expectedQuote && clean(element.textContent) === expectedQuote;
+      });
+      if (quote) quote.dataset.invittaXvHeroQuote = "true";
+    }
+
+    if (isChampagne) {
+      var heading = document.querySelector("#hero h2.font-display");
+      if (heading) heading.dataset.invittaXvHeroName = "true";
+    }
   }
 
   function applyPlumNoirWeddingAdapter() {
@@ -591,7 +661,10 @@
       style.id = "invitta-midnight-couple-layout";
       style.textContent = [
         "#hero h2[data-invitta-midnight-couple]{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:clamp(.12rem,1vw,.4rem)!important;max-width:100%!important;}",
-        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]{display:block!important;margin:0!important;max-width:100%!important;overflow-wrap:anywhere!important;text-wrap:balance!important;}",
+        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]{display:block!important;max-width:100%!important;overflow-wrap:anywhere!important;text-wrap:balance!important;}",
+        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(1){margin:0!important;}",
+        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(2){margin:0 0 0 clamp(1rem,6vw,2.25rem)!important;max-width:calc(100% - clamp(1rem,6vw,2.25rem))!important;}",
+        "#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(3){margin:0 0 0 clamp(2.5rem,14vw,5.25rem)!important;max-width:calc(100% - clamp(2.5rem,14vw,5.25rem))!important;}",
         "@media(max-width:767px){#hero h2[data-invitta-midnight-couple]{gap:.2rem!important;line-height:1!important;}#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(1),#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(3){font-size:clamp(2.55rem,12.4vw,3.2rem)!important;line-height:.96!important;letter-spacing:-.035em!important;}#hero h2[data-invitta-midnight-couple] [data-invitta-midnight-couple-piece]:nth-child(2){font-size:clamp(2rem,10vw,2.8rem)!important;line-height:.8!important;}}"
       ].join("");
       document.head.appendChild(style);
@@ -3269,6 +3342,8 @@
     installRsvpFormBridge();
     hideLegacyGuestAdmin();
     restoreCanonicalNameCasing();
+    applyRoseGoldXvHeroName();
+    applyXvHeroSafety();
     applyPlumNoirWeddingAdapter();
     applyCoverNameSizing();
     applyEditorialCoverMeta();

@@ -1,0 +1,297 @@
+.invitta-premium-extra {
+  position: relative;
+  width: 100%;
+  padding: clamp(5rem, 10vw, 8rem) clamp(1.25rem, 6vw, 5rem);
+  overflow: hidden;
+  border-top: 1px solid color-mix(in srgb, var(--color-outline-variant, #f0e2de) 82%, transparent);
+  background: var(--color-paper, #fdfaf8);
+  color: var(--color-ink, #1e1b1a);
+  font-family: var(--font-sans, "Hanken Grotesk", sans-serif);
+}
+
+.invitta-premium-extra--album {
+  background: var(--color-surface-container-low, #faf3f1);
+}
+
+.invitta-premium-extra::before {
+  content: "";
+  position: absolute;
+  inset: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--color-sage, #ab8478) 24%, transparent);
+  pointer-events: none;
+}
+
+.invitta-extra__header,
+.invitta-extra__album-layout,
+.invitta-extra__hotel-grid {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 68rem);
+  margin-inline: auto;
+}
+
+.invitta-extra__header {
+  max-width: 44rem;
+  margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+  text-align: center;
+}
+
+.invitta-extra__kicker {
+  display: block;
+  color: var(--color-sage, #ab8478);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+}
+
+.invitta-extra__title,
+.invitta-extra__subtitle {
+  font-family: var(--font-display, "Playfair Display", serif);
+  font-weight: 400;
+}
+
+.invitta-extra__title {
+  margin-top: 1rem;
+  font-size: clamp(2.2rem, 7vw, 4rem);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.invitta-extra__description,
+.invitta-extra__copy {
+  color: var(--color-on-surface-variant, #6b5853);
+  line-height: 1.75;
+}
+
+.invitta-extra__description {
+  max-width: 38rem;
+  margin: 1.25rem auto 0;
+  font-size: .92rem;
+}
+
+.invitta-extra__album-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.invitta-extra__panel,
+.invitta-extra__hotel {
+  border: 1px solid color-mix(in srgb, var(--color-sage, #ab8478) 34%, transparent);
+  background: color-mix(in srgb, var(--color-paper, #fdfaf8) 94%, transparent);
+  box-shadow: 0 1.5rem 4rem rgba(62, 40, 33, .07);
+}
+
+.invitta-extra__panel {
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+}
+
+.invitta-extra__subtitle {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  line-height: 1.2;
+}
+
+.invitta-extra__copy {
+  margin-top: .9rem;
+  font-size: .9rem;
+}
+
+.invitta-extra__controls {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.invitta-extra__field-label {
+  display: grid;
+  gap: .55rem;
+  color: var(--color-sage, #ab8478);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.invitta-extra__file,
+.invitta-extra__input {
+  width: 100%;
+  min-height: 2.9rem;
+  border: 1px solid color-mix(in srgb, var(--color-sage, #ab8478) 40%, transparent);
+  background: var(--color-paper, #fdfaf8);
+  color: var(--color-ink, #1e1b1a);
+  font-size: .86rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.invitta-extra__file {
+  padding: .65rem;
+}
+
+.invitta-extra__input {
+  padding: .75rem 1rem;
+}
+
+.invitta-extra__button {
+  min-height: 3.2rem;
+  padding: .9rem 1rem;
+  border: 1px solid var(--color-primary, #8e665c);
+  background: var(--color-primary, #8e665c);
+  color: var(--color-paper, #fdfaf8);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity .2s ease, background .2s ease;
+}
+
+.invitta-extra__button:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+
+.invitta-extra__button:not(:disabled):hover {
+  background: var(--color-sage, #ab8478);
+}
+
+.invitta-extra__button:focus-visible,
+.invitta-extra__file:focus-visible,
+.invitta-extra__input:focus-visible,
+.invitta-extra__hotel-link:focus-visible {
+  outline: 2px solid var(--color-champagne-gold, #dfba6b);
+  outline-offset: 3px;
+}
+
+.invitta-extra__status {
+  min-height: 1.25rem;
+  color: var(--color-on-surface-variant, #6b5853);
+  font-size: .8rem;
+}
+
+.invitta-extra__access-note {
+  display: grid;
+  min-height: 12rem;
+  margin-top: 1.75rem;
+  padding: 1.5rem;
+  place-content: center;
+  gap: .8rem;
+  border: 1px solid color-mix(in srgb, var(--color-sage, #ab8478) 34%, transparent);
+  color: var(--color-sage, #ab8478);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+}
+
+.invitta-extra__camera {
+  font-size: 2rem;
+}
+
+.invitta-extra__access-note strong {
+  font-size: .68rem;
+}
+
+.invitta-extra__photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+}
+
+.invitta-extra__photo {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-sage, #ab8478) 28%, transparent);
+  background: var(--color-paper, #fdfaf8);
+}
+
+.invitta-extra__photo-image {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.invitta-extra__photo-caption {
+  display: grid;
+  gap: .2rem;
+  padding: .8rem;
+  color: var(--color-on-surface-variant, #6b5853);
+  font-size: .75rem;
+}
+
+.invitta-extra__photo-caption strong {
+  color: var(--color-ink, #1e1b1a);
+}
+
+.invitta-extra__empty {
+  grid-column: 1 / -1;
+  min-height: 12rem;
+  display: grid;
+  padding: 1.5rem;
+  place-items: center;
+  border: 1px dashed color-mix(in srgb, var(--color-sage, #ab8478) 38%, transparent);
+  color: var(--color-on-surface-variant, #6b5853);
+  font-size: .84rem;
+  text-align: center;
+}
+
+.invitta-extra__hotel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.invitta-extra__hotel {
+  min-height: 15rem;
+  display: flex;
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+  flex-direction: column;
+}
+
+.invitta-extra__hotel-detail,
+.invitta-extra__hotel-link {
+  margin-top: 1rem;
+  color: var(--color-on-surface-variant, #6b5853);
+  font-size: .88rem;
+  line-height: 1.6;
+}
+
+.invitta-extra__hotel-link {
+  width: fit-content;
+  color: var(--color-sage, #ab8478);
+  text-decoration: none;
+}
+
+.invitta-extra__hotel-link--map {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 760px) {
+  .invitta-premium-extra {
+    padding: 5.5rem 1.5rem;
+  }
+
+  .invitta-premium-extra::before {
+    inset: .75rem;
+  }
+
+  .invitta-extra__album-layout,
+  .invitta-extra__hotel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invitta-extra__photo-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .invitta-extra__photo-grid {
+    grid-template-columns: 1fr;
+  }
+}

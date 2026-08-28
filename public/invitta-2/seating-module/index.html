@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Organizador de Mesas — Invitta Studio</title>
+
+  <!-- Google Fonts Oficiales -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-high": "#e9e8e8",
+            "on-secondary-container": "#6e6354",
+            "soft-linen": "#F5F2ED",
+            "stone-deep": "#262626",
+            "surface": "#faf9f9",
+            "surface-variant": "#e3e2e2",
+            "outline-variant": "#c4c7c7",
+            "secondary-fixed": "#f0e0cd",
+            "on-error": "#ffffff",
+            "on-tertiary-fixed-variant": "#474743",
+            "surface-tint": "#5f5e5e",
+            "tertiary-fixed-dim": "#c9c6c2",
+            "surface-container": "#efeded",
+            "surface-container-lowest": "#ffffff",
+            "outline": "#747878",
+            "charcoal": "#3A3A3A",
+            "inverse-surface": "#2f3031",
+            "on-tertiary-fixed": "#1c1c19",
+            "primary-container": "#3a3a3a",
+            "secondary-container": "#f0e0cd",
+            "on-error-container": "#93000a",
+            "primary": "#242525",
+            "tertiary-fixed": "#e5e2dd",
+            "on-primary-fixed-variant": "#474747",
+            "surface-bright": "#faf9f9",
+            "on-primary-container": "#a5a4a3",
+            "secondary": "#685d4e",
+            "error-container": "#ffdad6",
+            "primary-fixed-dim": "#c8c6c6",
+            "on-secondary-fixed-variant": "#4f4538",
+            "tertiary-container": "#3a3a37",
+            "surface-container-low": "#f4f3f3",
+            "on-secondary-fixed": "#221a0f",
+            "on-tertiary": "#ffffff",
+            "warm-grey": "#8C8C8C",
+            "on-tertiary-container": "#a5a49f",
+            "tertiary": "#252422",
+            "on-primary": "#ffffff",
+            "surface-container-highest": "#e3e2e2",
+            "on-background": "#1b1c1c",
+            "inverse-primary": "#c8c6c6",
+            "on-secondary": "#ffffff",
+            "error": "#ba1a1a",
+            "background": "#faf9f9",
+            "primary-fixed": "#e4e2e1",
+            "secondary-fixed-dim": "#d3c4b2",
+            "on-surface-variant": "#444748",
+            "brushed-champagne": "#C7B299",
+            "on-surface": "#1b1c1c",
+            "on-primary-fixed": "#1b1c1c",
+            "inverse-on-surface": "#f2f0f0",
+            "surface-dim": "#dbdad9"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gap-sm": "1rem",
+            "unit": "4px",
+            "gap-md": "2rem",
+            "gap-lg": "4rem",
+            "gap-xs": "0.5rem",
+            "max-width": "1440px",
+            "margin-page": "5vw",
+            "sidebar-width": "300px",
+            "section-padding": "2rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Inter", "sans-serif"],
+            "headline-xl": ["Playfair Display", "serif"],
+            "label-caps": ["Inter", "sans-serif"],
+            "display-lg": ["Playfair Display", "serif"],
+            "headline-lg-mobile": ["Playfair Display", "serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
+            "headline-lg": ["Playfair Display", "serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          },
+          "fontSize": {
+            "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-xl": ["36px", { "lineHeight": "1.2", "fontWeight": "400" }],
+            "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.15em", "fontWeight": "500" }],
+            "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "1.3", "fontWeight": "400" }],
+            "body-md": ["15px", { "lineHeight": "1.5", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "1", "fontWeight": "400" }],
+            "headline-lg": ["28px", { "lineHeight": "1.3", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar {
+      display: block;
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #e3e2e2;
+      border-radius: 4px;
+    }
+
+    .cursor-grab {
+      cursor: grab;
+    }
+    .cursor-grab:active {
+      cursor: grabbing;
+    }
+
+    /* Animación Suave de Entrada para Asientos */
+    @keyframes dropInertia {
+      0% { transform: scale(0.85); opacity: 0; }
+      60% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .seat-pill {
+      animation: dropInertia 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      background: rgba(20, 20, 22, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+<body class="bg-background font-body-md text-on-surface antialiased flex h-screen overflow-hidden select-none">
+
+  <!-- ==================== BARRA LATERAL FIJA (300px) ==================== -->
+  <aside class="fixed left-0 top-0 h-full w-[300px] bg-surface-container-lowest border-r border-outline-variant z-50 flex flex-col pt-8">
+    
+    <!-- Logo Oficial Invitta Studio -->
+    <a href="../index.html" class="px-7 mb-9 flex items-center gap-3.5 group" title="Ir al Dashboard Principal">
+      <div class="w-10 h-10 rounded-xl bg-primary text-surface-container-lowest flex items-center justify-center shadow-md flex-shrink-0 border border-outline-variant/60 group-hover:scale-105 transition-transform">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L19 9L12 16L5 9L12 2Z" stroke="#C7B299" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M12 7L16 11L12 15L8 11L12 7Z" fill="#C7B299" fill-opacity="0.3"/>
+          <line x1="12" y1="16" x2="12" y2="22" stroke="#C7B299" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="8" y1="22" x2="16" y2="22" stroke="#C7B299" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="12" cy="11" r="1.5" fill="#C7B299"/>
+        </svg>
+      </div>
+      <div class="flex flex-col justify-center">
+        <span class="font-headline-lg text-primary tracking-widest uppercase text-xl leading-none font-normal">Invitta</span>
+        <span class="font-label-caps text-on-surface-variant tracking-[0.25em] text-[10.5px] uppercase mt-1">Studio</span>
+      </div>
+    </a>
+
+    <!-- NAVEGACIÓN TOTALMENTE CONECTADA -->
+    <nav class="flex-1 flex flex-col gap-1.5 px-4" id="sidebarNav">
+      
+      <!-- 1. Resumen (Dashboard Central) -->
+      <a href="../index.html" class="nav-item group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" title="Dashboard Principal de Invitaciones">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px] group-hover:text-primary transition-colors">dashboard</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Resumen</span>
+      </a>
+
+      <!-- 2. Invitados (Módulo RSVP & Confirmaciones) -->
+      <a href="../rsvp-module/index.html" class="nav-item group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" title="Laboratorio de Confirmación RSVP">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px] group-hover:text-primary transition-colors">group</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Invitados & RSVP</span>
+      </a>
+
+      <!-- 3. Mesas (PÁGINA ACTIVA) -->
+      <a aria-current="page" href="#" class="nav-item group flex items-center px-5 py-3.5 rounded-lg transition-all duration-300 bg-surface-container-high text-primary font-semibold shadow-sm" title="Organizador de Mesas y Floor Plan">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px]">table_restaurant</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Mesas (Floor Plan)</span>
+      </a>
+
+      <!-- 4. Catering (Tabla Táctica WeasyPrint) -->
+      <a href="../catering-module/catering-tactical-sheet.html" target="_blank" rel="noopener noreferrer" class="nav-item group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" title="Abrir Tabla Táctica de Catering en Nueva Pestaña">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px] group-hover:text-primary transition-colors">restaurant_menu</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Catering Táctico ↗</span>
+      </a>
+
+      <!-- 5. Cronograma (Modal de Itinerario) -->
+      <button type="button" id="btnOpenTimeline" class="nav-item w-full text-left group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" title="Cronograma e Itinerario del Evento">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px] group-hover:text-primary transition-colors">calendar_today</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Cronograma</span>
+      </button>
+
+      <!-- 6. Configuración (Modal de Parámetros de Mesas) -->
+      <button type="button" id="btnOpenSettings" class="nav-item w-full text-left group flex items-center px-5 py-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-300" title="Ajustes de Capacidad y Exportación">
+        <span class="material-symbols-outlined mr-4 font-light text-[20px] group-hover:text-primary transition-colors">settings</span>
+        <span class="font-label-caps uppercase tracking-widest text-xs">Configuración</span>
+      </button>
+
+      <div class="my-2 border-t border-outline-variant/60"></div>
+
+      <!-- 7. Estudio de Invitación Digital -->
+      <a href="../invitacion-estudio.html" target="_blank" rel="noopener noreferrer" class="nav-item group flex items-center px-4 py-2.5 rounded-xl text-amber-950 bg-amber-50/80 hover:bg-amber-100/90 transition-all text-xs font-semibold" title="Abrir Estudio Generador de Invitación">
+        <span class="material-symbols-outlined mr-3 font-light text-[18px] text-amber-700">auto_fix_high</span>
+        <span class="tracking-wide">Estudio de Invitación ↗</span>
+      </a>
+
+      <!-- 8. Ver Invitación Digital Real -->
+      <a href="../invitacion.html" target="_blank" rel="noopener noreferrer" class="nav-item group flex items-center px-4 py-2.5 rounded-xl text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition-all text-xs font-semibold" title="Abrir Invitación Digital Real en Pantalla Completa">
+        <span class="material-symbols-outlined mr-3 font-light text-[18px] text-emerald-700">visibility</span>
+        <span class="tracking-wide">Ver Invitación Real ↗</span>
+      </a>
+
+    </nav>
+
+    <!-- Indicador de Enlace en Vivo en Footer de Sidebar -->
+    <div class="px-7 py-5 border-t border-outline-variant/60 flex items-center gap-2.5 text-on-surface-variant">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="font-label-sm text-[10px] tracking-wider uppercase">Todos los módulos conectados</span>
+    </div>
+  </aside>
+
+  <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+  <div class="pl-[300px] flex-1 flex flex-col h-full overflow-hidden">
+    
+    <!-- HEADER SUPERIOR -->
+    <header class="h-20 bg-surface-container-lowest/90 backdrop-blur-md z-40 px-8 flex items-center justify-between border-b border-outline-variant flex-shrink-0">
+      <div class="flex items-center bg-surface-container px-4 py-2.5 rounded-lg border border-outline-variant w-96">
+        <span class="material-symbols-outlined text-on-surface-variant font-light text-[20px] mr-3">search</span>
+        <input class="bg-transparent border-none focus:ring-0 text-sm text-on-surface placeholder-on-surface-variant w-full outline-none" placeholder="Buscar invitado o mesa..." type="text">
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <a href="../scanner-acceso.html" target="_blank" class="flex items-center gap-1.5 px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl transition-all shadow-sm text-xs font-bold tracking-wide">
+          <span class="material-symbols-outlined text-base">qr_code_scanner</span>
+          <span>Escáner Puerta ↗</span>
+        </a>
+        <a href="../generador-emergencia.html" target="_blank" class="flex items-center gap-1.5 px-3 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-xl transition-all shadow-sm text-xs font-bold tracking-wide">
+          <span class="material-symbols-outlined text-base">bolt</span>
+          <span>Pase Emergencia ↗</span>
+        </a>
+        <button class="text-on-surface-variant hover:text-primary transition-colors p-2 relative" title="Notificaciones" onclick="alert('✦ No hay alertas pendientes en la recepción.')">
+          <span class="material-symbols-outlined font-light text-[22px]">notifications</span>
+          <span class="w-2 h-2 rounded-full bg-amber-500 absolute top-2 right-2"></span>
+        </button>
+        <a href="../index.html" class="w-9 h-9 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary hover:bg-surface-container transition-colors" title="Ver Perfil de Anfitrión">
+          <span class="material-symbols-outlined text-primary font-light text-[18px]">person</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- ÁREA DE TRABAJO (Stats Bar + Layout de 2 Columnas) -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-background">
+      
+      <!-- STATS BAR SUPERIOR -->
+      <div class="flex flex-wrap items-center justify-between px-8 py-5 bg-surface-container-lowest border-b border-outline-variant flex-shrink-0 z-10">
+        <div class="flex gap-10">
+          
+          <!-- Asignados -->
+          <div class="flex flex-col gap-1">
+            <span class="font-label-caps text-on-surface-variant uppercase tracking-widest text-[11px]">Asignados</span>
+            <div class="flex items-baseline gap-2">
+              <span class="font-headline-xl text-primary font-normal" id="statAssignedCount">2</span>
+              <span class="font-body-md text-on-surface-variant" id="statTotalCount">/ 14</span>
+            </div>
+          </div>
+          
+          <div class="w-px h-12 bg-outline-variant"></div>
+          
+          <!-- Sin Asignar -->
+          <div class="flex flex-col gap-1">
+            <span class="font-label-caps text-on-surface-variant uppercase tracking-widest text-[11px]">Sin Asignar</span>
+            <span class="font-headline-xl text-charcoal font-normal" id="statUnassignedCount">12</span>
+          </div>
+
+          <div class="w-px h-12 bg-outline-variant"></div>
+
+          <!-- Ocupación -->
+          <div class="flex flex-col gap-1">
+            <span class="font-label-caps text-on-surface-variant uppercase tracking-widest text-[11px]">Ocupación</span>
+            <div class="flex items-center gap-4 mt-1.5">
+              <div class="w-36 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                <div class="h-full bg-charcoal rounded-full transition-all duration-500" id="statProgressBar" style="width: 14%;"></div>
+              </div>
+              <span class="font-label-sm text-on-surface-variant font-mono" id="statPercent">14%</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Alerta de Sobrecupo & Botón Nueva Mesa -->
+        <div class="flex items-center gap-4">
+          <div id="statOvercapacityBadge" class="flex items-center gap-2 px-4 py-2 bg-surface-container text-on-surface-variant border border-outline-variant rounded-lg">
+            <span class="material-symbols-outlined font-light text-[18px]">info</span>
+            <span class="font-label-caps">0 Sobrecupo</span>
+          </div>
+          
+          <button type="button" id="btnAddNewTable" class="flex items-center gap-2 px-6 py-2.5 bg-primary text-on-primary font-label-caps tracking-widest uppercase rounded-lg hover:bg-charcoal transition-colors shadow-sm text-xs">
+            <span class="material-symbols-outlined font-light text-[18px]">add</span>
+            <span>Nueva Mesa</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- WORKSPACE AREA: 2 COLUMNAS -->
+      <div class="flex flex-1 overflow-hidden">
+        
+        <!-- SIDEBAR IZQUIERDA: PENDIENTES & FAMILIAS (w-96) -->
+        <div class="w-96 bg-surface-container-lowest border-r border-outline-variant flex flex-col h-full z-10 shrink-0">
+          
+          <div class="p-6 border-b border-outline-variant bg-surface-container-lowest">
+            <h2 class="font-headline-lg text-primary mb-4 flex items-center gap-3 text-2xl">
+              <span class="material-symbols-outlined font-light text-[24px]">group</span>
+              <span>Pendientes</span>
+            </h2>
+
+            <!-- Búsqueda reactiva -->
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-light text-[18px]">search</span>
+              <input id="searchGuestsInput" class="w-full bg-surface-container rounded-lg py-2.5 pl-11 pr-4 text-sm text-on-surface placeholder-on-surface-variant focus:outline-none border border-outline-variant focus:border-charcoal transition-all" placeholder="Buscar familia o invitado..." type="text">
+            </div>
+          </div>
+
+          <!-- LISTA SCROLLABLE DE INVITADOS -->
+          <div class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar" id="unassignedList"></div>
+
+        </div>
+
+        <!-- CANVAS: FLOOR PLAN (bg-soft-linen) -->
+        <div class="flex-1 bg-soft-linen relative overflow-auto p-10 custom-scrollbar" id="floorPlanCanvas">
+          
+          <!-- Decoración Gráfica Sutil de Fondo -->
+          <div class="absolute top-8 right-8 w-64 h-40 opacity-15 pointer-events-none rounded-lg overflow-hidden mix-blend-multiply grayscale">
+            <div class="w-full h-full border border-dashed border-charcoal/40 flex items-center justify-center text-center p-4">
+              <span class="font-label-caps text-[9px] uppercase tracking-widest text-charcoal/60">Plano Arquitectónico · Salón Las Magnolias</span>
+            </div>
+          </div>
+
+          <!-- CONTENEDOR DE MESAS: Presidencia Superior + Alas Izquierda / Derecha -->
+          <div class="w-full max-w-[1020px] mx-auto relative pt-4 pb-20" id="tablesContainer"></div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- FOOTER FIJO -->
+    <footer class="h-14 bg-surface-container-lowest border-t border-outline-variant z-40 px-8 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-8">
+        <div class="flex items-center gap-2.5">
+          <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span class="font-label-caps text-on-surface-variant uppercase tracking-widest text-[10.5px]">Sincronización Activa</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined font-light text-[18px] text-on-surface-variant">chair</span>
+          <span class="font-label-caps text-on-surface-variant uppercase tracking-widest text-[10.5px]">Capacidad Salón: 300 Pases</span>
+        </div>
+      </div>
+      <div class="font-label-sm text-on-surface-variant opacity-60 uppercase tracking-widest text-[10px]">
+        v2.4.0-lux // invitta-engine-stable
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==================== MODAL: CRONOGRAMA / ITINERARIO ==================== -->
+  <div id="modalTimeline" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-6 hidden">
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl w-full max-w-lg shadow-2xl p-7 flex flex-col gap-6 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-outline-variant pb-4">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-lg bg-surface-container text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-base">calendar_today</span>
+          </span>
+          <div>
+            <h3 class="font-headline-lg text-primary text-xl font-normal">Cronograma del Evento</h3>
+            <span class="font-label-caps text-on-surface-variant text-[10px]">Programa sincronizado desde la Invitación Digital (Catalina & Julián)</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal text-on-surface-variant hover:text-primary text-2xl font-light">&times;</button>
+      </div>
+
+      <div class="space-y-3 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar text-xs" id="timelineListContainer">
+        <!-- 1. 18:00 HRS · Ceremonia Religiosa -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">church</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Ceremonia Religiosa</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">18:00 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Parroquia San Rafael · Av. de las Rosas 123</p>
+          </div>
+        </div>
+
+        <!-- 2. 19:00 HRS · Boda Civil -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">favorite</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Boda Civil</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">19:00 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Firma de Actas & Brindis de Honor</p>
+          </div>
+        </div>
+
+        <!-- 3. 20:00 HRS · Recepción -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">celebration</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Recepción</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">20:00 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Jardín Las Magnolias · Cóctel de Bienvenida</p>
+          </div>
+        </div>
+
+        <!-- 4. 20:30 HRS · Cena -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">restaurant_menu</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Cena / Banquete Nupcial</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">20:30 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Salón Principal · Protocolo Táctico de Catering</p>
+          </div>
+        </div>
+
+        <!-- 5. 21:30 HRS · Todo mundo a bailar -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">nightlife</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Todo mundo a bailar</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">21:30 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Vals de los Novios, Apertura de Pista & Fiesta</p>
+          </div>
+        </div>
+
+        <!-- 6. 02:00 HRS · Fin del evento -->
+        <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-surface border border-outline-variant hover:border-amber-400/50 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">directions_car</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-primary text-xs">Fin del Evento</h4>
+              <span class="font-mono font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded text-[11px]">02:00 HRS</span>
+            </div>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Cierre de Celebración & Agradecimientos</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pie del Modal con Enlace a la Invitación -->
+      <div class="flex items-center justify-between pt-3 border-t border-outline-variant">
+        <a href="../invitacion-estudio.html" target="_blank" rel="noopener noreferrer" class="text-xs text-amber-800 hover:text-amber-950 font-semibold flex items-center gap-1 transition-colors" title="Editar Itinerario en el Estudio de Invitación">
+          <span class="material-symbols-outlined text-sm text-amber-700">edit_calendar</span>
+          <span>Editar Programa en Invitación ↗</span>
+        </a>
+        <button type="button" class="btn-close-modal px-5 py-2 rounded-xl bg-primary text-white text-xs tracking-wider uppercase hover:bg-charcoal transition-colors font-medium">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: CONFIGURACIÓN DE MESAS ==================== -->
+  <div id="modalSettings" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-6 hidden">
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl w-full max-w-lg shadow-2xl p-7 flex flex-col gap-6 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-outline-variant pb-4">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-lg bg-surface-container text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-base">settings</span>
+          </span>
+          <div>
+            <h3 class="font-headline-lg text-primary text-xl font-normal">Configuración del Salón</h3>
+            <span class="font-label-caps text-on-surface-variant text-[10px]">Ajustes de Capacidad & Exportación</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal text-on-surface-variant hover:text-primary text-2xl font-light">&times;</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        
+        <!-- 1. Entrada de Invitados Contemplados & Calculadora de Mesas -->
+        <div class="p-4 rounded-xl bg-surface-container border border-outline-variant space-y-3">
+          <div class="flex items-center justify-between">
+            <label for="inputContemplatedGuests" class="font-label-caps text-primary font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base text-amber-700">groups</span>
+              Total de Invitados Contemplados
+            </label>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary font-bold" id="badgeQuickRatio">12 Mesas requeridas</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1">
+              <input type="number" id="inputContemplatedGuests" min="1" max="1500" value="120"
+                class="w-full bg-surface border border-outline-variant rounded-xl py-2 px-3.5 text-lg font-headline-lg font-bold text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+              <span class="absolute right-3 top-2.5 text-[11px] text-on-secondary-container font-mono">comensales</span>
+            </div>
+            
+            <!-- Botones Rápidos de Escala -->
+            <div class="flex gap-1">
+              <button type="button" class="btn-quick-guests px-2.5 py-2 rounded-lg bg-surface border border-outline-variant hover:border-primary text-[10.5px] font-mono text-primary font-semibold transition-all" data-val="80">80</button>
+              <button type="button" class="btn-quick-guests px-2.5 py-2 rounded-lg bg-surface border border-outline-variant hover:border-primary text-[10.5px] font-mono text-primary font-semibold transition-all" data-val="120">120</button>
+              <button type="button" class="btn-quick-guests px-2.5 py-2 rounded-lg bg-surface border border-outline-variant hover:border-primary text-[10.5px] font-mono text-primary font-semibold transition-all" data-val="150">150</button>
+              <button type="button" class="btn-quick-guests px-2.5 py-2 rounded-lg bg-surface border border-outline-variant hover:border-primary text-[10.5px] font-mono text-primary font-semibold transition-all" data-val="200">200</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Entrada de Invitados en Mesa Imperial (Presidencia / Novios & Corte) -->
+        <div class="p-4 rounded-xl bg-amber-50/80 border border-amber-300/70 space-y-3">
+          <div class="flex items-center justify-between">
+            <label for="inputImperialGuests" class="text-amber-950 font-bold uppercase tracking-wider text-[10.5px] flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base text-amber-700">stars</span>
+              Invitados en Mesa Imperial (Presidencia)
+            </label>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-200/80 text-amber-900 font-bold" id="badgeImperialRatio">Novios & Corte (10 pases)</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1">
+              <input type="number" id="inputImperialGuests" min="2" max="30" value="10"
+                class="w-full bg-white border border-amber-300/80 rounded-xl py-2 px-3.5 text-lg font-['Cinzel'] font-bold text-amber-950 focus:outline-none focus:border-amber-700">
+              <span class="absolute right-3 top-2.5 text-[11px] text-amber-800 font-mono">asientos</span>
+            </div>
+            
+            <!-- Botones Rápidos Mesa Imperial -->
+            <div class="flex gap-1">
+              <button type="button" class="btn-quick-imperial px-2 py-2 rounded-lg bg-white border border-amber-300/70 hover:border-amber-700 text-[10px] font-mono text-amber-900 font-bold transition-all" data-val="6">6</button>
+              <button type="button" class="btn-quick-imperial px-2 py-2 rounded-lg bg-white border border-amber-300/70 hover:border-amber-700 text-[10px] font-mono text-amber-900 font-bold transition-all" data-val="8">8</button>
+              <button type="button" class="btn-quick-imperial px-2 py-2 rounded-lg bg-white border border-amber-300/70 hover:border-amber-700 text-[10px] font-mono text-amber-900 font-bold transition-all" data-val="10">10</button>
+              <button type="button" class="btn-quick-imperial px-2 py-2 rounded-lg bg-white border border-amber-300/70 hover:border-amber-700 text-[10px] font-mono text-amber-900 font-bold transition-all" data-val="12">12</button>
+              <button type="button" class="btn-quick-imperial px-2 py-2 rounded-lg bg-white border border-amber-300/70 hover:border-amber-700 text-[10px] font-mono text-amber-900 font-bold transition-all" data-val="14">14</button>
+            </div>
+          </div>
+          <p class="text-[10px] text-amber-800/90 leading-tight">
+            Asientos reservados para los Novios y Corte. El resto (<strong id="labelRemainingGuests" class="font-bold text-amber-950">110 comensales</strong>) se distribuirá en las mesas de las alas izquierda y derecha.
+          </p>
+        </div>
+
+        <!-- 3. Selector de Acomodo por Mesa (8, 10 y 12) -->
+        <div>
+          <label class="font-label-caps text-on-surface-variant uppercase tracking-wider block mb-2">
+            Acomodo de Invitados en Mesas Circulares (Salón)
+          </label>
+          <div class="grid grid-cols-3 gap-2.5" id="capacitySelectorGroup">
+            
+            <!-- Opción 8 -->
+            <button type="button" class="btn-capacity-card active p-3 rounded-xl border border-primary bg-primary/10 text-center flex flex-col items-center gap-1 transition-all" data-capacity="8">
+              <span class="font-headline-lg text-primary text-lg font-bold">8</span>
+              <span class="font-label-caps text-[9.5px] uppercase tracking-wider text-on-secondary-container font-semibold">Por Mesa</span>
+              <span class="text-[9.5px] text-primary font-mono font-bold" id="tablesNeeded8">14 mesas</span>
+            </button>
+
+            <!-- Opción 10 -->
+            <button type="button" class="btn-capacity-card p-3 rounded-xl border border-outline-variant bg-surface-container text-center flex flex-col items-center gap-1 hover:border-primary transition-all" data-capacity="10">
+              <span class="font-headline-lg text-primary text-lg font-bold">10</span>
+              <span class="font-label-caps text-[9.5px] uppercase tracking-wider text-on-secondary-container font-semibold">Por Mesa</span>
+              <span class="text-[9.5px] text-on-secondary-container font-mono font-bold" id="tablesNeeded10">11 mesas</span>
+            </button>
+
+            <!-- Opción 12 -->
+            <button type="button" class="btn-capacity-card p-3 rounded-xl border border-outline-variant bg-surface-container text-center flex flex-col items-center gap-1 hover:border-primary transition-all" data-capacity="12">
+              <span class="font-headline-lg text-primary text-lg font-bold">12</span>
+              <span class="font-label-caps text-[9.5px] uppercase tracking-wider text-on-secondary-container font-semibold">Por Mesa</span>
+              <span class="text-[9.5px] text-on-secondary-container font-mono font-bold" id="tablesNeeded12">10 mesas</span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- 4. Caja Resumen de Distribución Calculada -->
+        <div class="p-3.5 rounded-xl bg-amber-50/60 border border-amber-400/40 space-y-2.5">
+          <div class="flex items-center justify-between text-[11px]">
+            <span class="font-label-caps text-amber-900 font-bold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base">table_restaurant</span>
+              Cálculo de Distribución del Salón
+            </span>
+            <span class="font-mono text-amber-900 font-bold text-xs" id="calcSummaryBadge">1 Imperial (10) + 14 Circulares (8) = 122 asientos</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 text-center text-[10.5px] font-mono">
+            <div class="p-2 rounded-lg bg-surface border border-outline-variant">
+              <span class="text-on-secondary-container block text-[9.5px]">Mesas Circulares</span>
+              <span class="text-primary font-bold text-xs" id="calcRequiredTables">14 (7 Izq / 7 Der)</span>
+            </div>
+            <div class="p-2 rounded-lg bg-surface border border-outline-variant">
+              <span class="text-on-secondary-container block text-[9.5px]">Capacidad Total</span>
+              <span class="text-primary font-bold text-sm" id="calcTotalCapacity">122</span>
+            </div>
+            <div class="p-2 rounded-lg bg-surface border border-outline-variant">
+              <span class="text-on-secondary-container block text-[9.5px]">Asientos Libres</span>
+              <span class="text-emerald-700 font-bold text-sm" id="calcFreeSeats">2</span>
+            </div>
+          </div>
+
+          <button type="button" id="btnAutoDistribute" class="w-full py-2.5 px-4 rounded-xl bg-primary text-on-primary font-label-caps text-xs tracking-wider uppercase hover:bg-charcoal transition-all shadow-md flex items-center justify-center gap-2 font-semibold">
+            <span class="material-symbols-outlined text-base text-amber-300">magic_button</span>
+            <span>✦ Configurar Salón y Distribuir Invitados ✦</span>
+          </button>
+        </div>
+
+        <!-- 4. Alerta de Sobrecupo & Color -->
+        <div class="flex items-center justify-between pt-1">
+          <span class="font-label-caps text-on-surface-variant uppercase tracking-wider text-[10px]">Alerta de Sobrecupo</span>
+          <div class="flex items-center gap-2">
+            <input type="color" id="cfgOverColor" value="#A38047" class="w-7 h-7 rounded border border-outline-variant cursor-pointer">
+            <span class="font-mono text-xs text-primary font-semibold">#A38047</span>
+          </div>
+        </div>
+
+        <!-- 5. Exportación y Reseteo -->
+        <div class="pt-3 border-t border-outline-variant flex flex-col gap-2">
+          <div class="flex gap-2">
+            <button type="button" id="btnExportSeatingJson" class="flex-1 py-2 px-3 rounded-lg bg-surface-container border border-outline-variant hover:border-charcoal text-primary font-medium flex items-center justify-center gap-1.5 transition-colors text-xs">
+              <span class="material-symbols-outlined text-sm">download</span> Exportar JSON
+            </button>
+            <button type="button" id="btnResetAllTables" class="py-2 px-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-700 hover:bg-rose-500/20 font-medium flex items-center justify-center gap-1.5 transition-colors text-xs">
+              <span class="material-symbols-outlined text-sm">restart_alt</span> Resetear Asignaciones
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-outline-variant">
+        <button type="button" class="btn-close-modal px-5 py-2 rounded-lg bg-primary text-on-primary font-label-caps text-xs tracking-wider uppercase hover:bg-charcoal transition-colors">
+          Guardar & Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT MODULAR DE SEATING PLANNER -->
+  <script src="seating-planner.js"></script>
+
+  <script>
+    // 1. Inicializar instancia de SeatingPlanner conectada al nuevo diseño
+    const planner = new SeatingPlanner({
+      unassignedListSelector: '#unassignedList',
+      tablesContainerSelector: '#tablesContainer',
+      statsAssignedCountSelector: '#statAssignedCount',
+      statsTotalCountSelector: '#statTotalCount',
+      statsUnassignedSelector: '#statUnassignedCount',
+      statsProgressBarSelector: '#statProgressBar',
+      statsPercentSelector: '#statPercent',
+      statsOvercapacityBadgeSelector: '#statOvercapacityBadge',
+      searchInputSelector: '#searchGuestsInput'
+    });
+
+    // 2. Botón Nueva Mesa
+    document.getElementById('btnAddNewTable').addEventListener('click', () => {
+      const type = planner.state.tables.length % 2 === 0 ? 'circular' : 'imperial';
+      planner.addTable('Mesa', type, 8);
+    });
+
+    // 3. Modales y Calculadora de Mesas (Mesa Imperial + Circulares 8, 10, 12)
+    const modalTimeline = document.getElementById('modalTimeline');
+    const modalSettings = document.getElementById('modalSettings');
+    const inputContemplated = document.getElementById('inputContemplatedGuests');
+    const inputImperial = document.getElementById('inputImperialGuests');
+    const badgeQuickRatio = document.getElementById('badgeQuickRatio');
+    const badgeImperialRatio = document.getElementById('badgeImperialRatio');
+    const labelRemainingGuests = document.getElementById('labelRemainingGuests');
+    const tablesNeeded8 = document.getElementById('tablesNeeded8');
+    const tablesNeeded10 = document.getElementById('tablesNeeded10');
+    const tablesNeeded12 = document.getElementById('tablesNeeded12');
+    const calcRequiredTables = document.getElementById('calcRequiredTables');
+    const calcTotalCapacity = document.getElementById('calcTotalCapacity');
+    const calcFreeSeats = document.getElementById('calcFreeSeats');
+    const calcSummaryBadge = document.getElementById('calcSummaryBadge');
+
+    let currentSelectedCapacity = 8;
+
+    function recalculateTablesPlan() {
+      const totalGuests = Math.max(1, parseInt(inputContemplated?.value || '120', 10) || 120);
+      const imperialGuests = Math.max(2, parseInt(inputImperial?.value || '10', 10) || 10);
+      
+      const remainingForSalon = Math.max(0, totalGuests - imperialGuests);
+      if (labelRemainingGuests) labelRemainingGuests.textContent = `${remainingForSalon} comensales`;
+      if (badgeImperialRatio) badgeImperialRatio.textContent = `Novios & Corte (${imperialGuests} pases)`;
+
+      const n8 = Math.ceil(remainingForSalon / 8) || 1;
+      const n10 = Math.ceil(remainingForSalon / 10) || 1;
+      const n12 = Math.ceil(remainingForSalon / 12) || 1;
+
+      if (tablesNeeded8) tablesNeeded8.textContent = `${n8} mesas (${Math.ceil(n8/2)} Izq / ${Math.floor(n8/2)} Der)`;
+      if (tablesNeeded10) tablesNeeded10.textContent = `${n10} mesas (${Math.ceil(n10/2)} Izq / ${Math.floor(n10/2)} Der)`;
+      if (tablesNeeded12) tablesNeeded12.textContent = `${n12} mesas (${Math.ceil(n12/2)} Izq / ${Math.floor(n12/2)} Der)`;
+
+      const activeCircularNeeded = Math.ceil(remainingForSalon / currentSelectedCapacity) || 1;
+      const totalCap = imperialGuests + (activeCircularNeeded * currentSelectedCapacity);
+      const freeSeats = totalCap - totalGuests;
+
+      const leftWingCount = Math.ceil(activeCircularNeeded / 2);
+      const rightWingCount = Math.floor(activeCircularNeeded / 2);
+
+      if (calcRequiredTables) calcRequiredTables.textContent = `${activeCircularNeeded} (${leftWingCount} Izq / ${rightWingCount} Der)`;
+      if (calcTotalCapacity) calcTotalCapacity.textContent = totalCap;
+      if (calcFreeSeats) calcFreeSeats.textContent = freeSeats;
+      if (badgeQuickRatio) badgeQuickRatio.textContent = `${activeCircularNeeded + 1} Mesas en total`;
+      if (calcSummaryBadge) calcSummaryBadge.textContent = `1 Imperial (${imperialGuests}) + ${activeCircularNeeded} Circulares (${currentSelectedCapacity}) = ${totalCap} asientos`;
+    }
+
+    if (inputContemplated) {
+      inputContemplated.addEventListener('input', recalculateTablesPlan);
+    }
+
+    if (inputImperial) {
+      inputImperial.addEventListener('input', recalculateTablesPlan);
+    }
+
+    document.querySelectorAll('.btn-quick-guests').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (inputContemplated) {
+          inputContemplated.value = btn.dataset.val;
+          recalculateTablesPlan();
+        }
+      });
+    });
+
+    document.querySelectorAll('.btn-quick-imperial').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (inputImperial) {
+          inputImperial.value = btn.dataset.val;
+          recalculateTablesPlan();
+        }
+      });
+    });
+
+    document.getElementById('btnOpenTimeline').addEventListener('click', () => {
+      modalTimeline.classList.remove('hidden');
+    });
+
+    document.getElementById('btnOpenSettings').addEventListener('click', () => {
+      recalculateTablesPlan();
+      modalSettings.classList.remove('hidden');
+    });
+
+    document.querySelectorAll('.btn-close-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        modalTimeline.classList.add('hidden');
+        modalSettings.classList.add('hidden');
+      });
+    });
+
+    // 4. Selector de Acomodo de 8, 10 y 12 por mesa
+    document.querySelectorAll('.btn-capacity-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.btn-capacity-card').forEach(b => {
+          b.classList.remove('active', 'border-primary', 'bg-primary/10');
+          b.classList.add('border-outline-variant', 'bg-surface-container');
+        });
+        btn.classList.add('active', 'border-primary', 'bg-primary/10');
+        btn.classList.remove('border-outline-variant', 'bg-surface-container');
+
+        currentSelectedCapacity = parseInt(btn.dataset.capacity, 10) || 8;
+        recalculateTablesPlan();
+      });
+    });
+
+    // 5. Ejecutar Distribución Automática y Ajuste del Salón
+    document.getElementById('btnAutoDistribute').addEventListener('click', () => {
+      const totalGuests = Math.max(1, parseInt(inputContemplated?.value || '120', 10) || 120);
+      const imperialGuests = Math.max(2, parseInt(inputImperial?.value || '10', 10) || 10);
+
+      const summary = planner.configureSalonAndDistribute({
+        totalGuests: totalGuests,
+        imperialCapacity: imperialGuests,
+        circularCapacity: currentSelectedCapacity
+      });
+
+      modalSettings.classList.add('hidden');
+      alert(`✨ ¡Salón Configurado y Distribuido!\n\n• Total de comensales: ${totalGuests}\n• Mesa Imperial (Presidencia): ${imperialGuests} asientos\n• Mesas Circulares: ${summary.circularTablesCount} mesas (${summary.leftWingCount} Ala Izquierda · ${summary.rightWingCount} Ala Derecha)\n• Capacidad total instalada: ${summary.totalCapacity} asientos (${summary.freeSeats} asientos libres).`);
+    });
+
+    // 7. Exportar Plano a JSON
+    document.getElementById('btnExportSeatingJson').addEventListener('click', () => {
+      const jsonStr = JSON.stringify(planner.state, null, 2);
+      navigator.clipboard.writeText(jsonStr).then(() => {
+        alert('✅ Distribución del salón y asignación de mesas copiada al portapapeles en formato JSON.');
+      });
+    });
+
+    // 8. Resetear todas las mesas
+    document.getElementById('btnResetAllTables').addEventListener('click', () => {
+      if (confirm('¿Deseas desasignar a todos los comensales para reiniciar el plano?')) {
+        planner.state.guests.forEach(g => g.tableId = null);
+        planner.updateStateAndDOM();
+        refreshModalStats();
+        modalSettings.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

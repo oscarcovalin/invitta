@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabla Táctica de Catering — Catalina & Julián</title>
+
+  <!-- Tipografía Inter Oficial -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. REGLAS @PAGE PARA WEASYPRINT Y EXPORTACIÓN A PDF IMPRESO
+       ========================================================================== */
+    @page {
+      size: letter portrait;
+      margin: 15mm 12mm 15mm 12mm;
+      
+      @top-left {
+        content: "INVITTA STUDIO · TABLA TÁCTICA DE CATERING";
+        font-family: 'Inter', sans-serif;
+        font-size: 6.5pt;
+        font-weight: 700;
+        color: #163C2B;
+        letter-spacing: 0.12em;
+      }
+      @top-right {
+        content: "CATALINA & JULIÁN · 20 DE MARZO 2027";
+        font-family: 'Inter', sans-serif;
+        font-size: 6.5pt;
+        font-weight: 500;
+        color: #666666;
+        letter-spacing: 0.05em;
+      }
+      @bottom-left {
+        content: "DOCUMENTO OPERATIVO CONFIDENCIAL · USO EXCLUSIVO SERVICIO DE BANQUETES";
+        font-family: 'Inter', sans-serif;
+        font-size: 6pt;
+        color: #888888;
+      }
+      @bottom-right {
+        content: "Página " counter(page) " de " counter(pages);
+        font-family: 'Inter', sans-serif;
+        font-size: 7pt;
+        font-weight: 500;
+        color: #444444;
+      }
+    }
+
+    /* ==========================================================================
+       2. RESET Y ESTILOS BASE
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-weight: 500;
+      font-size: 9pt;
+      line-height: 1.35;
+      color: #1A1A1A;
+      background-color: #F4F4F6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Contenedor de Hoja / Documento */
+    .sheet-wrapper {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      background: #FFFFFF;
+      padding: 24px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+    }
+
+    /* Barra Superior de Control en Pantalla */
+    .screen-toolbar {
+      max-width: 800px;
+      margin: 15px auto 0;
+      padding: 10px 16px;
+      background: #163C2B;
+      color: #FFFFFF;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(22, 60, 43, 0.25);
+    }
+    .screen-toolbar h1 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    .btn-print {
+      background: #A38047;
+      color: #FFFFFF;
+      border: none;
+      padding: 6px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s ease;
+    }
+    .btn-print:hover {
+      background: #8e6c35;
+    }
+
+    /* ==========================================================================
+       3. ENCABEZADO TÁCTICO DEL EVENTO
+       ========================================================================== */
+    .tactical-header {
+      border-bottom: 2px solid #163C2B;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .header-title-block h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 18pt;
+      font-weight: 700;
+      color: #163C2B;
+      letter-spacing: 0.06em;
+      line-height: 1.1;
+      margin-bottom: 2px;
+    }
+    .header-subtitle {
+      font-size: 9pt;
+      font-weight: 600;
+      color: #A38047;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .header-meta-block {
+      text-align: right;
+      font-size: 8pt;
+      color: #444444;
+    }
+    .header-meta-block strong {
+      color: #163C2B;
+    }
+
+    /* Resumen de Métricas de Cocina */
+    .metrics-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .metric-badge {
+      background: #FAF8F5;
+      border: 1px solid #E6DFD5;
+      border-radius: 4px;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    .metric-badge .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12pt;
+      font-weight: 700;
+      color: #163C2B;
+      display: block;
+      line-height: 1.1;
+    }
+    .metric-badge .lbl {
+      font-size: 6.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666666;
+      font-weight: 600;
+    }
+    .metric-badge.highlight-gold {
+      border-color: #A38047;
+      background: rgba(163, 128, 71, 0.07);
+    }
+    .metric-badge.highlight-gold .num {
+      color: #A38047;
+    }
+
+    /* ==========================================================================
+       4. ESTRUCTURA Y ESTILOS DE LA TABLA TÁCTICA
+       ========================================================================== */
+    table.tactical-table {
+      width: 100%;
+      border-collapse: collapse;
+      page-break-inside: auto;
+    }
+
+    thead {
+      display: table-header-group;
+    }
+
+    tfoot {
+      display: table-footer-group;
+    }
+
+    tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Encabezados de Columna (#163C2B) */
+    th.tactical-th {
+      background-color: #163C2B;
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 8px 10px;
+      text-align: left;
+      border-top: 1px solid #163C2B;
+      border-bottom: 2px solid #163C2B;
+    }
+    th.tactical-th.text-center {
+      text-align: center;
+    }
+    th.tactical-th.text-right {
+      text-align: right;
+    }
+
+    /* Celdas de Datos */
+    td.tactical-td {
+      padding: 7px 10px;
+      font-size: 8.2pt;
+      vertical-align: middle;
+      border-bottom: 1px solid #E8E5E0;
+    }
+
+    /* Filas Alternadas (Zebra Striping #FAF8F5 y Blanco Puro) */
+    tr.row-even {
+      background-color: #FFFFFF;
+    }
+    tr.row-odd {
+      background-color: #FAF8F5;
+    }
+
+    /* ==========================================================================
+       5. ALERTAS VIP Y PRIORIDAD (#A38047)
+       ========================================================================== */
+    /* Fila VIP para Padres de los Novios y Miembros de la Corte */
+    tr.row-vip-priority {
+      background-color: rgba(163, 128, 71, 0.09) !important;
+      border-left: 4.5px solid #A38047 !important;
+    }
+    tr.row-vip-priority td.tactical-td:first-child {
+      border-left: 4.5px solid #A38047;
+      font-weight: 700;
+    }
+
+    /* Badges VIP */
+    .vip-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 6.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #A38047;
+      background: rgba(163, 128, 71, 0.15);
+      border: 1px solid rgba(163, 128, 71, 0.35);
+      padding: 1.5px 5px;
+      border-radius: 3px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    /* Badges de Menú y Restricciones */
+    .diet-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 7.5pt;
+      font-weight: 600;
+      padding: 2.5px 6px;
+      border-radius: 3px;
+      line-height: 1.2;
+    }
+    .diet-kids {
+      background-color: #E8F0EC;
+      color: #163C2B;
+      border: 1px solid #163C2B;
+    }
+    .diet-celiac {
+      background-color: #FFF3E0;
+      color: #B25E00;
+      border: 1px solid #FFB74D;
+    }
+    .diet-vegan {
+      background-color: #E8F5E9;
+      color: #1B5E20;
+      border: 1px solid #81C784;
+    }
+    .diet-vegetarian {
+      background-color: #F1F8E9;
+      color: #33691E;
+      border: 1px solid #AED581;
+    }
+    .diet-allergy {
+      background-color: #FFEBEE;
+      color: #B71C1C;
+      border: 1px solid #E57373;
+      font-weight: 700;
+    }
+
+    /* Insignia de Mesa */
+    .table-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      font-weight: 700;
+      background: #163C2B;
+      color: #FFFFFF;
+      padding: 2px 6px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    /* Notas del Chef / Instrucciones */
+    .chef-note {
+      font-size: 7.5pt;
+      color: #555555;
+      font-style: italic;
+      display: block;
+      margin-top: 1px;
+    }
+
+    /* Pie de Página Táctico */
+    .tactical-footer-note {
+      margin-top: 16px;
+      padding-top: 10px;
+      border-top: 1px dashed #A38047;
+      font-size: 7pt;
+      color: #666666;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ==========================================================================
+       6. ESTILOS DE IMPRESIÓN DIRECTA (WEASYPRINT / BROWSER PRINT)
+       ========================================================================== */
+    @media print {
+      body {
+        background: #FFFFFF !important;
+      }
+      .screen-toolbar {
+        display: none !important;
+      }
+      .sheet-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        max-width: 100% !important;
+      }
+      tr.row-vip-priority {
+        background-color: rgba(163, 128, 71, 0.12) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      th.tactical-th {
+        background-color: #163C2B !important;
+        color: #FFFFFF !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      tr.row-odd {
+        background-color: #FAF8F5 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .diet-kids, .diet-celiac, .diet-vegan, .diet-vegetarian, .diet-allergy, .table-pill {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE ACCIÓN SUPERIOR (SOLO VISIBLE EN PANTALLA) -->
+  <div class="screen-toolbar">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="../index.html" style="color:#C7B299; text-decoration:none; font-size:11px; font-weight:600; display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:6px; background:rgba(255,255,255,0.1); transition: background 0.2s;" title="Regresar al Organizador de Mesas">
+        <span>← Volver al Organizador</span>
+      </a>
+      <h1>Documento Táctico de Cocina (Vista Imprimible WeasyPrint)</h1>
+    </div>
+    <button type="button" class="btn-print" onclick="window.print()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+      <span>Imprimir / Exportar a PDF</span>
+    </button>
+  </div>
+
+  <!-- CONTENEDOR DE HOJA IMPRESA -->
+  <div class="sheet-wrapper">
+
+    <!-- ENCABEZADO TÁCTICO -->
+    <header class="tactical-header">
+      <div class="header-title-block">
+        <h1>Catalina & Julián</h1>
+        <p class="header-subtitle">Mapa de Ruta Táctico · Servicio de Catering & Alimentos Especiales</p>
+      </div>
+      <div class="header-meta-block">
+        <p><strong>Fecha:</strong> 20 de Marzo, 2027 · 18:00 hrs</p>
+        <p><strong>Recepción:</strong> Jardín Las Magnolias (Salón Principal)</p>
+        <p><strong>Filtro:</strong> Solo comensales con requerimiento especial</p>
+      </div>
+    </header>
+
+    <!-- RESUMEN DE MÉTRICAS DINÁMICAS DE COCINA -->
+    <div class="metrics-summary" id="metricsSummary">
+      <!-- Inyectado por JS -->
+    </div>
+
+    <!-- TABLA TÁCTICA -->
+    <table class="tactical-table" id="tacticalTable">
+      <thead>
+        <tr>
+          <th class="tactical-th" style="width: 75px;">Mesa</th>
+          <th class="tactical-th" style="width: 175px;">Comensal / Titular</th>
+          <th class="tactical-th text-center" style="width: 60px;">Pases</th>
+          <th class="tactical-th" style="width: 175px;">Tipo de Menú / Requerimiento</th>
+          <th class="tactical-th">Instrucción Especial / Alergias Críticas</th>
+        </tr>
+      </thead>
+      <tbody id="tacticalTableBody">
+        <!-- Inyectado dinámicamente con filtrado estricto -->
+      </tbody>
+    </table>
+
+    <!-- PIE DE HOJA TÁCTICO -->
+    <footer class="tactical-footer-note">
+      <span>✦ Las filas con borde dorado <strong>#A38047</strong> indican comensales prioritarios (Padres de los Novios o Corte de Honor).</span>
+      <span>Invitta Studio · Sistema Operativo de Eventos</span>
+    </footer>
+
+  </div>
+
+  <!-- SCRIPT DE PROCESAMIENTO Y FILTRADO DINÁMICO -->
+  <script>
+    /**
+     * ESTRUCTURA JSON OFICIAL DE LA INVITACIÓN DE CATALINA & JULIÁN
+     * Contiene la corte de honor, los padres de los novios y las respuestas RSVP con asignación de mesas.
+     */
+    const eventConfig = {
+      brideDisplayName: "Catalina",
+      groomDisplayName: "Julián",
+      eventDate: "20 de Marzo, 2027",
+      
+      // Padres de los Novios (VIP Priority)
+      brideFather: "Fernando Martínez Ruiz",
+      brideMother: "Catalina Ruiz de Martínez",
+      groomFather: "Julián Morales Soto",
+      groomMother: "Elena Soto de Morales",
+
+      // Corte de Honor (VIP Priority)
+      court: ["Camila Ortiz", "Renata Vega", "Diego Fuentes", "Emiliano Cruz", "Ximena Paredes"],
+
+      // Respuestas y asignaciones con diversos tipos de menú
+      rsvpResponses: [
+        {
+          id: "rsvp_1",
+          tableNumber: "01",
+          tableName: "Mesa de Honor (Novios & Corte)",
+          nombre: "Renata Vega",
+          pases: 1,
+          tipoMenu: "celiac",
+          menuLabel: "Libre de Gluten (Celíaco)",
+          instruccion: "Celíaca severa. Cero contaminación cruzada con harina o trigo.",
+          isKidMenu: false
+        },
+        {
+          id: "rsvp_2",
+          tableNumber: "01",
+          tableName: "Mesa de Honor (Novios & Corte)",
+          nombre: "Diego Fuentes",
+          pases: 2,
+          tipoMenu: "standard",
+          menuLabel: "Estándar",
+          instruccion: "",
+          isKidMenu: false
+        },
+        {
+          id: "rsvp_3",
+          tableNumber: "02",
+          tableName: "Familia de la Novia",
+          nombre: "Catalina Ruiz de Martínez",
+          pases: 2,
+          tipoMenu: "vegetarian",
+          menuLabel: "Menú Vegetariano",
+          instruccion: "Mamá de la novia. Sin carnes rojas ni mariscos.",
+          isKidMenu: false
+        },
+        {
+          id: "rsvp_4",
+          tableNumber: "02",
+          tableName: "Familia de la Novia",
+          nombre: "Mateo Martínez (Niño)",
+          pases: 1,
+          tipoMenu: "kids",
+          menuLabel: "Menú Infantil",
+          instruccion: "Servir en primer tiempo junto con los novios.",
+          isKidMenu: true
+        },
+        {
+          id: "rsvp_5",
+          tableNumber: "02",
+          tableName: "Familia de la Novia",
+          nombre: "Fernando Martínez Ruiz",
+          pases: 2,
+          tipoMenu: "standard",
+          menuLabel: "Estándar",
+          instruccion: "",
+          isKidMenu: false
+        },
+        {
+          id: "rsvp_6",
+          tableNumber: "03",
+          tableName: "Familia del Novio",
+          nombre: "Elena Soto de Morales",
+          pases: 2,
+          tipoMenu: "allergy_shellfish",
+          menuLabel: "Alergia Severa: Mariscos",
+          instruccion: "Mamá del novio. Alergia anafiláctica a crustáceos y moluscos.",
+          isKidMenu: false
+        },
+        {
+          id: "rsvp_7",
+          tableNumber: "04",
+          tableName: "Amigos de la Universidad",
+          nombre: "Lucía Fernández",
+          pases: 1,
+          tipoMenu: "vegan",
+          menuLabel: "Menú Vegano Estricto",
+          instruccion: "100% plant-based. Sin lácteos, miel ni derivados.",
+          isKidMenu: false
+        },
+        {
+          id: "rsvp_8",
+          tableNumber: "04",
+          tableName: "Amigos de la Universidad",
+          nombre: "Carlos Mendoza",
+          pases: 2,
+          tipoMenu: "standard",
+          menuLabel: "Estándar",
+          instruccion: "",
+          isKidMenu: false
+        },
+        {
+          id: "rsvp_9",
+          tableNumber: "05",
+          tableName: "Familia Foránea",
+          nombre: "Sofía de Valenzuela",
+          pases: 2,
+          tipoMenu: "kids",
+          menuLabel: "Menú Infantil (2 comensales)",
+          instruccion: "2 niños de 4 y 6 años. Servir bebidas sin gas.",
+          isKidMenu: true
+        },
+        {
+          id: "rsvp_10",
+          tableNumber: "05",
+          tableName: "Familia Foránea",
+          nombre: "Dr. Carlos Valenzuela",
+          pases: 2,
+          tipoMenu: "standard",
+          menuLabel: "Estándar",
+          instruccion: "",
+          isKidMenu: false
+        },
+        {
+          id: "rsvp_11",
+          tableNumber: "06",
+          tableName: "Compañeros de Trabajo",
+          nombre: "Valeria Martínez",
+          pases: 1,
+          tipoMenu: "vegetarian",
+          menuLabel: "Menú Ovolactovegetariano",
+          instruccion: "Acepta quesos pasteurizados y huevo.",
+          isKidMenu: false
+        },
+        {
+          id: "rsvp_12",
+          tableNumber: "06",
+          tableName: "Compañeros de Trabajo",
+          nombre: "Mauricio Garza",
+          pases: 2,
+          tipoMenu: "allergy_nuts",
+          menuLabel: "Alergia Severa: Frutos Secos",
+          instruccion: "Sin nuez, cacahuate, almendra ni trazas en postre.",
+          isKidMenu: false
+        }
+      ]
+    };
+
+    /**
+     * ICONOGRAFÍA SVG EN LÍNEA EN COLOR #163C2B
+     */
+    const SVG_ICONS = {
+      // Ícono Minimalista de Menú Infantil en #163C2B
+      kids: `
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#163C2B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px; flex-shrink:0;">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M8 13c1 1.2 2.5 1.8 4 1.8s3-.6 4-1.8"/>
+          <circle cx="9" cy="9.5" r="1" fill="#163C2B"/>
+          <circle cx="15" cy="9.5" r="1" fill="#163C2B"/>
+        </svg>
+      `,
+      // Ícono de Celíaco / Gluten Free
+      celiac: `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#B25E00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px; flex-shrink:0;">
+          <path d="M12 2v20M5 5l14 14M4 12c4 0 7-3 7-7M20 12c-4 0-7 3-7 7"/>
+        </svg>
+      `,
+      // Ícono Botánico Vegano / Vegetariano
+      leaf: `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1B5E20" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px; flex-shrink:0;">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c0 3 0 6.5-1.5 10a7 7 0 0 1-6.5 8z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6"/>
+        </svg>
+      `,
+      // Ícono de Alerta Médica
+      alert: `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#B71C1C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px; flex-shrink:0;">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      `
+    };
+
+    /**
+     * VERIFICACIÓN DE PRIORIDAD VIP (Padres de los Novios o Miembros de la Corte)
+     */
+    function checkVipStatus(nombre, config) {
+      const clean = (nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      
+      // 1. Padres de la Novia y Novio
+      const parents = [
+        config.brideFather,
+        config.brideMother,
+        config.groomFather,
+        config.groomMother
+      ].filter(Boolean).map(p => p.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim());
+
+      const isParent = parents.some(p => p.includes(clean) || clean.includes(p));
+      if (isParent) {
+        return { isVip: true, label: "⭐️ PADRES DE NOVIOS" };
+      }
+
+      // 2. Integrantes del arreglo Court (Corte de Honor)
+      const court = (config.court || []).map(c => c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim());
+      const isCourt = court.some(c => c.includes(clean) || clean.includes(c));
+      if (isCourt) {
+        return { isVip: true, label: "👑 CORTE DE HONOR" };
+      }
+
+      return { isVip: false, label: "" };
+    }
+
+    /**
+     * RENDERIZADO DINÁMICO DE LA TABLA TÁCTICA
+     */
+    function renderTacticalSheet() {
+      const tbody = document.getElementById('tacticalTableBody');
+      const metricsContainer = document.getElementById('metricsSummary');
+
+      // Cargar datos en vivo si existen en localStorage
+      let dataSource = eventConfig.rsvpResponses;
+      try {
+        const raw = localStorage.getItem('invitta_seating_state_v2');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.guests) && Array.isArray(parsed.tables)) {
+            const tableMap = new Map(parsed.tables.map(t => [t.id, t]));
+            dataSource = parsed.guests.map(g => {
+              const tbl = tableMap.get(g.tableId);
+              const tagLower = (g.tag || '').toLowerCase();
+              let tipo = 'standard';
+              let label = 'Menú Estándar';
+              let isKid = false;
+
+              if (tagLower.includes('vegano') || tagLower.includes('veg')) {
+                tipo = 'vegan';
+                label = 'Menú Vegano';
+              } else if (tagLower.includes('gluten') || tagLower.includes('celiac')) {
+                tipo = 'celiac';
+                label = 'Libre de Gluten';
+              } else if (tagLower.includes('niño') || tagLower.includes('silla')) {
+                tipo = 'kids';
+                label = 'Menú Infantil / Silla';
+                isKid = true;
+              } else if (tagLower.includes('alergia') || tagLower.includes('frutos')) {
+                tipo = 'allergy_nuts';
+                label = 'Alergia / Especial';
+              } else if (g.diet && g.diet !== 'none') {
+                tipo = g.diet;
+                label = g.diet;
+              }
+
+              const tableNumRaw = tbl ? (tbl.number || tbl.name.replace(/\D/g, '') || '1') : '99';
+
+              return {
+                tableNumber: String(tableNumRaw).padStart(2, '0'),
+                tableName: tbl ? tbl.name : 'Sin Asignar',
+                nombre: g.name,
+                pases: g.pases || g.passes || 1,
+                tipoMenu: tipo,
+                menuLabel: label,
+                instruccion: g.tag ? `${g.tag}. Servir según especificación.` : 'Servicio estándar según protocolo.',
+                isKidMenu: isKid
+              };
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Usando configuración por defecto de catering', err);
+      }
+
+      // 1. FILTRADO DINÁMICO ESTRICTO:
+      // Se omiten los menús estándar y se conservan únicamente requerimientos especiales, alergias o infantiles
+      const tacticalRows = dataSource.filter(r => {
+        const isStandard = r.tipoMenu === 'standard' || r.tipoMenu === 'none' || (!r.tipoMenu && !r.isKidMenu);
+        return !isStandard; // Excluye comensales sin requerimiento especial
+      });
+
+      // Ordenar por número de mesa para mapa de ruta ordenado
+      tacticalRows.sort((a, b) => parseInt(a.tableNumber, 10) - parseInt(b.tableNumber, 10));
+
+      // Métricas de Cocina
+      const countKids = tacticalRows.filter(r => r.isKidMenu || r.tipoMenu === 'kids').length;
+      const countCeliac = tacticalRows.filter(r => r.tipoMenu === 'celiac').length;
+      const countVeganVeg = tacticalRows.filter(r => r.tipoMenu === 'vegan' || r.tipoMenu === 'vegetarian').length;
+      const countAllergies = tacticalRows.filter(r => r.tipoMenu && r.tipoMenu.startsWith('allergy')).length;
+      const countVip = tacticalRows.filter(r => checkVipStatus(r.nombre, eventConfig).isVip).length;
+
+      metricsContainer.innerHTML = `
+        <div class="metric-badge">
+          <span class="num">${tacticalRows.length}</span>
+          <span class="lbl">Platillos Especiales</span>
+        </div>
+        <div class="metric-badge">
+          <span class="num">${countKids}</span>
+          <span class="lbl">${SVG_ICONS.kids} Menús Infantiles</span>
+        </div>
+        <div class="metric-badge">
+          <span class="num">${countVeganVeg + countCeliac + countAllergies}</span>
+          <span class="lbl">Dietas & Alergias</span>
+        </div>
+        <div class="metric-badge highlight-gold">
+          <span class="num">${countVip}</span>
+          <span class="lbl">Prioridad VIP</span>
+        </div>
+      `;
+
+      // Renderizar Filas
+      tbody.innerHTML = tacticalRows.map((row, index) => {
+        const vip = checkVipStatus(row.nombre, eventConfig);
+        const rowClass = (index % 2 === 0) ? 'row-even' : 'row-odd';
+        const vipClass = vip.isVip ? 'row-vip-priority' : '';
+
+        // Formato del Badge de Menú
+        let badgeHtml = '';
+        if (row.isKidMenu || row.tipoMenu === 'kids') {
+          badgeHtml = `<span class="diet-badge diet-kids">${SVG_ICONS.kids} ${row.menuLabel}</span>`;
+        } else if (row.tipoMenu === 'celiac') {
+          badgeHtml = `<span class="diet-badge diet-celiac">${SVG_ICONS.celiac} ${row.menuLabel}</span>`;
+        } else if (row.tipoMenu === 'vegan') {
+          badgeHtml = `<span class="diet-badge diet-vegan">${SVG_ICONS.leaf} ${row.menuLabel}</span>`;
+        } else if (row.tipoMenu === 'vegetarian') {
+          badgeHtml = `<span class="diet-badge diet-vegetarian">${SVG_ICONS.leaf} ${row.menuLabel}</span>`;
+        } else if (row.tipoMenu && row.tipoMenu.startsWith('allergy')) {
+          badgeHtml = `<span class="diet-badge diet-allergy">${SVG_ICONS.alert} ${row.menuLabel}</span>`;
+        } else {
+          badgeHtml = `<span class="diet-badge" style="background:#ECEFF1; color:#37474F;">${row.menuLabel}</span>`;
+        }
+
+        return `
+          <tr class="${rowClass} ${vipClass}">
+            <td class="tactical-td">
+              <span class="table-pill">MESA ${row.tableNumber}</span>
+              <span style="font-size:6.5pt; color:#666; display:block; margin-top:2px;">${row.tableName}</span>
+            </td>
+            <td class="tactical-td">
+              <strong style="color:#163C2B; font-size:8.5pt;">${row.nombre}</strong>
+              ${vip.isVip ? `<span class="vip-tag">${vip.label}</span>` : ''}
+            </td>
+            <td class="tactical-td text-center" style="font-family:'JetBrains Mono', monospace; font-weight:700;">
+              ${row.pases}
+            </td>
+            <td class="tactical-td">
+              ${badgeHtml}
+            </td>
+            <td class="tactical-td">
+              <span style="font-weight:600; color:#1A1A1A;">${row.instruccion || 'Servicio según protocolo.'}</span>
+              ${vip.isVip ? `<span class="chef-note">★ Prioridad de servicio simultáneo con mesa principal.</span>` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Ejecutar renderizado al cargar
+    document.addEventListener('DOMContentLoaded', renderTacticalSheet);
+  </script>
+</body>
+</html>
