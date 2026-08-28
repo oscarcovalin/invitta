@@ -284,24 +284,25 @@
         // Generar Código QR Autónomo
         const qrContainer = document.getElementById('resultQrContainer');
         qrContainer.innerHTML = '';
-        const qrPayload = JSON.stringify({
-          folio: folio,
-          titular: guest.name,
-          pases: guest.passes,
-          mesa: tableObj ? tableObj.name : guest.tableId,
-          evento: guestManager.options.eventDetails.coupleName,
-          fecha: guestManager.options.eventDetails.eventDate
-        });
+        // El lector valida el folio contra la lista local. Mantener este QR compacto
+        // evita sobrepasar la capacidad del código y no expone datos del invitado.
+        const qrPayload = folio;
 
         if (typeof QRCode !== 'undefined') {
-          new QRCode(qrContainer, {
-            text: qrPayload,
-            width: 150,
-            height: 150,
-            colorDark: "#111827",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.M
-          });
+          try {
+            new QRCode(qrContainer, {
+              text: qrPayload,
+              width: 150,
+              height: 150,
+              colorDark: "#111827",
+              colorLight: "#ffffff",
+              correctLevel: QRCode.CorrectLevel.M
+            });
+          } catch (error) {
+            qrContainer.innerHTML = `<span class="text-[10px] text-center text-neutral-700 font-mono-code px-2">${folio}</span>`;
+          }
+        } else {
+          qrContainer.innerHTML = `<span class="text-[10px] text-center text-neutral-700 font-mono-code px-2">${folio}</span>`;
         }
 
         // WhatsApp Enlace
