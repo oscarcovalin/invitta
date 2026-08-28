@@ -3247,19 +3247,17 @@ if (musicPlayer && audio) {
               dietarySumEl.classList.add('hidden');
             }
 
-            const qrData = JSON.stringify({
-              folio: folio,
-              titular: guestName,
-              pases: confirmedTickets,
-              mesa: mesaCode,
-              evento: calcDisplayName,
-              fecha: CONFIG.eventDateShort || ''
-            });
             const qrContainer = document.getElementById('qrContainer');
             if (qrContainer) {
               qrContainer.innerHTML = '';
               if (typeof QRCode !== 'undefined') {
-                new QRCode(qrContainer, { text: qrData, width: 140, height: 140, colorDark: "#222222", colorLight: "#ffffff" });
+                // El escáner resuelve el detalle del invitado por folio. Un QR
+                // compacto evita desbordamientos y no expone datos personales.
+                try {
+                  new QRCode(qrContainer, { text: folio, width: 140, height: 140, colorDark: "#222222", colorLight: "#ffffff" });
+                } catch (error) {
+                  qrContainer.textContent = folio;
+                }
               }
             }
           } else {
