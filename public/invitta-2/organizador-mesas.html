@@ -656,6 +656,9 @@
             <span class="material-symbols-outlined text-sm">upload</span> Importar respaldo
           </button>
           <input id="inputImportSeatingJson" type="file" accept="application/json,.json" class="hidden">
+          <button type="button" id="btnUndoSeating" disabled class="py-2 px-3 rounded-xl bg-amber-50 border border-amber-400/40 text-amber-900 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-amber-100 font-medium flex items-center justify-center gap-1.5 transition-colors text-xs" title="Revierte la última distribución o reinicio local">
+            <span class="material-symbols-outlined text-sm">undo</span> Deshacer
+          </button>
           <button type="button" id="btnResetAllTables" class="py-2 px-3 rounded-xl bg-rose-50 border border-rose-400/40 text-rose-700 hover:bg-rose-100 font-medium flex items-center justify-center gap-1.5 transition-colors text-xs">
             <span class="material-symbols-outlined text-sm">restart_alt</span> Reiniciar Mesas
           </button>
@@ -1073,6 +1076,34 @@
     const gm = new GuestManager({
       storageKey: `invitta_2_guest_db${operationsStorageSuffix}`
     });
+    let lastSeatingSnapshot = null;
+
+    function rememberSeatingState(label) {
+      lastSeatingSnapshot = { label, state: JSON.parse(JSON.stringify({
+        guests: planner.state.guests,
+        tables: planner.state.tables
+      })) };
+      const undoButton = document.getElementById('btnUndoSeating');
+      if (undoButton) {
+        undoButton.disabled = false;
+        undoButton.title = `Deshacer: ${label}`;
+      }
+    }
+
+    function undoLastSeatingAction() {
+      if (!lastSeatingSnapshot) return;
+      planner.state = { ...lastSeatingSnapshot.state, draggedItem: null };
+      const label = lastSeatingSnapshot.label;
+      lastSeatingSnapshot = null;
+      planner.updateStateAndDOM();
+      updateFooterStats();
+      const undoButton = document.getElementById('btnUndoSeating');
+      if (undoButton) {
+        undoButton.disabled = true;
+        undoButton.title = 'No hay una acción local para deshacer';
+      }
+      alert(`↩️ Se revirtió: ${label}.`);
+    }
 
     // Sincronizar footer y métricas de semáforo de acceso en tiempo real
     function updateAccessTrafficLightStats() {
@@ -1175,6 +1206,7 @@
     });
 
     document.getElementById('btnTopAutoDistribute').addEventListener('click', () => {
+      rememberSeatingState('Auto-distribución');
       planner.autoDistributeGuests({ capacity: currentSelectedCapacity });
       updateFooterStats();
       alert('✨ ¡Salón distribuido automáticamente respetando familias y corte!');
@@ -1543,6 +1575,7 @@
       const totalGuests = Math.max(1, parseInt(inputContemplated?.value || '120', 10) || 120);
       const imperialGuests = Math.max(2, parseInt(inputImperial?.value || '10', 10) || 10);
 
+      rememberSeatingState('Configuración y auto-distribución del salón');
       const summary = planner.configureSalonAndDistribute({
         totalGuests: totalGuests,
         imperialCapacity: imperialGuests,
@@ -1734,12 +1767,15 @@
         return;
       }
       if (confirm('¿Deseas desasignar a todos los comensales para reiniciar el plano?')) {
+        rememberSeatingState('Reinicio de asignaciones');
         planner.state.guests.forEach(g => g.tableId = null);
         planner.updateStateAndDOM();
         updateFooterStats();
         modalSettings.classList.add('hidden');
       }
     });
+
+    document.getElementById('btnUndoSeating').addEventListener('click', undoLastSeatingAction);
 
     // =========================================================================
     // 11. SISTEMA DE CONTROL DE ROLES & DELEGACIÓN DE ACCESOS
