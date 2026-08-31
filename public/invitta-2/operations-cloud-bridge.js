@@ -74,6 +74,11 @@
     return url.toString();
   }
 
+  function getPublicInvitationUrl() {
+    const slug = state.project && state.project.public_slug;
+    return slug ? new URL(`/i/${encodeURIComponent(slug)}`, window.location.origin).toString() : null;
+  }
+
   function subscribeToOperations() {
     if (state.realtimeChannel || !state.client || !state.project) return;
     state.realtimeChannel = state.client
@@ -92,7 +97,8 @@
 
   window.InvittaOperationsCloud = Object.freeze({
     ensureGuestLinks,
-    buildGuestRsvpUrl
+    buildGuestRsvpUrl,
+    getPublicInvitationUrl
   });
 
   function cloneSeatingState() {
@@ -188,7 +194,7 @@
 
       const { data: project, error: projectError } = await state.client
         .from('invitation_projects')
-        .select('id,name,status')
+        .select('id,name,status,public_slug')
         .eq('id', projectId)
         .single();
       if (projectError) throw projectError;

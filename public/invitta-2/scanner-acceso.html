@@ -228,11 +228,19 @@
 
   <!-- CONTROLADOR PRINCIPAL SCANNER JS -->
   <script src="guest-manager.js"></script>
+  <script src="vendor/supabase-2.112.3.js"></script>
+  <script src="cloud-config.js"></script>
   <script>
     // Inicializar Motor
     const accessCloudProjectId = new URLSearchParams(window.location.search).get('cloudProject');
     const accessStorageSuffix = accessCloudProjectId ? `_cloud_${accessCloudProjectId}` : '';
     const guestManager = new GuestManager({ storageKey: `invitta_seating_state_v2${accessStorageSuffix}` });
+    const accessCloud = {
+      client: null,
+      version: 0,
+      active: false,
+      loading: false
+    };
     if (accessCloudProjectId) {
       document.querySelectorAll('[data-operations-link]').forEach(link => {
         const target = new URL(link.getAttribute('href'), window.location.href);
@@ -243,7 +251,7 @@
     let currentScannedGuest = null;
     let admittedPassesCount = 1;
     let maxAuthorizedPasses = 1;
-    let isScanningActive = true;
+    let isScanningActive = !accessCloudProjectId;
     let currentCameraFacing = 'environment';
     let currentStream = null;
 
@@ -284,6 +292,90 @@
     const searchResultsList = document.getElementById('searchResultsList');
     const btnClearSearch = document.getElementById('btnClearSearch');
     const checkinHistoryList = document.getElementById('checkinHistoryList');
+
+    function scannerStateForCloud() {
+      return {
+        seating: {
+          guests: JSON.parse(JSON.stringify(guestManager.state.guests || [])),
+          tables: JSON.parse(JSON.stringify(guestManager.state.tables || []))
+        },
+        guests: JSON.parse(JSON.stringify(guestManager.state || {}))
+      };
+    }
+
+    async function loadScannerCloudState() {
+      if (!accessCloudProjectId) return true;
+      const config = window.INVITTA2_CLOUD_CONFIG;
+      if (!config || !window.supabase) {
+        scanStatus.textContent = 'Acceso en nube no configurado';
+        return false;
+      }
+      accessCloud.loading = true;
+      scanStatus.textContent = 'Cargando lista segura de invitados…';
+      try {
+        accessCloud.client = window.supabase.createClient(config.url, config.publishableKey, {
+          auth: {
+            storageKey: config.authStorageKey || 'invitta-2-dev-auth',
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: false
+          }
+        });
+        const { data: sessionData, error: sessionError } = await accessCloud.client.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!sessionData.session) throw new Error('Inicia sesión en el Studio con la cuenta propietaria antes de abrir el acceso al salón.');
+
+        const { data: record, error: recordError } = await accessCloud.client
+          .from('invitation_operations')
+          .select('seating_state,guest_state,version')
+          .eq('project_id', accessCloudProjectId)
+          .maybeSingle();
+        if (recordError) throw recordError;
+        if (!record) throw new Error('Primero activa y guarda Mesas en la nube para este evento.');
+        if (!record.guest_state || !Array.isArray(record.guest_state.guests)) {
+          throw new Error('La lista de invitados en nube no tiene un formato válido.');
+        }
+
+        guestManager.state = record.guest_state;
+        guestManager.saveState();
+        accessCloud.version = Number(record.version) || 1;
+        accessCloud.active = true;
+        scanStatus.textContent = `Acceso conectado · nube v${accessCloud.version}`;
+        isScanningActive = true;
+        updateMetricsUI();
+        renderCheckinHistory();
+        return true;
+      } catch (error) {
+        console.error('No fue posible preparar el acceso del salón:', error);
+        scanStatus.textContent = error.message || 'No se pudo cargar el acceso del salón';
+        scanStatus.classList.add('text-rose-300', 'border-rose-500/40');
+        isScanningActive = false;
+        return false;
+      } finally {
+        accessCloud.loading = false;
+      }
+    }
+
+    async function saveScannerCloudState() {
+      if (!accessCloudProjectId) return true;
+      if (!accessCloud.active || !accessCloud.client) return false;
+      const snapshot = scannerStateForCloud();
+      const { data, error } = await accessCloud.client.rpc('save_invitation_operations', {
+        p_project_id: accessCloudProjectId,
+        p_expected_version: accessCloud.version,
+        p_seating_state: snapshot.seating,
+        p_guest_state: snapshot.guests
+      });
+      if (error) {
+        const conflict = error.code === '40001' || /version conflict/i.test(error.message || '');
+        throw new Error(conflict
+          ? 'El evento cambió en otra pantalla. Se recargó la lista; vuelve a escanear el pase.'
+          : error.message || 'No se pudo registrar el acceso en nube.');
+      }
+      accessCloud.version = Number(data && data.version) || accessCloud.version + 1;
+      scanStatus.textContent = `Acceso registrado · nube v${accessCloud.version}`;
+      return true;
+    }
 
     // 1. SINTETIZADOR WEB AUDIO API PARA FEEDBACK EN PUERTA
     let audioCtx = null;
@@ -459,13 +551,25 @@
     });
 
     // 7. CONFIRMAR CHECK-IN
-    btnConfirmCheckin.addEventListener('click', () => {
+    btnConfirmCheckin.addEventListener('click', async () => {
       if (!currentScannedGuest) return;
 
+      const stateBeforeCheckin = JSON.parse(JSON.stringify(guestManager.state));
       const result = guestManager.checkInGuest(currentScannedGuest.id, admittedPassesCount);
       if (!result.success) {
         checkinModal.classList.add('hidden');
         rejectScan(result.error || 'No se pudo registrar el acceso');
+        currentScannedGuest = null;
+        return;
+      }
+      try {
+        await saveScannerCloudState();
+      } catch (error) {
+        guestManager.state = stateBeforeCheckin;
+        guestManager.saveState();
+        checkinModal.classList.add('hidden');
+        if (/otra pantalla/i.test(error.message || '')) await loadScannerCloudState();
+        rejectScan(error.message || 'No se pudo registrar el acceso');
         currentScannedGuest = null;
         return;
       }
@@ -607,6 +711,7 @@
       startCamera();
       updateMetricsUI();
       renderCheckinHistory();
+      loadScannerCloudState();
     });
   </script>
 </body>

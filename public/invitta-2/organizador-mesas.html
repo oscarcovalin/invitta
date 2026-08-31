@@ -1657,10 +1657,12 @@
       list.innerHTML = '<div class="py-8 text-center text-sm text-on-surface-variant">Preparando enlaces seguros…</div>';
 
       let secureLinks = new Map();
+      let publicInvitationUrl = null;
       if (window.InvittaOperationsCloud) {
         try {
           await window.InvittaOperationsCloud.ensureGuestLinks();
           secureLinks = new Map(guests.map(g => [g.id, window.InvittaOperationsCloud.buildGuestRsvpUrl(g.id)]));
+          publicInvitationUrl = window.InvittaOperationsCloud.getPublicInvitationUrl();
         } catch (error) {
           console.error('No fue posible preparar enlaces RSVP seguros:', error);
         }
@@ -1685,7 +1687,23 @@
         return url.toString();
       };
 
-      list.innerHTML = guests.map(g => {
+      const publicInvitationCard = publicInvitationUrl ? `
+        <div class="mb-3 rounded-xl border border-emerald-300 bg-emerald-50/70 px-3 py-2.5 flex items-center justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold text-emerald-950">Invitación pública publicada</p>
+            <p class="text-[10px] text-emerald-800">Comparte este enlace general y usa el enlace seguro para el RSVP de cada familia.</p>
+          </div>
+          <button type="button" class="btn-copy-public-invitation px-2 py-1.5 rounded-lg bg-emerald-700 text-white text-[11px] font-semibold whitespace-nowrap" data-url="${escapeDispatchHtml(publicInvitationUrl)}">
+            Copiar invitación
+          </button>
+        </div>
+      ` : `
+        <div class="mb-3 rounded-xl border border-amber-300 bg-amber-50/70 px-3 py-2.5 text-[11px] text-amber-950">
+          Esta invitación aún no tiene enlace público. Vuelve al Estudio y usa <strong>Publicar</strong> antes de enviarla a invitados.
+        </div>
+      `;
+
+      list.innerHTML = publicInvitationCard + guests.map(g => {
         const passes = g.pases || g.passes || 1;
         const cloudInvite = secureLinks.get(g.id);
         const inviteUrl = cloudInvite || getLocalRsvpUrl(g);
@@ -1695,9 +1713,9 @@
         const safeGuestId = escapeDispatchHtml(g.id);
         const safeInviteUrl = escapeDispatchHtml(inviteUrl || '');
         
-        const message = inviteUrl ? `✨ *Invitación Especial de Boda — Catalina & Julián* ✨\n\n` +
+        const message = inviteUrl ? `✨ *Invitación Invitta* ✨\n\n` +
           `Estimad@ *${g.name}*:\n` +
-          `Nos llena de alegría invitarte a celebrar nuestra boda este *20 de Marzo, 2027*.\n\n` +
+          (publicInvitationUrl ? `Conoce todos los detalles del evento aquí:\n${publicInvitationUrl}\n\n` : '') +
           `🎟️ Hemos reservado *${passes} ${passes === 1 ? 'pase' : 'pases'}* para ti.\n\n` +
           `📲 Confirma tu asistencia en tu pase digital interactivo:\n${inviteUrl}\n\n` +
           `¡Esperamos contar con tu valiosa presencia!` : '';
@@ -1757,6 +1775,14 @@
         btn.addEventListener('click', () => {
           copyLocalText(btn.dataset.url).then(copied => {
             alert(copied ? `📋 Enlace copiado:\n${btn.dataset.url}` : `No se pudo copiar automáticamente. Copia este enlace:\n${btn.dataset.url}`);
+          });
+        });
+      });
+
+      list.querySelectorAll('.btn-copy-public-invitation').forEach(btn => {
+        btn.addEventListener('click', () => {
+          copyLocalText(btn.dataset.url).then(copied => {
+            alert(copied ? `📋 Invitación pública copiada:\n${btn.dataset.url}` : `Copia este enlace:\n${btn.dataset.url}`);
           });
         });
       });
