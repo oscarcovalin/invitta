@@ -85,9 +85,7 @@
 
     if (state.pendingEmail && resend) resend.disabled = true;
     else submit.disabled = true;
-    if (!state.pendingEmail || !modal.querySelector('#invittaCloudCode')?.value) {
-      message.textContent = `Código enviado. Espera ${Math.ceil(remaining / 1000)} s antes de solicitar otro.`;
-    }
+    message.textContent = `Enlace enviado. Espera ${Math.ceil(remaining / 1000)} s antes de solicitar otro.`;
     state.cooldownTimer = window.setTimeout(refreshMagicLinkCooldown, Math.min(1000, remaining));
   }
 
@@ -262,15 +260,11 @@
             <label for="invittaCloudEmail">Correo de acceso</label>
             <input id="invittaCloudEmail" type="email" autocomplete="email" required placeholder="tu@correo.com">
           </div>
-          <div class="invitta-cloud-field" id="invittaCloudCodeField" hidden>
-            <label for="invittaCloudCode">Código de 6 dígitos</label>
-            <input id="invittaCloudCode" class="invitta-cloud-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000">
-          </div>
           <p class="invitta-cloud-message" id="invittaCloudMessage" aria-live="polite"></p>
           <div class="invitta-cloud-actions">
             <button type="button" data-cloud-close>Cancelar</button>
-            <button type="button" id="invittaCloudResend" hidden>Reenviar código</button>
-            <button type="submit" class="primary" id="invittaCloudSubmit">Enviar código de acceso</button>
+            <button type="button" id="invittaCloudResend" hidden>Reenviar enlace</button>
+            <button type="submit" class="primary" id="invittaCloudSubmit">Enviar enlace de acceso</button>
           </div>
         </form>
         <div id="invittaCloudAccount" hidden>
@@ -292,8 +286,6 @@
     });
     modal.querySelector('#invittaCloudLoginForm').addEventListener('submit', requestAccessCode);
     modal.querySelector('#invittaCloudResend').addEventListener('click', () => {
-      const code = modal.querySelector('#invittaCloudCode');
-      if (code) code.value = '';
       requestAccessCode();
     });
     modal.querySelector('#invittaCloudSignOut').addEventListener('click', signOut);
@@ -319,18 +311,15 @@
   function setAccessCodeStep(active) {
     const modal = ensureModal();
     const email = modal.querySelector('#invittaCloudEmail');
-    const codeField = modal.querySelector('#invittaCloudCodeField');
-    const code = modal.querySelector('#invittaCloudCode');
     const resend = modal.querySelector('#invittaCloudResend');
     const submit = modal.querySelector('#invittaCloudSubmit');
-    if (!email || !codeField || !code || !resend || !submit) return;
-    codeField.hidden = !active;
+    if (!email || !resend || !submit) return;
     email.readOnly = active;
     email.setAttribute('aria-readonly', String(active));
     resend.hidden = !active;
-    submit.textContent = active ? 'Verificar código' : 'Enviar código de acceso';
+    submit.hidden = active;
+    submit.textContent = 'Enviar enlace de acceso';
     if (!active) {
-      code.value = '';
       state.pendingEmail = '';
     }
   }
@@ -384,7 +373,7 @@
     refreshMagicLinkCooldown();
     const focusTarget = state.session
       ? modal.querySelector('[data-cloud-close].primary')
-      : state.pendingEmail ? modal.querySelector('#invittaCloudCode') : modal.querySelector('#invittaCloudEmail');
+      : state.pendingEmail ? modal.querySelector('#invittaCloudResend') : modal.querySelector('#invittaCloudEmail');
     if (focusTarget) focusTarget.focus();
   }
 
@@ -397,35 +386,10 @@
     if (event) event.preventDefault();
     const modal = ensureModal();
     const emailInput = modal.querySelector('#invittaCloudEmail');
-    const codeInput = modal.querySelector('#invittaCloudCode');
     const message = modal.querySelector('#invittaCloudMessage');
     const submit = modal.querySelector('#invittaCloudSubmit');
     const email = emailInput.value.trim();
     if (!email) return;
-
-    const code = codeInput.value.trim();
-    if (state.pendingEmail && code) {
-      if (!/^\d{6}$/.test(code)) {
-        message.textContent = 'Escribe el código de 6 dígitos que llegó a tu correo.';
-        return;
-      }
-      submit.disabled = true;
-      message.textContent = 'Verificando código…';
-      const { data, error } = await state.client.auth.verifyOtp({ email: state.pendingEmail, token: code, type: 'email' });
-      if (error || !data || !data.session) {
-        submit.disabled = false;
-        message.textContent = 'El código no es válido o ya venció. Solicita uno nuevo.';
-        return;
-      }
-      state.session = data.session;
-      setAccessCodeStep(false);
-      message.textContent = '';
-      setCloudStatus('Nube lista', '#1d8a55', 'Sesión activa en invitta-2-dev');
-      refreshModal();
-      const targetProject = cloudProjectFromUrl();
-      if (targetProject) await loadProject(targetProject);
-      return;
-    }
 
     if (magicLinkCooldownRemaining()) {
       refreshMagicLinkCooldown();
@@ -433,10 +397,13 @@
     }
 
     submit.disabled = true;
-    message.textContent = 'Enviando código seguro…';
+    message.textContent = 'Enviando enlace seguro…';
     const { error } = await state.client.auth.signInWithOtp({
       email,
-      options: { shouldCreateUser: true }
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: studioRedirectUrl()
+      }
     });
     if (error) {
       submit.disabled = false;
@@ -450,9 +417,8 @@
     window.localStorage.setItem(magicLinkCooldownKey, String(Date.now()));
     state.pendingEmail = email;
     setAccessCodeStep(true);
-    message.textContent = 'Revisa tu correo y escribe aquí el código de 6 dígitos. El siguiente envío estará disponible en 60 s.';
+    message.textContent = 'Revisa tu correo y abre el enlace más reciente en este mismo navegador. El siguiente envío estará disponible en 60 s.';
     refreshMagicLinkCooldown();
-    codeInput.focus();
   }
 
   async function signOut() {
