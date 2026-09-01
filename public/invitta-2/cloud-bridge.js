@@ -232,6 +232,7 @@
       .invitta-cloud-field{display:flex;flex-direction:column;gap:7px;margin:15px 0}
       .invitta-cloud-field label{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
       .invitta-cloud-field input{height:44px;border:1px solid #d7d2c8;border-radius:10px;padding:0 12px;font:inherit}
+      .invitta-cloud-field small{color:#777;font-size:11px;line-height:1.35}
       .invitta-cloud-field input.invitta-cloud-code{letter-spacing:.3em;font-weight:800;text-align:center;font-size:18px}
       .invitta-cloud-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
       .invitta-cloud-actions button{border:1px solid #c9b991;border-radius:10px;padding:10px 14px;background:#fff;font:700 12px 'Plus Jakarta Sans',sans-serif;cursor:pointer}
@@ -260,11 +261,18 @@
             <label for="invittaCloudEmail">Correo de acceso</label>
             <input id="invittaCloudEmail" type="email" autocomplete="email" required placeholder="tu@correo.com">
           </div>
+          <div class="invitta-cloud-field">
+            <label for="invittaCloudPassword">Contraseña</label>
+            <input id="invittaCloudPassword" type="password" autocomplete="current-password" minlength="8" placeholder="Mínimo 8 caracteres">
+            <small>Usa contraseña para entrar sin depender del límite de correos.</small>
+          </div>
           <p class="invitta-cloud-message" id="invittaCloudMessage" aria-live="polite"></p>
           <div class="invitta-cloud-actions">
             <button type="button" data-cloud-close>Cancelar</button>
             <button type="button" id="invittaCloudResend" hidden>Reenviar enlace</button>
-            <button type="submit" class="primary" id="invittaCloudSubmit">Enviar enlace de acceso</button>
+            <button type="button" id="invittaCloudMagicLink">Enviar enlace</button>
+            <button type="button" id="invittaCloudSignup">Crear cuenta</button>
+            <button type="submit" class="primary" id="invittaCloudSubmit">Entrar con contraseña</button>
           </div>
         </form>
         <div id="invittaCloudAccount" hidden>
@@ -284,7 +292,9 @@
     modal.addEventListener('click', event => {
       if (event.target === modal) closeModal();
     });
-    modal.querySelector('#invittaCloudLoginForm').addEventListener('submit', requestAccessCode);
+    modal.querySelector('#invittaCloudLoginForm').addEventListener('submit', requestPasswordLogin);
+    modal.querySelector('#invittaCloudMagicLink').addEventListener('click', requestAccessCode);
+    modal.querySelector('#invittaCloudSignup').addEventListener('click', requestPasswordSignup);
     modal.querySelector('#invittaCloudResend').addEventListener('click', () => {
       requestAccessCode();
     });
@@ -313,12 +323,14 @@
     const email = modal.querySelector('#invittaCloudEmail');
     const resend = modal.querySelector('#invittaCloudResend');
     const submit = modal.querySelector('#invittaCloudSubmit');
+    const magicLink = modal.querySelector('#invittaCloudMagicLink');
     if (!email || !resend || !submit) return;
     email.readOnly = active;
     email.setAttribute('aria-readonly', String(active));
     resend.hidden = !active;
-    submit.hidden = active;
-    submit.textContent = 'Enviar enlace de acceso';
+    if (magicLink) magicLink.hidden = active;
+    submit.disabled = false;
+    submit.textContent = 'Entrar con contraseña';
     if (!active) {
       state.pendingEmail = '';
     }
@@ -419,6 +431,67 @@
     setAccessCodeStep(true);
     message.textContent = 'Revisa tu correo y abre el enlace más reciente en este mismo navegador. El siguiente envío estará disponible en 60 s.';
     refreshMagicLinkCooldown();
+  }
+
+  async function requestPasswordLogin(event) {
+    if (event) event.preventDefault();
+    const modal = ensureModal();
+    const email = modal.querySelector('#invittaCloudEmail').value.trim();
+    const password = modal.querySelector('#invittaCloudPassword').value;
+    const message = modal.querySelector('#invittaCloudMessage');
+    const submit = modal.querySelector('#invittaCloudSubmit');
+    if (!email || password.length < 8) {
+      message.textContent = 'Escribe tu correo y una contraseña de al menos 8 caracteres.';
+      return;
+    }
+    submit.disabled = true;
+    message.textContent = 'Validando acceso…';
+    const { data, error } = await state.client.auth.signInWithPassword({ email, password });
+    submit.disabled = false;
+    if (error) {
+      message.textContent = /invalid login credentials/i.test(error.message || '')
+        ? 'Correo o contraseña incorrectos. Si aún no tienes contraseña, usa Crear cuenta o el enlace.'
+        : `No se pudo iniciar sesión: ${error.message}`;
+      return;
+    }
+    state.session = data.session;
+    refreshModal();
+    closeModal();
+    const targetProject = cloudProjectFromUrl();
+    if (targetProject) await loadProject(targetProject);
+  }
+
+  async function requestPasswordSignup() {
+    const modal = ensureModal();
+    const email = modal.querySelector('#invittaCloudEmail').value.trim();
+    const password = modal.querySelector('#invittaCloudPassword').value;
+    const message = modal.querySelector('#invittaCloudMessage');
+    const signup = modal.querySelector('#invittaCloudSignup');
+    if (!email || password.length < 8) {
+      message.textContent = 'Escribe tu correo y una contraseña de al menos 8 caracteres.';
+      return;
+    }
+    signup.disabled = true;
+    message.textContent = 'Creando cuenta…';
+    const { data, error } = await state.client.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: studioRedirectUrl() }
+    });
+    signup.disabled = false;
+    if (error) {
+      message.textContent = /rate limit|too many|over_email_send_rate_limit/i.test(`${error.code || ''} ${error.message || ''}`)
+        ? 'No se pudo crear la cuenta porque el correo de confirmación está temporalmente limitado. Configuraremos SMTP propio para producción.'
+        : `No se pudo crear la cuenta: ${error.message}`;
+      return;
+    }
+    if (data.session) {
+      state.session = data.session;
+      refreshModal();
+      closeModal();
+      return;
+    }
+    message.textContent = 'Cuenta creada. Confirma el correo cuando el mensaje esté disponible y después entra con tu contraseña.';
   }
 
   async function signOut() {
