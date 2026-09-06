@@ -64,8 +64,27 @@ import { supabase as db } from './api/supabase-client.js';
       var data  = result.data;
       var error = result.error;
 
-      // console.log("data invitación:", data);
-      // console.log("error Supabase:", error);
+      // Fallback tolerante a mayúsculas/minúsculas (Keiry-XV, keiry-xv, KEIRY-XV)
+      if (!data && !error && slug) {
+        console.warn(`[invitation] Slug exacto "${slug}" no devolvió resultados. Intentando fallback case-insensitive...`);
+        var fallbackQuery = db
+          .from("studio_invitations")
+          .select("*")
+          .ilike("slug", slug);
+
+        if (!studioPreview || !hasStudioSession) {
+          fallbackQuery = fallbackQuery.eq("published", true);
+        }
+
+        var fallbackResult = await fallbackQuery.maybeSingle();
+        if (fallbackResult.data) {
+          data = fallbackResult.data;
+          slug = data.slug;
+          console.warn(`[invitation] Invitación resuelta vía fallback case-insensitive con slug canónico: "${slug}"`);
+        } else if (fallbackResult.error) {
+          console.warn("[invitation] Error en consulta fallback case-insensitive:", fallbackResult.error);
+        }
+      }
 
       if (error) {
         console.error("Error real de Supabase:", error);
@@ -74,6 +93,7 @@ import { supabase as db } from './api/supabase-client.js';
       }
 
       if (!data) {
+        console.warn(`[invitation] No se encontró ninguna invitación publicada para el slug "${slug}".`);
         showError(studioPreview && hasStudioSession
           ? "No se pudo cargar este borrador con la sesion actual."
           : studioPreview
