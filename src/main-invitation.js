@@ -1872,37 +1872,100 @@ function renderDefaultTemplate(inv) {
     if (artist) artist.textContent = "";
 
     if (invitationAudio) {
-      invitationAudio.pause();
+      try { invitationAudio.pause(); } catch (_) {}
       invitationAudio = null;
     }
 
-    invitationAudio = new Audio(invitation.music_url);
-    invitationAudio.preload = "auto";
-    invitationAudio.loop = true;
-    invitationAudio.volume = 0.85;
+    // Usar elemento audio adjunto al DOM para máxima compatibilidad móvil (iOS Safari / Android)
+    let audioEl = document.getElementById("inv-audio-element");
+    if (!audioEl) {
+      audioEl = document.createElement("audio");
+      audioEl.id = "inv-audio-element";
+      audioEl.loop = true;
+      audioEl.preload = "auto";
+      audioEl.setAttribute("playsinline", "true");
+      audioEl.setAttribute("webkit-playsinline", "true");
+      document.body.appendChild(audioEl);
+    }
+    audioEl.src = invitation.music_url;
+    audioEl.volume = 0.85;
+    invitationAudio = audioEl;
 
     isMusicPlaying = false;
     toggle.innerHTML = getPlayIconSvg();
     toggle.disabled = false;
 
-    toggle.onclick = async () => {
+    function updatePlayState(playing) {
+      isMusicPlaying = playing;
+      if (playing) {
+        toggle.innerHTML = getPauseIconSvg();
+        toggle.setAttribute("aria-label", "Pausar música");
+        player.classList.add("is-playing");
+      } else {
+        toggle.innerHTML = getPlayIconSvg();
+        toggle.setAttribute("aria-label", "Reproducir música");
+        player.classList.remove("is-playing");
+      }
+    }
+
+    invitationAudio.onplay = () => updatePlayState(true);
+    invitationAudio.onpause = () => updatePlayState(false);
+    invitationAudio.onended = () => updatePlayState(false);
+    invitationAudio.onerror = (e) => {
+      console.warn("[invitation] Error en audio:", invitationAudio.error || e);
+      updatePlayState(false);
+    };
+
+    async function toggleMusic(e) {
+      if (e) e.stopPropagation();
       try {
-        if (!isMusicPlaying) {
+        if (invitationAudio.paused) {
           await invitationAudio.play();
-          isMusicPlaying = true;
-          toggle.innerHTML = getPauseIconSvg();
-          toggle.setAttribute("aria-label", "Pausar mºsica");
+          updatePlayState(true);
         } else {
           invitationAudio.pause();
-          isMusicPlaying = false;
-          toggle.innerHTML = getPlayIconSvg();
-          toggle.setAttribute("aria-label", "Reproducir mºsica");
+          updatePlayState(false);
         }
       } catch (err) {
-        console.error("Error reproduciendo mºsica:", err);
-        alert("No se pudo reproducir la mºsica. Verifica que el archivo sea compatible.");
+        console.warn("[invitation] Error al reproducir audio:", err);
       }
+    }
+
+    toggle.onclick = toggleMusic;
+    player.style.cursor = "pointer";
+    player.onclick = (e) => {
+      if (e.target.closest("#inv-music-toggle")) return;
+      toggleMusic(e);
     };
+
+    // Intentar reproducción automática (si el navegador lo permite)
+    function attemptAutoPlay() {
+      if (invitationAudio && invitationAudio.paused && !isMusicPlaying) {
+        invitationAudio.play().then(() => {
+          updatePlayState(true);
+        }).catch((err) => {
+          // Bloqueo estándar del navegador; se activará con el primer gesto
+          console.log("[invitation] Autoplay en espera de primer gesto del usuario:", err.message);
+        });
+      }
+    }
+
+    attemptAutoPlay();
+
+    // Activar audio automáticamente en el primer scroll o toque en cualquier parte de la pantalla
+    const gestureEvents = ["click", "touchstart", "touchend", "pointerdown", "scroll", "keydown"];
+    function onFirstUserGesture() {
+      attemptAutoPlay();
+      gestureEvents.forEach((evt) => {
+        window.removeEventListener(evt, onFirstUserGesture, { capture: true });
+        document.removeEventListener(evt, onFirstUserGesture, { capture: true });
+      });
+    }
+
+    gestureEvents.forEach((evt) => {
+      window.addEventListener(evt, onFirstUserGesture, { once: true, passive: true, capture: true });
+      document.addEventListener(evt, onFirstUserGesture, { once: true, passive: true, capture: true });
+    });
   }
 
   /* ¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬ Cuenta regresiva ¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬¢íÆ’Ã†â€™íâ€š¢íÆ’¢íâ€š¬íÆ’Ã†â€™íâ€š¢íÆ’¢í¢Ã¢â‚¬Å¡¬íâ€¦¡¬ */
