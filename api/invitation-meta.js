@@ -97,27 +97,82 @@ function isMilestoneInvitation(invitation) {
 async function getInvitation(slug) {
   if (!slug) return null;
 
-  const query = new URLSearchParams({
+  const isoNow = new Date().toISOString();
+  const baseHeaders = {
+    apikey: SUPABASE_ANON_KEY,
+    Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    Accept: "application/json"
+  };
+
+  // Paso 1: búsqueda exacta (case-sensitive, más eficiente)
+  const exactQuery = new URLSearchParams({
     select: "title,honoree_name,event_type,event_date,main_photo_url,gallery_urls,section_backgrounds,template_id,expires_at",
     slug: `eq.${slug}`,
     published: "eq.true",
-    or: `(expires_at.is.null,expires_at.gt.${new Date().toISOString()})`,
+    or: `(expires_at.is.null,expires_at.gt.${isoNow})`,
     limit: "1"
   });
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/studio_invitations?${query}`, {
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      Accept: "application/json"
-    }
+
+  const exactResponse = await fetch(`${SUPABASE_URL}/rest/v1/studio_invitations?${exactQuery}`, {
+    headers: baseHeaders
   });
 
-  if (!response.ok) {
-    throw new Error(`Supabase returned ${response.status}.`);
+  if (!exactResponse.ok) {
+    throw new Error(`Supabase returned ${exactResponse.status} on exact lookup.`);
   }
 
-  const invitations = await response.json();
-  return invitations[0] || null;
+  const exactResults = await exactResponse.json();
+  if (exactResults[0]) return exactResults[0];
+
+  // Paso 2: fallback case-insensitive (cubre Keiry-XV / keiry-xv / KEIRY-XV)
+  console.warn(`[invitation-meta] Slug exacto "${slug}" no encontrado o inactivo. Intentando búsqueda case-insensitive.`);
+
+  const ilikeQuery = new URLSearchParams({
+    select: "title,honoree_name,event_type,event_date,main_photo_url,gallery_urls,section_backgrounds,template_id,expires_at,slug",
+    slug: `ilike.${slug}`,
+    published: "eq.true",
+    or: `(expires_at.is.null,expires_at.gt.${isoNow})`,
+    limit: "1"
+  });
+
+  const ilikeResponse = await fetch(`${SUPABASE_URL}/rest/v1/studio_invitations?${ilikeQuery}`, {
+    headers: baseHeaders
+  });
+
+  if (!ilikeResponse.ok) {
+    throw new Error(`Supabase returned ${ilikeResponse.status} on ilike lookup.`);
+  }
+
+  const ilikeResults = await ilikeResponse.json();
+  if (ilikeResults[0]) {
+    console.warn(`[invitation-meta] Slug encontrado con variación de mayúsculas: "${ilikeResults[0].slug}" (solicitado: "${slug}"). Considera corregir el slug en la BD.`);
+    return ilikeResults[0];
+  }
+
+  // Paso 3: diagnóstico — verificar si el registro existe pero está inactivo
+  const diagQuery = new URLSearchParams({
+    select: "slug,published,expires_at",
+    slug: `ilike.${slug}`,
+    limit: "1"
+  });
+  const diagResponse = await fetch(`${SUPABASE_URL}/rest/v1/studio_invitations?${diagQuery}`, {
+    headers: baseHeaders
+  });
+  if (diagResponse.ok) {
+    const diagResults = await diagResponse.json();
+    if (diagResults[0]) {
+      const rec = diagResults[0];
+      if (!rec.published) {
+        console.warn(`[invitation-meta] DIAGNÓSTICO: El slug "${rec.slug}" existe pero published=false. Actívalo en el dashboard de Supabase.`);
+      } else if (rec.expires_at && new Date(rec.expires_at) <= new Date()) {
+        console.warn(`[invitation-meta] DIAGNÓSTICO: El slug "${rec.slug}" existe pero expiró el ${rec.expires_at}. Extiende expires_at en la BD.`);
+      }
+    } else {
+      console.warn(`[invitation-meta] DIAGNÓSTICO: El slug "${slug}" NO EXISTE en la tabla studio_invitations. Créalo desde Invitta Studio.`);
+    }
+  }
+
+  return null;
 }
 
 function injectSocialMetadata(html, invitation, slug) {
@@ -185,10 +240,21 @@ module.exports = async function handler(request, response) {
   try {
     invitation = await getInvitation(slug);
   } catch (error) {
-    console.error("Unable to build invitation social preview:", error.message);
+    console.error("[invitation-meta] Error al consultar invitación social preview:", error.message);
+  }
+
+  if (slug && !invitation) {
+    // El slug no se encontró o está inactivo. Se sirve igualmente el HTML (200)
+    // para que el motor JS del cliente muestre el error elegante al usuario.
+    // Retornar 404 aquí evitaría que carguen CSS/JS → pantalla en blanco.
+    console.warn(`[invitation-meta] Slug "${slug}" no encontrado o inactivo → sirviendo HTML con status 200 para manejo en cliente.`);
   }
 
   response.setHeader("Content-Type", "text/html; charset=utf-8");
-  response.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
-  response.status(slug && !invitation ? 404 : 200).send(injectSocialMetadata(html, invitation, slug));
+  // No cachear cuando no hay invitación (puede activarse pronto en Supabase)
+  const cacheControl = invitation
+    ? "public, s-maxage=60, stale-while-revalidate=300"
+    : "no-store";
+  response.setHeader("Cache-Control", cacheControl);
+  response.status(200).send(injectSocialMetadata(html, invitation, slug));
 };
