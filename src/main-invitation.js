@@ -59,7 +59,13 @@ import { supabase as db } from './api/supabase-client.js';
         query = query.eq("published", true);
       }
 
-      var result = await query.maybeSingle();
+      var fetchPromise = query.maybeSingle();
+      var timeoutPromise = new Promise(function(_, reject) {
+        setTimeout(function() {
+          reject(new Error("La base de datos está tardando demasiado en responder o se encuentra pausada. Por favor, intenta más tarde."));
+        }, 15000);
+      });
+      var result = await Promise.race([fetchPromise, timeoutPromise]);
 
       var data  = result.data;
       var error = result.error;
