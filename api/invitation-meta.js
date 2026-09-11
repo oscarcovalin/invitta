@@ -1,32 +1,32 @@
-const fs = require("fs");
+﻿const fs = require("fs");
 const path = require("path");
 
 const APP_URL = "https://invitta.vercel.app";
 const SUPABASE_URL = "https://zqnlvmafwcioizzxhnhz.supabase.co";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "sb_publishable_aGhY_wqkcuv0c2wLDMb-nw_wsjjfTcd";
 
-// ── Resolución robusta del HTML de invitación ──────────────────────────────
+// â”€â”€ ResoluciÃ³n robusta del HTML de invitaciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // En Vercel Functions, process.cwd() apunta a /var/task (no al proyecto),
 // por lo que se usan __dirname (directorio de este archivo: api/) y
 // VERCEL_PROJECT_DIR (variable de entorno disponible en el runtime de Vercel)
 // para construir rutas absolutas correctas en cualquier entorno.
 const PROJECT_ROOT =
   process.env.VERCEL_PROJECT_DIR ||             // runtime Vercel
-  path.resolve(__dirname, "..");                  // local: api/ → proyecto raíz
+  path.resolve(__dirname, "..");                  // local: api/ â†’ proyecto raÃ­z
 
 const DIST_HTML    = path.join(PROJECT_ROOT, "dist", "invitacion.html");
 const SOURCE_HTML  = path.join(PROJECT_ROOT, "invitacion.html");
 
 let HTML_PATH;
 if (fs.existsSync(DIST_HTML)) {
-  HTML_PATH = DIST_HTML;   // ✅ Vite build: tiene bundle /assets/invitacion-*.js
+  HTML_PATH = DIST_HTML;   // âœ… Vite build: tiene bundle /assets/invitacion-*.js
   console.log("[invitation-meta] Usando dist/invitacion.html (build de Vite).");
 } else if (fs.existsSync(SOURCE_HTML)) {
   HTML_PATH = SOURCE_HTML;
   console.warn("[invitation-meta] ADVERTENCIA: dist/invitacion.html no encontrado. Usando invitacion.html fuente. El motor de invitaciones puede no funcionar correctamente.");
 } else {
-  console.error("[invitation-meta] ERROR CRÍTICO: No se encontró invitacion.html en ninguna ubicación. PROJECT_ROOT:", PROJECT_ROOT);
-  // Se lanzará un error al intentar readFileSync más adelante
+  console.error("[invitation-meta] ERROR CRÃTICO: No se encontrÃ³ invitacion.html en ninguna ubicaciÃ³n. PROJECT_ROOT:", PROJECT_ROOT);
+  // Se lanzarÃ¡ un error al intentar readFileSync mÃ¡s adelante
 }
 
 function escapeHtml(value) {
@@ -123,7 +123,7 @@ async function getInvitation(slug) {
     Accept: "application/json"
   };
 
-  // Paso 1: búsqueda exacta (case-sensitive, más eficiente)
+  // Paso 1: bÃºsqueda exacta (case-sensitive, mÃ¡s eficiente)
   const exactQuery = new URLSearchParams({
     select: "title,honoree_name,event_type,event_date,main_photo_url,gallery_urls,section_backgrounds,template_id,expires_at",
     slug: `eq.${slug}`,
@@ -144,7 +144,7 @@ async function getInvitation(slug) {
   if (exactResults[0]) return exactResults[0];
 
   // Paso 2: fallback case-insensitive (cubre Keiry-XV / keiry-xv / KEIRY-XV)
-  console.warn(`[invitation-meta] Slug exacto "${slug}" no encontrado o inactivo. Intentando búsqueda case-insensitive.`);
+  console.warn(`[invitation-meta] Slug exacto "${slug}" no encontrado o inactivo. Intentando bÃºsqueda case-insensitive.`);
 
   const ilikeQuery = new URLSearchParams({
     select: "title,honoree_name,event_type,event_date,main_photo_url,gallery_urls,section_backgrounds,template_id,expires_at,slug",
@@ -164,11 +164,11 @@ async function getInvitation(slug) {
 
   const ilikeResults = await ilikeResponse.json();
   if (ilikeResults[0]) {
-    console.warn(`[invitation-meta] Slug encontrado con variación de mayúsculas: "${ilikeResults[0].slug}" (solicitado: "${slug}"). Considera corregir el slug en la BD.`);
+    console.warn(`[invitation-meta] Slug encontrado con variaciÃ³n de mayÃºsculas: "${ilikeResults[0].slug}" (solicitado: "${slug}"). Considera corregir el slug en la BD.`);
     return ilikeResults[0];
   }
 
-  // Paso 3: diagnóstico — verificar si el registro existe pero está inactivo
+  // Paso 3: diagnÃ³stico â€” verificar si el registro existe pero estÃ¡ inactivo
   const diagQuery = new URLSearchParams({
     select: "slug,published,expires_at",
     slug: `ilike.${slug}`,
@@ -182,12 +182,12 @@ async function getInvitation(slug) {
     if (diagResults[0]) {
       const rec = diagResults[0];
       if (!rec.published) {
-        console.warn(`[invitation-meta] DIAGNÓSTICO: El slug "${rec.slug}" existe pero published=false. Actívalo en el dashboard de Supabase.`);
+        console.warn(`[invitation-meta] DIAGNÃ“STICO: El slug "${rec.slug}" existe pero published=false. ActÃ­valo en el dashboard de Supabase.`);
       } else if (rec.expires_at && new Date(rec.expires_at) <= new Date()) {
-        console.warn(`[invitation-meta] DIAGNÓSTICO: El slug "${rec.slug}" existe pero expiró el ${rec.expires_at}. Extiende expires_at en la BD.`);
+        console.warn(`[invitation-meta] DIAGNÃ“STICO: El slug "${rec.slug}" existe pero expirÃ³ el ${rec.expires_at}. Extiende expires_at en la BD.`);
       }
     } else {
-      console.warn(`[invitation-meta] DIAGNÓSTICO: El slug "${slug}" NO EXISTE en la tabla studio_invitations. Créalo desde Invitta Studio.`);
+      console.warn(`[invitation-meta] DIAGNÃ“STICO: El slug "${slug}" NO EXISTE en la tabla studio_invitations. CrÃ©alo desde Invitta Studio.`);
     }
   }
 
@@ -198,11 +198,11 @@ function injectSocialMetadata(html, invitation, slug) {
   const name = repairMojibake(invitation?.honoree_name || invitation?.title).trim();
   const invitationTitle = repairMojibake(invitation?.title).trim();
   const title = invitation
-    ? `${invitationTitle || name || "Invitación Digital"} | Invitta Studio`
-    : "Invitación Digital | Invitta Studio";
+    ? `${invitationTitle || name || "InvitaciÃ³n Digital"} | Invitta Studio`
+    : "InvitaciÃ³n Digital | Invitta Studio";
   const description = name
-    ? `Acompáñanos a celebrar con ${name}. Consulta todos los detalles de la invitación.`
-    : "Tu invitación digital personalizada para este evento especial.";
+    ? `AcompÃ¡Ã±anos a celebrar con ${name}. Consulta todos los detalles de la invitaciÃ³n.`
+    : "Tu invitaciÃ³n digital personalizada para este evento especial.";
   const milestoneSocialImage = `${APP_URL}/demos/evento-general-basic/assets/cumpleanos-50-sorpresa-social.jpg?v=20260814`;
   const usesMilestoneSocialImage = isMilestoneInvitation(invitation);
   const image = (usesMilestoneSocialImage ? milestoneSocialImage : "") ||
@@ -229,7 +229,7 @@ function injectSocialMetadata(html, invitation, slug) {
       `<meta property="og:image" content="${escapeHtml(image)}">`,
       `<meta property="og:image:secure_url" content="${escapeHtml(image)}">`,
       `<meta property="og:image:type" content="${escapeHtml(/\.webp(?:$|\?)/i.test(image) ? "image/webp" : /\.png(?:$|\?)/i.test(image) ? "image/png" : "image/jpeg")}">`,
-      `<meta property="og:image:alt" content="${escapeHtml(name || "Fotografía de la invitación")}">`,
+      `<meta property="og:image:alt" content="${escapeHtml(name || "FotografÃ­a de la invitaciÃ³n")}">`,
       `<meta name="twitter:image" content="${escapeHtml(image)}">`
     );
 
@@ -251,11 +251,11 @@ function injectSocialMetadata(html, invitation, slug) {
 }
 
 module.exports = async function handler(request, response) {
-  // Guard: si no se encontró ningún HTML válido, responder con error claro
+  // Guard: si no se encontrÃ³ ningÃºn HTML vÃ¡lido, responder con error claro
   if (!HTML_PATH) {
-    console.error("[invitation-meta] FATAL: HTML_PATH no está definido. Revisa la configuración de includeFiles en vercel.json y que el build haya generado dist/invitacion.html.");
+    console.error("[invitation-meta] FATAL: HTML_PATH no estÃ¡ definido. Revisa la configuraciÃ³n de includeFiles en vercel.json y que el build haya generado dist/invitacion.html.");
     response.setHeader("Content-Type", "text/html; charset=utf-8");
-    response.status(500).send(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Error · Invitta</title></head><body><p style="font-family:sans-serif;padding:2rem;color:#c00">Error interno: no se pudo cargar el motor de invitaciones. Contacta al administrador.</p></body></html>`);
+    response.status(500).send(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Error Â· Invitta</title></head><body><p style="font-family:sans-serif;padding:2rem;color:#c00">Error interno: no se pudo cargar el motor de invitaciones. Contacta al administrador.</p></body></html>`);
     return;
   }
 
@@ -265,7 +265,7 @@ module.exports = async function handler(request, response) {
   } catch (readError) {
     console.error("[invitation-meta] ERROR leyendo HTML_PATH:", HTML_PATH, readError.message);
     response.setHeader("Content-Type", "text/html; charset=utf-8");
-    response.status(500).send(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Error · Invitta</title></head><body><p style="font-family:sans-serif;padding:2rem;color:#c00">Error interno al cargar la invitación. Contacta al administrador.</p></body></html>`);
+    response.status(500).send(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Error Â· Invitta</title></head><body><p style="font-family:sans-serif;padding:2rem;color:#c00">Error interno al cargar la invitaciÃ³n. Contacta al administrador.</p></body></html>`);
     return;
   }
 
@@ -276,18 +276,18 @@ module.exports = async function handler(request, response) {
   try {
     invitation = await getInvitation(slug);
   } catch (error) {
-    console.error("[invitation-meta] Error al consultar invitación social preview:", error.message);
+    console.error("[invitation-meta] Error al consultar invitaciÃ³n social preview:", error.message);
   }
 
   if (slug && !invitation) {
-    // El slug no se encontró o está inactivo. Se sirve igualmente el HTML (200)
+    // El slug no se encontrÃ³ o estÃ¡ inactivo. Se sirve igualmente el HTML (200)
     // para que el motor JS del cliente muestre el error elegante al usuario.
-    // Retornar 404 aquí evitaría que carguen CSS/JS → pantalla en blanco.
-    console.warn(`[invitation-meta] Slug "${slug}" no encontrado o inactivo → sirviendo HTML con status 200 para manejo en cliente.`);
+    // Retornar 404 aquÃ­ evitarÃ­a que carguen CSS/JS â†’ pantalla en blanco.
+    console.warn(`[invitation-meta] Slug "${slug}" no encontrado o inactivo â†’ sirviendo HTML con status 200 para manejo en cliente.`);
   }
 
   response.setHeader("Content-Type", "text/html; charset=utf-8");
-  // No cachear cuando no hay invitación (puede activarse pronto en Supabase)
+  // No cachear cuando no hay invitaciÃ³n (puede activarse pronto en Supabase)
   const cacheControl = invitation
     ? "public, s-maxage=60, stale-while-revalidate=300"
     : "no-store";
