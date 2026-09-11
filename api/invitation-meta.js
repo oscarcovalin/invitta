@@ -5,9 +5,28 @@ const APP_URL = "https://invitta.vercel.app";
 const SUPABASE_URL = "https://zqnlvmafwcioizzxhnhz.supabase.co";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "sb_publishable_aGhY_wqkcuv0c2wLDMb-nw_wsjjfTcd";
 
-let HTML_PATH = path.join(process.cwd(), "dist", "invitacion.html");
-if (!fs.existsSync(HTML_PATH)) {
-  HTML_PATH = path.join(process.cwd(), "invitacion.html");
+// ── Resolución robusta del HTML de invitación ──────────────────────────────
+// En Vercel Functions, process.cwd() apunta a /var/task (no al proyecto),
+// por lo que se usan __dirname (directorio de este archivo: api/) y
+// VERCEL_PROJECT_DIR (variable de entorno disponible en el runtime de Vercel)
+// para construir rutas absolutas correctas en cualquier entorno.
+const PROJECT_ROOT =
+  process.env.VERCEL_PROJECT_DIR ||             // runtime Vercel
+  path.resolve(__dirname, "..");                  // local: api/ → proyecto raíz
+
+const DIST_HTML    = path.join(PROJECT_ROOT, "dist", "invitacion.html");
+const SOURCE_HTML  = path.join(PROJECT_ROOT, "invitacion.html");
+
+let HTML_PATH;
+if (fs.existsSync(DIST_HTML)) {
+  HTML_PATH = DIST_HTML;   // ✅ Vite build: tiene bundle /assets/invitacion-*.js
+  console.log("[invitation-meta] Usando dist/invitacion.html (build de Vite).");
+} else if (fs.existsSync(SOURCE_HTML)) {
+  HTML_PATH = SOURCE_HTML;
+  console.warn("[invitation-meta] ADVERTENCIA: dist/invitacion.html no encontrado. Usando invitacion.html fuente. El motor de invitaciones puede no funcionar correctamente.");
+} else {
+  console.error("[invitation-meta] ERROR CRÍTICO: No se encontró invitacion.html en ninguna ubicación. PROJECT_ROOT:", PROJECT_ROOT);
+  // Se lanzará un error al intentar readFileSync más adelante
 }
 
 function escapeHtml(value) {
@@ -232,7 +251,24 @@ function injectSocialMetadata(html, invitation, slug) {
 }
 
 module.exports = async function handler(request, response) {
-  const html = fs.readFileSync(HTML_PATH, "utf8");
+  // Guard: si no se encontró ningún HTML válido, responder con error claro
+  if (!HTML_PATH) {
+    console.error("[invitation-meta] FATAL: HTML_PATH no está definido. Revisa la configuración de includeFiles en vercel.json y que el build haya generado dist/invitacion.html.");
+    response.setHeader("Content-Type", "text/html; charset=utf-8");
+    response.status(500).send(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Error · Invitta</title></head><body><p style="font-family:sans-serif;padding:2rem;color:#c00">Error interno: no se pudo cargar el motor de invitaciones. Contacta al administrador.</p></body></html>`);
+    return;
+  }
+
+  let html;
+  try {
+    html = fs.readFileSync(HTML_PATH, "utf8");
+  } catch (readError) {
+    console.error("[invitation-meta] ERROR leyendo HTML_PATH:", HTML_PATH, readError.message);
+    response.setHeader("Content-Type", "text/html; charset=utf-8");
+    response.status(500).send(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Error · Invitta</title></head><body><p style="font-family:sans-serif;padding:2rem;color:#c00">Error interno al cargar la invitación. Contacta al administrador.</p></body></html>`);
+    return;
+  }
+
   const requestUrl = new URL(request.url || "/", APP_URL);
   const slug = String(requestUrl.searchParams.get("slug") || "").trim().slice(0, 160);
   let invitation = null;
@@ -258,3 +294,4 @@ module.exports = async function handler(request, response) {
   response.setHeader("Cache-Control", cacheControl);
   response.status(200).send(injectSocialMetadata(html, invitation, slug));
 };
+
