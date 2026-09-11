@@ -28,7 +28,7 @@ async function run() {
   console.log("\n[1] Chequeo de Supabase...");
   let supabaseOk = false;
   try {
-    var r = await doFetch(SUPABASE_URL + "/rest/v1/studio_invitations?select=slug,published,expires_at&slug=ilike." + SLUG + "&limit=1", {
+    var r = await doFetch(SUPABASE_URL + "/rest/v1/studio_invitations?select=slug,published,expires_at,template_id&slug=ilike." + SLUG + "&limit=1", {
       headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, Accept: "application/json" },
       timeout: 5000
     });
@@ -39,9 +39,13 @@ async function run() {
         console.warn("  WARN: slug NO existe en Supabase");
       } else {
         var rec = d[0];
-        console.log("  slug:", rec.slug, "published:", rec.published, "expires_at:", rec.expires_at);
+        console.log("  slug:", rec.slug, "published:", rec.published, "expires_at:", rec.expires_at, "template_id:", rec.template_id);
+        if (!rec.template_id) {
+          console.error("  FAIL CRITICO: template_id es null. La invitacion no renderizara visualmente.");
+          supabaseOk = false;
+        }
         if (!rec.published) console.warn("  WARN: published=false");
-        else supabaseOk = true;
+        else if (rec.template_id) supabaseOk = true;
       }
     } else {
       console.warn("  WARN: Supabase fallo con status", r.status, r.body);
@@ -53,10 +57,16 @@ async function run() {
   console.log("\n[2] Chequeo de Fallback Local...");
   let fallbackOk = false;
   try {
-    var fb = await doFetch(FALLBACK_URL, { method: "HEAD" });
+    var fb = await doFetch(FALLBACK_URL, { method: "GET" });
     if (fb.status === 200) {
       console.log("  OK: Fallback local disponible en /data/legacy-invitations/keiry-xv.json");
-      fallbackOk = true;
+      var fbData = JSON.parse(fb.body);
+      if (!fbData.template_id) {
+        console.error("  FAIL CRITICO: El fallback local tiene template_id = null. La invitacion no renderizara.");
+      } else {
+        console.log("  OK: template_id en fallback es " + fbData.template_id);
+        fallbackOk = true;
+      }
     } else {
       console.error("  FAIL: Fallback local HTTP", fb.status);
     }
