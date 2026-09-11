@@ -1,0 +1,17 @@
+﻿{
+  "slug": "keiry-xv",
+  "published": true,
+  "template_id": null,
+  "event_type": "xv",
+  "title": "Keiry",
+  "celebrant_name": "Keiry",
+  "event_date": "2024-12-31T20:00:00.000Z",
+  "reception_time": "20:00",
+  "parents": [],
+  "godparents": [],
+  "itinerary": [],
+  "color_primary": "#d4af37",
+  "color_secondary": "#000000",
+  "message": "¡Te invito a mis XV años! (Fallback local)",
+  "_note": "FALTAN DATOS ORIGINALES: Este archivo es un fallback estatico porque Supabase esta caido."
+}

@@ -86,6 +86,27 @@ import { supabase as db } from './api/supabase-client.js';
         }
       }
 
+      // =======================================================================
+      // FALLBACK DE EMERGENCIA LOCAL: KEIRY-XV
+      // Si Supabase falla por timeout, caida de recursos o no devuelve datos
+      // =======================================================================
+      var normalizedSlug = String(slug || "").trim().toLowerCase();
+      if (normalizedSlug === "keiry-xv" && (error || !data)) {
+        console.warn("[Invitta Legacy] Supabase no disponible o sin datos, usando fallback local para Keiry-XV");
+        try {
+          var fbRes = await fetch("/data/legacy-invitations/keiry-xv.json");
+          if (fbRes.ok) {
+            data = await fbRes.json();
+            error = null; // Limpiar el error para continuar con el renderizado local
+          } else {
+            console.error("[Invitta Legacy] Falló la descarga del archivo fallback Keiry-XV (HTTP " + fbRes.status + ")");
+          }
+        } catch (fbErr) {
+          console.error("[Invitta Legacy] Excepción cargando fallback Keiry-XV", fbErr);
+        }
+      }
+      // =======================================================================
+
       if (error) {
         console.error("Error real de Supabase:", error);
         showError("Error al consultar la invitacion.");
